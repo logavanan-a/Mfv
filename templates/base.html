@@ -10,7 +10,7 @@
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
     <meta content="Themesbrand" name="author" />
 
-    <title>{{heading}} | WAIC </title>
+    <title>{{heading}}</title>
     
     <link href="{% static 'libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}" rel="stylesheet"
     type="text/css" />
@@ -21,7 +21,7 @@
     <link href="{% static 'libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css' %}" rel="stylesheet"
     type="text/css" />
     <!-- App favicon -->
-    <link rel="shortcut icon" href="{% static '/images/WAIC_logo.png' %}">
+    <!-- <link rel="shortcut icon" href="{% static '/images/WAIC_logo.png' %}"> -->
     <link href="{% static 'libs/sweetalert2/dist/sweetalert2.min.css' %}" rel="stylesheet" type="text/css" />
 
     {% block css %}
@@ -36,6 +36,12 @@
     <!-- App Css-->
     <link href="{% static 'css/app.min.css' %}" id="app-style" rel="stylesheet" type="text/css" />
     {% endblock css %}
+    <style>
+        table, th, td {
+          border: 1px solid rgba(0, 0, 0, 0.87);
+          border-collapse: collapse;
+        }
+        </style>
 </head>
 
 

@@ -1,30 +1,33 @@
 from __future__ import unicode_literals
-# from schedule import every, repeat, run_pending
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import HttpResponseRedirect, HttpResponse
-from django.conf import settings
-from django.shortcuts import redirect, render
+
+import csv
+import json
+from datetime import datetime
 
 import requests
-import json
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from .models import *
+from django.conf import settings
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 # from child_management.models import *
 from django.contrib.auth.models import User, auth
-from django.db.models import Subquery
-# from master_data.models import *
-from django.http import JsonResponse
-# from django.db import connection
-from django.utils.encoding import smart_str
-from datetime import datetime
-import csv
-from django.core.management import call_command
-from django.http import HttpResponseRedirect
 # from child_management.views import *     
 from django.contrib.sessions.models import Session
-   
+from django.core.management import call_command
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db.models import Subquery
+# from master_data.models import *
+from django.http import HttpResponseRedirect, JsonResponse
+# from schedule import every, repeat, run_pending
+from django.shortcuts import (HttpResponse, HttpResponseRedirect, redirect,
+                              render)
+# from django.db import connection
+from django.utils.encoding import smart_str
+
+from .models import *
+from application_master.models import *
+
+
+
 def login_view(request):
     heading = "Login"
     if request.method == 'POST':
@@ -55,9 +58,8 @@ def child_listing(request):
     heading = "Child Management"
     return render(request, 'mis/child_listing.html', locals())
 
-
 def guardian_add(request, auto_child_id=None):
-    heading = "Add New Guardian"
+    heading = "Add new"
     if request.method == 'POST':
         data = request.POST
 
@@ -67,7 +69,33 @@ def guardian_add(request, auto_child_id=None):
         address = data.get('address')
         child_id = data.get('child')
 
+        name = data.get('name')
+        last_name =  data.get('name1')
+        print(name,'>>>>>>>>>>>')
+        print(last_name)
+
         if True:
             return redirect('/child-list/')
 
     return render(request, 'mis/add_child_form.html', locals())
+
+def indicator_list(request):
+    heading = "Mission Disha"
+    mi_obj = MissionIndicator.objects.all()
+
+    if request.method == 'POST':
+        data = request.POST
+
+        one = data.get('one')
+        last_name =  data.get('last_name')
+        print(one,'>>>>>>>>>>>')
+        print(last_name)
+       
+        if True:
+            return redirect('/child-list/')
+
+    return render(request, 'mis/indicator_list.html', locals())
+
+def mission_add(request):
+    return render(request, 'mis/add_child_form.html', locals())
+
