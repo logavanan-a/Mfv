@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    {% comment %} <meta name="viewport" content="width=device-width, initial-scale=1.0"> {% endcomment %}
+    <meta name="viewport" content="width=device-width, initial-scale=0.86, maximum-scale=5.0, minimum-scale=0.86">
+    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
+    <meta content="Themesbrand" name="author" />
+
+    <title>{{heading}} | WAIC </title>
+    
+    <link href="{% static 'libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}" rel="stylesheet"
+    type="text/css" />
+    <link href="{% static 'libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css' %}" rel="stylesheet"
+    type="text/css" />
+
+    <!-- Responsive datatable examples -->
+    <link href="{% static 'libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css' %}" rel="stylesheet"
+    type="text/css" />
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="{% static '/images/WAIC_logo.png' %}">
+    <link href="{% static 'libs/sweetalert2/dist/sweetalert2.min.css' %}" rel="stylesheet" type="text/css" />
+
+    {% block css %}
+    {% block extra_css %}
+    {% endblock %}
+    <!-- Bootstrap Css -->
+    <link href="{% static 'css/bootstrap.min.css' %}" id="bootstrap-style" rel="stylesheet" type="text/css" />
+    <link href="{% static 'libs/select2/dist/css/select2.min.css'%}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'css/base.css'%}" rel="stylesheet" type="text/css" />
+    <!-- Icons Css -->
+    <link href="{% static 'css/icons.min.css' %}" rel="stylesheet" type="text/css" />
+    <!-- App Css-->
+    <link href="{% static 'css/app.min.css' %}" id="app-style" rel="stylesheet" type="text/css" />
+    {% endblock css %}
+</head>
+
+
+<body data-sidebar="dark">
+    <!-- Begin page -->
+    
+    <script src="{% static 'libs/jquery/dist/jquery.min.js' %}"></script>
+    
+    
+    <div id="layout-wrapper">
+    {% if heading != 'Login' %}
+        {% block header %}
+        {% include 'partials/header.html' %}
+        {% endblock %}
+        {% block sidebar %}
+        {% include 'partials/sidebar.html' %}
+        {% endblock %}
+        
+        <!-- ============================================================== -->
+        <!-- Start right Content here -->
+        <!-- ============================================================== -->
+        <div class="main-content">
+            <div class="page-content">
+                <div class="container-fluid">
+                    <!-- start page title -->
+                    <div class="row">   
+                        <div class="col-12">
+                            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                               
+                                    <h2 class="mb-sm-0 font-size-20">{{heading}} {% if details %}<span class='text-muted'>- {{details}}</span>{% endif %}</h2>
+                                
+                            </div>
+                        </div>
+
+               
+                    </div>
+    {% endif %}  
+                    <!-- end page title -->
+                    {% block contents %}
+                    {% block filters %}
+                    {% endblock  %}
+
+                    {% endblock %}
+                </div>
+                <!-- container-fluid -->
+            </div>
+            <!-- End Page-content -->
+            {% if heading != 'Login' %}
+                {% block footer %}
+                {% include 'partials/footer.html' %}
+                {% endblock %}
+            {% endif %}
+        </div>
+        <!-- end main content-->
+    </div>
+    <!-- END layout-wrapper -->
+            <script src="{% static 'js/base.js' %}"></script>
+
+            {% block javascript %}
+            <!-- JAVASCRIPT -->
+            <script src="{% static 'libs/jquery/dist/jquery.min.js' %}"></script>
+            <script src="{% static 'libs/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
+            <script src="{% static 'libs/metismenu/dist/metisMenu.min.js' %}"></script>
+            <script src="{% static 'libs/simplebar/dist/simplebar.min.js' %}"></script>
+            <script src="{% static 'libs/node-waves/dist/waves.min.js' %}"></script>
+            <script src="{% static 'libs/select2/dist/js/select2.min.js'%}"></script>
+            <script src="{% static 'js/pages/form-validation.init.js' %}"></script>
+            <script src="{% static 'libs/parsleyjs/dist/parsley.min.js' %}"></script>
+            <script src="{% static 'js/pages/form-advanced.init.js'%}"></script>
+            {% block extra_javascript %}
+            {% endblock %}
+
+            <script src="{% static 'js/app.js' %}"></script>    
+            {% endblock javascript %}
+    
+        </body>
+
+    </html>

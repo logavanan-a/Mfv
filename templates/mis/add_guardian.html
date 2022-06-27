@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block contents %}
+<div class="row align-items-center">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <form method='POST' class="needs-validation" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    <div class='row'>
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <select class="select2 form-control"  name='state' id='state' {% if child_with_shelterhome %}disabled{%endif%}
+                                    aria-label="Floating label select example" data-placeholder="Choose State" required>
+                                    <option selected disabled value="">Choose State </option>
+                                    {% for state in states %}
+                                    <option value="{{state.id}}" {% if child_with_shelterhome.get_shelter_home_name.district.state.id == state.id %}selected{% endif %}>{{state.name}}</option>
+                                    {% endfor %}
+
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select a valid State.
+                                </div>
+                            </div> 
+                        </div> 
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <select class="select2 form-control"  name='district' id='district' {% if child_with_shelterhome %}disabled{%endif%}
+                                    aria-label="Floating label select example" data-placeholder="Choose District" required>
+                                    <option selected disabled value="">Choose District </option>
+                                    {% if child_with_shelterhome %}
+                                    <option selected value="child_with_shelterhome.get_shelter_home_name.district.id">{{child_with_shelterhome.get_shelter_home_name.district.name}}</option>
+                                    {% endif %}
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select a valid District.
+                                </div>
+                            </div> 
+                        </div> 
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">  
+                            <div class="form-floating mb-3 forms">
+                                <select class="form-control select2 "  name='shelter_home' id="shelter_home"
+                                    aria-label="Floating label select example" required="" {% if child_with_shelterhome %}disabled{%endif%}>
+                                    <option selected disabled value="">Select Shelter Home </option>    
+                                    {% if child_with_shelterhome %}
+                                    <option selected value="child_with_shelterhome.get_shelter_home_name.id">{{ child_with_shelterhome.get_shelter_home_name.name }}</option>
+                                    {% endif %}                            
+                                </select>
+                                <div id='feedback_boarder' class="invalid-feedback">
+                                    Please select a valid Shelter Home.
+                                </div>
+                            </div>   
+                        </div>
+                        <div class="col-lg-6">  
+                            <div class="form-floating mb-3 forms">
+                                <select class="form-control select2 "  name='child' id="child_listing"
+                                    aria-label="Floating label select example" required="" {% if child_with_shelterhome %}disabled{% endif %}>
+                                    <option selected disabled value="">Select Child </option>
+                                    {% if child_with_shelterhome %}
+                                    <option selected value="{{child_with_shelterhome.id}}">{{child_with_shelterhome.first_name|add:' '}}({{child_with_shelterhome.case_number}})</option>
+                                    {% endif %}
+                                </select>
+                                <div id='feedback_boarder' class="invalid-feedback">
+                                    Please select a valid Child.
+                                </div>
+                            </div>   
+                        </div>
+                        
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3 ">
+                                <input type="text" class="form-control {% if exist_error %}border border-danger{% endif%}" name='name' {% if name %}value="{{name}}" {% endif %} placeholder="Enter Name" required="">
+                                <label for="floatingnameInput">Name <span class="required-field"></span></label>
+                                <div class="invalid-feedback">
+                                    Please provide a valid name.
+                                </div>
+                                {% if exist_error %}
+                                <div class="text-danger">
+                                    {{exist_error}}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3 ">
+                                <input type="text" pattern="[67890][0-9]{9,10}" class="form-control" name='phone_number' id="floatingnameInput" {% if contact_number %}value={{contact_number}}{% endif %} placeholder="Enter Phone Number" required="">
+                                <label for="floatingnameInput">Phone Number <span class="required-field"></span></label>
+                                <div class="invalid-feedback">
+                                    Please provide a valid number.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                    <div class="row">
+                        
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <select class="form-select" name='relationship' 
+                                    aria-label="Floating label select example" required="">
+                                    <option selected disabled value="">Select</option>
+                                    {% for r in relationship %}
+                                    <option value="{{r.id}}"{% if relationship_obj.id == r.id %}selected{%endif%}>{{r.name}}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select a valid relationship.
+                                </div>
+                                <label for="floatingSelectGrid">Relationship <span class="required-field"></span></label>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-2 ">
+                                <input type="text" class="form-control" name='address' {% if address %}value={{address}}{% endif %} placeholder="Enter address" required="">
+                                <label for="floatingnameInput">Address <span class="required-field"></span></label>
+
+                                <div class="invalid-feedback">
+                                    Please select a valid address.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <p>Guardian Image:</p>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-floating image_field mt-2">
+                                <input type="file" class="form-control" onchange='validate(this);validate2(this)' accept="image/png, image/jpeg" id="image"  name='guardian_image' id="floatingfileInput" >
+                                <p class='text-danger element' id="element"></p>
+                                <p class='text-danger' id="info">* Image Size:  {{image_size}} MB <br> * Image Format: .JPEG, .JPG, .PNG</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" value="{{image_size}}" id='image_size'>
+                    <div>
+                        {% if child_with_shelterhome %}
+                        <button type="reset" onclick="location.href='/profile/{{child_with_shelterhome.id}}/#guardian'" class="btn btn-secondary waves-effect">
+                            Cancel
+                        </button>
+                        {% else %}
+                        <button type="reset" onclick="location.href='/guardian/'" class="btn btn-secondary waves-effect">
+                            Cancel
+                        </button>
+                        {% endif %}
+                        <button type="submit" id="submitting" class="btn btn-primary w-md">Submit</button>
+                        
+                    </div>
+                </form>
+                
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+
+
+    <!-- end col -->
+</div>
+<!-- end row -->
+<style>
+    .select2-container .select2-selection--single {
+        height: 55px
+    }
+
+    .needs-validation #child_listing .was-validated :invalid~.invalid-feedback {
+        border-color: #34c38f;
+    }
+    .needs-validation #child_listing .was-validated:valid + .select2 .select2-selection{
+        border-color: #34c38f;
+    }
+    .select2-container .select2-selection--single #select2-shelter_home-container:after,
+    .select2-container .select2-selection--single #select2-child_listing-container:after,
+    .select2-container .select2-selection--single #select2-state-container:after ,
+    .select2-container .select2-selection--single #select2-district-container:after {
+        content: " *";
+        color: red;
+    }
+</style>
+<script>
+    $(document).ready(function(){
+            $('select#shelter_home').change(function () {
+                var optionSelected = $(this).find("option:selected");
+                var valueSelected  = optionSelected.val();
+                data = {'selected_shelter_home' : valueSelected };
+                $.ajax({
+                    type:"GET",
+                    url: '/ajax/getshelter-home-child/',
+                    data:data,
+                    success:function(result){
+                        $("#child_listing option").remove();
+                        a = '<option selected disabled value="">Select Child</option>';
+                        $("#child_listing").append(a);
+                        if(JSON.parse(result) == 0){
+                            $("#child_listing option").remove();
+                            a = '<option selected disabled value="">No child is mapped to this shelter home</option>';
+                            $("#child_listing").append(a);
+                        }
+                        else{
+                            $.each(JSON.parse(result),function(key, value)
+                            {
+                                a = '<option value=' + value['id'] + '>' + value['name']+' ('+ value['case_number']+')'+'</option>';
+                                $("#child_listing").append(a);
+                            });
+                        }
+                        
+                    
+                    }
+
+                    });
+            });
+    });  
+    $(document).ready(function(){
+        $('select#state').change(function () {
+            var optionSelected = $(this).find("option:selected");
+            var valueSelected  = optionSelected.val();
+            data = {'selected_state' : valueSelected };
+            $.ajax({
+                type:"GET",
+                url: '/ajax/district/',
+                data:data,
+                success:function(result){
+                    $("#district option").remove();
+                    a = '<option selected disabled value="">Select District</option>';
+                    $("#district").append(a);
+                    $("#shelter_home option").remove();
+                    b = '<option selected value="">Select Shelter Home</option>';
+                    $("#shelter_home").append(b);
+                    if(JSON.parse(result) == 0){
+                        $("#district option").remove();
+                        a = '<option selected disabled value="">No district is mapped to this state</option>';
+                        $("#district").append(a);
+                    }
+                    else{
+                        $.each(JSON.parse(result),function(key, value)
+                        {
+                            a = '<option value=' + value['id']+'>' + value['name']+'</option>';
+                            $("#district").append(a);
+                        });
+                    }
+                }
+            });
+        });
+    });  
+    $(document).ready(function(){
+        $('select#district').change(function () {
+            var optionSelected = $(this).find("option:selected");
+            var valueSelected  = optionSelected.val();
+            data = {'selected_district' : valueSelected };
+            $.ajax({
+                type:"GET",
+                url: '/ajax/shelterhome/',
+                data:data,
+                success:function(result){
+                    $("#shelter_home option").remove();
+                    a = '<option selected disabled value="">Select Shelter Home</option>';
+                    $("#shelter_home").append(a);
+                    if(JSON.parse(result) == 0){
+                        $("#shelter_home option").remove();
+                        a = '<option selected disabled value="">No shelter home is mapped to this district</option>';
+                        $("#shelter_home").append(a);
+                    }
+                    else{
+                        $.each(JSON.parse(result),function(key, value)
+                        {
+                            a = '<option value=' + value['id']+'>' + value['name']+'</option>';
+                            $("#shelter_home").append(a);
+                        });
+                    }
+                }
+            });
+        });
+    });
+
+</script>
+<script src="{% static 'libs/jquery/dist/jquery.min.js' %}"></script>
+
+
+{% endblock %}

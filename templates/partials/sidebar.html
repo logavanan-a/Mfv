@@ -1,0 +1,57 @@
+{% load static %} {% block sidebar %}
+<!-- ========== Left Sidebar Start ========== -->
+<div class="vertical-menu">
+  <div data-simplebar class="h-100">
+    <!--- Sidemenu -->
+    <div id="sidebar-menu">
+      <!-- Left Menu Start -->
+      <ul class="metismenu list-unstyled" id="side-menu">
+        <li class="menu-title" key="t-menu">Menu</li>
+        {% for menu in request.session.menus %}
+           {% if menu.1 == 'Reports' %}{% comment %} or menu.1 == 'Settings' {% endcomment %}
+          <li {% if 'Report' in heading %}class='mm-active'{% endif %}>
+            <a href="{{menu.3}}" class="has-arrow waves-effect {% if menu.1 in heading %}mm-active{% endif %}"  >
+              <i class="{{menu.2}}"></i>
+              <span key="t-ui-elements">{{menu.0}}</span>
+            </a>
+            <ul class="sub-menu mm-collapse" aria-expanded="false">
+          {% comment %} {% elif menu.1 == 'Report' %}
+              <li>
+                <a href="" key="t-alerts">{{menu.0}}</a>
+              </li>           {% endcomment %}
+           {% elif menu.1 == 'ReportLast' %}{% comment %} or menu.1 == 'SettingLast' {% endcomment %}
+          <li >
+            <a href="{{menu.3}}" class="waves-effect {% if menu.0 in heading %}mm-active{% endif %}">
+              <i class="{{menu.2}}"></i>
+              <span key="t-dashboards ">{{menu.0}}</span>
+            </a>
+          </li>
+        </ul>
+          {% else %}
+          <li >
+           
+          </li>
+          {% endif %}
+          
+        {% endfor %}
+        {% if request.user.is_superuser %}
+        <li {% if 'User Management' == heading %}class='mm-active'{% endif %}>
+            <!-- <a href="javascript: void(0);" class="has-arrow waves-effect ">
+              <i class="bx bx-cog"></i>
+              <span key="t-ui-elements">Settings</span>
+            </a> -->
+            <ul class="sub-menu"  aria-expanded="false">
+              <li>
+                
+              </li>
+            </ul>
+          </li>
+        {% endif %}
+        </ul>
+        
+    </div>
+    <!-- Sidebar -->
+  </div>
+</div>
+<!-- Left Sidebar End -->
+{% endblock %}
