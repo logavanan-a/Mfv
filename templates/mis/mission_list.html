@@ -5,40 +5,33 @@
     <div class="col-xl-12 mx-auto">
         <div class="card">
             <div class="card-body">
-                <form method='POST' class="needs-validation" enctype="multipart/form-data" novalidate>
-                    {% csrf_token %}
-
-                    {% for data in mic_obj %}
-                    <div class="table-responsive">
-                        <table class="table table-hover" id="hospital_report">
-                            <thead >
-                                <tr>
-                                    <th style="text-align: center;">{{data.name}}</th>
-                                    <th style="text-align: center;" colspan="2">Target</th>
-                                </tr>
-                            </thead>
-                                {% for sub_category in data.sub_category %}
-                                <tbody>
-                                    <td>{{sub_category.name}}</td> 
-                                    <td><input type="number"  name="male_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="" >
-                                        <div class="invalid-feedback">Please enter the Target value</div>
-                                    </td>
-                                    <td>
-                                        <input type="number"  name="female_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
-                                        <div class="invalid-feedback">Please enter the Target value</div>
-                                    </td>
-                                </tbody>   
-                                {% endfor %} 
-                        </table>
-                    </div>
-                    {% endfor %}
-
-                    <div class="modal-footer">
-                        <button type="reset" onclick="location.href='/mission/list/'" class="btn btn-secondary waves-effect">Cancel</button>
-                        <button type="submit" class="btn btn-primary  ml-2">Submit</button>
-                    </div>
-                    
-                </form>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                        <table id="datatable-button" class="table table-bordered dt-responsive w-100">
+                                            <thead>
+                                                <tr>
+                                                    <th style="text-align: center;">Name</th>
+                                                    <th style="text-align: center;">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for mission in mission_obj %}
+                                                <tr>
+                                                    <td>{{mission.name}}</td>
+                                                    <!-- <td><button type="button" class="btn btn-outline-primary" onclick="">Add</button></td> -->
+                                                    <td><button type="button" class="btn btn-outline-primary" id='add_buton_list' onclick="location.href='/table_add/{{mission.id}}/'">Add Mission Indicator</button></td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                </div>     
+                            </div>     
+                        </div>
+                    </div> 
+                </div>
             </div>
         </div>
     </div>

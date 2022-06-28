@@ -27,7 +27,6 @@ from .models import *
 from application_master.models import *
 
 
-
 def login_view(request):
     heading = "Login"
     if request.method == 'POST':
@@ -44,57 +43,35 @@ def login_view(request):
             login(request, user)
             # configure_error = load_user_details_to_sessions(request)
             # if not configure_error:
-            return redirect('/child-list/')
+            return redirect('/mission/list/')
             # else:
             #     logout(request)
         else:
             error_message = "Invalid Username and Password"
     return render(request, 'login.html', locals())
 
-
 # @login_required(login_url='/login/')
 # @permission_required('child_management.view_child', raise_exception=True)
-def child_listing(request):
-    heading = "Child Management"
-    return render(request, 'mis/child_listing.html', locals())
+def mission_list(request):
+    heading = "Mission List"
+    mission_obj = Mission.objects.all()
 
-def guardian_add(request, auto_child_id=None):
-    heading = "Add new"
-    if request.method == 'POST':
-        data = request.POST
+    return render(request, 'mis/mission_list.html', locals())
 
-        name = data.get('name')
-        contact_number = data.get('phone_number')
-        relation = data.get('relationship')
-        address = data.get('address')
-        child_id = data.get('child')
 
-        name = data.get('name')
-        last_name =  data.get('name1')
-        print(name,'>>>>>>>>>>>')
-        print(last_name)
+def missionindicator_table(request, id):
+    mission_obj = Mission.objects.get(id = id)
+    heading = mission_obj.name
 
-        if True:
-            return redirect('/child-list/')
-
-    return render(request, 'mis/add_child_form.html', locals())
-
-def indicator_list(request):
-    heading = "Mission Disha"
-    mic_obj = MissionIndicatorCategory.objects.all()
+    mic_obj = MissionIndicatorCategory.objects.filter(mission__id = id)
 
     if request.method == 'POST':
         data = request.POST
         print(data,'data')
 
-        # result = []
-        # for temp in mi_obj:
-        #         one = data.getlist('pro_'+str(temp.id))
-        #         result.append(one)
-        # print(result)
 
         if True:
-            return redirect('/child-list/')
+            return redirect('/mission/list/')
 
     return render(request, 'mis/indicator_list.html', locals())
 
