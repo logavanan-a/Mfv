@@ -81,21 +81,31 @@ def guardian_add(request, auto_child_id=None):
 
 def indicator_list(request):
     heading = "Mission Disha"
-    mi_obj = MissionIndicator.objects.all()
+    mic_obj = MissionIndicatorCategory.objects.all()
 
     if request.method == 'POST':
         data = request.POST
+        print(data,'data')
 
-        one = data.get('one')
-        last_name =  data.get('last_name')
-        print(one,'>>>>>>>>>>>')
-        print(last_name)
-       
+        # result = []
+        # for temp in mi_obj:
+        #         one = data.getlist('pro_'+str(temp.id))
+        #         result.append(one)
+        # print(result)
+
         if True:
             return redirect('/child-list/')
 
     return render(request, 'mis/indicator_list.html', locals())
 
 def mission_add(request):
+    mi_obj = MissionIndicator.objects.all()
+    data = request.POST
+    result = []
+    for temp in mi_obj:
+            one = data.getlist('pro_'+str(temp.id))
+            result.append(one)
+    print(result)
+
     return render(request, 'mis/add_child_form.html', locals())
 
