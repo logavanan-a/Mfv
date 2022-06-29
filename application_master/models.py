@@ -1,4 +1,6 @@
+from django.contrib.postgres.fields import JSONField
 from django.db import models
+
 
 class BaseContent(models.Model):
     ACTIVE_CHOICES = ((0, 'Deleted'), (2, 'Active'),(3,"Inactive"))
@@ -31,7 +33,9 @@ class Partner(BaseContent):
         return self.name
 
 class Mission(BaseContent):
+    MISSION_CHOICES = ((1,'Indicator'),(2,'Form'))
     name = models.CharField(max_length=350)
+    mission_template = models.IntegerField(choices = MISSION_CHOICES)
 
     def __str__(self):
         return self.name
@@ -67,6 +71,23 @@ class MissionIndicator(BaseContent):
 
     def __str__(self):
         return self.name
+
+class MissionForm(BaseContent):
+    TYPE_CHOICES = (
+        (1, 'Text'), 
+        (2, 'Radio'), 
+        (3, 'Number'), 
+        (4, 'File Upload'), 
+        (5, 'Date')
+    )
+    mission = models.ForeignKey(Mission, on_delete = models.DO_NOTHING)
+    field_name = models.CharField(max_length=350)
+    field_type = models.IntegerField(choices= TYPE_CHOICES)
+    required = models.BooleanField(default=True)
+    field_config = JSONField()
+
+    def __str__(self):
+        return self.mission.name
 
 
 

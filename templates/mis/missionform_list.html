@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+<div class="row align-items-center">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                        <table id="datatable-button" class="table table-bordered dt-responsive w-100">
+                                            <thead>
+                                                <tr>
+                                                    <th style="text-align: center;">Name</th>
+                                                    <th style="text-align: center;">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for mission in mission_obj %}
+                                                <tr>
+                                                    <td>{{mission.name}}</td>
+                                                    <!-- <td><button type="button" class="btn btn-outline-primary" onclick="">Add</button></td> -->
+                                                    <td><button type="button" class="btn btn-outline-primary" id='add_buton_list' onclick="location.href='/generator_form/{{mission.id}}/'">Add Mission Form</button></td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                </div>     
+                            </div>     
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </div>
+<style>
+    .select2-container .select2-selection {
+        min-height: 55px
+    }
+    .select2-container .select2-selection--single .select2-selection__placeholder:after {
+        content: " *";
+        color: red;
+    }
+</style>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('select#state').change(function () {
+            var optionSelected = $(this).find("option:selected");
+            var valueSelected  = optionSelected.val();
+            data = {'selected_state' : valueSelected };
+            $.ajax({
+                type:"GET",
+                url: '/ajax/district/',
+                data:data,
+                success:function(result){
+                    $("#district option").remove();
+                    a = '<option selected disabled value="">Select District</option>';
+                    $("#district").append(a);
+                    $("#shelter option").remove();
+                    b = '<option selected value="">Select Shelter Home</option>';
+                    $("#shelter").append(b);
+                    if(JSON.parse(result) == 0){
+                        $("#district option").remove();
+                        a = '<option selected disabled value="">No district is mapped to this state</option>';
+                        $("#district").append(a);
+                    }
+                    else{
+                        $.each(JSON.parse(result),function(key, value)
+                        {
+                            a = '<option value=' + value['id']+'>' + value['name']+'</option>';
+                            $("#district").append(a);
+                        });
+                    }
+                }
+            });
+        });
+    });  
+    $(document).ready(function(){
+        $('select#district').change(function () {
+            var optionSelected = $(this).find("option:selected");
+            var valueSelected  = optionSelected.val();
+            data = {'selected_district' : valueSelected };
+            $.ajax({
+                type:"GET",
+                url: '/ajax/shelterhome/',
+                data:data,
+                success:function(result){
+                    $("#shelter option").remove();
+                    a = '<option selected disabled value="">Select Shelter Home</option>';
+                    $("#shelter").append(a);
+                    if(JSON.parse(result) == 0){
+                        $("#shelter option").remove();
+                        a = '<option selected disabled value="">No shelter home is mapped to this district</option>';
+                        $("#shelter").append(a);
+                    }
+                    else{
+                        $.each(JSON.parse(result),function(key, value)
+                        {
+                            a = '<option value=' + value['id']+'>' + value['name']+'</option>';
+                            $("#shelter").append(a);
+                        });
+                    }
+                }
+            });
+        });
+    });
+      
+</script>
+</div>
+{% endblock %}

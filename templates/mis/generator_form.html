@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+<div class="row align-items-center">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <form method='POST' class="needs-validation" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    
+                    {% for item in missionform_obj %}
+
+                        {% if item.field_config.field_type == 'select' %}
+
+                            <label for="{{item.field_config.name}}">{{item.field_name}}
+                                {% if item.required == True %}<span class="text-danger required">*</span>{% endif %}
+                            </label>
+                            <select name="{{item.field_config.name}}" class="form-control" 
+                                {% if item.required == True %} required {% endif %}>
+                                {% if item.field_config.empty_choice == True %} <option value="">Select Option</option>{% endif %}
+                                    {% for key,value in item.field_config.choices.items %}
+                                        <option value={{key}}>{{value}}</option>
+                                    {% endfor %}
+                            </select>
+
+                            {% if item.required == True %}
+                            <div class="invalid-feedback">{{item.field_name}} is Required.</div>
+                            {% endif %}
+
+                        {% elif item.field_config.field_type == 'radio' %}    
+
+                            <label for="{{item.field_config.name}}" class=""> {{item.field_name}} 
+                                {% if item.required == True %}<span class="text-danger required">*</span>{% endif %}
+                            </label>
+
+                            <div class="custom_radiobtn pt10">
+                                {% for key,value in item.field_config.choices.items %}
+                                <label for="option_{{forloop.counter}}" class="form-check-inline">
+                                    <input type="radio" name="{{item.field_config.name}}" value={{key}} class="mr5" 
+                                    {% if item.required == True %} required {% endif %}>
+                                    {{value}}
+                                </label>
+                                {% endfor  %}
+                            </div>
+
+                            {% if item.required == True %}
+                            <div class="invalid-feedback">{{item.field_name}} is Required.</div>
+                            {% endif %}
+
+                        {% else %}
+                            <label for="{{item.field_config.name}}">{{item.field_name}}{% if item.required == True %}<span class="text-danger required">*</span>{% endif %}</label>
+                            <input type="{{item.field_config.field_type}}" name="{{item.field_config.name}}" class="form-control input_style pt10"  value=""
+                            {% if item.required == True %}required = ""{% endif %}
+                            />
+                            
+                            {% if item.required == True %}
+                            <div class="invalid-feedback">{{item.field_name}} is Required.</div>
+                            {% endif %}
+
+                        {% endif %}
+                    {% endfor %}
+
+                    <div class="modal-footer">
+                        <button type="reset" onclick="location.href='/mission_form/list/'" class="btn btn-secondary waves-effect">Cancel</button>
+                        <button type="submit" class="btn btn-primary  ml-2">Submit</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+<style>
+    .select2-container .select2-selection {
+        min-height: 55px
+    }
+    .select2-container .select2-selection--single .select2-selection__placeholder:after {
+        content: " *";
+        color: red;
+    }
+</style>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('select#state').change(function () {
+            var optionSelected = $(this).find("option:selected");
+            var valueSelected  = optionSelected.val();
+            data = {'selected_state' : valueSelected };
+            $.ajax({
+                type:"GET",
+                url: '/ajax/district/',
+                data:data,
+                success:function(result){
+                    $("#district option").remove();
+                    a = '<option selected disabled value="">Select District</option>';
+                    $("#district").append(a);
+                    $("#shelter option").remove();
+                    b = '<option selected value="">Select Shelter Home</option>';
+                    $("#shelter").append(b);
+                    if(JSON.parse(result) == 0){
+                        $("#district option").remove();
+                        a = '<option selected disabled value="">No district is mapped to this state</option>';
+                        $("#district").append(a);
+                    }
+                    else{
+                        $.each(JSON.parse(result),function(key, value)
+                        {
+                            a = '<option value=' + value['id']+'>' + value['name']+'</option>';
+                            $("#district").append(a);
+                        });
+                    }
+                }
+            });
+        });
+    });  
+    $(document).ready(function(){
+        $('select#district').change(function () {
+            var optionSelected = $(this).find("option:selected");
+            var valueSelected  = optionSelected.val();
+            data = {'selected_district' : valueSelected };
+            $.ajax({
+                type:"GET",
+                url: '/ajax/shelterhome/',
+                data:data,
+                success:function(result){
+                    $("#shelter option").remove();
+                    a = '<option selected disabled value="">Select Shelter Home</option>';
+                    $("#shelter").append(a);
+                    if(JSON.parse(result) == 0){
+                        $("#shelter option").remove();
+                        a = '<option selected disabled value="">No shelter home is mapped to this district</option>';
+                        $("#shelter").append(a);
+                    }
+                    else{
+                        $.each(JSON.parse(result),function(key, value)
+                        {
+                            a = '<option value=' + value['id']+'>' + value['name']+'</option>';
+                            $("#shelter").append(a);
+                        });
+                    }
+                }
+            });
+        });
+    });
+      
+</script>
+</div>
+{% endblock %}

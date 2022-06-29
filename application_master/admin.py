@@ -42,6 +42,11 @@ class AdminMissionIndicatorCategory(admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
+@admin.register(MissionForm)
+class AdminMissionForm(admin.ModelAdmin):
+    def get_list_display(self, request):
+        return [field.name for field in self.model._meta.concrete_fields]
+
 # @admin.register(State)
 # class StateAdmin(ImportExportModelAdmin):
 #     list_display = ['name',]

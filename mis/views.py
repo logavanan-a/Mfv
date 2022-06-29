@@ -50,15 +50,22 @@ def login_view(request):
             error_message = "Invalid Username and Password"
     return render(request, 'login.html', locals())
 
-# @login_required(login_url='/login/')
-# @permission_required('child_management.view_child', raise_exception=True)
+@login_required(login_url='/login/')
 def mission_list(request):
-    heading = "Mission List"
-    mission_obj = Mission.objects.all()
+    heading = "Mission List" 
+    mission_obj = Mission.objects.filter(mission_template = '1')
 
     return render(request, 'mis/mission_list.html', locals())
 
+@login_required(login_url='/login/')
+def mission_form_list(request):
+    heading = "Mission Form List" 
 
+    mission_obj = Mission.objects.filter(mission_template = '2')
+
+    return render(request, 'mis/missionform_list.html', locals())
+
+@login_required(login_url='/login/')
 def missionindicator_table(request, id):
     mission_obj = Mission.objects.get(id = id)
     heading = mission_obj.name
@@ -68,12 +75,29 @@ def missionindicator_table(request, id):
     if request.method == 'POST':
         data = request.POST
         print(data,'data')
-
-
+        
         if True:
             return redirect('/mission/list/')
 
     return render(request, 'mis/indicator_list.html', locals())
+
+@login_required(login_url='/login/')
+def generator_form(request, id):
+    mission_obj = Mission.objects.get(id = id)
+    heading = mission_obj.name
+
+    missionform_obj = MissionForm.objects.filter(mission__id = id)
+
+    if request.method == 'POST':
+        data = request.POST
+        files = request.FILES
+        print(data,'TEST Data')
+        print(files,'files')
+
+        if True:
+            return redirect('/mission_form/list/')
+
+    return render(request, 'mis/generator_form.html', locals())
 
 def mission_add(request):
     mi_obj = MissionIndicator.objects.all()

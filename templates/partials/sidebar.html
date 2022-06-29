@@ -35,17 +35,17 @@
           
         {% endfor %}
         {% if request.user.is_superuser %}
-        <li {% if 'User Management' == heading %}class='mm-active'{% endif %}>
-            <!-- <a href="javascript: void(0);" class="has-arrow waves-effect ">
-              <i class="bx bx-cog"></i>
-              <span key="t-ui-elements">Settings</span>
-            </a> -->
-            <ul class="sub-menu"  aria-expanded="false">
-              <li>
-                
-              </li>
-            </ul>
-          </li>
+        <li>
+          <a href="javascript: void(0);" class="waves-effect">
+            <i class="bx bx-home-circle"></i
+            ><span class="badge rounded-pill bg-info float-end"></span>
+            <span key="t-dashboards">Mission</span>
+          </a>
+          <ul class="sub-menu" aria-expanded="false">
+            <li><a href="/mission/list/" key="t-default">Mission Indicator</a></li>
+            <li><a href="/mission_form/list/" key="t-saas">Mission Form</a></li>
+          </ul>
+        </li>
         {% endif %}
         </ul>
         
