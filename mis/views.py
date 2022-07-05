@@ -138,4 +138,51 @@ def mission_add(request):
 
     return render(request, 'mis/add_child_form.html', locals())
 
+def missionindicator_target(request, id):
+    mission_obj = Mission.objects.get(id = id)
+    heading = mission_obj.name
+    mic_obj = MissionIndicatorCategory.objects.filter(mission__id = id)
 
+    if request.method == 'POST':
+        data = request.POST
+        # print(data,'data')
+        temp = dict(data)
+        results = {}
+        for key,values in temp.items():
+            if key != 'csrfmiddlewaretoken':
+                results[key] = int(values[0])
+        MissionIndicatorTarget.objects.create(created_by = request.user, mission = mission_obj, response = results)
+
+        if True:
+            return redirect('/mission/list/')
+
+    return render(request, 'mis/add_target.html', locals())
+
+@login_required(login_url='/login/')
+def mission_target_edit(request):
+    mission_respons_obj = MissionIndicatorTarget.objects.all()
+    return render(request, 'mis/mission_target_edit.html', locals())
+
+
+@login_required(login_url='/login/')
+def missiontarget_table_edit(request, ids, id):
+    mission_obj = Mission.objects.get(id = ids)
+    heading = mission_obj.name
+    mic_obj = MissionIndicatorCategory.objects.filter(mission__id = ids)
+    mission_target_obj = MissionIndicatorTarget.objects.get(id = id)
+
+    if request.method == 'POST':
+        data = request.POST
+        temp = dict(data)
+        results = {}
+        for key,values in temp.items():
+            if key != 'csrfmiddlewaretoken':
+                results[key] = int(values[0])
+        
+        mission_respose_obj = MissionIndicatorTarget.objects.get(id = id)
+        mission_respose_obj.response = results
+        mission_respose_obj.save()
+
+        if True:
+            return redirect('/mission/list/')
+    return render(request, 'mis/target_edit.html', locals())

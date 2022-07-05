@@ -5,43 +5,51 @@
     <div class="col-xl-12 mx-auto">
         <div class="card">
             <div class="card-body">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="row">
-                                        <table id="datatable-button" class="table table-bordered dt-responsive w-100">
-                                            <thead>
-                                                <tr>
-                                                    <th style="text-align: center;">Name</th>
-                                                    <th style="text-align: center;">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for mission in mission_obj %}
-                                                <tr>
-                                                    <td>{{mission.name}}</td>
-                                                    <td>
-                                                        <button type="button" class="btn btn-outline-primary" id='add_buton_list' onclick="location.href='/table_add/{{mission.id}}/'">Add Mission Indicator</button>
-                                                        <button type="button" class="btn btn-outline-primary" id='add_buton_list' onclick="location.href='/mission/target/{{mission.id}}/'">Add Mission Target</button>
-                                                        <button type="button" class="btn btn-outline-primary" id='add_buton_list' onclick="location.href='/mission-indicator/edit/list/'">Response Indicator</button>
-                                                        <button type="button" class="btn btn-outline-primary" id='add_buton_list' onclick="location.href='/mission-target/list/'">Response Mission Target</button>
+                <form method='POST' class="needs-validation" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
 
+                    {% for data in mic_obj %}
+                    <div class="table-responsive">
+                        <h5> {{data.name}} </h5>
+                        <table class="table table-hover a" id="hospital_report">
+                            <thead >
+                                <tr><th>Indicator</th>
+                                    <th>Indicator Type</th> 
+                                    <th>Target</th>
+                                   
+                                </tr>
+                            </thead>
+                                {% for sub_category in data.sub_category %}
+                                <tbody>
+                                    <td>{{sub_category.name}}</td> 
+                                    <td>{{sub_category.get_indicator_type_display}}</td> 
 
-                                                    </td>
-                                                </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                </div>     
-                            </div>     
-                        </div>
-                    </div> 
-                </div>
+                                    <td>
+                                        <input type="number"  name="target_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
+                                        <div class="invalid-feedback">Please enter the Total value</div>
+                                    </td>
+                                </tbody>   
+                                {% endfor %} 
+                        </table>
+                    </div>
+                    {% endfor %}
+
+                    <div class="modal-footer">
+                        <button type="reset" onclick="location.href='/mission/list/'" class="btn btn-secondary waves-effect">Cancel</button>
+                        <button type="submit" class="btn btn-primary  ml-2">Submit</button>
+                    </div>
+                    
+                </form>
             </div>
         </div>
     </div>
 <style>
+table,
+            th,
+            td {
+                border: 1px solid black;
+                border-collapse: collapse;
+            }
     .select2-container .select2-selection {
         min-height: 55px
     }
