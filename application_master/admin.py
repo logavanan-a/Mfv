@@ -42,8 +42,8 @@ class AdminMissionIndicatorCategory(admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
-@admin.register(MissionForm)
-class AdminMissionForm(admin.ModelAdmin):
+@admin.register(MissionQuestion)
+class AdminMissionQuestion(admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 

@@ -74,25 +74,78 @@ def missionindicator_table(request, id):
 
     if request.method == 'POST':
         data = request.POST
-        print(data,'data')
+        # print(data,'data')
+
+        temp = dict(data)
+        results = {}
+        for key,values in temp.items():
+            if key != 'csrfmiddlewaretoken':
+                results[key] = int(values[0])
+
+        print(results,'data')
+
+        MissionResponse.objects.create(created_by = request.user, mission = mission_obj , response = results)
+
+
+
+
         
         if True:
             return redirect('/mission/list/')
 
     return render(request, 'mis/indicator_list.html', locals())
 
+
+def missionindicator_table_edit(request, ids, id):
+    mission_obj = Mission.objects.get(id = ids)
+    heading = mission_obj.name
+
+    mic_obj = MissionIndicatorCategory.objects.filter(mission__id = ids)
+
+    mission_respose_obj = MissionResponse.objects.get(id = id)
+
+    if request.method == 'POST':
+        data = request.POST
+        # print(data,'data')
+
+        temp = dict(data)
+        results = {}
+        for key,values in temp.items():
+            if key != 'csrfmiddlewaretoken':
+                results[key] = int(values[0])
+
+        print(results,'data')
+
+
+
+
+    return render(request, 'mis/indicator_edit.html', locals())
+
+
+
 @login_required(login_url='/login/')
 def generator_form(request, id):
     mission_obj = Mission.objects.get(id = id)
     heading = mission_obj.name
 
-    missionform_obj = MissionForm.objects.filter(mission__id = id)
+    missionform_obj = MissionQuestion.objects.filter(mission__id = id)
 
     if request.method == 'POST':
         data = request.POST
-        files = request.FILES
-        print(data,'TEST Data')
-        print(files,'files')
+        print(data,'data')
+        files = request.FILES.get('')
+        print(data,'data')
+
+        temp = dict(data)
+        results = {}
+        for key,values in temp.items():
+            if key != 'csrfmiddlewaretoken':
+                results[key] = values[0]
+
+        MissionResponse.objects.create(created_by = request.user, mission = mission_obj , response = results)
+
+        # survey = MissionQuestion.objects.get(id=int(survey_ids))
+        # questions = Question.objects.filter(block__survey=survey,active=2)
 
         if True:
             return redirect('/mission_form/list/')
@@ -106,7 +159,13 @@ def mission_add(request):
     for temp in mi_obj:
             one = data.getlist('pro_'+str(temp.id))
             result.append(one)
+
     print(result)
 
     return render(request, 'mis/add_child_form.html', locals())
 
+def mission_indicator_edit(request):
+
+    mission_respons_obj = MissionResponse.objects.all()
+
+    return render(request, 'mis/mission_indicator_edit.html', locals())

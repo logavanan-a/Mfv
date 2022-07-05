@@ -15,7 +15,7 @@
                             <label for="{{item.field_config.name}}">{{item.field_name}}
                                 {% if item.required == True %}<span class="text-danger required">*</span>{% endif %}
                             </label>
-                            <select name="{{item.field_config.name}}" class="form-control" 
+                            <select name="{{item.id}}" class="form-control" 
                                 {% if item.required == True %} required {% endif %}>
                                 {% if item.field_config.empty_choice == True %} <option value="">Select Option</option>{% endif %}
                                     {% for key,value in item.field_config.choices.items %}
@@ -29,14 +29,14 @@
 
                         {% elif item.field_config.field_type == 'radio' %}    
 
-                            <label for="{{item.field_config.name}}" class=""> {{item.field_name}} 
+                            <label for="{{item.field_config.name}}" class="">{{item.field_name}} 
                                 {% if item.required == True %}<span class="text-danger required">*</span>{% endif %}
                             </label>
 
                             <div class="custom_radiobtn pt10">
                                 {% for key,value in item.field_config.choices.items %}
                                 <label for="option_{{forloop.counter}}" class="form-check-inline">
-                                    <input type="radio" name="{{item.field_config.name}}" value={{key}} class="mr5" 
+                                    <input type="radio" name="{{item.id}}" value={{key}} class="mr5" 
                                     {% if item.required == True %} required {% endif %}>
                                     {{value}}
                                 </label>
@@ -49,8 +49,8 @@
 
                         {% else %}
                             <label for="{{item.field_config.name}}">{{item.field_name}}{% if item.required == True %}<span class="text-danger required">*</span>{% endif %}</label>
-                            <input type="{{item.field_config.field_type}}" name="{{item.field_config.name}}" class="form-control input_style pt10"  value=""
-                            {% if item.required == True %}required = ""{% endif %}
+                            <input type="{{item.field_config.field_type}}" name="{{item.id}}" class="form-control input_style pt10"  value=""
+                            {% if item.required == True %}required = "" {% endif %}
                             />
                             
                             {% if item.required == True %}
