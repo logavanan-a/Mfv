@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load configuration_tags   %}
 {% load static %}
 {% block contents %}
 <div class="row align-items-center">
@@ -26,47 +27,49 @@
                             </thead>
                                 {% for sub_category in data.sub_category %}
                                 <tbody>
-                                    <td>{{sub_category.name}} {{mission_respose_obj.response}}</td> 
-                                    <td>{{sub_category.get_indicator_type_display}}</td> 
-
-                                    <td>
-                                        <input type="number" name="total_{{sub_category.id}}" value="{{mission_respose_obj.response.total_1}}" class="form-control input_style qty" maxlength="5" required="">
-                            
+                                    <td>{{sub_category.name}}</td> 
+                                    <td>{{sub_category.get_indicator_type_display}} </td> 
+                                    
+                                    <td>     
+                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'total_' as total %}                                  
+                                        <input type="number" name="total_{{sub_category.id}}" value="{{total}}" class="form-control input_style qty" maxlength="5" required=""> 
+                                                                                   
                                         <div class="invalid-feedback">Please enter the Total value</div>
                                     </td>
 
-                                    <!-- <td>
-                                        <input type="number"  name="indicator_type_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
-                                        <div class="invalid-feedback">Please enter the Target value</div>
-                                    </td> 
-                                    -->
-
-                                    <td><input type="number"  name="adult_male_{{sub_category.id}}" value="{{mission_respose_obj.response.male_1.0}}" class="form-control input_style qty" maxlength="5" required="" >
+                                    <td>
+                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_male_' as adult_male %}  
+                                        <input type="number"  name="adult_male_{{sub_category.id}}" value="{{adult_male}}" class="form-control input_style qty" maxlength="5" required="" >
                                         <div class="invalid-feedback">Please enter the Adult Male value</div>
                                     </td>
 
                                      <td>
-                                        <input type="number"  name="adult_female_{{sub_category.id}}" value="{{mission_respose_obj.response.female_1.0}}" class="form-control input_style qty" maxlength="5" required="">
+                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_female_' as adult_female %} 
+                                        <input type="number"  name="adult_female_{{sub_category.id}}" value="{{adult_female}}" class="form-control input_style qty" maxlength="5" required="">
                                         <div class="invalid-feedback">Please enter the Adult Female value</div>
                                     </td>
 
                                     <td>
-                                        <input type="number"  name="adult_transgender_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
+                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_transgender_' as adult_transgender %}
+                                        <input type="number"  name="adult_transgender_{{sub_category.id}}" value="{{adult_transgender}}" class="form-control input_style qty" maxlength="5" required="">
                                         <div class="invalid-feedback">Please enter the Adult Transgender_ value</div>
                                     </td>
 
                                    <td>
-                                        <input type="number"  name="child_male_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
+                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_male_' as child_male %}
+                                        <input type="number"  name="child_male_{{sub_category.id}}" value="{{child_male}}" class="form-control input_style qty" maxlength="5" required="">
                                         <div class="invalid-feedback">Please enter the Target value</div>
                                     </td>
 
                                     <td>
-                                        <input type="number"  name="child_female_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
+                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_female_' as child_female %}
+                                        <input type="number"  name="child_female_{{sub_category.id}}" value="{{child_female}}" class="form-control input_style qty" maxlength="5" required="">
                                         <div class="invalid-feedback">Please enter the Target value</div>
                                     </td>
 
                                     <td>
-                                        <input type="number"  name="child_transgender_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
+                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_transgender_' as child_transgender %}
+                                        <input type="number"  name="child_transgender_{{sub_category.id}}" value="{{child_transgender}}" class="form-control input_style qty" maxlength="5" required="">
                                         <div class="invalid-feedback">Please enter the Target value</div>
                                     </td>
                                     
