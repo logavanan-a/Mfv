@@ -19,7 +19,7 @@ urlpatterns = [
 
     path('mission_form/list/', mission_form_list, name="mission_form_list"),
     path('generator_form/<id>/', generator_form, name='generator_form'),
-    path('mission/add/', mission_add, name='adding')
+    # path('mission/add/', mission_add, name='add')
 
 	]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
-from django.contrib.postgres.fields import JSONField
 from django.db import models
+# from django.contrib.postgres.fields import JSONField
+from jsonfield import JSONField
 
 User = get_user_model()
 
@@ -108,7 +109,7 @@ class MissionQuestion(BaseContent):
     field_name = models.CharField(max_length=350)
     field_type = models.IntegerField(choices= TYPE_CHOICES)
     required = models.BooleanField(default=True)
-    field_config = JSONField()
+    field_config = JSONField(default=dict)
 
     def __str__(self):
         return self.mission.name

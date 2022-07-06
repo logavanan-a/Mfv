@@ -3,7 +3,9 @@ from __future__ import unicode_literals
 import json
 
 import requests
-from application_master.models import BaseContent, Mission, MissionIndicatorCategory, MissionIndicator, MissionQuestion
+from application_master.models import (BaseContent, Mission, MissionIndicator,
+                                       MissionIndicatorCategory,
+                                       MissionQuestion)
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -67,7 +69,6 @@ def missionindicator_table(request, id):
                 results[key] = int(values[0])
 
         MissionResponse.objects.create(created_by = request.user, mission = mission_obj , response = results)
-
         if True:
             return redirect('/mission/list/')
 
@@ -109,10 +110,8 @@ def generator_form(request, id):
 
     if request.method == 'POST':
         data = request.POST
-        print(data,'data')
-        files = request.FILES.get('')
-        print(data,'data')
-
+        # print(data,'data')
+        # files = request.FILES.get('')
         temp = dict(data)
         results = {}
         for key,values in temp.items():
@@ -126,17 +125,14 @@ def generator_form(request, id):
 
     return render(request, 'mis/generator_form.html', locals())
 
-def mission_add(request):
-    mi_obj = MissionIndicator.objects.all()
-    data = request.POST
-    result = []
-    for temp in mi_obj:
-            one = data.getlist('pro_'+str(temp.id))
-            result.append(one)
-
-    print(result)
-
-    return render(request, 'mis/add_child_form.html', locals())
+# def mission_add(request):
+#     mi_obj = MissionIndicator.objects.all()
+#     data = request.POST
+#     result = []
+#     for mi in mi_obj:
+#         mission_add = data.getlist('pro_'+str(mi.id))
+#         result.append(mission_add)
+#     return render(request, 'mis/add_child_form.html', locals())
 
 def missionindicator_target(request, id):
     mission_obj = Mission.objects.get(id = id)
