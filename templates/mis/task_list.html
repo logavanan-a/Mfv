@@ -14,19 +14,18 @@
                                             <thead>
                                                 <tr>
                                                     <th style="text-align: center;">Name</th>
-                                                    <th style="text-align: center;">Action</th>
+                                                    <th style="text-align: center;">Vision Centre Name</th>
+                                                    <th style="text-align: center;">Start Date</th>
+                                                    <th style="text-align: center;">End Date</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {% for mission in mission_obj %}
+                                                {% for task in task_obj %}
                                                 <tr>
-                                                    <td>{{mission.name}}</td>
-                                                    <td>
-                                                        <button type="button" class="btn btn-outline-primary" id='add_buton_list' onclick="location.href='{{ mission.get_absolute_url }}'">Add Mission Indicator</button>
-                                                        <button type="button" class="btn btn-outline-primary" id='add_buton_list' onclick="location.href='/mission/target/{{mission.id}}/'">Add Mission Target</button>
-                                                        <button type="button" class="btn btn-outline-primary" id='add_buton_list' onclick="location.href='/mission-indicator/edit/list/'">Response Indicator</button>
-                                                        <button type="button" class="btn btn-outline-primary" id='add_buton_list' onclick="location.href='/mission-target/list/'">Response Mission Target</button>
-                                                    </td>
+                                                    <td><a href="#">{{task.name}}</a></td>
+                                                    <td>{{task.vision_centre.name}}</td>
+                                                    <td>{{task.start_date}}</td>
+                                                    <td>{{task.end_date}}</td>
                                                 </tr>
                                                 {% endfor %}
                                             </tbody>

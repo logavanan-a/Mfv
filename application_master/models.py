@@ -1,7 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 # from django.contrib.postgres.fields import JSONField
+from django.template.defaultfilters import slugify
 from jsonfield import JSONField
+from django.urls import reverse
+
 
 User = get_user_model()
 
@@ -20,6 +23,9 @@ class State(BaseContent):
 
     def __str__(self):
         return self.name
+    
+    class Meta: 
+        verbose_name_plural = "State"
 
 class District(BaseContent):
     name = models.CharField(max_length=350)
@@ -28,12 +34,23 @@ class District(BaseContent):
     def __str__(self):
         return self.name
 
+    class Meta: 
+        verbose_name_plural = "District"
+
 class Partner(BaseContent):
     name = models.CharField(max_length=350)
+    slug = models.SlugField(max_length=100, default="")
     # district =  models.ForeignKey(District, on_delete = models.DO_NOTHING)
 
     def __str__(self):
         return self.name
+    
+    class Meta: 
+        verbose_name_plural = "Partner"
+
+    # def save(self, *args, **kwargs):
+    #     self.slug = self.slug or slugify(self.title)
+    #     super().save(*args, **kwargs)
 
 class UserPartnerMapping(BaseContent):
     partner =  models.ForeignKey(Partner, on_delete = models.DO_NOTHING)
@@ -43,6 +60,7 @@ class UserPartnerMapping(BaseContent):
         return self.partner.name
 
     class Meta: 
+        verbose_name_plural = "User Partner Mapping"
         unique_together = ('partner', 'user')
 
 class Donor(BaseContent):
@@ -53,13 +71,23 @@ class Donor(BaseContent):
     def __str__(self):
         return self.name
     
+    class Meta:
+        verbose_name_plural = "Donor"
+    
 class Mission(BaseContent):
     MISSION_CHOICES = ((1,'Indicator'),(2,'Form'))
     name = models.CharField(max_length = 350)
     mission_template = models.IntegerField(choices = MISSION_CHOICES)
+    slug = models.SlugField(max_length=100, default="")
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name_plural = "Mission"
+
+    def get_absolute_url(self):
+        return reverse("mis:mission_detail", kwargs={"slug": self.slug})
 
 class VisionCentre(BaseContent):
     name = models.CharField(max_length = 350)
@@ -71,20 +99,31 @@ class VisionCentre(BaseContent):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name_plural = "Vision Centre"
+
 class PartnerMissionMapping(BaseContent):
     partner = models.ForeignKey(Partner, on_delete = models.DO_NOTHING)
     mission = models.ForeignKey(Mission, on_delete = models.DO_NOTHING)
 
     def __str__(self):
         return self.partner.name
+    
+    class Meta:
+        verbose_name_plural = "Partner Mission Mapping"
 
 class MissionIndicatorCategory(BaseContent):
+    CATEGORY_CHOICES = ((1,'Program Indicator'),(2,'Finace Indicator'),(3, 'Income & Expense'))
     name = models.CharField(max_length = 350)
     mission = models.ForeignKey(Mission, on_delete = models.DO_NOTHING)
+    category_type = models.IntegerField(choices = CATEGORY_CHOICES, default=1)
 
     def __str__(self):
         return self.name
-    
+
+    class Meta:
+        verbose_name_plural = "Mission Indicator Category"
+
     def sub_category(self):
         return MissionIndicator.objects.filter(category = self)
 
@@ -96,6 +135,10 @@ class MissionIndicator(BaseContent):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name_plural = "Mission Indicator"
+
 
 class MissionQuestion(BaseContent):
     TYPE_CHOICES = (
@@ -113,6 +156,9 @@ class MissionQuestion(BaseContent):
 
     def __str__(self):
         return self.mission.name
+    
+    class Meta:
+        verbose_name_plural = "Mission Question"
 
 class MissionQuastionChioce(BaseContent):
     mission_question = models.ForeignKey(MissionQuestion, on_delete = models.DO_NOTHING, blank=True, null=True)
@@ -121,6 +167,9 @@ class MissionQuastionChioce(BaseContent):
 
     def __str__(self):
         return self.mission.name
+
+    class Meta:
+        verbose_name_plural = "Mission Quastion Chioce"
 
 
 

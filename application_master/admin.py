@@ -1,5 +1,12 @@
 from django.contrib import admin
-from .models import *
+
+from application_master.models import (District, Donor, Mission,
+                                       MissionIndicator,
+                                       MissionIndicatorCategory,
+                                       MissionQuestion, Partner,
+                                       PartnerMissionMapping, State,
+                                       UserPartnerMapping, VisionCentre)
+
 # from import_export.admin import ImportExportModelAdmin
 
 @admin.register(State)
@@ -42,7 +49,7 @@ class AdminMissionIndicatorCategory(admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
-@admin.register(MissionQuestion)
+@admin.register(MissionQuestion) 
 class AdminMissionQuestion(admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
@@ -56,10 +63,6 @@ class AdminUserPartnerMapping(admin.ModelAdmin):
 class AdminVisionCentre(admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
-
-
-
-        
 
 # @admin.register(State)
 # class StateAdmin(ImportExportModelAdmin):
