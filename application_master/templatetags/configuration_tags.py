@@ -7,8 +7,7 @@ from django.contrib.auth.models import User
 import json
 import urllib3
 
-from mis.models import MissionIndicatorAchievement, MissionIndicatorTarget
-from django.http import QueryDict
+from mis.models import MissionIndicatorAchievement
 
 register = template.Library()
 
@@ -20,6 +19,6 @@ def disply_indicator_values(res_id, ind_id, keys):
 
 @register.simple_tag
 def disply_target_values(res_id, ind_id, keys):
-    mission_response = MissionIndicatorTarget.objects.get(id = res_id)
+    mission_response = ''
 
     return mission_response.response.get(keys + str(ind_id))

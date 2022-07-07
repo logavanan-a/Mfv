@@ -16,7 +16,8 @@ from django.shortcuts import (HttpResponse, HttpResponseRedirect, redirect,
                               render)
 from django.views.generic import RedirectView, View
 
-from mis.models import MissionIndicatorAchievement, MissionIndicatorTarget, Task
+from mis.models import (MissionIndicatorAchievement,
+                        Task)
 
 
 def login_view(request):
@@ -31,12 +32,11 @@ def login_view(request):
         if findUser is not None:
             username = findUser.get_username()
         user = authenticate(request, username=username, password=password)
-        print(user)
         if user is not None:
-            login(request, user)
+            login(request, user) 
+            return redirect('/task-list/')
             # configure_error = load_user_details_to_sessions(request)
             # if not configure_error:
-            return redirect('/mission-list/')
             # return redirect('/task-list/')
             # else:
             #     logout(request)
@@ -48,7 +48,7 @@ class LogoutView(RedirectView):
     """
     Provides users the ability to logout
     """
-    url = '/login/'
+    url = '/'
     def get(self, request, *args, **kwargs):
         logout(request)
         request.session['partner_key']=''
@@ -56,7 +56,7 @@ class LogoutView(RedirectView):
 
 @login_required(login_url='/login/')
 def mission_list(request):
-    heading = "Mission List" 
+    heading = "Mission Indicator List" 
     mission_obj = Mission.objects.filter(mission_template = '1')
     return render(request, 'mis/mission_list.html', locals())
 
@@ -67,10 +67,11 @@ def mission_form_list(request):
     return render(request, 'mis/missionform_list.html', locals())
 
 @login_required(login_url='/login/')
-def missionindicator_table(request, slug):
+def missionindicator_table(request, slug,task_id):
     mission_obj = Mission.objects.get(slug = slug)
     heading = mission_obj.name
-    mic_obj = MissionIndicatorCategory.objects.filter(mission__slug = slug)
+    programe_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '1')
+    finance_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '2')
 
     if request.method == 'POST':
         data = request.POST
@@ -80,24 +81,31 @@ def missionindicator_table(request, slug):
         for key,values in temp.items():
             if key != 'csrfmiddlewaretoken':
                 results[key] = int(values[0])
-
-        MissionIndicatorAchievement.objects.create(created_by = request.user, mission = mission_obj , response = results)
-        if True:
-            return redirect('/mission-list/')
+        
+        task_obj = Task.objects.get(id = task_id)
+        MissionIndicatorAchievement.objects.create(task = task_obj , response = results)
+        
+        return redirect('/mission-list/')
 
     return render(request, 'mis/indicator_list.html', locals())
 
 @login_required(login_url='/login/')
 def mission_indicator_edit(request):
-    mission_respons_obj = MissionIndicatorAchievement.objects.all()
+    mission_indicator_achievement = MissionIndicatorAchievement.objects.all()
     return render(request, 'mis/mission_indicator_edit.html', locals())
 
 @login_required(login_url='/login/')
-def missionindicator_table_edit(request, ids, id):
-    mission_obj = Mission.objects.get(id = ids)
+def missionindicator_table_edit(request, slug, id):
+    mission_obj = Mission.objects.get(slug = slug)
     heading = mission_obj.name
-    mic_obj = MissionIndicatorCategory.objects.filter(mission__id = ids)
+    # mic_obj = MissionIndicatorCategory.objects.filter(mission__slug = slug)
+
+    programe_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '1')
+    finance_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '2')
+
     mission_respose_obj = MissionIndicatorAchievement.objects.get(id = id)
+
+
 
     if request.method == 'POST':
         data = request.POST
@@ -110,9 +118,8 @@ def missionindicator_table_edit(request, ids, id):
         mission_respose_obj = MissionIndicatorAchievement.objects.get(id = id)
         mission_respose_obj.response = results
         mission_respose_obj.save()
+        return redirect('/mission-list/')
 
-        if True:
-            return redirect('/mission-list/')
     return render(request, 'mis/indicator_edit.html', locals())
 
 @login_required(login_url='/login/')
@@ -123,19 +130,14 @@ def generator_form(request, id):
 
     if request.method == 'POST':
         data = request.POST
-        # print(data,'data')
-        # files = request.FILES.get('')
         temp = dict(data)
         results = {}
         for key,values in temp.items():
             if key != 'csrfmiddlewaretoken':
                 results[key] = values[0]
-
-        MissionIndicatorAchievement.objects.create(created_by = request.user, mission = mission_obj, response = results)
-
-        if True:
-            return redirect('/mission_form/list/')
-
+        MissionIndicatorAchievement.objects.create( response = results)
+      
+        return redirect('/mission_form/list/')
     return render(request, 'mis/generator_form.html', locals())
 
 def missionindicator_target(request, id):
@@ -155,7 +157,6 @@ def missionindicator_target(request, id):
 
         if True:
             return redirect('/mission-list/')
-
     return render(request, 'mis/add_target.html', locals())
 
 @login_required(login_url='/login/')
@@ -187,20 +188,7 @@ def missiontarget_table_edit(request, ids, id):
             return redirect('/mission-list/')
     return render(request, 'mis/target_edit.html', locals())
 
-
+@login_required(login_url='/login/')
 def task_list(request):
     task_obj = Task.objects.filter(user = request.user)
-
     return render(request, 'mis/task_list.html', locals())
-
-
-# Task create scripts
-# def task_create():
-#     for user_obj in User.objects.filter(is_superuser = False):
-#         if user_obj:
-#             for visio_ncentre in VisionCentre.objects.all():
-#                 string_cancate = visio_ncentre.mission.name +" "+visio_ncentre.name+" july 2022"
-#                 print(string_cancate)
-#                 Task.objects.create(name = string_cancate,user = user_obj, vision_centre = visio_ncentre,
-#                 start_date = "2022-07-01",end_date = "2022-07-31"
-#                 )

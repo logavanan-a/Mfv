@@ -18,11 +18,11 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {% for mission_respons in mission_respons_obj %}
+                                                {% for mission_respons in mission_indicator_achievement %}
                                                 <tr>
-                                                    <td>{{mission_respons.mission.name}}</td>
+                                                    <td>{{mission_respons.task.vision_centre.mission.name}}</td>
                                                     <!-- <td><button type="button" class="btn btn-outline-primary" onclick="">Add</button></td> -->
-                                                    <td><button type="button" class="btn btn-outline-primary" id='add_buton_list' onclick="location.href='/table_edit/{{mission_respons.mission.id}}/{{mission_respons.id}}/'">Edit Mission Indicator</button></td>
+                                                    <td><button type="button" class="btn btn-outline-primary" id='add_buton_list' onclick="location.href='/table_edit/{{mission_respons.task.vision_centre.mission.slug}}/{{mission_respons.id}}/'">Edit Mission Indicator</button></td>
                                                 </tr>
                                                 {% endfor %}
                                             </tbody>

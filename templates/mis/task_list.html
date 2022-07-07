@@ -13,7 +13,7 @@
                                         <table id="datatable-button" class="table table-bordered dt-responsive w-100">
                                             <thead>
                                                 <tr>
-                                                    <th style="text-align: center;">Name</th>
+                                                    <th style="text-align: center;">Task Name</th>
                                                     <th style="text-align: center;">Vision Centre Name</th>
                                                     <th style="text-align: center;">Start Date</th>
                                                     <th style="text-align: center;">End Date</th>
@@ -22,7 +22,7 @@
                                             <tbody>
                                                 {% for task in task_obj %}
                                                 <tr>
-                                                    <td><a href="#">{{task.name}}</a></td>
+                                                    <td><a href="/{{task.vision_centre.mission.slug}}/monthly-report/{{task.id}}/">{{task.name}}</a></td>
                                                     <td>{{task.vision_centre.name}}</td>
                                                     <td>{{task.start_date}}</td>
                                                     <td>{{task.end_date}}</td>

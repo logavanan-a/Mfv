@@ -16,14 +16,12 @@
                                 <tr><th>Indicator</th>
                                     <th>Indicator Type</th> 
                                     <th>Target</th>
-                                   
                                 </tr>
                             </thead>
                                 {% for sub_category in data.sub_category %}
                                 <tbody>
                                     <td>{{sub_category.name}}</td> 
                                     <td>{{sub_category.get_indicator_type_display}}</td> 
-
                                     <td>
                                         <input type="number"  name="target_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
                                         <div class="invalid-feedback">Please enter the Total value</div>

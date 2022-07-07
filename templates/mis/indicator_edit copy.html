@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load configuration_tags   %}
 {% load static %}
 {% block contents %}
 <div class="row align-items-center">
@@ -7,12 +8,8 @@
             <div class="card-body">
                 <form method='POST' class="needs-validation" enctype="multipart/form-data" novalidate>
                     {% csrf_token %}
-                    
-                    {% if programe_category %}
-                    <h5>Program Data</h5>
-                    
-                    {% for data in programe_category %}
 
+                    {% for data in programe_category %}
                     <div class="table-responsive">
                         <h5> {{data.name}} </h5>
                         <table class="table table-hover a" id="hospital_report">
@@ -31,85 +28,61 @@
                                 {% for sub_category in data.sub_category %}
                                 <tbody>
                                     <td>{{sub_category.name}}</td> 
-                                    <td>{{sub_category.get_indicator_type_display}}</td> 
+                                    <td>{{sub_category.get_indicator_type_display}} </td> 
+                                    
+                                    <td>     
+                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'total_' as total %}                                  
+                                        <input type="number" name="total_{{sub_category.id}}" value="{{total}}" class="form-control input_style qty" maxlength="5" required=""> 
+                                                                                   
+                                        <div class="invalid-feedback">Please enter the Total value</div>
+                                    </td>
 
                                     <td>
-                                        <input type="number"  name="total_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
-                                        <div class="invalid-feedback">Please enter the Total value</div>
-                                    </td> 
-
-                                    <td><input type="number"  name="adult_male_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="" >
+                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_male_' as adult_male %}  
+                                        <input type="number"  name="adult_male_{{sub_category.id}}" value="{{adult_male}}" class="form-control input_style qty" maxlength="5" required="" >
                                         <div class="invalid-feedback">Please enter the Adult Male value</div>
                                     </td>
 
                                      <td>
-                                        <input type="number"  name="adult_female_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
+                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_female_' as adult_female %} 
+                                        <input type="number"  name="adult_female_{{sub_category.id}}" value="{{adult_female}}" class="form-control input_style qty" maxlength="5" required="">
                                         <div class="invalid-feedback">Please enter the Adult Female value</div>
                                     </td>
 
                                     <td>
-                                        <input type="number"  name="adult_transgender_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
+                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_transgender_' as adult_transgender %}
+                                        <input type="number"  name="adult_transgender_{{sub_category.id}}" value="{{adult_transgender}}" class="form-control input_style qty" maxlength="5" required="">
                                         <div class="invalid-feedback">Please enter the Adult Transgender_ value</div>
                                     </td>
 
                                    <td>
-                                        <input type="number"  name="child_male_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
+                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_male_' as child_male %}
+                                        <input type="number"  name="child_male_{{sub_category.id}}" value="{{child_male}}" class="form-control input_style qty" maxlength="5" required="">
                                         <div class="invalid-feedback">Please enter the Target value</div>
                                     </td>
 
                                     <td>
-                                        <input type="number"  name="child_female_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
+                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_female_' as child_female %}
+                                        <input type="number"  name="child_female_{{sub_category.id}}" value="{{child_female}}" class="form-control input_style qty" maxlength="5" required="">
                                         <div class="invalid-feedback">Please enter the Target value</div>
                                     </td>
 
                                     <td>
-                                        <input type="number"  name="child_transgender_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
+                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_transgender_' as child_transgender %}
+                                        <input type="number"  name="child_transgender_{{sub_category.id}}" value="{{child_transgender}}" class="form-control input_style qty" maxlength="5" required="">
                                         <div class="invalid-feedback">Please enter the Target value</div>
                                     </td>
-
+                                    
                                 </tbody>   
                                 {% endfor %} 
                         </table>
                     </div>
-                    {% endfor %} 
+                    {% endfor %}
 
-                    {% endif %}
-
-                    {% if finance_category %}
-                    <h5>Finance Data</h5>
-                    
-                    {% for fin_data in finance_category %}
-
-                    <div class="table-responsive">
-                        <h5> {{fin_data.name}} </h5>
-                        <table class="table table-hover a" id="hospital_report">
-                            <thead >
-                                <tr><th>Indicator</th>
-                                    <th>Indicator Type</th> 
-                                    <th>Actual</th>
-                                </tr>
-                            </thead>
-                                {% for sub_category in fin_data.sub_category %}
-                                <tbody>
-                                    <td>{{sub_category.name}}</td> 
-                                    <td>{{sub_category.get_indicator_type_display}}</td> 
-
-                                    <td>
-                                        <input type="number"  name="actual_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
-                                        <div class="invalid-feedback">Please enter the Total value</div>
-                                    </td> 
-
-                                </tbody>   
-                                {% endfor %} 
-                        </table>
-                    </div>
-                    {% endfor %} 
-
-                    {% endif %}
 
 
                     <div class="modal-footer">
-                        <button type="reset" onclick="location.href='/task-list/'" class="btn btn-secondary waves-effect">Cancel</button>
+                        <button type="reset" onclick="location.href='/mission-list/'" class="btn btn-secondary waves-effect">Cancel</button>
                         <button type="submit" class="btn btn-primary  ml-2">Submit</button>
                     </div>
                     

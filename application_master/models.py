@@ -2,9 +2,8 @@ from django.contrib.auth import get_user_model
 from django.db import models
 # from django.contrib.postgres.fields import JSONField
 from django.template.defaultfilters import slugify
-from jsonfield import JSONField
 from django.urls import reverse
-
+from jsonfield import JSONField
 
 User = get_user_model()
 
@@ -78,7 +77,7 @@ class Mission(BaseContent):
     MISSION_CHOICES = ((1,'Indicator'),(2,'Form'))
     name = models.CharField(max_length = 350)
     mission_template = models.IntegerField(choices = MISSION_CHOICES)
-    slug = models.SlugField(max_length=100, default="")
+    slug = models.SlugField(max_length=100, default="") # unique = True
 
     def __str__(self):
         return self.name
@@ -87,7 +86,7 @@ class Mission(BaseContent):
         verbose_name_plural = "Mission"
 
     def get_absolute_url(self):
-        return reverse("mis:mission_detail", kwargs={"slug": self.slug})
+        return reverse("mis:mission_detail", kwargs={"slug": self.slug, "id": self.id})
 
 class VisionCentre(BaseContent):
     name = models.CharField(max_length = 350)
@@ -113,7 +112,7 @@ class PartnerMissionMapping(BaseContent):
         verbose_name_plural = "Partner Mission Mapping"
 
 class MissionIndicatorCategory(BaseContent):
-    CATEGORY_CHOICES = ((1,'Program Indicator'),(2,'Finace Indicator'),(3, 'Income & Expense'))
+    CATEGORY_CHOICES = ((1,'Program Indicator'),(2,'Finance Indicator'))
     name = models.CharField(max_length = 350)
     mission = models.ForeignKey(Mission, on_delete = models.DO_NOTHING)
     category_type = models.IntegerField(choices = CATEGORY_CHOICES, default=1)
@@ -138,7 +137,6 @@ class MissionIndicator(BaseContent):
     
     class Meta:
         verbose_name_plural = "Mission Indicator"
-
 
 class MissionQuestion(BaseContent):
     TYPE_CHOICES = (
@@ -172,6 +170,14 @@ class MissionQuastionChioce(BaseContent):
         verbose_name_plural = "Mission Quastion Chioce"
 
 
+class MissionIndicatorTarget(BaseContent):
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    mission_indicator = models.ForeignKey(MissionIndicator, on_delete=models.CASCADE, blank=True, null=True)
+    target = models.IntegerField()
+    periodicity_date = models.DateField(blank=True, null=True)
 
-
-
+    def __str__(self):
+        return f"{self.mission_indicator.name} - {created_by.username}"
+    
+    class Meta:
+        verbose_name_plural = "Mission Indicator Target"

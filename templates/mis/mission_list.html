@@ -22,10 +22,9 @@
                                                 <tr>
                                                     <td>{{mission.name}}</td>
                                                     <td>
-                                                        <button type="button" class="btn btn-outline-primary" id='add_buton_list' onclick="location.href='{{ mission.get_absolute_url }}'">Add Mission Indicator</button>
-                                                        <button type="button" class="btn btn-outline-primary" id='add_buton_list' onclick="location.href='/mission/target/{{mission.id}}/'">Add Mission Target</button>
-                                                        <button type="button" class="btn btn-outline-primary" id='add_buton_list' onclick="location.href='/mission-indicator/edit/list/'">Response Indicator</button>
-                                                        <button type="button" class="btn btn-outline-primary" id='add_buton_list' onclick="location.href='/mission-target/list/'">Response Mission Target</button>
+                                                     <button type="button" class="btn btn-outline-primary" id='add_buton_list' onclick="location.href='/{{mission.slug}}/monthly-report/{{mission.id}}/'">Add Mission Indicator</button>
+                                                     
+                                                    <button type="button" class="btn btn-outline-primary" id='add_buton_list' onclick="location.href='/mission-indicator/edit/list/'">Response Indicator</button>
                                                     </td>
                                                 </tr>
                                                 {% endfor %}

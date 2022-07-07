@@ -66,7 +66,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='missionindicatorcategory',
             name='category_type',
-            field=models.IntegerField(choices=[(1, 'Program Indicator'), (2, 'Finace Indicator'), (3, 'Income & Expense')], default=1),
+            field=models.IntegerField(choices=[(1, 'Program Indicator'), (2, 'finance Indicator'), (3, 'Income & Expense')], default=1),
         ),
         migrations.AddField(
             model_name='partner',

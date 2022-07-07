@@ -34,10 +34,9 @@
           {% endif %}
           
         {% endfor %}
-        {% if request.user.is_superuser %}
         <li>
           <a href="javascript: void(0);" class="waves-effect">
-            <i class="bx bx-home-circle"></i
+            <i class="bx bx-list-ul"></i
             ><span class="badge rounded-pill bg-info float-end"></span>
             <span key="t-dashboards">Mission</span>
           </a>
@@ -46,21 +45,17 @@
             <li><a href="/mission_form/list/" key="t-saas">Mission Form</a></li>
           </ul>
         </li>
-        {% endif %}
+        
 
-        {% if request.user.is_superuser %}
         <li>
-          <a href="javascript: void(0);" class="waves-effect">
-            <i class="bx bx-home-circle"></i
-            ><span class="badge rounded-pill bg-info float-end"></span>
-            <span key="t-dashboards">Data Entry</span>
-          </a>
-          <ul class="sub-menu" aria-expanded="false">
-
-            <li><a href="/login/" key="t-default">User</a></li>
-          </ul>
+            <span class="badge rounded-pill bg-info float-end"></span>
+            <a href="/task-list/" key="t-default"><span key="t-dashboards">Data Entry</span></a>
         </li>
-        {% endif %}
+
+        <li>
+          <span class="badge rounded-pill bg-info float-end"></span>
+          <a href="#" key="t-default"><span key="t-dashboards">Target Entry</span></a>
+      </li>
         </ul>
         
     </div>

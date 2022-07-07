@@ -7,7 +7,8 @@ User = get_user_model()
 
 
 class Task(BaseContent):
-    STATUS_CHOICES = ((1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'),)
+    STATUS_CHOICES = ((1, 'Pending'), (2, 'Submitted for approval'), (3, 'Approved'), (4,  'Rejected'), (5, 'Cancelled'))
+        
     name = models.CharField(max_length=150)
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     vision_centre = models.ForeignKey(VisionCentre, on_delete=models.CASCADE, blank=True, null=True)
@@ -23,29 +24,14 @@ class Task(BaseContent):
         verbose_name_plural = "Task"
 
 class MissionIndicatorAchievement(BaseContent):
-    INTERFACE_TYPES = (('0','Web'),('1','App'),('2','Migrated Data'))
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-    mission = models.ForeignKey(Mission, on_delete=models.CASCADE, blank=True, null=True)
     task = models.ForeignKey(Task, on_delete=models.CASCADE, blank=True, null=True)
-    interface = models.CharField(choices = INTERFACE_TYPES, default = 0, max_length = 2)
     response = JSONField(default=dict)
 
     def __str__(self):
-        return self.mission.name
+        return self.task.name
     
     class Meta:
         verbose_name_plural = "Mission Indicator Achievement"
-
-class MissionIndicatorTarget(BaseContent):
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-    mission = models.ForeignKey(Mission, on_delete=models.CASCADE, blank=True, null=True)
-    response = JSONField(default=dict)
-
-    def __str__(self):
-        return self.mission.name
-    
-    class Meta:
-        verbose_name_plural = "Mission Indicator Target"
 
 
 
