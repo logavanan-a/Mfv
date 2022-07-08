@@ -1,15 +1,18 @@
 from django.contrib import admin
-
-from application_master.models import (District, Donor, Mission,
-                                       MissionIndicator,
-                                       MissionIndicatorCategory,
-                                       MissionQuestion, Partner,
-                                       PartnerMissionMapping, State,
-                                       UserPartnerMapping, VisionCentre,
-                                       MissionIndicatorTarget)
-
 from import_export.admin import ImportExportActionModelAdmin
 
+from application_master.models import (District, Donor, Menus, Mission,
+                                       MissionIndicator,
+                                       MissionIndicatorCategory,
+                                       MissionIndicatorTarget, MissionQuestion,
+                                       Partner, PartnerMissionMapping, State,
+                                       UserPartnerMapping, VisionCentre)
+
+
+@admin.register(Menus)
+class AdminMenus(ImportExportActionModelAdmin,admin.ModelAdmin):
+    def get_list_display(self, request):
+        return [field.name for field in self.model._meta.concrete_fields]
 
 @admin.register(State)
 class AdminState(ImportExportActionModelAdmin,admin.ModelAdmin):
@@ -25,8 +28,6 @@ class AdminDistrict(ImportExportActionModelAdmin,admin.ModelAdmin):
 class AdminVisionCentre(ImportExportActionModelAdmin,admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
-
-
 
 @admin.register(MissionQuestion)
 class AdminMissionQuestion(ImportExportActionModelAdmin,admin.ModelAdmin):
@@ -55,11 +56,13 @@ class AdminPartnerMissionMapping(ImportExportActionModelAdmin,admin.ModelAdmin):
 
 @admin.register(Partner)
 class AdminPartner(ImportExportActionModelAdmin,admin.ModelAdmin):
+    prepopulated_fields = {'slug': ('name',)}
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
 @admin.register(Mission)
 class AdminMission(ImportExportActionModelAdmin,admin.ModelAdmin):
+    prepopulated_fields = {'slug': ('name',)}
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
@@ -70,12 +73,10 @@ class AdminMissionIndicatorTarget(ImportExportActionModelAdmin,admin.ModelAdmin)
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
-
 @admin.register(UserPartnerMapping)
 class AdminUserPartnerMapping(admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
-
 
 # @admin.register(UserPartnerMapping)
 # class AdminUserPartnerMapping(ImportExportActionModelAdmin,admin.ModelAdmin):

@@ -18,7 +18,20 @@ from django.views.generic import RedirectView, View
 
 from mis.models import (MissionIndicatorAchievement,
                         Task)
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
+
+pg_size = 10
+def get_pagination(request,users):
+    paginator = Paginator(users, pg_size) # Show no of object per page
+    page = request.GET.get('page',1)
+    try:
+        users = paginator.page(page)
+    except PageNotAnInteger:
+        users = paginator.page(1)
+    except EmptyPage:
+        users = paginator.page(paginator.num_pages)
+    return users
 
 def login_view(request):
     heading = "Login"
@@ -67,11 +80,12 @@ def mission_form_list(request):
     return render(request, 'mis/missionform_list.html', locals())
 
 @login_required(login_url='/login/')
-def missionindicator_table(request, slug,task_id):
+def missionindicator_add(request, slug,task_id):
     mission_obj = Mission.objects.get(slug = slug)
     heading = mission_obj.name
     programe_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '1')
     finance_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '2')
+    task_obj = Task.objects.get(id = task_id)
 
     if request.method == 'POST':
         data = request.POST
@@ -81,11 +95,10 @@ def missionindicator_table(request, slug,task_id):
         for key,values in temp.items():
             if key != 'csrfmiddlewaretoken':
                 results[key] = int(values[0])
-        
-        task_obj = Task.objects.get(id = task_id)
+
         MissionIndicatorAchievement.objects.create(task = task_obj , response = results)
         
-        return redirect('/mission-list/')
+        return redirect('/task-list/')
 
     return render(request, 'mis/indicator_list.html', locals())
 
@@ -105,8 +118,6 @@ def missionindicator_table_edit(request, slug, id):
 
     mission_respose_obj = MissionIndicatorAchievement.objects.get(id = id)
 
-
-
     if request.method == 'POST':
         data = request.POST
         temp = dict(data)
@@ -118,7 +129,7 @@ def missionindicator_table_edit(request, slug, id):
         mission_respose_obj = MissionIndicatorAchievement.objects.get(id = id)
         mission_respose_obj.response = results
         mission_respose_obj.save()
-        return redirect('/mission-list/')
+        return redirect('/task-list/')
 
     return render(request, 'mis/indicator_edit.html', locals())
 
@@ -190,5 +201,8 @@ def missiontarget_table_edit(request, ids, id):
 
 @login_required(login_url='/login/')
 def task_list(request):
+    heading = " Task List" 
     task_obj = Task.objects.filter(user = request.user)
+
+    object_list = get_pagination(request, task_obj)
     return render(request, 'mis/task_list.html', locals())

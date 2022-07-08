@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block contents %}
+
 <div class="row align-items-center">
     <div class="col-xl-12 mx-auto">
         <div class="card">
@@ -13,27 +14,38 @@
                                         <table id="datatable-button" class="table table-bordered dt-responsive w-100">
                                             <thead>
                                                 <tr>
-                                                    <th style="text-align: center;">Task Name</th>
-                                                    <th style="text-align: center;">Vision Centre Name</th>
-                                                    <th style="text-align: center;">Start Date</th>
-                                                    <th style="text-align: center;">End Date</th>
+                                                    <th>SL No</th>
+                                                    <th>Task Name</th>
+                                                    <th>Vision Centre Name</th>
+                                                    <th>Start Date</th>
+                                                    <th>End Date</th>
+                                                    <th>Task Status</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {% for task in task_obj %}
-                                                <tr>
-                                                    {% if false %}
-                                                    <td><a href="/{{task.vision_centre.mission.slug}}/monthly-report/{{task.id}}/">{{task.name}}</a></td>
-                                                    {% else %}
-                                                    <td><a href="/{{task.vision_centre.mission.slug}}/monthly-report/{{task.id}}/">{{task.name}}</a></td>
-                                                    {% endif %}
-                                                    <td>{{task.vision_centre.name}}</td>
-                                                    <td>{{task.start_date}}</td>
-                                                    <td>{{task.end_date}}</td>
-                                                </tr>
-                                                {% endfor %}
+                                            {% if object_list %}
+                                                {% for task in object_list %}
+                                                    <tr>
+                                                        <td>{{forloop.counter0|add:object_list.start_index}}</td>
+                                                        {% if task.get_task %}
+                                                        <td><a href="/mission_edit/{{task.vision_centre.mission.slug}}/{{task.get_task.id}}/">{{task.name}}</a></td>
+                                                        {% else %}
+                                                        <td><a href="/{{task.vision_centre.mission.slug}}/monthly-report/{{task.id}}/">{{task.name}}</a></td>
+                                                        {% endif %}
+                                                        <td>{{task.vision_centre.name}}</td>
+                                                        <td>{{task.start_date|date:"d-m-Y"}}</td>
+                                                        <td>{{task.end_date|date:"d-m-Y"}}</td>
+                                                        <td>{{task.get_task_status_display}}</td>
+                                                    </tr>
+                                                {% endfor %}  
+                                            {% else %}
+                                                <td colspan="6" class="text-primary">No records found</td>
+                                            {% endif %} 
                                             </tbody>
                                         </table>
+                                        {% if object_list %}
+                                        {% include 'partials/pagination.html' %}
+                                    {% endif %}
                                 </div>     
                             </div>     
                         </div>
