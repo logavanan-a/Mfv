@@ -11,7 +11,7 @@ urlpatterns = [
 
     path('task-list/', task_list, name="task-list"),
     path('<slug:slug>/monthly-report/<task_id>/', missionindicator_add, name='mission_add'),
-    path('mission_edit/<slug:slug>/<id>/', missionindicator_table_edit,name='mission_edit'),
+    path('mission_edit/<slug:slug>/<id>/', missionindicator_edit,name='mission_edit'),
     
     path('mission-list/', mission_list, name="mission-list"),
     path('mission-indicator/edit/list/', mission_indicator_edit),
@@ -21,6 +21,8 @@ urlpatterns = [
 
     path('mission_form/list/', mission_form_list, name="mission_form_list"),
     path('generator_form/<id>/', generator_form, name='generator_form'),
+    
+    path("ajax-task/<task_id>", task_submitted_approval, name="submitted_approval"),
 
 	]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

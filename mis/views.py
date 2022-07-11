@@ -5,24 +5,23 @@ import json
 import requests
 from application_master.models import (BaseContent, Mission, MissionIndicator,
                                        MissionIndicatorCategory,
-                                       MissionQuestion, VisionCentre)
+                                       MissionQuestion, UserPartnerMapping,
+                                       VisionCentre)
 from django.conf import settings
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout,get_user
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, auth
 from django.contrib.sessions.models import Session
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.shortcuts import (HttpResponse, HttpResponseRedirect, redirect,
                               render)
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView, View
 
-from mis.models import (MissionIndicatorAchievement,
-                        Task)
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-
+from mis.models import MissionIndicatorAchievement, Task
 
 pg_size = 10
-def get_pagination(request,users):
+def get_pagination(request,users=1):
     paginator = Paginator(users, pg_size) # Show no of object per page
     page = request.GET.get('page',1)
     try:
@@ -47,6 +46,7 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user) 
+           
             return redirect('/task-list/')
             # configure_error = load_user_details_to_sessions(request)
             # if not configure_error:
@@ -86,20 +86,18 @@ def missionindicator_add(request, slug,task_id):
     programe_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '1')
     finance_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '2')
     task_obj = Task.objects.get(id = task_id)
+    user = get_user(request)
+    user_role = str(user.groups.last())
 
     if request.method == 'POST':
         data = request.POST
-        # print(data,'data')
-        temp = dict(data)
+        # temp = dict(data)
         results = {}
-        for key,values in temp.items():
+        for key,values in dict(data).items():
             if key != 'csrfmiddlewaretoken':
                 results[key] = int(values[0])
-
         MissionIndicatorAchievement.objects.create(task = task_obj , response = results)
-        
         return redirect('/task-list/')
-
     return render(request, 'mis/indicator_list.html', locals())
 
 @login_required(login_url='/login/')
@@ -108,15 +106,14 @@ def mission_indicator_edit(request):
     return render(request, 'mis/mission_indicator_edit.html', locals())
 
 @login_required(login_url='/login/')
-def missionindicator_table_edit(request, slug, id):
+def missionindicator_edit(request, slug, id):
     mission_obj = Mission.objects.get(slug = slug)
     heading = mission_obj.name
-    # mic_obj = MissionIndicatorCategory.objects.filter(mission__slug = slug)
-
+    mission_respose_obj = MissionIndicatorAchievement.objects.get(id = id)
     programe_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '1')
     finance_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '2')
-
-    mission_respose_obj = MissionIndicatorAchievement.objects.get(id = id)
+    user = get_user(request)
+    user_role = str(user.groups.last())
 
     if request.method == 'POST':
         data = request.POST
@@ -125,7 +122,6 @@ def missionindicator_table_edit(request, slug, id):
         for key,values in temp.items():
             if key != 'csrfmiddlewaretoken':
                 results[key] = int(values[0])
-        
         mission_respose_obj = MissionIndicatorAchievement.objects.get(id = id)
         mission_respose_obj.response = results
         mission_respose_obj.save()
@@ -165,9 +161,7 @@ def missionindicator_target(request, id):
             if key != 'csrfmiddlewaretoken':
                 results[key] = int(values[0])
         MissionIndicatorTarget.objects.create(created_by = request.user, mission = mission_obj, response = results)
-
-        if True:
-            return redirect('/mission-list/')
+        return redirect('/mission-list/')
     return render(request, 'mis/add_target.html', locals())
 
 @login_required(login_url='/login/')
@@ -190,19 +184,33 @@ def missiontarget_table_edit(request, ids, id):
         for key,values in temp.items():
             if key != 'csrfmiddlewaretoken':
                 results[key] = int(values[0])
-        
         mission_respose_obj = MissionIndicatorTarget.objects.get(id = id)
         mission_respose_obj.response = results
         mission_respose_obj.save()
-
-        if True:
-            return redirect('/mission-list/')
+        return redirect('/mission-list/')
     return render(request, 'mis/target_edit.html', locals())
 
 @login_required(login_url='/login/')
 def task_list(request):
-    heading = " Task List" 
-    task_obj = Task.objects.filter(user = request.user)
+    user = get_user(request)
+    if user.groups.filter(name = 'Partner Admin').exists():
+        user_list = UserPartnerMapping.objects.get(user = request.user)
+        for user_list1 in UserPartnerMapping.objects.filter(partner = user_list.partner).exclude(user = request.user):
+            task_obj = Task.objects.filter(user = user_list1.user)
+            # print(task_obj,obj_list)
+    else:
+        task_obj = Task.objects.filter(user = request.user)
 
+    # task_obj = Task.objects.filter(user = request.user)
     object_list = get_pagination(request, task_obj)
     return render(request, 'mis/task_list.html', locals())
+
+@csrf_exempt 
+def task_submitted_approval(request, task_id):
+    if request.method == "POST":
+        status_val = request.POST.get('status_val')
+        task_obj = Task.objects.get(id = task_id)
+        task_obj.task_status = status_val
+        task_obj.save()
+        return HttpResponse({"message":'true'} , content_type="application/json")
+    return HttpResponse({"message":'false'}, content_type="application/json")  
