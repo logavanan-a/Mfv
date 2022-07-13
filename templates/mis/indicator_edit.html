@@ -6,134 +6,106 @@
     <div class="col-xl-12 mx-auto">
         <div class="card">
             <div class="card-body">
-                <form method='POST' class="needs-validation" enctype="multipart/form-data" novalidate>
+                {%  if 'Partner Data Entry Operator' == user_role and mission_respose_obj.task.task_status == 1 or mission_respose_obj.task.task_status == 4 %}
+                <div style="display: flex;justify-content: flex-end;align-items: center;">
+                    <input type='button' id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{mission_respose_obj.task.id}}',2,'Submit for Approval')">
+                  </div>
+                {% endif %}
+                <form method='POST' class="" action="/mission_edit/{{slug}}/{{id}}/" enctype="multipart/form-data" novalidate>
                     {% csrf_token %}
-
                     {% if programe_category %}
                     <h5>Program Data</h5>
                     {% for data in programe_category %}
+                        <div class="table-responsive">
+                            <h5> {{data.name}} </h5>
+                            <table class="table table-hover">
+                                <thead >
+                                    <tr><th>Indicator</th>
+                                        <th>Indicator Type</th> 
+                                        <th>Total </th>
+                                        <th>Adult Male</th>
+                                        <th>Adult Female</th>
+                                        <th>Child Male</th>
+                                        <th>Child Female</th>
+                                    </tr>
+                                </thead>
+                                    {% for sub_category in data.sub_category %}
+                                    <tbody>
+                                        <td>{{sub_category.name}}</td> 
+                                        <td>{{sub_category.get_indicator_type_display}} </td> 
+                                        
+                                        <td>     
+                                            {% disply_indicator_values mission_respose_obj.id sub_category.id  'total_' as total %}                                  
+                                            <input type="number" name="total_{{sub_category.id}}" value="{{total}}" class="form-control" maxlength="5"> 
+                                                                                    
+                                            <div class="invalid-feedback">Please enter the Total value</div>
+                                        </td>
 
-                    <div class="table-responsive">
-                        <h5> {{data.name}} </h5>
-                        <table class="table table-hover a" id="hospital_report">
-                            <thead >
-                                <tr><th>Indicator</th>
-                                    <th>Indicator Type</th> 
-                                    <th>Total </th>
-                                    <th>Adult Male</th>
-                                    <th>Adult Female</th>
-                                    <th>Adult Transgender</th>
-                                    <th>Child Male</th>
-                                    <th>Child Female</th>
-                                    <th>Child Transgender</th>
-                                </tr>
-                            </thead>
-                                {% for sub_category in data.sub_category %}
-                                <tbody>
-                                    <td>{{sub_category.name}}</td> 
-                                    <td>{{sub_category.get_indicator_type_display}} </td> 
-                                    
-                                    <td>     
-                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'total_' as total %}                                  
-                                        <input type="number" name="total_{{sub_category.id}}" value="{{total}}" class="form-control input_style qty" maxlength="5" required=""> 
-                                                                                   
-                                        <div class="invalid-feedback">Please enter the Total value</div>
-                                    </td>
+                                        <td>
+                                            {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_male_' as adult_male %}  
+                                            <input type="number"  name="adult_male_{{sub_category.id}}" value="{{adult_male}}" class="form-control" maxlength="5" >
+                                        </td>
 
-                                    <td>
-                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_male_' as adult_male %}  
-                                        <input type="number"  name="adult_male_{{sub_category.id}}" value="{{adult_male}}" class="form-control input_style qty" maxlength="5" required="" >
-                                        <div class="invalid-feedback">Please enter the Adult Male value</div>
-                                    </td>
+                                        <td>
+                                            {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_female_' as adult_female %} 
+                                            <input type="number"  name="adult_female_{{sub_category.id}}" value="{{adult_female}}" class="form-control" maxlength="5">
+                                        </td>
 
-                                     <td>
-                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_female_' as adult_female %} 
-                                        <input type="number"  name="adult_female_{{sub_category.id}}" value="{{adult_female}}" class="form-control input_style qty" maxlength="5" required="">
-                                        <div class="invalid-feedback">Please enter the Adult Female value</div>
-                                    </td>
+                                        <td>
+                                            {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_male_' as child_male %}
+                                            <input type="number"  name="child_male_{{sub_category.id}}" value="{{child_male}}" class="form-control" maxlength="5">
+                                        </td>
 
-                                    <td>
-                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_transgender_' as adult_transgender %}
-                                        <input type="number"  name="adult_transgender_{{sub_category.id}}" value="{{adult_transgender}}" class="form-control input_style qty" maxlength="5" required="">
-                                        <div class="invalid-feedback">Please enter the Adult Transgender_ value</div>
-                                    </td>
-
-                                   <td>
-                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_male_' as child_male %}
-                                        <input type="number"  name="child_male_{{sub_category.id}}" value="{{child_male}}" class="form-control input_style qty" maxlength="5" required="">
-                                        <div class="invalid-feedback">Please enter the Target value</div>
-                                    </td>
-
-                                    <td>
-                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_female_' as child_female %}
-                                        <input type="number"  name="child_female_{{sub_category.id}}" value="{{child_female}}" class="form-control input_style qty" maxlength="5" required="">
-                                        <div class="invalid-feedback">Please enter the Target value</div>
-                                    </td>
-
-                                    <td>
-                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_transgender_' as child_transgender %}
-                                        <input type="number"  name="child_transgender_{{sub_category.id}}" value="{{child_transgender}}" class="form-control input_style qty" maxlength="5" required="">
-                                        <div class="invalid-feedback">Please enter the Target value</div>
-                                    </td>
-                                    
-                                </tbody>    
-                                {% endfor %} 
-                        </table>
-                    </div>
-                    {% endfor %} 
+                                        <td>
+                                            {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_female_' as child_female %}
+                                            <input type="number"  name="child_female_{{sub_category.id}}" value="{{child_female}}" class="form-control" maxlength="5">
+                                        </td>
+                                       
+                                    </tbody>    
+                                    {% endfor %} 
+                            </table>
+                        </div>
+                        {% endfor %} 
 
                     {% endif %}
 
                     {% if finance_category %}
                     <h5>Finance Data</h5>
-                    
                     {% for fin_data in finance_category %}
-
-                    <div class="table-responsive">
-                        <h5> {{fin_data.name}} </h5>
-                        <table class="table table-hover a" id="hospital_report">
-                            <thead >
-                                <tr><th>Indicator</th>
-                                    <th>Indicator Type</th> 
-                                    <th>Actual</th>
-                                </tr>
-                            </thead>
-                                {% for sub_category in fin_data.sub_category %}
-                                <tbody>
-                                    <td>{{sub_category.name}}</td> 
-                                    <td>{{sub_category.get_indicator_type_display}}</td> 
-
-                                    <td>
-                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'actual_' as actual %}                                  
-                                        <input type="number"  name="actual_{{sub_category.id}}" value="{{actual}}" class="form-control input_style qty" maxlength="5" required="">
-                                        <div class="invalid-feedback">Please enter the Total value</div>
-                                    </td> 
-
-                                </tbody>   
-                                {% endfor %} 
-                        </table>
-                    </div>
-                    {% endfor %} 
-
+                        <div class="table-responsive">
+                            <h5> {{fin_data.name}} </h5>
+                            <table class="table table-hover a" id="hospital_report">
+                                <thead >
+                                    <tr><th>Indicator</th>
+                                        <th>Indicator Type</th> 
+                                        <th>Actual</th>
+                                    </tr>
+                                </thead>
+                                    {% for sub_category in fin_data.sub_category %}
+                                    <tbody>
+                                        <td>{{sub_category.name}}</td> 
+                                        <td>{{sub_category.get_indicator_type_display}}</td> 
+                                        <td>
+                                            {% disply_indicator_values mission_respose_obj.id sub_category.id  'actual_' as actual %}                                  
+                                            <input type="number"  name="actual_{{sub_category.id}}" value="{{actual}}" class="form-control" maxlength="5">
+                                        </td> 
+                                    </tbody>   
+                                    {% endfor %} 
+                            </table>
+                        </div>
+                        {% endfor %} 
                     {% endif %}
 
                     <div class="modal-footer">
                             {%  if 'Partner Data Entry Operator' == user_role %}
                                 {% if mission_respose_obj.task.task_status == 1 or mission_respose_obj.task.task_status == 4 %}
                                 <button type="submit" class="btn btn-primary  ml-2">Save</button>
-                                <button type="submit" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{task_id}}',2,'Submit for Approval')">
-                                    Submit for Approval
-                                </button>
                                 <button type="reset" onclick="location.href='/task-list/'" class="btn btn-secondary waves-effect">Cancel</button>
                                 {% endif %}
                             {%  elif 'Partner Admin' == user_role %}
                                 {% if mission_respose_obj.task.task_status == 2 %}
-                                <button type="button" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{task_id}}',3,'Approve')" >    
-                                    Approved
-                                </button>
-                                <button type="button" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{task_id}}',4,'Reject')" >
-                                    Reject
-                                </button>
+                                <button type="button" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{mission_respose_obj.task.id}}',3,'Approve')">Approved</button>
+                                <button type="button" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{mission_respose_obj.task.id}}',4,'Reject')">Reject</button>
                                 <button type="reset" onclick="location.href='/task-list/'" class="btn btn-secondary waves-effect">Cancel</button>
                                 {% endif %}
                             {% endif %}
@@ -144,34 +116,28 @@
         </div>
     </div>
 </div>
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="/static/app-assets/vendors/js/extensions/sweetalert2.all.min.js"></script>
-    <script src="/static/app-assets/js/scripts/extensions/ext-component-sweet-alerts.js"></script>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-    
-    <script>
-        function Confirm(task_id,val,title){
-            Swal.fire({
-            title: 'Are you sure you want to '+ title +' ?',
-            showCancelButton: true,
-            confirmButtonText: 'Yes',
-            }).then((result) => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed){
-                $.ajax({
-                url: "/ajax-task/"+task_id,
-                type:'POST',
-                data:{status_val:val}, 
-                dataType: 'json',
-                success: function(result) {
-                    // window.location.reload();
-                } 
-            });
-            }
-            }).then(function(){ window.location.reload() })
-            }
-        </script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function Confirm(task_id,val,title){
+        Swal.fire({
+        title: 'Are you sure you want to '+ title +' ?',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed){
+            $.ajax({
+            url: '/ajax-task/'+task_id,
+            type:'POST',
+            data:{status_val:val}, 
+            dataType: 'json',
+            success: function(result) {
+                window.location.reload();
+            } 
+        });
+        }
+    }).then(function(){ window.location.reload(); })
+    }
+</script>
 
 {% endblock %}

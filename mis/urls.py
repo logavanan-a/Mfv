@@ -20,9 +20,8 @@ urlpatterns = [
     path('target_table_edit/<ids>/<id>/', missiontarget_table_edit),
 
     path('mission_form/list/', mission_form_list, name="mission_form_list"),
-    path('generator_form/<id>/', generator_form, name='generator_form'),
     
-    path("ajax-task/<task_id>", task_submitted_approval, name="submitted_approval"),
+    path("ajax-task/<task_id>", task_status_changes, name="submitted_approval"),
 
 	]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

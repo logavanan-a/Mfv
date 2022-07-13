@@ -4,10 +4,9 @@ from import_export.admin import ImportExportActionModelAdmin
 from application_master.models import (District, Donor, Menus, Mission,
                                        MissionIndicator,
                                        MissionIndicatorCategory,
-                                       MissionIndicatorTarget, MissionQuestion,
-                                       Partner, PartnerMissionMapping, State,
-                                       UserPartnerMapping, VisionCentre)
-
+                                       MissionIndicatorTarget,
+                                       Partner, PartnerMissionDonorMapping, State,
+                                       UserPartnerMapping, Facility)
 
 @admin.register(Menus)
 class AdminMenus(ImportExportActionModelAdmin,admin.ModelAdmin):
@@ -24,13 +23,8 @@ class AdminDistrict(ImportExportActionModelAdmin,admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
-@admin.register(VisionCentre)
-class AdminVisionCentre(ImportExportActionModelAdmin,admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.concrete_fields]
-
-@admin.register(MissionQuestion)
-class AdminMissionQuestion(ImportExportActionModelAdmin,admin.ModelAdmin):
+@admin.register(Facility)
+class AdminFacility(ImportExportActionModelAdmin,admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
@@ -49,8 +43,8 @@ class AdminDonor(ImportExportActionModelAdmin,admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
-@admin.register(PartnerMissionMapping)
-class AdminPartnerMissionMapping(ImportExportActionModelAdmin,admin.ModelAdmin):
+@admin.register(PartnerMissionDonorMapping)
+class AdminPartnerMissionDonorMapping(ImportExportActionModelAdmin,admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 

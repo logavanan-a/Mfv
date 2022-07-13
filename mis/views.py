@@ -4,9 +4,8 @@ import json
 
 import requests
 from application_master.models import (BaseContent, Mission, MissionIndicator,
-                                       MissionIndicatorCategory,
-                                       MissionQuestion, UserPartnerMapping,
-                                       VisionCentre)
+                                       MissionIndicatorCategory,Facility,
+                                        UserPartnerMapping)
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout,get_user
 from django.contrib.auth.decorators import login_required
@@ -21,7 +20,7 @@ from django.views.generic import RedirectView, View
 from mis.models import MissionIndicatorAchievement, Task
 
 pg_size = 10
-def get_pagination(request,users=1):
+def get_pagination(request, users = None):
     paginator = Paginator(users, pg_size) # Show no of object per page
     page = request.GET.get('page',1)
     try:
@@ -91,13 +90,17 @@ def missionindicator_add(request, slug,task_id):
 
     if request.method == 'POST':
         data = request.POST
-        # temp = dict(data)
+        temp = dict(data)
         results = {}
-        for key,values in dict(data).items():
-            if key != 'csrfmiddlewaretoken':
+        for key,values in temp.items():
+            if key != 'csrfmiddlewaretoken' and values[0] != '':
+                # print(values)
                 results[key] = int(values[0])
-        MissionIndicatorAchievement.objects.create(task = task_obj , response = results)
-        return redirect('/task-list/')
+
+        mission_add = MissionIndicatorAchievement.objects.create(task = task_obj , response = results)
+        return redirect('mis:mission_edit', slug = slug, id = mission_add.id)
+        # return redirect('/task-list/')
+
     return render(request, 'mis/indicator_list.html', locals())
 
 @login_required(login_url='/login/')
@@ -120,32 +123,16 @@ def missionindicator_edit(request, slug, id):
         temp = dict(data)
         results = {}
         for key,values in temp.items():
-            if key != 'csrfmiddlewaretoken':
+            if key != 'csrfmiddlewaretoken' and values[0] != '':
                 results[key] = int(values[0])
         mission_respose_obj = MissionIndicatorAchievement.objects.get(id = id)
         mission_respose_obj.response = results
         mission_respose_obj.save()
-        return redirect('/task-list/')
 
+        
+        # return redirect('/task-list/')
     return render(request, 'mis/indicator_edit.html', locals())
 
-@login_required(login_url='/login/')
-def generator_form(request, id):
-    mission_obj = Mission.objects.get(id = id)
-    heading = mission_obj.name
-    missionform_obj = MissionQuestion.objects.filter(mission__id = id)
-
-    if request.method == 'POST':
-        data = request.POST
-        temp = dict(data)
-        results = {}
-        for key,values in temp.items():
-            if key != 'csrfmiddlewaretoken':
-                results[key] = values[0]
-        MissionIndicatorAchievement.objects.create( response = results)
-      
-        return redirect('/mission_form/list/')
-    return render(request, 'mis/generator_form.html', locals())
 
 def missionindicator_target(request, id):
     mission_obj = Mission.objects.get(id = id)
@@ -193,6 +180,7 @@ def missiontarget_table_edit(request, ids, id):
 @login_required(login_url='/login/')
 def task_list(request):
     user = get_user(request)
+    
     if user.groups.filter(name = 'Partner Admin').exists():
         user_list = UserPartnerMapping.objects.get(user = request.user)
         for user_list1 in UserPartnerMapping.objects.filter(partner = user_list.partner).exclude(user = request.user):
@@ -201,16 +189,26 @@ def task_list(request):
     else:
         task_obj = Task.objects.filter(user = request.user)
 
-    # task_obj = Task.objects.filter(user = request.user)
     object_list = get_pagination(request, task_obj)
     return render(request, 'mis/task_list.html', locals())
 
 @csrf_exempt 
-def task_submitted_approval(request, task_id):
+def task_status_changes(request, task_id):
     if request.method == "POST":
         status_val = request.POST.get('status_val')
+        print(status_val,'status_val')
         task_obj = Task.objects.get(id = task_id)
         task_obj.task_status = status_val
         task_obj.save()
         return HttpResponse({"message":'true'} , content_type="application/json")
     return HttpResponse({"message":'false'}, content_type="application/json")  
+
+
+# def task_create():
+#     for user_obj in User.objects.filter(is_superuser = False):
+#         if user_obj:
+#             for visio_ncentre in Facility.objects.all():
+#                 string_cancate = visio_ncentre.partner_mission_mapping.mission.name +" "+visio_ncentre.name+" july 2022"
+#                 # print(string_cancate)
+#                 added = Task(facility = visio_ncentre,user=user_obj, name = string_cancate, start_date="2022-07-01",end_date= "2022-07-31")
+#                 added.save()

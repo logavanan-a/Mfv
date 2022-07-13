@@ -5,9 +5,13 @@
     <div class="col-xl-12 mx-auto">
         <div class="card">
             <div class="card-body">
-                <form method='POST' class="needs-validation" enctype="multipart/form-data" novalidate>
+                {%  if 'Partner Data Entry Operator' == user_role and task_obj.task_status == 1 or task_obj.task_status == 4 %}
+                <div style="display: flex;justify-content: flex-end;align-items: center;">
+                    <input type='button' id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{task_id}}',2,'Submit for Approval')">
+                  </div>
+                {% endif %}
+                <form method='POST' class="" enctype="multipart/form-data"  novalidate>
                     {% csrf_token %}
-                    
                     {% if programe_category %}
                     <h5>Program Data</h5>
                         {% for data in programe_category %}
@@ -20,10 +24,8 @@
                                         <th>Total </th>
                                         <th>Adult Male</th>
                                         <th>Adult Female</th>
-                                        <th>Adult Transgender</th>
                                         <th>Child Male</th>
                                         <th>Child Female</th>
-                                        <th>Child Transgender</th>
                                     </tr>
                                 </thead>
                                     {% for sub_category in data.sub_category %}
@@ -31,31 +33,23 @@
                                         <td>{{sub_category.name}}</td> 
                                         <td>{{sub_category.get_indicator_type_display}}</td> 
                                         <td>
-                                            <input type="number"  name="total_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
-                                            <div class="invalid-feedback">Please enter the Total value</div>
+                                            <input type="text" id="txtresult"  name="total_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" readonly>
+                                            <!-- <div class="invalid-feedback">Please enter the Total value</div> -->
                                         </td> 
-                                        <td><input type="number"  name="adult_male_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="" >
-                                            <div class="invalid-feedback">Please enter the Adult Male value</div>
+                                        <td><input type="number" id="Text1"  name="adult_male_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" onkeypress="return add_number(event)">
+                                            <!-- <div class="invalid-feedback">Please enter the Adult Male value</div> -->
                                         </td>
                                         <td>
-                                            <input type="number"  name="adult_female_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
-                                            <div class="invalid-feedback">Please enter the Adult Female value</div>
+                                            <input type="number" id="Text2" name="adult_female_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" onkeypress="return add_number(event)">
+                                            <!-- <div class="invalid-feedback">Please enter the Adult Female value</div> -->
                                         </td>
                                         <td>
-                                            <input type="number"  name="adult_transgender_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
-                                            <div class="invalid-feedback">Please enter the Adult Transgender_ value</div>
+                                            <input type="number" id="Text3" name="child_male_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" onkeypress="return add_number(event)">
+                                            <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                         </td>
                                         <td>
-                                            <input type="number"  name="child_male_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
-                                            <div class="invalid-feedback">Please enter the Target value</div>
-                                        </td>
-                                        <td>
-                                            <input type="number"  name="child_female_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
-                                            <div class="invalid-feedback">Please enter the Target value</div>
-                                        </td>
-                                        <td>
-                                            <input type="number"  name="child_transgender_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
-                                            <div class="invalid-feedback">Please enter the Target value</div>
+                                            <input type="number" id="Text4" name="child_female_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" onkeypress="return add_number(event)">
+                                            <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                         </td>
                                     </tbody>   
                                     {% endfor %} 
@@ -82,8 +76,8 @@
                                         <td>{{sub_category.name}}</td> 
                                         <td>{{sub_category.get_indicator_type_display}}</td> 
                                         <td>
-                                            <input type="number"  name="actual_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" required="">
-                                            <div class="invalid-feedback">Please enter the Total value</div>
+                                            <input type="number" name="actual_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5">
+                                            <!-- <div class="invalid-feedback">Please enter the Total value</div> -->
                                         </td> 
                                     </tbody>   
                                     {% endfor %} 
@@ -93,28 +87,26 @@
                     {% endif %}
 
                     <div class="modal-footer">
+                    {%  if 'Partner Data Entry Operator' == user_role %}
+                        {% if task_obj.task_status == 1 or task_obj.task_status == 4 %}
+                        <button type="submit" class="btn btn-primary  ml-2">Save</button>
+                        <!-- <button type="submit" value="" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{task_id}}',2,'Submit for Approval')" >
+                            Submit for Approval
+                        </button> -->
+                        <button type="reset" onclick="location.href='/task-list/'" class="btn btn-secondary waves-effect">Cancel</button>
+                        {% endif %}
+                    {%  elif 'Partner Admin' == user_role %}
+                        {% if task_obj.task_status == 2 %}
+                        <button type="submit" value="" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{task_id}}',3,'Approve')" >    
+                            Approve
+                        </button>
+                        <button type="submit" value="}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{task_id}}',4,'Reject')" >
+                            Reject
+                        </button>
+                        <button type="reset" onclick="location.href='/task-list/'" class="btn btn-secondary waves-effect">Cancel</button>
+                        {% endif %}
 
-                            {%  if 'Partner Data Entry Operator' == user_role %}
-                                {% if task_obj.task_status == 1 or task_obj.task_status == 4 %}
-                                <button type="submit" class="btn btn-primary  ml-2">Save</button>
-                                <button type="submit" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{task_id}}',2,'Submit for Approval')" >
-                                    Submit for Approval
-                                </button>
-                                <button type="reset" onclick="location.href='/task-list/'" class="btn btn-secondary waves-effect">Cancel</button>
-                                {% endif %}
-                            {%  elif 'Partner Admin' == user_role %}
-
-                                {% if task_obj.task_status == 2 %}
-                                <button type="submit" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{task_id}}',3,'Approve')" >    
-                                    Approve
-                                </button>
-                                <button type="submit" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{task_id}}',4,'Reject')" >
-                                    Reject
-                                </button>
-                                <button type="reset" onclick="location.href='/task-list/'" class="btn btn-secondary waves-effect">Cancel</button>
-                                {% endif %}
-
-                            {% endif %}
+                    {% endif %}
 
                     </div>
                 </form>
@@ -122,12 +114,34 @@
         </div>
     </div>
 </div>
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="/static/app-assets/vendors/js/extensions/sweetalert2.all.min.js"></script>
-    <script src="/static/app-assets/js/scripts/extensions/ext-component-sweet-alerts.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+    function add_number(e) {
+    if (isNumberKey(e)) {
+        setTimeout(() => {
+        var first_number = document.getElementById("Text1").value !== "" ? parseInt(document.getElementById("Text1").value) : 0;
+        var second_number = document.getElementById("Text2").value !== "" ? parseInt(document.getElementById("Text2").value) : 0;
+        var three_number = document.getElementById("Text3").value !== "" ? parseInt(document.getElementById("Text3").value) : 0;
+        var four_number = document.getElementById("Text4").value !== "" ? parseInt(document.getElementById("Text4").value) : 0;
+
+        var result = first_number + second_number+ three_number + four_number;
+        document.getElementById("txtresult").value = result;
+        }, 50)
+        return true;
+    } else {
+        return false;
+    }
+    }
+
+    function isNumberKey(evt) {
+    var charCode = (evt.which) ? evt.which : event.keyCode
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+        return false;
+    }
+    return true;
+    }
+</script>
 
     <script>
         function Confirm(task_id,val,title){
@@ -139,16 +153,16 @@
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed){
                 $.ajax({
-                url: "/ajax-task/"+task_id,
+                url: '/ajax-task/'+task_id,
                 type:'POST',
                 data:{status_val:val}, 
                 dataType: 'json',
                 success: function(result) {
-                    // window.location.reload();
+                    window.location.reload();
                 } 
             });
             }
-        }).then(function(){ window.location.reload() })
+        }).then(function(){ window.location.reload(); })
         }
     </script>
 

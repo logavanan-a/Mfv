@@ -70,15 +70,11 @@
                     <div class="row">   
                         <div class="col-12">
                             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                               
                                     <h2 class="mb-sm-0 font-size-20">{{heading}} {% if details %}<span class='text-muted'>-{{details}}</span>{% endif %}</h2>
                                     <h2 class="mb-sm-0 font-size-20"> 
                                         {% if task_obj.task_status or mission_respose_obj.task.task_status %}
-                                        <span class='text-muted'>Status:{{task_obj.get_task_status_display}} {{mission_respose_obj.task.get_task_status_display}} </span>
-                                        
-                                        
-                                        
-                                        {% endif %}</h2>
+                                        <span class='text-muted'>Status:{{task_obj.get_task_status_display}} {{mission_respose_obj.task.get_task_status_display}} </span>                                       
+                                       {% endif %}</h2>
                             </div>
                         </div>
                

@@ -1,4 +1,4 @@
-from application_master.models import BaseContent, VisionCentre
+from application_master.models import BaseContent, Facility
 from django.contrib.auth.models import User
 from django.db import models
 from jsonfield import JSONField
@@ -7,16 +7,17 @@ from jsonfield import JSONField
 # declare a new model with a name "Task"
 class Task(BaseContent):
     STATUS_CHOICES = ((1, 'Pending'), (2, 'Submitted for approval'), (3, 'Approved'), (4,  'Rejected'), (5, 'Cancelled'))
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length = 150)
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
-    vision_centre = models.ForeignKey(VisionCentre, on_delete=models.CASCADE, blank=True, null=True)
+    facility = models.ForeignKey(Facility, on_delete = models.DO_NOTHING, blank=True, null=True)
     start_date = models.DateField()
     end_date = models.DateField()
-    task_status = models.IntegerField(choices=STATUS_CHOICES, default=1)
+    task_status = models.IntegerField(choices = STATUS_CHOICES, default=1)
     extension_date = models.DateField(blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "Task"
+        ordering = ['-id']
 
     def __str__(self):
         return self.name
@@ -31,7 +32,7 @@ class Task(BaseContent):
 
 # declare a new model with a name "MissionIndicatorAchievement"
 class MissionIndicatorAchievement(BaseContent):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, blank=True, null=True)
+    task = models.ForeignKey(Task, on_delete=models.DO_NOTHING, blank=True, null=True)
     response = JSONField(default=dict)
 
     class Meta:
