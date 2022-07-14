@@ -11,7 +11,14 @@
                     <input type='button' id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{mission_respose_obj.task.id}}',2,'Submit for Approval')">
                   </div>
                 {% endif %}
-                <form method='POST' class="" action="/mission_edit/{{slug}}/{{id}}/" enctype="multipart/form-data" novalidate>
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                <form method='POST' class="" enctype="multipart/form-data" novalidate>
                     {% csrf_token %}
                     {% if programe_category %}
                     <h5>Program Data</h5>

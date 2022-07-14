@@ -12,6 +12,10 @@ urlpatterns = [
     path('task-list/', task_list, name="task-list"),
     path('<slug:slug>/monthly-report/<task_id>/', missionindicator_add, name='mission_add'),
     path('mission_edit/<slug:slug>/<id>/', missionindicator_edit,name='mission_edit'),
+
+    path('facility-list/', facility_list, name="facility-list"),
+    path('facility-add/', FacilityAdd.as_view(), name='facility-add'),
+    path('facility-edit/<id>/', FacilityUpdate.as_view(), name='facility-edit'),
     
     path('mission-list/', mission_list, name="mission-list"),
     path('mission-indicator/edit/list/', mission_indicator_edit),

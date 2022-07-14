@@ -4,6 +4,7 @@ from django.template.defaultfilters import slugify
 from django.urls import reverse
 from jsonfield import JSONField
 
+
 class BaseContent(models.Model):
     ACTIVE_CHOICES  = ((2, 'Active'),(0,"Inactive"))
     active          = models.PositiveIntegerField(choices = ACTIVE_CHOICES, default = 2)
@@ -86,7 +87,6 @@ class UserPartnerMapping(BaseContent):
     def __str__(self):
         return self.partner.name
 
-
 class Donor(BaseContent):
     name = models.CharField(max_length=350)
     logo = models.ImageField(upload_to = 'image_folder/', blank=True)
@@ -96,7 +96,6 @@ class Donor(BaseContent):
 
     def __str__(self):
         return self.name
-    
     
 class Mission(BaseContent):
     MISSION_CHOICES = ((1,'Indicator'),(2,'Form'))
@@ -115,7 +114,7 @@ class Mission(BaseContent):
         super(Mission, self).save()
 
     def get_absolute_url(self):
-        return reverse("mis:mission_add", kwargs={"slug": self.slug})
+        return reverse("mis:mission_add", kwargs = {"slug": self.slug})
 
 class PartnerMissionDonorMapping(BaseContent):
     partner = models.ForeignKey(Partner, on_delete = models.DO_NOTHING)
@@ -126,15 +125,12 @@ class PartnerMissionDonorMapping(BaseContent):
         verbose_name_plural = "Partner Mission Donor Mapping"
 
     def __str__(self):
-        return self.partner.name
+        return f"{self.partner.name} - {self.donor.name} - {self.mission.name}"
 
-# class VisionCentre(BaseContent):
-class Facility(BaseContent):# FORM ADD Edit list(user base )
-    name = models.CharField(max_length = 350) #1
-    # partner =  models.ForeignKey(Partner, on_delete = models.DO_NOTHING)
+class Facility(BaseContent):
+    name = models.CharField(max_length = 350)
     partner_mission_mapping =  models.ForeignKey(PartnerMissionDonorMapping, on_delete = models.DO_NOTHING)
-    # mission = models.ForeignKey(Mission, on_delete = models.DO_NOTHING)
-    district =  models.ForeignKey(District, on_delete = models.DO_NOTHING)
+    district = models.ForeignKey(District, on_delete = models.DO_NOTHING)
     location = models.CharField(max_length = 350)
 
     class Meta:
@@ -172,19 +168,20 @@ class MissionIndicator(BaseContent):
         return self.name
     
 class MissionIndicatorTarget(BaseContent):
-    created_by = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True)
     mission_indicator = models.ForeignKey(MissionIndicator, on_delete=models.DO_NOTHING, blank=True, null=True)
+    facility = models.ForeignKey(Facility, on_delete=models.DO_NOTHING, blank=True, null=True)
     target = models.IntegerField()
     periodicity_date = models.DateField(blank=True, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "Mission Indicator Target"
 
     def __str__(self):
-        return f"{self.mission_indicator.name} - {created_by.username}"
+        return f"{self.mission_indicator.name} - {self.created_by.username}"
 
-#models.CASCADE, DoNothing
 class FacilityFiles(BaseContent):
+    name = models.CharField(max_length=350) 
     facility = models.ForeignKey(Facility, on_delete = models.CASCADE, blank=True, null=True)
     upload_file = models.FileField()
     created_by = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True, related_name='created_by')
@@ -195,4 +192,3 @@ class FacilityFiles(BaseContent):
 
     def __str__(self):
         return self.facility.name
-

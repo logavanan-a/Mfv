@@ -1,26 +1,26 @@
-from __future__ import unicode_literals
-
 import json
-
 import requests
-from application_master.models import (BaseContent, Mission, MissionIndicator,
-                                       MissionIndicatorCategory,Facility,
-                                        UserPartnerMapping)
+from application_master.models import (BaseContent, District, Facility,
+                                       Mission, MissionIndicator,
+                                       MissionIndicatorCategory,
+                                       PartnerMissionDonorMapping,
+                                       UserPartnerMapping)
 from django.conf import settings
-from django.contrib.auth import authenticate, login, logout,get_user
+from django.contrib.auth import authenticate, get_user, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, auth
 from django.contrib.sessions.models import Session
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.shortcuts import (HttpResponse, HttpResponseRedirect, redirect,
                               render)
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView, View
 
 from mis.models import MissionIndicatorAchievement, Task
 
 pg_size = 10
-def get_pagination(request, users = None):
+def get_pagination(request, users):
     paginator = Paginator(users, pg_size) # Show no of object per page
     page = request.GET.get('page',1)
     try:
@@ -129,10 +129,8 @@ def missionindicator_edit(request, slug, id):
         mission_respose_obj.response = results
         mission_respose_obj.save()
 
-        
-        # return redirect('/task-list/')
+        return redirect('/task-list/')
     return render(request, 'mis/indicator_edit.html', locals())
-
 
 def missionindicator_target(request, id):
     mission_obj = Mission.objects.get(id = id)
@@ -156,7 +154,6 @@ def mission_target_edit(request):
     mission_respons_obj = MissionIndicatorTarget.objects.all()
     return render(request, 'mis/mission_target_edit.html', locals())
 
-
 @login_required(login_url='/login/')
 def missiontarget_table_edit(request, ids, id):
     mission_obj = Mission.objects.get(id = ids)
@@ -174,23 +171,27 @@ def missiontarget_table_edit(request, ids, id):
         mission_respose_obj = MissionIndicatorTarget.objects.get(id = id)
         mission_respose_obj.response = results
         mission_respose_obj.save()
+        
         return redirect('/mission-list/')
+
     return render(request, 'mis/target_edit.html', locals())
 
 @login_required(login_url='/login/')
 def task_list(request):
+    heading= 'Task List'
     user = get_user(request)
     
     if user.groups.filter(name = 'Partner Admin').exists():
-        user_list = UserPartnerMapping.objects.get(user = request.user)
-        for user_list1 in UserPartnerMapping.objects.filter(partner = user_list.partner).exclude(user = request.user):
-            task_obj = Task.objects.filter(user = user_list1.user)
+        user_lists = UserPartnerMapping.objects.get(user = request.user)
+        for user_list in UserPartnerMapping.objects.filter(partner = user_lists.partner).exclude(user = request.user):
+            task_obj = Task.objects.filter(user = user_list.user)
             # print(task_obj,obj_list)
     else:
         task_obj = Task.objects.filter(user = request.user)
 
     object_list = get_pagination(request, task_obj)
     return render(request, 'mis/task_list.html', locals())
+
 
 @csrf_exempt 
 def task_status_changes(request, task_id):
@@ -202,6 +203,78 @@ def task_status_changes(request, task_id):
         task_obj.save()
         return HttpResponse({"message":'true'} , content_type="application/json")
     return HttpResponse({"message":'false'}, content_type="application/json")  
+
+def facility_list(request):
+    heading= 'Facility List'
+
+    partner = UserPartnerMapping.objects.get(user = request.user).partner
+    partner_mission_mapping_ids = PartnerMissionDonorMapping.objects.filter(partner = partner).values_list('id', flat=True)
+    facility_obj = Facility.objects.filter(partner_mission_mapping__id__in = partner_mission_mapping_ids, partner_mission_mapping__mission__id = 2 )
+
+    # facility_obj = Facility.objects.all()
+    object_list = get_pagination(request, facility_obj)
+    return render(request, 'facility/facility_list.html', locals())
+
+class FacilityAdd(View):
+    template_name = 'facility/facility_add_edit.html'
+
+    def get(self, request):
+        heading= 'Facility Add'
+        districts = District.objects.all()
+        return render(request,self.template_name,locals())
+
+    def post(self, request):
+        data = request.POST
+        name = data.get('name')
+        district = data.get('district')
+        location = data.get('location')
+
+        partner = UserPartnerMapping.objects.get(user = request.user).partner
+        partner_mission_mapping_obj = PartnerMissionDonorMapping.objects.get(partner = partner,mission__id = 2)
+
+        district_obj = District.objects.get(id = district)
+        facility_add = Facility.objects.create(name = name, partner_mission_mapping = partner_mission_mapping_obj, district = district_obj, location=location )
+        
+        return redirect('/facility-list/')
+        # return render(request,'facility/facility_list.html', locals())
+
+class FacilityUpdate(View):
+    template_name = 'facility/facility_add_edit.html'
+
+    def get(self, request, id):
+        heading= 'Facility Edit'
+        districts = District.objects.all()
+        facility_obj = Facility.objects.get(id = id)
+        return render(request,self.template_name,locals())
+
+    def post(self, request, id):
+        data = request.POST
+        name = data.get('name')
+        district = data.get('district')
+        location = data.get('location')
+                
+        district_obj = District.objects.get(id = district)
+        facility_update = Facility.objects.get(id = id)
+        facility_update.name = name
+        facility_update.district = district_obj
+        facility_update.location = location
+        facility_update.save()
+                
+        return redirect('/facility-list/')
+        # return render(request, self.template_name, locals())
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # def task_create():

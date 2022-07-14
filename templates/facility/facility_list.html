@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+<div class="row align-items-center">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <a style="display: flex;justify-content: flex-end;align-items: center;" href="/facility-add/"><button class="btn btn-primary ml-2" type="button" >Add Facility</button></a>
+                            
+                            <div class="card-body">
+                                <div class="row">
+                                    <table id="form" class="table table-bordered dt-responsive w-100">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl No</th>
+                                                <th>Name</th>
+                                                <th>District</th>
+                                                <th>Location</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% if object_list %}
+                                                {% for facility in object_list %}
+                                                    <tr>
+                                                        <td>{{forloop.counter0|add:object_list.start_index}}</td>
+                                                        <td>{{facility.name}}</td>
+                                                        <td>{{facility.district.name}}</td>
+                                                        <td>{{facility.location}}</td>
+                                                        <td><a href="/facility-edit/{{facility.id}}/"><button class="btn btn-primary ml-2" type="button">Edit</button></a></td>
+                                                    </tr>
+                                                {% endfor %}  
+                                            {% else %}
+                                                <td colspan="6" class="text-primary">No records found</td>
+                                            {% endif %} 
+                                        </tbody>
+                                    </table>
+
+                                    {% if object_list %}
+                                        {% include 'partials/pagination.html' %}
+                                    {% endif %}  
+
+                                </div>     
+                            </div>     
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
