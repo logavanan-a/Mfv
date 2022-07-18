@@ -28,11 +28,11 @@
                                                     <tr>
                                                         <td>{{forloop.counter0|add:object_list.start_index}}</td>
                                                         {% if task.get_task %}
-                                                        <td><a href="/mission_edit/{{task.facility.partner_mission_mapping.mission.slug}}/{{task.get_task.id}}/">{{task.name}}</a></td>
+                                                        <td><a href="/mission_edit/{{task.facility.partner_mission_donor_mapping.mission.slug}}/{{task.get_task.id}}/">{{task.name}}</a></td>
                                                         {% else %}
-                                                        <td><a href="/{{task.facility.partner_mission_mapping.mission.slug}}/monthly-report/{{task.id}}/">{{task.name}}</a></td>
+                                                        <td><a href="/{{task.facility.partner_mission_donor_mapping.mission.slug}}/monthly-report/{{task.id}}/">{{task.name}}</a></td>
                                                         {% endif %}
-                                                        <td>{{task.facility.partner_mission_mapping.mission.name}}</td>
+                                                        <td>{{task.facility.partner_mission_donor_mapping.mission.name}}</td>
                                                         <td>{{task.start_date|date:"d-m-Y"}}</td>
                                                         <td>{{task.end_date|date:"d-m-Y"}}</td>
                                                         <td>{{task.get_task_status_display}}</td>

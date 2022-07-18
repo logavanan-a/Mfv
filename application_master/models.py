@@ -129,12 +129,12 @@ class PartnerMissionDonorMapping(BaseContent):
 
 class Facility(BaseContent):
     name = models.CharField(max_length = 350)
-    partner_mission_mapping =  models.ForeignKey(PartnerMissionDonorMapping, on_delete = models.DO_NOTHING)
+    partner_mission_donor_mapping =  models.ForeignKey(PartnerMissionDonorMapping, on_delete = models.DO_NOTHING)
     district = models.ForeignKey(District, on_delete = models.DO_NOTHING)
     location = models.CharField(max_length = 350)
 
     class Meta:
-        unique_together = ('name', 'partner_mission_mapping')
+        unique_together = ('name', 'partner_mission_donor_mapping')
         verbose_name_plural = "Facility"
 
     def __str__(self):
