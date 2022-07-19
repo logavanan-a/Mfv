@@ -31,9 +31,9 @@ TEMPLATE_DIRS = (
 SECRET_KEY = 'django-insecure-b#)=a+k#m%%u^$#qqcyh+fvl42s%7^w1hzm4+l=1l44a7x%1b9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -88,9 +88,9 @@ WSGI_APPLICATION = 'mfv_mis.wsgi.application'
 DATABASES = {
    'default': {
        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-       'NAME': 'mis_local',
-       'USER': 'convene2demo',
-       'PASSWORD': 'convene2demo',
+       'NAME': 'mfv_mis_dev',
+       'USER': 'mis',
+       'PASSWORD': 'mfvdevmis',
        'HOST': 'localhost',
        'PORT': '',
        'AUTOCOMMIT': True,
@@ -149,7 +149,4 @@ os.path.join(BASE_DIR, 'static')
 # STATIC_URL = '/static/'
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
+# https://docs.djang
