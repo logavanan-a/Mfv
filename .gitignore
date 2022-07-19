@@ -12,7 +12,7 @@ __pycache__
 # /Convene2/database.py
 # /Convene2/storage.py
 # /Convene2/middleware.py
-# /mfv_mis/settings.py
+/mfv_mis/settings.py
 # /Convene2/wsgi.py
 # common_methods.py
 *.xlsx
