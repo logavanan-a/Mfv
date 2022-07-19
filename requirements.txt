@@ -13,12 +13,14 @@ MarkupPy==1.14
 odfpy==1.4.1
 openpyxl==3.0.10
 Pillow==8.4.0
-# pkg-resources==0.0.0
+pkg-resources==0.0.0
 psycopg2==2.7.5
 psycopg2-binary==2.7.5
+python-dateutil==2.8.2
 pytz==2022.1
 PyYAML==6.0
 requests==2.27.1
+six==1.16.0
 sqlparse==0.4.2
 tablib==3.1.0
 typing-extensions==4.1.1
