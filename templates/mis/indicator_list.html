@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load configuration_tags   %}
 {% load static %}
 {% block contents %}
 <div class="row align-items-center">
@@ -33,7 +34,10 @@
                                     <tbody>
                                         <td>{{sub_category.name}}</td> 
                                         <td>{{sub_category.get_indicator_type_display}}</td> 
-                                        <td> </td> 
+                                        
+                                        {% disply_indicator_target_values task_obj.id sub_category.id as target_values %}  
+                                        <td>{{target_values}} </td> 
+
                                         <td>
                                             <input type="text" id="txtresult"  name="total_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5" readonly>
                                             <!-- <div class="invalid-feedback">Please enter the Total value</div> -->

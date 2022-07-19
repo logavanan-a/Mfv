@@ -29,6 +29,7 @@
                                 <thead >
                                     <tr><th>Indicator</th>
                                         <th>Indicator Type</th> 
+                                        <th>Target</th>
                                         <th>Total </th>
                                         <th>Adult Male</th>
                                         <th>Adult Female</th>
@@ -40,6 +41,10 @@
                                     <tbody>
                                         <td>{{sub_category.name}}</td> 
                                         <td>{{sub_category.get_indicator_type_display}} </td> 
+                                        
+                                        
+                                        {% disply_indicator_target_values task_obj.id sub_category.id as target_values %}  
+                                        <td>{{target_values}} </td> 
                                         
                                         <td>     
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'total_' as total %}                                  

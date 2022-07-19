@@ -109,7 +109,7 @@ def missionindicator_add(request, slug,task_id):
 #     return render(request, 'mis/mission_indicator_edit.html', locals())
 
 @login_required(login_url='/login/')
-def missionindicator_edit(request, slug, id):
+def missionindicator_edit(request, slug, id,task_id):
     mission_obj = Mission.objects.get(slug = slug)
     heading = mission_obj.name
     mission_respose_obj = MissionIndicatorAchievement.objects.get(id = id)
@@ -117,6 +117,7 @@ def missionindicator_edit(request, slug, id):
     finance_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '2')
     user = get_user(request)
     user_role = str(user.groups.last())
+    task_obj = Task.objects.get(id = task_id)
 
     if request.method == 'POST':
         data = request.POST

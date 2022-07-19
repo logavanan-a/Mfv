@@ -11,7 +11,7 @@ urlpatterns = [
 
     path('task-list/', task_list, name="task-list"),
     path('<slug:slug>/monthly-report/<task_id>/', missionindicator_add, name='mission_add'),
-    path('mission_edit/<slug:slug>/<id>/', missionindicator_edit,name='mission_edit'),
+    path('mission_edit/<slug:slug>/<task_id>/<id>/', missionindicator_edit,name='mission_edit'),
 
     path('project-list/', project_list, name="project-list"),
     path('project-add/', ProjectAdd.as_view(), name='project-add'),

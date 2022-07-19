@@ -35,7 +35,7 @@
                                                         <td>{{task.get_task_status_display}}</td>
 
                                                         {% if task.get_task %}
-                                                        <td><a href="/mission_edit/{{task.project.partner_mission_mapping.mission.slug}}/{{task.get_task.id}}/">Edit</a></td>
+                                                        <td><a href="/mission_edit/{{task.project.partner_mission_mapping.mission.slug}}/{{task.id}}/{{task.get_task.id}}/">Edit</a></td>
                                                         {% else %}
                                                         <td><a href="/{{task.project.partner_mission_mapping.mission.slug}}/monthly-report/{{task.id}}/">Add</a></td>
                                                         {% endif %}
