@@ -172,6 +172,9 @@ class MissionIndicator(BaseContent):
 
     class Meta:
         verbose_name_plural = "Mission Indicator"
+    
+    def __str__(self):
+        return f"{self.name} - {self.category.name}"
 
 class MissionIndicatorTarget(BaseContent):
     mission_indicator = models.ForeignKey(MissionIndicator, on_delete=models.DO_NOTHING, blank=True, null=True)
