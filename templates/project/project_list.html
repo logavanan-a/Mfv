@@ -8,7 +8,7 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
-                            <a style="display: flex;justify-content: flex-end;align-items: center;" href="/facility-add/"><button class="btn btn-primary ml-2" type="button" >Add Facility</button></a>
+                            <a style="display: flex;justify-content: flex-end;align-items: center;" href="/project-add/"><button class="btn btn-primary ml-2" type="button" >Add Facility</button></a>
                             
                             <div class="card-body">
                                 <div class="row">
@@ -24,13 +24,13 @@
                                         </thead>
                                         <tbody>
                                             {% if object_list %}
-                                                {% for facility in object_list %}
+                                                {% for project in object_list %}
                                                     <tr>
                                                         <td>{{forloop.counter0|add:object_list.start_index}}</td>
-                                                        <td>{{facility.name}}</td>
-                                                        <td>{{facility.district.name}}</td>
-                                                        <td>{{facility.location}}</td>
-                                                        <td><a href="/facility-edit/{{facility.id}}/"><button class="btn btn-primary ml-2" type="button">Edit</button></a></td>
+                                                        <td>{{project.name}}</td>
+                                                        <td>{{project.district.name}}</td>
+                                                        <td>{{project.location}}</td>
+                                                        <td><a href="/project-edit/{{project.id}}/"><button class="btn btn-primary ml-2" type="button">Edit</button></a></td>
                                                     </tr>
                                                 {% endfor %}  
                                             {% else %}

@@ -116,41 +116,50 @@ class Mission(BaseContent):
     def get_absolute_url(self):
         return reverse("mis:mission_add", kwargs = {"slug": self.slug})
 
-class PartnerMissionDonorMapping(BaseContent):
-    partner = models.ForeignKey(Partner, on_delete = models.DO_NOTHING)
-    mission = models.ForeignKey(Mission, on_delete = models.DO_NOTHING)
-    donor =  models.ForeignKey(Donor, on_delete = models.DO_NOTHING)
+class PartnerMissionMapping(BaseContent):
+    partner = models.ForeignKey(Partner, on_delete = models.DO_NOTHING, blank=True, null=True)
+    mission = models.ForeignKey(Mission, on_delete = models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
-        verbose_name_plural = "Partner Mission Donor Mapping"
+        verbose_name_plural = "Partner Mission Mapping"
 
     def __str__(self):
-        return f"{self.partner.name} - {self.donor.name} - {self.mission.name}"
+        return f"{self.partner.name} - {self.mission.name}"
 
-class Facility(BaseContent):
+class Project(BaseContent):
     name = models.CharField(max_length = 350)
-    partner_mission_donor_mapping =  models.ForeignKey(PartnerMissionDonorMapping, on_delete = models.DO_NOTHING)
-    district = models.ForeignKey(District, on_delete = models.DO_NOTHING)
+    partner_mission_mapping =  models.ForeignKey(PartnerMissionMapping, on_delete = models.DO_NOTHING, blank=True, null=True)
+    district = models.ForeignKey(District, on_delete = models.DO_NOTHING, blank=True, null=True)
     location = models.CharField(max_length = 350)
 
     class Meta:
-        unique_together = ('name', 'partner_mission_donor_mapping')
-        verbose_name_plural = "Facility"
+        unique_together = ('name', 'partner_mission_mapping')
+        verbose_name_plural = "Project"
 
     def __str__(self):
         return self.name
 
+class ProjectDonorMapping(BaseContent):
+    project = models.OneToOneField(Project, on_delete=models.DO_NOTHING, primary_key=True) 
+    donor =  models.ForeignKey(Donor, on_delete = models.DO_NOTHING, blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = "Project Donor Mapping"
+
+    def __str__(self):
+        return f"{self.project.name} - {self.donor.name}"
+
 class MissionIndicatorCategory(BaseContent):
     CATEGORY_CHOICES = ((1,'Program Indicator'),(2,'Finance Indicator'))
     name = models.CharField(max_length = 350)
-    mission = models.ForeignKey(Mission, on_delete = models.DO_NOTHING)
+    mission = models.ForeignKey(Mission, on_delete = models.DO_NOTHING, blank=True, null=True)
     category_type = models.IntegerField(choices = CATEGORY_CHOICES, default=1)
 
     class Meta:
         verbose_name_plural = "Mission Indicator Category"
 
     def __str__(self):
-        return self.name
+        return f"{self.name} - {self.mission.name}"
     
     def sub_category(self):
         return MissionIndicator.objects.filter(category = self)
@@ -164,12 +173,9 @@ class MissionIndicator(BaseContent):
     class Meta:
         verbose_name_plural = "Mission Indicator"
 
-    def __str__(self):
-        return self.name
-    
 class MissionIndicatorTarget(BaseContent):
     mission_indicator = models.ForeignKey(MissionIndicator, on_delete=models.DO_NOTHING, blank=True, null=True)
-    facility = models.ForeignKey(Facility, on_delete=models.DO_NOTHING, blank=True, null=True)
+    project = models.ForeignKey(Project, on_delete=models.DO_NOTHING, blank=True, null=True)
     target = models.IntegerField()
     periodicity_date = models.DateField(blank=True, null=True)
     created_by = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True)
@@ -180,15 +186,15 @@ class MissionIndicatorTarget(BaseContent):
     def __str__(self):
         return f"{self.mission_indicator.name} - {self.created_by.username}"
 
-class FacilityFiles(BaseContent):
+class ProjectFiles(BaseContent):
     name = models.CharField(max_length=350) 
-    facility = models.ForeignKey(Facility, on_delete = models.CASCADE, blank=True, null=True)
+    project = models.ForeignKey(Project, on_delete = models.DO_NOTHING, blank=True, null=True)
     upload_file = models.FileField()
     created_by = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True, related_name='created_by')
     modified_by = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True, related_name='modified_by')
 
     class Meta:
-        verbose_name_plural = "Facility Files"
+        verbose_name_plural = "Project Files"
 
     def __str__(self):
-        return self.facility.name
+        return self.project.name

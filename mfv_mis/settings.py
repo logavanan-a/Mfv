@@ -88,7 +88,7 @@ WSGI_APPLICATION = 'mfv_mis.wsgi.application'
 DATABASES = {
    'default': {
        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-       'NAME': 'mis',
+       'NAME': 'mis_local',
        'USER': 'convene2demo',
        'PASSWORD': 'convene2demo',
        'HOST': 'localhost',

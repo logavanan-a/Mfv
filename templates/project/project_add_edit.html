@@ -6,10 +6,10 @@
         <div class="card">
             <div class="card-body">
 
-                {% if facility_obj %}
-                    <form method='POST' action="/facility-edit/{{id}}/" class="needs-validation" enctype="multipart/form-data" autocomplete="off" novalidate>
+                {% if project_obj %}
+                    <form method='POST' action="/project-edit/{{id}}/" class="needs-validation" enctype="multipart/form-data" autocomplete="off" novalidate>
                 {% else %}
-                    <form method='POST' action="/facility-add/" class="needs-validation" enctype="multipart/form-data" autocomplete="off" novalidate>
+                    <form method='POST' action="/project-add/" class="needs-validation" enctype="multipart/form-data" autocomplete="off" novalidate>
                 {% endif %}
                     
                 {% csrf_token %}
@@ -18,7 +18,7 @@
 								<div class="col-lg-4 col-12">
 									<div class="form-group">
 									   <label for="name">Name<span class="text-danger">*</span></label>
-									    <input Type="text" id="name" value="{{facility_obj.name}}" name="name" class="form-control" placeholder="Name" required = "" tabindex="1"/>
+									    <input Type="text" id="name" value="{{project_obj.name}}" name="name" class="form-control" placeholder="Name" required = "" tabindex="1"/>
 									    <div class="invalid-feedback">Please enter the name</div>
                                     </div>
 								</div>
@@ -29,7 +29,7 @@
                                         <select class="form-control select2" aria-label="Floating label select example" id="district" name="district" required = ""  tabindex="2">
                                             <option value="" selected>Select</option>
                                             {% for district in districts %}
-                                                <option value="{{district.id}}" {% if district.name == facility_obj.district.name %}selected{% endif %}>{{district.name}}</option>
+                                                <option value="{{district.id}}" {% if district.name == project_obj.district.name %}selected{% endif %}>{{district.name}}</option>
                                             {% endfor %}
                                         </select>
                                         <div class="invalid-feedback">Please select a valid District.</div>
@@ -39,7 +39,7 @@
                                 <div class="col-lg-4 col-12">
 									<div class="form-group">
 									   <label for="location">Location<span class="text-danger">*</span></label>
-									<input Type="text" id="location" value="{{facility_obj.location}}" name="location" class="form-control" placeholder="Location" required = "" tabindex="3"/>
+									<input Type="text" id="location" value="{{project_obj.location}}" name="location" class="form-control" placeholder="Location" required = "" tabindex="3"/>
                                     <div class="invalid-feedback">Please enter the Location</div>	
                                     </div>
 								</div>
@@ -48,13 +48,13 @@
 						
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary ml-2"> 
-                            {% if facility_obj %}
+                            {% if project_obj %}
                                 Update 
                             {% else %}
                                 Save
                             {% endif %}
                         </button>
-                        <span type="reset" class="btn btn-outline-secondary" tabindex="51" onclick="location.href='/facility-list/'">Cancel</span>
+                        <span type="reset" class="btn btn-outline-secondary" tabindex="51" onclick="location.href='/project-list/'">Cancel</span>
                     </div>
                 </form>
             </div>

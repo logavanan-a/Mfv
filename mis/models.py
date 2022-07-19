@@ -1,4 +1,5 @@
-from application_master.models import BaseContent, Facility
+from application_master.models import *
+
 from django.contrib.auth.models import User
 from django.db import models
 from jsonfield import JSONField
@@ -8,8 +9,8 @@ from jsonfield import JSONField
 class Task(BaseContent):
     STATUS_CHOICES = ((1, 'Pending'), (2, 'Submitted for approval'), (3, 'Approved'), (4,  'Rejected'), (5, 'Cancelled'))
     name = models.CharField(max_length = 150)
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
-    facility = models.ForeignKey(Facility, on_delete = models.DO_NOTHING, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete = models.DO_NOTHING)
+    project = models.ForeignKey(Project, on_delete = models.DO_NOTHING, blank=True, null=True)
     start_date = models.DateField()
     end_date = models.DateField()
     task_status = models.IntegerField(choices = STATUS_CHOICES, default=1)

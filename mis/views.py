@@ -1,10 +1,10 @@
 import json
+
 import requests
-from application_master.models import (BaseContent, District, Facility,
-                                       Mission, MissionIndicator,
-                                       MissionIndicatorCategory,
-                                       PartnerMissionDonorMapping,
-                                       UserPartnerMapping)
+from application_master.models import *
+
+#(BaseContent, District,Mission, MissionIndicator, MissionIndicatorCategory, PartnerMissionMapping, UserPartnerMapping)
+
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user, login, logout
 from django.contrib.auth.decorators import login_required
@@ -103,10 +103,10 @@ def missionindicator_add(request, slug,task_id):
 
     return render(request, 'mis/indicator_list.html', locals())
 
-@login_required(login_url='/login/')
-def mission_indicator_edit(request):
-    mission_indicator_achievement = MissionIndicatorAchievement.objects.all()
-    return render(request, 'mis/mission_indicator_edit.html', locals())
+# @login_required(login_url='/login/')
+# def mission_indicator_edit(request):
+#     mission_indicator_achievement = MissionIndicatorAchievement.objects.all()
+#     return render(request, 'mis/mission_indicator_edit.html', locals())
 
 @login_required(login_url='/login/')
 def missionindicator_edit(request, slug, id):
@@ -204,22 +204,22 @@ def task_status_changes(request, task_id):
         return HttpResponse({"message":'true'} , content_type="application/json")
     return HttpResponse({"message":'false'}, content_type="application/json")  
 
-def facility_list(request):
-    heading= 'Facility List'
+def project_list(request):
+    heading= 'Project List'
 
     partner = UserPartnerMapping.objects.get(user = request.user).partner
-    partner_mission_donor_mapping_ids = PartnerMissionDonorMapping.objects.filter(partner = partner).values_list('id', flat=True)
-    facility_obj = Facility.objects.filter(partner_mission_donor_mapping__id__in = partner_mission_donor_mapping_ids, partner_mission_donor_mapping__mission__id = 2 )
+    partner_mission_mapping_ids = PartnerMissionMapping.objects.filter(partner = partner).values_list('id', flat=True)
+    project_obj = Project.objects.filter(partner_mission_mapping__id__in = partner_mission_mapping_ids, partner_mission_mapping__mission__id = 2 )
 
-    # facility_obj = Facility.objects.all()
-    object_list = get_pagination(request, facility_obj)
-    return render(request, 'facility/facility_list.html', locals())
+    # project_obj = Project.objects.all()
+    object_list = get_pagination(request, project_obj)
+    return render(request, 'project/project_list.html', locals())
 
-class FacilityAdd(View):
-    template_name = 'facility/facility_add_edit.html'
+class ProjectAdd(View):
+    template_name = 'project/project_add_edit.html'
 
     def get(self, request):
-        heading= 'Facility Add'
+        heading= 'Project Add'
         districts = District.objects.all()
         return render(request,self.template_name,locals())
 
@@ -228,23 +228,22 @@ class FacilityAdd(View):
         name = data.get('name')
         district = data.get('district')
         location = data.get('location')
+        district_obj = District.objects.get(id = district)
 
         partner = UserPartnerMapping.objects.get(user = request.user).partner
-        partner_mission_donor_mapping_obj = PartnerMissionDonorMapping.objects.get(partner = partner,mission__id = 2)
-
-        district_obj = District.objects.get(id = district)
-        facility_add = Facility.objects.create(name = name, partner_mission_donor_mapping = partner_mission_donor_mapping_obj, district = district_obj, location=location )
+        partner_mission_mapping_obj = PartnerMissionMapping.objects.get(partner = partner,mission__id = 2)
+        project_add = Project.objects.create(name = name, partner_mission_mapping = partner_mission_mapping_obj, district = district_obj, location=location )
         
-        return redirect('/facility-list/')
-        # return render(request,'facility/facility_list.html', locals())
+        return redirect('/project-list/')
+        # return render(request,'project/project_list.html', locals())
 
-class FacilityUpdate(View):
-    template_name = 'facility/facility_add_edit.html'
+class ProjectUpdate(View):
+    template_name = 'project/project_add_edit.html'
 
     def get(self, request, id):
-        heading= 'Facility Edit'
+        heading= 'Project Edit'
         districts = District.objects.all()
-        facility_obj = Facility.objects.get(id = id)
+        project_obj = Project.objects.get(id = id)
         return render(request,self.template_name,locals())
 
     def post(self, request, id):
@@ -254,34 +253,21 @@ class FacilityUpdate(View):
         location = data.get('location')
                 
         district_obj = District.objects.get(id = district)
-        facility_update = Facility.objects.get(id = id)
-        facility_update.name = name
-        facility_update.district = district_obj
-        facility_update.location = location
-        facility_update.save()
+        project_update = Project.objects.get(id = id)
+        project_update.name = name
+        project_update.district = district_obj
+        project_update.location = location
+        project_update.save()
                 
-        return redirect('/facility-list/')
+        return redirect('/project-list/')
         # return render(request, self.template_name, locals())
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # def task_create():
 #     for user_obj in User.objects.filter(is_superuser = False):
 #         if user_obj:
-#             for visio_ncentre in Facility.objects.all():
-#                 string_cancate = visio_ncentre.partner_mission_donor_mapping.mission.name +" "+visio_ncentre.name+" july 2022"
-#                 # print(string_cancate)
-#                 added = Task(facility = visio_ncentre,user=user_obj, name = string_cancate, start_date="2022-07-01",end_date= "2022-07-31")
+#             for visio_ncentre in Project.objects.all():
+#                 string_cancate = visio_ncentre.partner_mission_mapping.mission.name +" "+visio_ncentre.name+" july 2022"
+#                 print(string_cancate)
+#                 added = Task(project = visio_ncentre,user=user_obj, name = string_cancate, start_date="2022-06-01",end_date= "2022-06-30")
 #                 added.save()
+                

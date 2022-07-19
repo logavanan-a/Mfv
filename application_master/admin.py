@@ -1,12 +1,14 @@
 from django.contrib import admin
 from import_export.admin import ImportExportActionModelAdmin
 
-from application_master.models import (District, Donor, Menus, Mission,
-                                       MissionIndicator,
-                                       MissionIndicatorCategory,
-                                       MissionIndicatorTarget,
-                                       Partner, PartnerMissionDonorMapping, State,
-                                       UserPartnerMapping, Facility,FacilityFiles)
+from application_master.models import *
+
+# (District, Donor, Menus, Mission,
+        #    MissionIndicator,0
+        #    MissionIndicatorCategory,
+        #    MissionIndicatorTarget,
+        #    Partner, PartnerMissionMapping, State,
+        #    UserPartnerMapping,ProjectFiles, ProjectDonorMapping)
 
 @admin.register(Menus)
 class AdminMenus(ImportExportActionModelAdmin,admin.ModelAdmin):
@@ -28,8 +30,8 @@ class AdminDistrict(ImportExportActionModelAdmin,admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
-@admin.register(Facility)
-class AdminFacility(ImportExportActionModelAdmin,admin.ModelAdmin):
+@admin.register(Project)
+class AdminProject(ImportExportActionModelAdmin,admin.ModelAdmin):
     search_fields = ['name']
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
@@ -54,10 +56,10 @@ class AdminDonor(ImportExportActionModelAdmin,admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
-@admin.register(PartnerMissionDonorMapping)
-class AdminPartnerMissionDonorMapping(ImportExportActionModelAdmin,admin.ModelAdmin):
-    search_fields = ['partner__name','mission__name','donor__name']
-    list_filter = ['mission__name','donor__name']
+@admin.register(PartnerMissionMapping)
+class AdminPartnerMissionMapping(ImportExportActionModelAdmin,admin.ModelAdmin):
+    search_fields = ['partner__name','mission__name']
+    list_filter = ['mission__name']
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
@@ -78,7 +80,7 @@ class AdminMission(ImportExportActionModelAdmin,admin.ModelAdmin):
 
 @admin.register(MissionIndicatorTarget)
 class AdminMissionIndicatorTarget(ImportExportActionModelAdmin,admin.ModelAdmin):
-    search_fields = ['mission_indicator__name','facility__name']
+    search_fields = ['mission_indicator__name','project__name']
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
@@ -89,8 +91,14 @@ class AdminUserPartnerMapping(admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
-@admin.register(FacilityFiles)
-class AdminFacilityFiles(ImportExportActionModelAdmin,admin.ModelAdmin):
-    search_fields = ['name','facility__name']
+@admin.register(ProjectFiles)
+class AdminProjectFiles(ImportExportActionModelAdmin,admin.ModelAdmin):
+    search_fields = ['name','project__name']
+    def get_list_display(self, request):
+        return [field.name for field in self.model._meta.concrete_fields]
+
+@admin.register(ProjectDonorMapping)
+class AdminProjectDonorMapping(ImportExportActionModelAdmin,admin.ModelAdmin):
+    search_fields = ['donor__name','project__name']
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]

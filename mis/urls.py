@@ -13,12 +13,12 @@ urlpatterns = [
     path('<slug:slug>/monthly-report/<task_id>/', missionindicator_add, name='mission_add'),
     path('mission_edit/<slug:slug>/<id>/', missionindicator_edit,name='mission_edit'),
 
-    path('facility-list/', facility_list, name="facility-list"),
-    path('facility-add/', FacilityAdd.as_view(), name='facility-add'),
-    path('facility-edit/<id>/', FacilityUpdate.as_view(), name='facility-edit'),
+    path('project-list/', project_list, name="project-list"),
+    path('project-add/', ProjectAdd.as_view(), name='project-add'),
+    path('project-edit/<id>/', ProjectUpdate.as_view(), name='project-edit'),
     
     path('mission-list/', mission_list, name="mission-list"),
-    path('mission-indicator/edit/list/', mission_indicator_edit),
+    # path('mission-indicator/edit/list/', mission_indicator_edit),
     path('mission/target/<id>/', missionindicator_target),
     path('mission-target/list/', mission_target_edit),
     path('target_table_edit/<ids>/<id>/', missiontarget_table_edit),
