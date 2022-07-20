@@ -27,6 +27,7 @@ class Menus(BaseContent):
         "SEO friendly url, use only aplhabets and hyphen", max_length=60,unique=True)
     parent = models.ForeignKey('self',on_delete=models.DO_NOTHING, blank=True, null=True)
     app_link = models.CharField(max_length=512, blank=True)
+    icon = models.CharField(max_length=512, blank=True, null=True)
     menu_order = models.IntegerField(null=True, blank=True)
 
     class Meta:
@@ -100,6 +101,7 @@ class Donor(BaseContent):
 class Mission(BaseContent):
     MISSION_CHOICES = ((1,'Indicator'),(2,'Form'))
     name = models.CharField(max_length = 350, unique = True)
+    short_description  = models.TextField(blank=True, null=True)
     mission_template = models.IntegerField(choices = MISSION_CHOICES, default = 1)
     slug = models.SlugField(max_length=100, unique = True) 
 
@@ -137,7 +139,7 @@ class Project(BaseContent):
         verbose_name_plural = "Project"
 
     def __str__(self):
-        return self.name
+        return f"{self.name} - {self.partner_mission_mapping.mission.name} - {self.partner_mission_mapping.partner.name}"
 
 class ProjectDonorMapping(BaseContent):
     project = models.OneToOneField(Project, on_delete=models.DO_NOTHING, primary_key=True) 

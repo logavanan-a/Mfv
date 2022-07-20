@@ -1,14 +1,26 @@
 from django.contrib import admin
 from import_export.admin import ImportExportActionModelAdmin
 
-from application_master.models import *
+from application_master.models import (District, Donor, Menus, Mission,
+                                       MissionIndicator,
+                                       MissionIndicatorCategory,
+                                       MissionIndicatorTarget, Partner,
+                                       PartnerMissionMapping, Project,
+                                       ProjectDonorMapping, ProjectFiles,
+                                       State, UserPartnerMapping)
 
-# (District, Donor, Menus, Mission,
-        #    MissionIndicator,0
-        #    MissionIndicatorCategory,
-        #    MissionIndicatorTarget,
-        #    Partner, PartnerMissionMapping, State,
-        #    UserPartnerMapping,ProjectFiles, ProjectDonorMapping)
+
+class MissionIndicatorCategoryInline(admin.TabularInline): #StackedInline
+    model = MissionIndicatorCategory
+    extra = 0
+
+@admin.register(Mission)
+class AdminMission(ImportExportActionModelAdmin,admin.ModelAdmin):
+    inlines = [MissionIndicatorCategoryInline]
+    search_fields = ['name']
+    prepopulated_fields = {'slug': ('name',)}
+    def get_list_display(self, request):
+        return [field.name for field in self.model._meta.concrete_fields]
 
 @admin.register(Menus)
 class AdminMenus(ImportExportActionModelAdmin,admin.ModelAdmin):
@@ -71,13 +83,6 @@ class AdminPartner(ImportExportActionModelAdmin,admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
-@admin.register(Mission)
-class AdminMission(ImportExportActionModelAdmin,admin.ModelAdmin):
-    search_fields = ['name']
-    prepopulated_fields = {'slug': ('name',)}
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.concrete_fields]
-
 @admin.register(MissionIndicatorTarget)
 class AdminMissionIndicatorTarget(ImportExportActionModelAdmin,admin.ModelAdmin):
     search_fields = ['mission_indicator__name','project__name']
@@ -100,5 +105,6 @@ class AdminProjectFiles(ImportExportActionModelAdmin,admin.ModelAdmin):
 @admin.register(ProjectDonorMapping)
 class AdminProjectDonorMapping(ImportExportActionModelAdmin,admin.ModelAdmin):
     search_fields = ['donor__name','project__name']
+    list_filter = ['donor__name']
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]

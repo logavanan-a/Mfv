@@ -11,6 +11,22 @@ from application_master.models import *
 
 register = template.Library()
 
+
+@register.simple_tag
+def get_usermenu_list(request):
+    # role_ids = request.session.get('role_id',None)
+    menus = []
+    if True:
+        # user_role ,created= UserRoles.objects.get_or_create(user = user)
+        # role_ids = user_role.role_type_id
+        # role_configs = RoleConfig.objects.filter(role__id = role_ids,
+        #                 view = True)
+        # menu_ids = list(set(role_configs.values_list('menu__id', flat = True)))
+        menus = Menus.objects.filter(active = 2).order_by("menu_order")
+    return menus
+
+
+
 @register.simple_tag
 def disply_indicator_values(res_id, ind_id, keys):
     mission_response = MissionIndicatorAchievement.objects.get(id = res_id)

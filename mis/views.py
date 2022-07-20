@@ -98,7 +98,7 @@ def missionindicator_add(request, slug,task_id):
                 results[key] = int(values[0])
 
         mission_add = MissionIndicatorAchievement.objects.create(task = task_obj , response = results)
-        return redirect('mis:mission_edit', slug = slug, id = mission_add.id)
+        return redirect('mis:mission_edit', slug = slug, task_id = task_id, id = mission_add.id,)
         # return redirect('/task-list/')
 
     return render(request, 'mis/indicator_list.html', locals())
@@ -262,13 +262,3 @@ class ProjectUpdate(View):
                 
         return redirect('/project-list/')
         # return render(request, self.template_name, locals())
-
-# def task_create():
-#     for user_obj in User.objects.filter(is_superuser = False):
-#         if user_obj:
-#             for visio_ncentre in Project.objects.all():
-#                 string_cancate = visio_ncentre.partner_mission_mapping.mission.name +" "+visio_ncentre.name+" july 2022"
-#                 print(string_cancate)
-#                 added = Task(project = visio_ncentre,user=user_obj, name = string_cancate, start_date="2022-06-01",end_date= "2022-06-30")
-#                 added.save()
-                
