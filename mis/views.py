@@ -1,10 +1,13 @@
 import json
 
 import requests
-from application_master.models import *
-
-#(BaseContent, District,Mission, MissionIndicator, MissionIndicatorCategory, PartnerMissionMapping, UserPartnerMapping)
-
+from application_master.models import (District, Donor, Menus, Mission,
+                                       MissionIndicator,
+                                       MissionIndicatorCategory,
+                                       MissionIndicatorTarget, Partner,
+                                       PartnerMissionMapping, Project,
+                                       ProjectDonorMapping, ProjectFiles,
+                                       State, UserPartnerMapping)
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user, login, logout
 from django.contrib.auth.decorators import login_required
@@ -91,14 +94,14 @@ def missionindicator_add(request, slug,task_id):
     if request.method == 'POST':
         data = request.POST
         working_day = request.POST.get('working_day')
-        project_reference_file = request.FILES['project_reference_file']
+        project_reference_file = request.FILES.get('project_reference_file')
 
         temp = dict(data)
         results = {}
         for key,values in temp.items():
             if key != 'csrfmiddlewaretoken' and key != 'working_day' and values[0] != '':
                 results[key] = int(values[0])
-                
+
         mission_add = MissionIndicatorAchievement.objects.create(task = task_obj , response = results)
 
         if working_day:
@@ -128,12 +131,12 @@ def missionindicator_edit(request, slug, id,task_id):
     finance_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '2')
     user = get_user(request)
     user_role = str(user.groups.last())
-    task_obj = Task.objects.get(id = task_id)
+    # task_obj = Task.objects.get(id = task_id)
 
     if request.method == 'POST':
 
         working_day = request.POST.get('working_day')
-        project_reference_file = request.FILES['project_reference_file']
+        project_reference_file = request.FILES.get('project_reference_file')
 
         data = request.POST
         temp = dict(data)
