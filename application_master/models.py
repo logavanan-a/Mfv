@@ -158,6 +158,7 @@ class MissionIndicatorCategory(BaseContent):
     category_type = models.IntegerField(choices = CATEGORY_CHOICES, default=1)
 
     class Meta:
+        unique_together = ('name', 'mission')
         verbose_name_plural = "Mission Indicator Category"
 
     def __str__(self):

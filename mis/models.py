@@ -3,6 +3,8 @@ from application_master.models import *
 from django.contrib.auth.models import User
 from django.db import models
 from jsonfield import JSONField
+from datetime import date
+from datetime import  timedelta
 
 
 # declare a new model with a name "Task"
@@ -35,6 +37,9 @@ class Task(BaseContent):
 class MissionIndicatorAchievement(BaseContent):
     task = models.ForeignKey(Task, on_delete=models.DO_NOTHING, blank=True, null=True)
     response = JSONField(default=dict)
+    number_working_days = models.IntegerField(default=0)
+    project_reference_file = models.FileField(upload_to='file/%Y/%m/%d',blank=True, null=True)
+    
 
     class Meta:
         # ordering = ['-id']

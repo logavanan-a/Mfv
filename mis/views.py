@@ -90,14 +90,25 @@ def missionindicator_add(request, slug,task_id):
 
     if request.method == 'POST':
         data = request.POST
+        working_day = request.POST.get('working_day')
+        project_reference_file = request.FILES['project_reference_file']
+
         temp = dict(data)
         results = {}
         for key,values in temp.items():
-            if key != 'csrfmiddlewaretoken' and values[0] != '':
-                # print(values)
+            if key != 'csrfmiddlewaretoken' and key != 'working_day' and values[0] != '':
                 results[key] = int(values[0])
-
+                
         mission_add = MissionIndicatorAchievement.objects.create(task = task_obj , response = results)
+
+        if working_day:
+            mission_add.number_working_days = working_day
+
+        if project_reference_file:
+            mission_add.project_reference_file = project_reference_file  
+
+        mission_add.save()
+
         return redirect('mis:mission_edit', slug = slug, task_id = task_id, id = mission_add.id,)
         # return redirect('/task-list/')
 
@@ -120,6 +131,10 @@ def missionindicator_edit(request, slug, id,task_id):
     task_obj = Task.objects.get(id = task_id)
 
     if request.method == 'POST':
+
+        working_day = request.POST.get('working_day')
+        project_reference_file = request.FILES['project_reference_file']
+
         data = request.POST
         temp = dict(data)
         results = {}
@@ -128,6 +143,13 @@ def missionindicator_edit(request, slug, id,task_id):
                 results[key] = int(values[0])
         mission_respose_obj = MissionIndicatorAchievement.objects.get(id = id)
         mission_respose_obj.response = results
+
+        if working_day:
+            mission_respose_obj.number_working_days = working_day
+
+        if project_reference_file:
+            mission_respose_obj.project_reference_file = project_reference_file 
+
         mission_respose_obj.save()
 
         return redirect('/task-list/')

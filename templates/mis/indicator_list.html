@@ -11,7 +11,13 @@
                     <input type='button' id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{task_id}}',2,'Submit for Approval')">
                   </div>
                 {% endif %}
+
                 <form method='POST' class="" enctype="multipart/form-data"  novalidate>
+
+
+                    <label for="working_day">Working Day : </label>
+                    <input type="text" id="working_day" name="working_day">
+
                     {% csrf_token %}
                     {% if programe_category %}
                     <h5>Program Data</h5>
@@ -91,6 +97,8 @@
                         </div>
                         {% endfor %} 
                     {% endif %}
+                    <label for="project_reference_file">Project Reference File : </label>
+                    <input type="file" name="project_reference_file">
 
                     <div class="modal-footer">
                     {%  if 'Partner Data Entry Operator' == user_role %}
