@@ -127,8 +127,8 @@ def missionindicator_edit(request, slug, id,task_id):
     mission_obj = Mission.objects.get(slug = slug)
     heading = mission_obj.name
     mission_respose_obj = MissionIndicatorAchievement.objects.get(id = id)
-    programe_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '1').order_by('listing_order')
-    finance_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '2').order_by('listing_order')
+    programe_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '1', active=2).order_by('listing_order')
+    finance_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '2', active=2).order_by('listing_order')
     user = get_user(request)
     user_role = str(user.groups.last())
     # task_obj = Task.objects.get(id = task_id)
