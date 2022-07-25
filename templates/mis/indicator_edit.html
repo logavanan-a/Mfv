@@ -28,7 +28,7 @@
                 <form method='POST' class="" enctype="multipart/form-data" novalidate>
                 
                 {%  if 'Partner Data Entry Operator' == user_role and mission_respose_obj.task.task_status == 1 or mission_respose_obj.task.task_status == 4 %}
-                <label for="working_day">Working Days: </label>
+                <label for="working_day">No. of Days Project Functional during the month: </label>
                 <input type="number" id="working_day" name="working_day" style="width: 50px;">
 
                 <input type='button'  style="float: right;" id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{mission_respose_obj.task.id}}',2,'Submit for Approval')">
