@@ -85,8 +85,8 @@ def mission_form_list(request):
 def missionindicator_add(request, slug,task_id):
     mission_obj = Mission.objects.get(slug = slug)
     heading = mission_obj.name
-    programe_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '1').order_by('listing_order')
-    finance_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '2').order_by('listing_order')
+    programe_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '1', active=2).order_by('listing_order')
+    finance_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '2', active=2).order_by('listing_order')
     task_obj = Task.objects.get(id = task_id)
     user = get_user(request)
     user_role = str(user.groups.last())
