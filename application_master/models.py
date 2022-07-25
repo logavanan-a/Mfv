@@ -141,6 +141,13 @@ class Project(BaseContent):
     def __str__(self):
         return f"{self.name} - {self.partner_mission_mapping.mission.name} - {self.partner_mission_mapping.partner.name}"
 
+    def get_project_donor_mapping(self):
+        try:
+            get_project_donor_mapping_obj = ProjectDonorMapping.objects.get(project = self).donor.name
+        except:
+            get_project_donor_mapping_obj = None
+        return get_project_donor_mapping_obj
+
 class ProjectDonorMapping(BaseContent):
     project = models.OneToOneField(Project, on_delete=models.DO_NOTHING, primary_key=True) 
     donor =  models.ForeignKey(Donor, on_delete = models.DO_NOTHING, blank=True, null=True)
@@ -150,6 +157,8 @@ class ProjectDonorMapping(BaseContent):
 
     def __str__(self):
         return f"{self.project.name} - {self.donor.name}"
+
+    
 
 class MissionIndicatorCategory(BaseContent):
     CATEGORY_CHOICES = ((1,'Program Indicator'),(2,'Finance Indicator'))
@@ -168,12 +177,13 @@ class MissionIndicatorCategory(BaseContent):
         return MissionIndicator.objects.filter(category = self)
 
 class MissionIndicator(BaseContent):
-    IT_CHOICES = ((1,'Gender Base'),(2,'Total'))
+    IT_CHOICES = ((1,'Gender Base'),(2,'Total'),(3,'Actuals'),(4,'Actuals With Grants Received'))
     name = models.CharField(max_length=350)
     category = models.ForeignKey(MissionIndicatorCategory, on_delete = models.DO_NOTHING)
     indicator_type = models.IntegerField(choices = IT_CHOICES, default = 1)
 
     class Meta:
+        # unique_together = ('name', 'category')
         verbose_name_plural = "Mission Indicator"
     
     def __str__(self):

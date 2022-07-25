@@ -6,21 +6,33 @@
     <div class="col-xl-12 mx-auto">
         <div class="card">
             <div class="card-body">
-                {%  if 'Partner Data Entry Operator' == user_role and task_obj.task_status == 1 or task_obj.task_status == 4 %}
-                <div style="display: flex;justify-content: flex-end;align-items: center;">
-                    <input type='button' id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{task_id}}',2,'Submit for Approval')">
-                  </div>
-                {% endif %}
 
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4 class="card-title">Project: {{task_obj.project.name}}</h4>
+                        <h4 class="card-title">Dist. & State: {{task_obj.project.district.name}}, {{task_obj.project.district.state.name}}</h4>
+                        <h4 class="card-title" >Project funded by: {{task_obj.project.get_project_donor_mapping}}</h4>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h4 id="right_side" class="card-title" >Partner: {{task_obj.project.partner_mission_mapping.partner.name}}, {{task_obj.project.district.name}}, {{task_obj.project.district.state.name}}</h4>
+                        <h4 id="right_side" class="card-title" >Month: {{task_obj.start_date|date:"F Y"}}</h4>
+
+                        {% disply_financial_year task_obj.start_date as financial_year %} 
+                        <h4 id="right_side"  class="card-title" >Financial year: {{financial_year}}</h4>
+                    </div>
+                </div><br>
+                
                 <form method='POST' class="" enctype="multipart/form-data"  novalidate>
-
-
-                    <label for="working_day">Working Day : </label>
-                    <input type="text" id="working_day" name="working_day">
+                    {%  if 'Partner Data Entry Operator' == user_role and task_obj.task_status == 1 or task_obj.task_status == 4 %}
+                    <label for="working_day">No. of Days Project Functional during the month: </label>
+                    <input type="number" id="working_day" name="working_day" style="width: 50px;">
+                    <input type='button'  style="float: right;" id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{task_id}}',2,'Submit for Approval')">
+                    {% endif %}
 
                     {% csrf_token %}
                     {% if programe_category %}
-                    <h5>Program Data</h5>
+                    <h5 style="text-align: center;">Program Data</h5>
                         {% for data in programe_category %}
                         <div class="table-responsive">
                             <h5> {{data.name}} </h5>
@@ -71,7 +83,7 @@
                     {% endif %}
 
                     {% if finance_category %}
-                    <h5>Finance Data</h5>
+                    <h5 style="text-align: center;">Finance Data</h5>
                         {% for fin_data in finance_category %}
 
                         <div class="table-responsive">
@@ -80,16 +92,25 @@
                                 <thead>
                                     <tr><th>Indicator</th>
                                         <th>Indicator Type</th> 
-                                        <th>Actual</th>
+                                        <th>Budgeted Amount</th>
+                                        <th>Grants Received</th>
+                                        <th>Actuals</th>
                                     </tr>
                                 </thead>
                                     {% for sub_category in fin_data.sub_category %}
                                     <tbody>
                                         <td>{{sub_category.name}}</td> 
                                         <td>{{sub_category.get_indicator_type_display}}</td> 
+
+                                        {% disply_indicator_target_values task_obj.id sub_category.id as target_values %}  
+                                        <td>{{target_values}} </td> 
+
                                         <td>
-                                            <input type="number" name="actual_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="5">
+                                            <input type="number" name="actuals_with_grants_received_{{sub_category.id}}" value="" class="form-control input_style qty" maxlength="6">
                                             <!-- <div class="invalid-feedback">Please enter the Total value</div> -->
+                                        </td> 
+                                        <td>
+                                            <input type="number" name="actuals_{{sub_category.id}}" value="" class="form-control" maxlength="5" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
                                         </td> 
                                     </tbody>   
                                     {% endfor %} 
@@ -129,6 +150,11 @@
     </div>
 </div>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    #right_side{
+        margin-left: 50%
+    }
+</style>
 
 <script>
     function add_number(e) {

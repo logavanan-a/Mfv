@@ -25,7 +25,15 @@ def get_usermenu_list(request):
         menus = Menus.objects.filter(active = 2).order_by("menu_order")
     return menus
 
+@register.simple_tag
+def disply_financial_year(start_date):
 
+    financial_year = ''
+    if start_date.month in [1,2,3]:
+        financial_year = f"{start_date.year-1}-{ start_date.year}"        
+    else:
+        financial_year =  f"{start_date.year}-{ start_date.year+1}"
+    return financial_year
 
 @register.simple_tag
 def disply_indicator_values(res_id, ind_id, keys):

@@ -5,15 +5,16 @@
     <div class="col-xl-12 mx-auto">
         <div class="card">
             <div class="card-body">
+
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-xl-12">
                         <div class="card">
                             <a style="display: flex;justify-content: flex-end;align-items: center;" href="/project-add/"><button class="btn btn-primary ml-2" type="button" >Add Facility</button></a>
-                            
                             <div class="card-body">
-                                <div class="row">
-                                    <table id="form" class="table table-bordered dt-responsive w-100">
-                                        <thead>
+                                <!-- <h4 class="card-title">Table head</h4>  -->                      
+                                <div class="table-responsive">
+                                    <table class="table mb-0">
+                                        <thead class="table-light">
                                             <tr>
                                                 <th>Sl No</th>
                                                 <th>Name</th>
@@ -36,18 +37,17 @@
                                             {% else %}
                                                 <td colspan="6" class="text-primary">No records found</td>
                                             {% endif %} 
-                                        </tbody>
-                                    </table>
-
+                                            </tbody>
+                                    </table><br>
                                     {% if object_list %}
                                         {% include 'partials/pagination.html' %}
-                                    {% endif %}  
-
-                                </div>     
-                            </div>     
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
-                    </div> 
+                    </div>
                 </div>
+                <!-- end row --> 
             </div>
         </div>
     </div>

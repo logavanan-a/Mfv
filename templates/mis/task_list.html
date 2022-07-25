@@ -2,28 +2,30 @@
 {% load static %}
 {% block contents %}
 
+
 <div class="row align-items-center">
     <div class="col-xl-12 mx-auto">
         <div class="card">
             <div class="card-body">
+
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-xl-12">
                         <div class="card">
                             <div class="card-body">
-                                <div class="row">
-                                        <table id="datatable-button" class="table table-bordered dt-responsive w-100">
-                                            <thead>
-                                                <tr>
-                                                    <th>SL No</th>
-                                                    <th>Mission</th>
-                                                    <th>Project</th>
-                                                    <th>Start Date</th>
-                                                    <th>End Date</th>
-                                                    <th>Status</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                                <div class="table-responsive">
+                                    <table class="table mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>SL No</th>
+                                                <th>Mission</th>
+                                                <th>Project</th>
+                                                <th>Start Date</th>
+                                                <th>End Date</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                                             {% if object_list %}
                                                 {% for task in object_list %}
                                                     <tr>
@@ -46,15 +48,16 @@
                                                 <td colspan="6" class="text-primary">No records found</td>
                                             {% endif %} 
                                             </tbody>
-                                        </table>
-                                        {% if object_list %}
+                                    </table><br>
+                                    {% if object_list %}
                                             {% include 'partials/pagination.html' %}
                                         {% endif %}
-                                </div>     
-                            </div>     
+                                </div>
+                            </div>
                         </div>
-                    </div> 
+                    </div>
                 </div>
+                <!-- end row --> 
             </div>
         </div>
     </div>

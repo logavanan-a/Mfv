@@ -2,30 +2,42 @@
 {% load configuration_tags   %}
 {% load static %}
 {% block contents %}
-<div class="row align-items-center">
+
+<div class="row">
     <div class="col-xl-12 mx-auto">
         <div class="card">
             <div class="card-body">
-                {%  if 'Partner Data Entry Operator' == user_role and mission_respose_obj.task.task_status == 1 or mission_respose_obj.task.task_status == 4 %}
-                <div style="display: flex;justify-content: flex-end;align-items: center;">
-                    <input type='button' id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{mission_respose_obj.task.id}}',2,'Submit for Approval')">
-                  </div>
-                {% endif %}
-                {% if messages %}
-                <ul class="messages">
-                    {% for message in messages %}
-                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4 class="card-title">Project: {{mission_respose_obj.task.project.name}}</h4>
+                        <h4 class="card-title">Dist. & State: {{mission_respose_obj.task.project.district.name}}, {{mission_respose_obj.task.project.district.state.name}}</h4>
+                        <h4 class="card-title" >Project funded by: {{mission_respose_obj.task.project.get_project_donor_mapping}}</h4>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h4 id="right_side" class="card-title" >Partner: {{mission_respose_obj.task.project.partner_mission_mapping.partner.name}}, {{mission_respose_obj.task.project.district.name}}, {{mission_respose_obj.task.project.district.state.name}}</h4>
+                        <h4 id="right_side" class="card-title" >Month: {{mission_respose_obj.task.start_date|date:"F Y"}}</h4>
+
+                        {% disply_financial_year mission_respose_obj.task.start_date as financial_year %} 
+                        <h4 id="right_side"  class="card-title" >Financial year: {{financial_year}}</h4>
+                    </div>
+                </div><br>
+
+
                 <form method='POST' class="" enctype="multipart/form-data" novalidate>
+                
+                {%  if 'Partner Data Entry Operator' == user_role and mission_respose_obj.task.task_status == 1 or mission_respose_obj.task.task_status == 4 %}
+                <label for="working_day">Working Days: </label>
+                <input type="number" id="working_day" name="working_day" style="width: 50px;">
 
-                    <label for="working_day">Working Day : </label>
-                    <input type="text" id="working_day" name="working_day">
+                <input type='button'  style="float: right;" id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{mission_respose_obj.task.id}}',2,'Submit for Approval')">
+                {% endif %}
 
+        
                     {% csrf_token %}
                     {% if programe_category %}
-                    <h5>Program Data</h5>
+                    <h5 style="text-align: center;">Program Data</h5>
                     {% for data in programe_category %}
                         <div class="table-responsive">
                             <h5> {{data.name}} </h5>
@@ -52,29 +64,29 @@
                                         
                                         <td>     
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'total_' as total %}                                  
-                                            <input type="number" name="total_{{sub_category.id}}" value="{{total}}" class="form-control" maxlength="5"> 
+                                            <input type="number" id="txtresult"  name="total_{{sub_category.id}}" value="{{total}}" class="form-control" maxlength="5" readonly> 
                                                                                     
                                             <div class="invalid-feedback">Please enter the Total value</div>
                                         </td>
 
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_male_' as adult_male %}  
-                                            <input type="number"  name="adult_male_{{sub_category.id}}" value="{{adult_male}}" class="form-control" maxlength="5" >
+                                            <input type="number" id="Text1"  name="adult_male_{{sub_category.id}}" value="{{adult_male}}" class="form-control" maxlength="5" onkeypress="return add_number(event)" >
                                         </td>
 
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_female_' as adult_female %} 
-                                            <input type="number"  name="adult_female_{{sub_category.id}}" value="{{adult_female}}" class="form-control" maxlength="5">
+                                            <input type="number" id="Text2"  name="adult_female_{{sub_category.id}}" value="{{adult_female}}" class="form-control" maxlength="5" onkeypress="return add_number(event)">
                                         </td>
 
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_male_' as child_male %}
-                                            <input type="number"  name="child_male_{{sub_category.id}}" value="{{child_male}}" class="form-control" maxlength="5">
+                                            <input type="number" id="Text3"  name="child_male_{{sub_category.id}}" value="{{child_male}}" class="form-control" maxlength="5" onkeypress="return add_number(event)">
                                         </td>
 
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_female_' as child_female %}
-                                            <input type="number"  name="child_female_{{sub_category.id}}" value="{{child_female}}" class="form-control" maxlength="5">
+                                            <input type="number" id="Text4"  name="child_female_{{sub_category.id}}" value="{{child_female}}" class="form-control" maxlength="5" onkeypress="return add_number(event)">
                                         </td>
                                        
                                     </tbody>    
@@ -86,7 +98,7 @@
                     {% endif %}
 
                     {% if finance_category %}
-                    <h5>Finance Data</h5>
+                    <h5 style="text-align: center;">Finance Data</h5>
                     {% for fin_data in finance_category %}
                         <div class="table-responsive">
                             <h5> {{fin_data.name}} </h5>
@@ -94,16 +106,25 @@
                                 <thead >
                                     <tr><th>Indicator</th>
                                         <th>Indicator Type</th> 
-                                        <th>Actual</th>
+                                        <th>Budgeted Amount</th>
+                                        <th>Grants Received</th>
+                                        <th>Actuals</th>
                                     </tr>
                                 </thead>
                                     {% for sub_category in fin_data.sub_category %}
                                     <tbody>
                                         <td>{{sub_category.name}}</td> 
                                         <td>{{sub_category.get_indicator_type_display}}</td> 
+                                        
+                                        {% disply_indicator_target_values mission_respose_obj.task.id sub_category.id as target_values %}  
+                                        <td>{{target_values}}</td> 
                                         <td>
-                                            {% disply_indicator_values mission_respose_obj.id sub_category.id  'actual_' as actual %}                                  
-                                            <input type="number"  name="actual_{{sub_category.id}}" value="{{actual}}" class="form-control" maxlength="5">
+                                            {% disply_indicator_values mission_respose_obj.id sub_category.id  'actuals_with_grants_received_' as actuals_with_grants_received %}                                  
+                                            <input type="number"  name="actuals_with_grants_received_{{sub_category.id}}" value="{{actuals_with_grants_received}}" class="form-control" maxlength="5">
+                                        </td> 
+                                        <td>
+                                            {% disply_indicator_values mission_respose_obj.id sub_category.id  'actuals_' as actuals %}                                  
+                                            <input type="number"  name="actuals_{{sub_category.id}}" value="{{actuals}}" class="form-control" maxlength="5" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
                                         </td> 
                                     </tbody>   
                                     {% endfor %} 
@@ -136,6 +157,38 @@
     </div>
 </div>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    #right_side{
+        margin-left: 50%
+    }
+</style>
+
+<script>
+    function add_number(e) {
+    if (isNumberKey(e)) {
+        setTimeout(() => {
+        var first_number = document.getElementById("Text1").value !== "" ? parseInt(document.getElementById("Text1").value) : 0;
+        var second_number = document.getElementById("Text2").value !== "" ? parseInt(document.getElementById("Text2").value) : 0;
+        var three_number = document.getElementById("Text3").value !== "" ? parseInt(document.getElementById("Text3").value) : 0;
+        var four_number = document.getElementById("Text4").value !== "" ? parseInt(document.getElementById("Text4").value) : 0;
+
+        var result = first_number + second_number+ three_number + four_number;
+        document.getElementById("txtresult").value = result;
+        }, 50)
+        return true;
+    } else {
+        return false;
+    }
+    }
+
+    function isNumberKey(evt) {
+    var charCode = (evt.which) ? evt.which : event.keyCode
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+        return false;
+    }
+    return true;
+    }
+</script>
 <script>
     function Confirm(task_id,val,title){
         Swal.fire({

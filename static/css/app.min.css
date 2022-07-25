@@ -701,11 +701,11 @@ body[data-layout=horizontal] .footer {
 }
 
 body[data-sidebar=dark] .vertical-menu {
-    background: #2a3042
+    background: #f1821a9c
 }
 
 body[data-sidebar=dark] #sidebar-menu ul li a {
-    color: #a6b0cf
+    color: #fff
 }
 
 body[data-sidebar=dark] #sidebar-menu ul li a i {
@@ -750,7 +750,7 @@ body[data-sidebar=dark].vertical-collpsed .vertical-menu #sidebar-menu>ul>li:hov
 }
 
 body[data-sidebar=dark].vertical-collpsed .vertical-menu #sidebar-menu>ul ul {
-    background-color: #2a3042
+    background-color: #f1821a9c
 }
 
 body[data-sidebar=dark].vertical-collpsed .vertical-menu #sidebar-menu ul li.mm-active .active {
