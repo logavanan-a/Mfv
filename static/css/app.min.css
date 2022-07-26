@@ -216,7 +216,7 @@ body[data-topbar=dark] .app-search span {
 }
 
 body[data-sidebar=dark] .navbar-brand-box {
-    background: #2a3042
+    background: #fff
 }
 
 body[data-sidebar=dark] .logo-dark {
@@ -701,11 +701,11 @@ body[data-layout=horizontal] .footer {
 }
 
 body[data-sidebar=dark] .vertical-menu {
-    background: #f1821a9c
+    background: #fff
 }
 
 body[data-sidebar=dark] #sidebar-menu ul li a {
-    color: #fff
+    color: #545a6d
 }
 
 body[data-sidebar=dark] #sidebar-menu ul li a i {
@@ -750,7 +750,7 @@ body[data-sidebar=dark].vertical-collpsed .vertical-menu #sidebar-menu>ul>li:hov
 }
 
 body[data-sidebar=dark].vertical-collpsed .vertical-menu #sidebar-menu>ul ul {
-    background-color: #f1821a9c
+    background-color: #fff
 }
 
 body[data-sidebar=dark].vertical-collpsed .vertical-menu #sidebar-menu ul li.mm-active .active {
@@ -778,11 +778,11 @@ body[data-sidebar=dark] .mm-active>i {
 }
 
 body[data-sidebar=dark] .mm-active .active {
-    color: #fff !important
+    color: #556ee6 !important
 }
 
 body[data-sidebar=dark] .mm-active .active i {
-    color: #fff !important
+    color: #556ee6 !important
 }
 
 body[data-sidebar=dark] .menu-title {
@@ -1926,8 +1926,8 @@ body[data-layout=horizontal][data-layout-size=boxed] .navbar-header {
 }
 
 .form-check-primary .form-check-input:checked {
-    background-color: #556ee6;
-    border-color: #556ee6
+    background-color: #13437e;
+    border-color: #13437e
 }
 
 .form-radio-primary .form-check-input:checked {
@@ -3950,8 +3950,8 @@ table.dataTable.dtr-inline.collapsed>tbody>tr>td.dtr-control:before {
 }
 
 .table-rep-plugin .btn-group .btn-default.btn-primary {
-    background-color: #556ee6;
-    border-color: #556ee6;
+    background-color: #13437e;
+    border-color: #13437e;
     color: #fff;
     -webkit-box-shadow: 0 0 0 2px rgba(85, 110, 230, .5);
     box-shadow: 0 0 0 2px rgba(85, 110, 230, .5)
@@ -4047,8 +4047,8 @@ table.dataTable.dtr-inline.collapsed>tbody>tr>td.dtr-control:before {
 }
 
 .table-rep-plugin .checkbox-row input[type=checkbox]:checked+label::before {
-    background-color: #556ee6;
-    border-color: #556ee6
+    background-color: #13437e;
+    border-color: #13437e
 }
 
 .table-rep-plugin .checkbox-row input[type=checkbox]:checked+label::after {

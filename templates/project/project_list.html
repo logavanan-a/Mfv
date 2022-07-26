@@ -1,17 +1,18 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block contents %}
+
 <div class="row align-items-center">
     <div class="col-xl-12 mx-auto">
         <div class="card">
             <div class="card-body">
-
                 <div class="row">
                     <div class="col-xl-12">
                         <div class="card">
-                            <a style="display: flex;justify-content: flex-end;align-items: center;" href="/project-add/"><button class="btn btn-primary ml-2" type="button" >Add Facility</button></a>
                             <div class="card-body">
-                                <!-- <h4 class="card-title">Table head</h4>  -->                      
+                                <div class="mb-2" style="display: flex;justify-content: flex-end;">
+                                <button class="btn btn-primary" onclick="location.href='/project-add/'" type="button">Add Facility</button>
+                            </div>                                       
                                 <div class="table-responsive">
                                     <table class="table mb-0">
                                         <thead class="table-light">
@@ -31,7 +32,7 @@
                                                         <td>{{project.name}}</td>
                                                         <td>{{project.district.name}}</td>
                                                         <td>{{project.location}}</td>
-                                                        <td><a href="/project-edit/{{project.id}}/"><button class="btn btn-primary ml-2" type="button">Edit</button></a></td>
+                                                        <td><a href="/project-edit/{{project.id}}/">Edit</a></td>
                                                     </tr>
                                                 {% endfor %}  
                                             {% else %}
