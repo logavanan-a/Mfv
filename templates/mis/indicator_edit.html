@@ -34,7 +34,7 @@
 
                 {% csrf_token %}
                     {% if programe_category %}
-                    <h5 style="text-align: center;">Program Data</h5>
+                    <h5 style="text-align:center;">Program Data</h5>
                     {% for data in programe_category %}
                         <div class="table-responsive">
                             <h5> {{data.name}} </h5>
@@ -98,7 +98,7 @@
                                     </tbody>    
                                     {% endfor %} 
                             </table>
-                        </div>
+                       
                         {% endfor %} 
 
                     {% endif %}
@@ -106,7 +106,7 @@
                     {% if finance_category %}
                     <h5 style="text-align: center;">Finance Data</h5>
                     {% for fin_data in finance_category %}
-                        <div class="table-responsive">
+                       
                             <h5> {{fin_data.name}} </h5>
                             <table class="table table-hover" id="hospital_report">
                                 <thead class="table-light">
