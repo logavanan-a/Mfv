@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<!-- DataTables -->
+<link href="{% static 'libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}" rel="stylesheet"
+    type="text/css" />
+<link href="{% static 'libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css' %}" rel="stylesheet"
+    type="text/css" />
+
+<!-- Responsive datatable examples -->
+<link href="{% static 'libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css' %}" rel="stylesheet"
+    type="text/css" />
+{% endblock %}
+{% block contents %}
+
+<div class="row">
+
+    <div class="col-12">
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="d-flex ">
+                        <div class="flex-shrink-1 me-4 ">
+                            <div class="image mt-2">
+                                
+                                <div class=' row d-block d-sm-none '>
+                                    <img src="/static/images/WAIC_logo.png"  draggable="false" height='90' width='90' 
+                                        class="rounded  opacity-75"  >
+                                </div>
+                                <div class=' col-sm-6 d-none d-sm-block '>
+                                    <img src="/static/images/WAIC_logo.png"   height='140' width='140' draggable="false"
+                                        class="rounded  opacity-75"  >
+                                </div>
+                            </div>
+                            {% if perms.auth.change_user %}
+                            <div class='row d-block d-sm-none mt-2'>
+                                <button type="button" class="btn btn-primary waves-effect waves-light" onclick="location.href='/user-edit/{{user.id}}/'">Edit</button>
+                                <button type="button" class="btn btn-primary waves-effect waves-light mt-1">Change Password</button>    
+                            </div>
+                            {% endif %}                                
+                        </div>
+    
+    
+                        <div class="row flex-grow-1">
+                            <div class='col-sm-6'>
+                                <div class='row '>
+                                    <div class="coltext-break">
+                                        <h2 class="font-size-20 fw-bold">{{user.username}}
+                                        </h2>
+                                    </div>
+                                </div>
+                                <div class='row '>
+                                    <h5 class="font-size-18 text-break fw-bold">{{child_info.0.12}}</h5>
+                                </div>
+                                
+                                <div class="row ">
+                                    <div class="row ">
+                                        <div class=' col-lg-4 col'>
+                                            <h5 class="font-size-14 fw-bold"> Last Login<span class='float-end'>:</span></h5>
+                                            {% comment %} <h5 class="font-size-14 fw-bold"> Active Status <span class='float-end'>:</span></h5> {% endcomment %}
+                                        </div>
+                                        <div class=' col-lg-4 col'>
+                                            <h5 class="font-size-14">{{user.last_login|date:"d-m-Y"|default:'-'}}</h5>
+                                            {% comment %} {% if user.is_active %}<i class='bx bxs-check-circle bx-sm text-success'></i>{% else %}<i class='bx bxs-x-circle bx-sm text-danger'></i>{% endif %} {% endcomment %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive-sm mt-4" id='profile_table'>
+                    <table class="table " >
+                        <tbody>
+                        <tr>
+                            <td>
+                                <h5 class="font-size-14 fw-bold "> First Name <span class='float-end'>:</span></h5>
+                            </td>
+                            <td class='col-3'>
+                                <p class="font-size-14"> {{user.first_name|default:'-'}}</p>
+                            </td>
+                            <td >
+                                <h5 class="font-size-14 fw-bold"> Last Name <span class='float-end'>:</span></h5>
+                            </td>
+                            <td  class='col-3'>
+                                <h5 class="font-size-14">{{user.last_name|default:'-'}}</h5>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td >
+                                <h5 class="font-size-14 fw-bold "> User Role<span class='float-end'>:</span></h5>
+                            </td>
+                            <td  class='col-3'>
+                                <p class="font-size-14"> {{user.groups.all.0|default:'-'}}</p>
+                            </td>
+                            <td>
+                                <h5 class="font-size-14 fw-bold "> Email<span class='float-end'>:</span></h5>
+                            </td>
+                            <td class='col-3'>
+                                <p class="font-size-14"> {{user.email|default:'-'}}</p>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+            </div>
+ 
+            <button type="button" onclick="location.href='/user_listing/'" class="btn btn-secondary waves-effect">
+                Back
+            </button>  
+                </div>
+            </div>          
+        </div>
+    </div> <!-- end col -->
+</div> <!-- end row -->
+
+{% endblock %}
+{% block extra_javascript %}
+<!-- Sweet Alerts js -->
+<script src="{% static 'libs/sweetalert2/dist/sweetalert2.min.js' %}"></script>
+<!-- Sweet alert init js-->
+<script src="{% static 'js/pages/sweet-alerts.init.js' %}"></script>
+<!-- Required datatable js -->
+<script src="{% static 'libs/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<!-- Buttons examples -->
+<script src="{% static 'libs/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'libs/jszip/dist/jszip.min.js' %}"></script>
+<script src="{% static 'libs/pdfmake/build/pdfmake.min.js' %}"></script>
+<script src="{% static 'libs/pdfmake/build/vfs_fonts.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons/js/buttons.colVis.min.js' %}"></script>
+
+<!-- Responsive examples -->
+<script src="{% static 'libs/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
+
+<!-- Datatable init js -->
+<script src="{% static 'js/pages/datatables.init.js' %}"></script>
+
+
+{% endblock %}

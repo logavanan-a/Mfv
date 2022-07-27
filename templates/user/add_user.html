@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block contents %}
+
+<div class="row align-items-center">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <form method='POST' class="needs-validation" enctype="multipart/form-data" oninput='password2.setCustomValidity(password2.value != password1.value ? "Passwords do not match." : "")' novalidate>
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control {% if user_exist_error %} border border-danger {% endif %}" name='username' id="floatingnameInput" {% if username %}value="{{username}}"{% endif %} placeholder="Enter Username" required=""  >
+                                <label for="floatingnameInput">Enter Username<span class="required-field"></span></label>
+                                <div class="invalid-feedback">
+                                    Please enter the username.
+                                </div>
+                                {% if user_exist_error %}
+                                <div class="text-danger">
+                                    {{user_exist_error}}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-lg-6">  
+                            <div class="form-floating mb-3">
+                                <select  class="select2 form-control select2 "  
+                                data-placeholder="Choose User Role" id="validationCustom04" name='user_role' required>      
+                                    <option selected disabled value="">Select User Role</option>
+                                    {% for group in groups %}
+                                    <option value="{{group.id}}">{{group.name}}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select the user role.
+                                </div>
+                            </div>   
+                        </div>
+
+                        <div class="col-lg-6">  
+                            <div class="form-floating mb-3">
+                                <select class="select2 form-control select2 "  
+                                data-placeholder="Choose Partner" id="validationCustom04" name='partner' required>      
+                                    <option selected disabled value="">Select Partner</option>
+                                    {% for partner in partners %}
+                                    <option value="{{partner.id}}">{{partner.name}}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select the Partner.
+                                </div>
+                            </div>   
+                        </div>
+
+                    </div>                    
+                    <div class='row'>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-4">
+                                <input type="password" class="form-control"  name='password1'  id="password1"
+                                    placeholder="Enter Password" required>
+                                <label for="floatingemailInput">Enter Password<span class="required-field"></span></label>
+                                <div class="invalid-feedback">
+                                    Please enter the valid password.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-4">
+                                <input type="password" class="form-control"  name='password2'  id="password2"
+                                    placeholder="Enter Confirm Password" required>
+                                <label for="floatingemailInput">Enter Confirm Password<span class="required-field"></span></label>
+                                <div class="invalid-feedback">
+                                    Please enter the matching password.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <legend class='font-size-20 fw-bold'>Personal Information</legend>
+                    <div class='row'>
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" name='first_name' id="floatingnameInput"  placeholder="Enter First Name" >
+                                <label for="floatingnameInput">Enter First Name</label>
+                                <div class="invalid-feedback">
+                                    Please enter the first name.
+                                </div>
+                            </div>
+                        </div><div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" name='last_name' id="floatingnameInput"  placeholder="Enter Last Name" >
+                                <label for="floatingnameInput">Enter Last Name</label>
+                                <div class="invalid-feedback">
+                                    Please enter the last name.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='row'>
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control" name='email' id="floatingnameInput"  placeholder="Enter Email" >
+                                <label for="floatingnameInput">Enter Email</label>
+                                <div class="invalid-feedback">
+                                    Please enter the email.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="reset" onclick="location.href='/user_listing/'" class="btn btn-secondary waves-effect">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary w-md">Save and Continue</button>
+                        
+                    </div>
+                </form>
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+<style>
+    .select2-container .select2-selection {
+        min-height: 55px
+    }
+    
+    .select2-container .select2-selection--single .select2-selection__placeholder:after {
+        content: " *";
+        color: red;
+    }
+    .select2-container .select2-selection--multiple {
+        height: 70px;
+        overflow: scroll;
+    } 
+</style>
+{% comment %} 
+<script>
+    $(document).ready(function(e){
+        $("#user_location").select2({
+            ajax: {
+                url: '/ajax/user_role_search/',
+                type: "GET",
+                dataType: 'json',
+                data: function (e) {
+                    return {
+                        'search_text': e.term,
+                        'selected_role_model': '{{selected_role_model}}',
+                        'user_role_location_config_id':'{{user_role_location_config.id}}'
+                    }
+                },
+            }
+        });
+    });
+</script> 
+{% endcomment %}
+</div>
+
+{% endblock %}

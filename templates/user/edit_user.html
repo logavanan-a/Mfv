@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block contents %}
+
+<div class="row align-items-center">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <form method='POST' class="needs-validation" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" name='username' id="floatingnameInput" value="{{user.username}}" placeholder="Enter Username" required=""  >
+                                <label for="floatingnameInput">Enter Username<span class="required-field"></span></label>
+                                <div class="invalid-feedback">
+                                    Please enter the username.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">  
+                            <div class="form-floating mb-3">
+                                <select  class="select2 form-control select2 "  
+                                data-placeholder="Choose User Role" id="validationCustom04" name='user_role' required>      
+                                    {% for group in groups %}
+                                    <option value="{{group.id}}" {% if group.id == user_partner_config.user.groups.all.0.id %}selected{% endif %}>{{group.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>   
+                        </div>
+
+                        <div class="col-lg-6">  
+                            <div class="form-floating mb-3">
+                                <select class="select2 form-control select2 "  
+                                data-placeholder="Choose Partner" id="validationCustom04" name='partner' required>      
+                                    {% for partner in partners %}
+                                    <option value="{{partner.id}}" {% if partner.id == user_partner_config.partner.id %}selected{% endif %}>{{partner.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>   
+                        </div>
+                    </div>                    
+                    
+                    <legend class='font-size-20 fw-bold'>Personal Information</legend>
+                    <div class='row'>
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" name='first_name' id="floatingnameInput" value="{{user.first_name}}"  placeholder="Enter First Name" >
+                                <label for="floatingnameInput">Enter First Name</label>
+                            </div>
+                        </div><div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" name='last_name' id="floatingnameInput" value="{{user.last_name}}" placeholder="Enter Last Name" >
+                                <label for="floatingnameInput">Enter Last Name</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='row'>
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control" name='email' id="floatingnameInput" value="{{user.email}}" placeholder="Enter Email" >
+                                <label for="floatingnameInput">Enter Email</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="reset" onclick="location.href='/user-profile/{{user.id}}/'" class="btn btn-secondary waves-effect">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary w-md">Save</button>
+                    </div>
+                </form>
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+<style>
+    .select2-container .select2-selection {
+        min-height: 55px
+    }
+    
+    .select2-container .select2-selection--single .select2-selection__placeholder:after {
+        content: " *";
+        color: red;
+    }
+</style>
+
+
+</div>
+
+{% endblock %}
