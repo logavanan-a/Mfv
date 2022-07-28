@@ -7,37 +7,39 @@
     <div class="col-xl-12 mx-auto">
         <div class="card">
             <div class="card-body">
-
                 <div class="row">
                     <div class="col-md-6">
-                        <h5 ><b class="card-title">Project: </b> {{mission_respose_obj.task.project.name}}</h5>
-                        <h5><b class="card-title">Dist. & State: </b> {{mission_respose_obj.task.project.district.name}}, {{mission_respose_obj.task.project.district.state.name}}</h5>
-                        <h5><b class="card-title">Project funded by: </b>{{mission_respose_obj.task.project.get_project_donor_mapping}}</h5>
+                        {% if mission_respose_obj.task.task_status%}
+                        <p  class="text-dark"><b>Status : </b>{{mission_respose_obj.task.get_task_status_display}}</p>
+                        {% endif %}
+                        <h5 ><b class="card-title">Project : </b><span style="font-size: 14px;">{{mission_respose_obj.task.project.name}}</span></h5>
+                        <h5><b class="card-title">Dist. & State : </b><span style="font-size: 14px;">{{mission_respose_obj.task.project.district.name}}, {{mission_respose_obj.task.project.district.state.name}}</span></h5>
+                        <h5><b class="card-title">Project funded by : </b><span style="font-size: 14px;"> {{mission_respose_obj.task.project.get_project_donor_mapping}}</span></h5>
                     </div>
 
                     <div class="col-md-6">
-                        <h5 id="right_side"><b class="card-title">Partner: </b> {{mission_respose_obj.task.project.partner_mission_mapping.partner.name}}, {{mission_respose_obj.task.project.district.name}}, {{mission_respose_obj.task.project.district.state.name}}</h5>
-                            <h5 id="right_side"><b class="card-title">Month: </b> {{mission_respose_obj.task.start_date|date:"F Y"}}</h5>
+                        <h5 id="right_side"><b class="card-title">Partner: </b><span style="font-size: 14px;">{{mission_respose_obj.task.project.partner_mission_mapping.partner.name}}, {{mission_respose_obj.task.project.district.name}}, {{mission_respose_obj.task.project.district.state.name}}</span> </h5>
+                        <h5 id="right_side"><b class="card-title">Month: </b><span style="font-size: 14px;">{{mission_respose_obj.task.start_date|date:"F Y"}}</span> </h5>
 
                         {% disply_financial_year mission_respose_obj.task.start_date as financial_year %} 
-                        <h5 id="right_side" > <b class="card-title">Financial year: </b>{{financial_year}}</h5>
+                        <h5 id="right_side" > <b class="card-title">Financial year: </b></b><span style="font-size: 14px;">{{financial_year}}</span></h5>
                     </div>
-                </div><br>
+                </div>
 
                 <form method='POST' class="" enctype="multipart/form-data" novalidate>
                     <label for="working_day" class="card-title">No. of Days Project Functional during the month: </label>
                     <input type="number" id="working_day" name="working_day" style="width: 50px;">
 
                 {%  if 'Partner Data Entry Operator' == user_role and mission_respose_obj.task.task_status == 1 or mission_respose_obj.task.task_status == 4 %}
-                <input type='button'  style="float: right;" id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{mission_respose_obj.task.id}}',2,'Submit for Approval')">
+                <input type='button' style="float: right;" id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{mission_respose_obj.task.id}}',2,'Submit for Approval')">
                 {% endif %}
 
                 {% csrf_token %}
                     {% if programe_category %}
-                    <h5 style="text-align:center;">Program Data</h5>
+                    <p class="text-center text-uppercase"><b><br>Program Data.</b></p>
                     {% for data in programe_category %}
                         <div class="table-responsive">
-                            <h5> {{data.name}} </h5>
+                            <h5 class="text-dark"> {{data.name}} </h5>
                             <table class="table table-hover">
                                 <thead class="table-light">
                                     <tr><th>Indicator</th>
@@ -97,17 +99,18 @@
                                        
                                     </tbody>    
                                     {% endfor %} 
-                            </table>
+                            </table><br>
+                            </div>
                        
                         {% endfor %} 
 
                     {% endif %}
 
                     {% if finance_category %}
-                    <h5 style="text-align: center;">Finance Data</h5>
+                    <p class="text-center text-uppercase"><b><br>Finance Data.</b></p>
                     {% for fin_data in finance_category %}
-                       
-                            <h5> {{fin_data.name}} </h5>
+                    <div class="table-responsive">
+                            <h5 class="text-dark"> {{fin_data.name}} </h5>
                             <table class="table table-hover" id="hospital_report">
                                 <thead class="table-light">
                                     <tr><th>Indicator</th>
