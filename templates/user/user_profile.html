@@ -25,23 +25,20 @@
                         <div class="flex-shrink-1 me-4 ">
                             <div class="image mt-2">
                                 
-                                <div class=' row d-block d-sm-none '>
+                                <!-- <div class=' row d-block d-sm-none '>
                                     <img src="/static/images/WAIC_logo.png"  draggable="false" height='90' width='90' 
                                         class="rounded  opacity-75"  >
                                 </div>
                                 <div class=' col-sm-6 d-none d-sm-block '>
                                     <img src="/static/images/WAIC_logo.png"   height='140' width='140' draggable="false"
                                         class="rounded  opacity-75"  >
-                                </div>
+                                </div> -->
                             </div>
-                            {% if perms.auth.change_user %}
                             <div class='row d-block d-sm-none mt-2'>
                                 <button type="button" class="btn btn-primary waves-effect waves-light" onclick="location.href='/user-edit/{{user.id}}/'">Edit</button>
                                 <button type="button" class="btn btn-primary waves-effect waves-light mt-1">Change Password</button>    
                             </div>
-                            {% endif %}                                
                         </div>
-    
     
                         <div class="row flex-grow-1">
                             <div class='col-sm-6'>
