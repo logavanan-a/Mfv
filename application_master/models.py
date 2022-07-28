@@ -133,6 +133,7 @@ class Project(BaseContent):
     partner_mission_mapping =  models.ForeignKey(PartnerMissionMapping, on_delete = models.DO_NOTHING, blank=True, null=True)
     district = models.ForeignKey(District, on_delete = models.DO_NOTHING, blank=True, null=True)
     location = models.CharField(max_length = 350)
+    additional_info = models.TextField(blank=True, null=True)
 
     class Meta:
         unique_together = ('name', 'partner_mission_mapping')

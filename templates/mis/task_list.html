@@ -19,8 +19,8 @@
                                                 <th>SL No</th>
                                                 <th style="width: 28%;">Mission</th>
                                                 <th>Project</th>
-                                                <th>Start Date</th>
-                                                <th>End Date</th>
+                                                <!-- <th>Start Date</th>
+                                                <th>End Date</th> -->
                                                 <th>Status</th>
                                                 <th>Actions</th>
                                             </tr>
@@ -30,13 +30,13 @@
                                                 {% for task in object_list %}
                                                     <tr>
                                                         <td>{{forloop.counter0|add:object_list.start_index}}</td>
-                                                        <td>{{task.name}}</td>
                                                         <td>{{task.project.partner_mission_mapping.mission.name}}</td>
-                                                        <td>{{task.start_date|date:"d-m-Y"}}</td>
-                                                        <td>{{task.end_date|date:"d-m-Y"}}</td>
+                                                        <td>{{task.name}}</td>
+                                                        <!-- <td>{{task.start_date|date:"d-m-Y"}}</td>
+                                                        <td>{{task.end_date|date:"d-m-Y"}}</td> -->
                                                         <td>{{task.get_task_status_display}}</td>
                                                         {% if task.get_task %}
-                                                        <td><a href="/mission_edit/{{task.project.partner_mission_mapping.mission.slug}}/{{task.id}}/{{task.get_task.id}}/">Edit</a></td>
+                                                        <td><a href="/mission_edit/{{task.project.partner_mission_mapping.mission.slug}}/{{task.id}}/{{task.get_task.id}}/">{% if task.task_status == 2 %}View{% else %}Edit{% endif %}</a></td>
                                                         {% else %}
                                                         <td><a href="/{{task.project.partner_mission_mapping.mission.slug}}/monthly-report/{{task.id}}/">Add</a></td>
                                                         {% endif %}
@@ -48,8 +48,8 @@
                                             </tbody>
                                     </table><br>
                                     {% if object_list %}
-                                            {% include 'partials/pagination.html' %}
-                                        {% endif %}
+                                        {% include 'partials/pagination.html' %}
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
