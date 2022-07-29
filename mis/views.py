@@ -101,7 +101,7 @@ def missionindicator_add(request, slug,task_id):
         results = {}
         for key,values in temp.items():
             if key != 'csrfmiddlewaretoken' and key != 'working_day' and values[0] != '':
-                results[key] = int(values[0])
+                results[key] = values[0]
 
         mission_add = MissionIndicatorAchievement.objects.create(task = task_obj , response = results)
 
@@ -144,7 +144,7 @@ def missionindicator_edit(request, slug, id,task_id):
         results = {}
         for key,values in temp.items():
             if key != 'csrfmiddlewaretoken' and values[0] != '':
-                results[key] = int(values[0])
+                results[key] = values[0]
         mission_respose_obj = MissionIndicatorAchievement.objects.get(id = id)
         mission_respose_obj.response = results
 

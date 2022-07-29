@@ -105,10 +105,16 @@
                             <h5 class="text-dark"> {{fin_data.name|title}} </h5>
                             <table class="table table-hover" id="hospital_report">
                                 <thead class="table-light">
-                                    <tr><th>Particulars</th>
-                                        <th>Amount</th>
+                                    <tr>
+                                        <th>Particulars</th>
+                                        {% if fin_data.label_configuration == 2 %}
+                                        <th>Approved Budget</th>
                                         <th>Grants Received</th>
-                                        <th>Actuals</th>
+                                        <th>Expenses</th>
+                                        {% else %}
+                                        <th>Amount</th>
+                                        {% endif %}
+                                        <th>Comment</th>
                                     </tr>
                                 </thead>
                                 {% for sub_category in fin_data.sub_category %}
@@ -117,13 +123,21 @@
                                     
                                     {% disply_indicator_target_values mission_respose_obj.task.id sub_category.id as target_values %}  
                                     <td>{{target_values}}</td> 
+
+                                    {% if fin_data.label_configuration == 2 %}
                                     <td>
                                         {% disply_indicator_values mission_respose_obj.id sub_category.id  'actuals_with_grants_received_' as actuals_with_grants_received %}                                  
-                                        <input type="number"  name="actuals_with_grants_received_{{sub_category.id}}" value="{{actuals_with_grants_received}}" class="form-control" maxlength="5">
+                                        <input type="number"  name="actuals_with_grants_received_{{sub_category.id}}" value="{{actuals_with_grants_received}}" class="form-control" maxlength="5" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
                                     </td> 
                                     <td>
                                         {% disply_indicator_values mission_respose_obj.id sub_category.id  'actuals_' as actuals %}                                  
-                                        <input type="number"  name="actuals_{{sub_category.id}}" value="{{actuals}}" class="form-control" maxlength="5" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
+                                        <input type="number"  name="actuals_{{sub_category.id}}" value="{{actuals}}" class="form-control" maxlength="5" >
+                                    </td> 
+                                    {% endif %}
+                                   
+                                    <td>
+                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'comment_' as comment %}                                  
+                                        <input type="text"  name="comment_{{sub_category.id}}" value="{% if comment %}{{comment}}{% endif %}" class="form-control">
                                     </td> 
                                 </tbody>   
                                 {% endfor %} 

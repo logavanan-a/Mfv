@@ -166,6 +166,7 @@ class MissionIndicatorCategory(BaseContent):
     name = models.CharField(max_length = 350)
     mission = models.ForeignKey(Mission, on_delete = models.DO_NOTHING, blank=True, null=True)
     category_type = models.IntegerField(choices = CATEGORY_CHOICES, default=1)
+    label_configuration = models.IntegerField(default=1)
 
     class Meta:
         unique_together = ('name', 'mission')
