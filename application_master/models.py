@@ -184,6 +184,7 @@ class MissionIndicator(BaseContent):
     indicator_type = models.IntegerField(choices = IT_CHOICES, default = 1)
 
     class Meta:
+        ordering = ['name']
         # unique_together = ('name', 'category')
         verbose_name_plural = "Mission Indicator"
     

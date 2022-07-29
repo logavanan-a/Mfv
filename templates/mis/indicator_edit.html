@@ -60,21 +60,17 @@
                                         <td>{{sub_category.name}}</td> 
                                         <td>{{sub_category.get_indicator_type_display}} </td> 
                                         
-                                        
                                         {% disply_indicator_target_values mission_respose_obj.task.id sub_category.id as target_values %}  
                                         <td>{{target_values}} </td> 
-                                        
                                         <td>     
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'total_' as total %}                                  
                                             <input type="number" id="txtresult"  name="total_{{sub_category.id}}" value="{{total}}" class="form-control" maxlength="1" readonly> 
                                             <div class="invalid-feedback">Please enter the Total value</div>
                                         </td>
-
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_male_' as adult_male %}  
                                             <input type="number" id="Text1"  name="adult_male_{{sub_category.id}}" value="{{adult_male}}" class="form-control" maxlength="2" onkeypress="return add_number(event)" >
                                         </td>
-
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_female_' as adult_female %} 
                                             <input type="number" id="Text2"  name="adult_female_{{sub_category.id}}" value="{{adult_female}}" class="form-control" maxlength="3" onkeypress="return add_number(event)">
@@ -83,12 +79,10 @@
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_transgender_' as adult_transgender %} 
                                             <input type="number" id="Text3" name="adult_transgender_{{sub_category.id}}" value="{{adult_transgender}}" class="form-control" maxlength="4" onkeypress="return add_number(event)">
                                         </td>
-
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_male_' as child_male %}
                                             <input type="number" id="Text4"  name="child_male_{{sub_category.id}}" value="{{child_male}}" class="form-control" maxlength="5" onkeypress="return add_number(event)">
                                         </td>
-
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_female_' as child_female %}
                                             <input type="number" id="Text5"  name="child_female_{{sub_category.id}}" value="{{child_female}}" class="form-control" maxlength="6" onkeypress="return add_number(event)">
@@ -97,17 +91,14 @@
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_transgender_' as child_transgender %}
                                             <input type="number" id="Text6" name="child_transgender_{{sub_category.id}}" value="{{child_transgender}}" class="form-control" maxlength="7" onkeypress="return add_number(event)">
                                         </td>
-                                       
                                     </tbody>    
                                     {% endfor %} 
                             </table><br>
                             </div>
-                       
                         {% endfor %} 
-
                     {% endif %}
 
-                    {% if finance_category %}
+                    {% if finance_category and slug == 'mission-jyot' %}
                     <p class="text-center text-uppercase"><b><br>Finance Data.</b></p>
                     {% for fin_data in finance_category %}
                     <div class="table-responsive">
@@ -120,22 +111,22 @@
                                         <th>Actuals</th>
                                     </tr>
                                 </thead>
-                                    {% for sub_category in fin_data.sub_category %}
-                                    <tbody>
-                                        <td>{{sub_category.name}}</td> 
-                                        
-                                        {% disply_indicator_target_values mission_respose_obj.task.id sub_category.id as target_values %}  
-                                        <td>{{target_values}}</td> 
-                                        <td>
-                                            {% disply_indicator_values mission_respose_obj.id sub_category.id  'actuals_with_grants_received_' as actuals_with_grants_received %}                                  
-                                            <input type="number"  name="actuals_with_grants_received_{{sub_category.id}}" value="{{actuals_with_grants_received}}" class="form-control" maxlength="5">
-                                        </td> 
-                                        <td>
-                                            {% disply_indicator_values mission_respose_obj.id sub_category.id  'actuals_' as actuals %}                                  
-                                            <input type="number"  name="actuals_{{sub_category.id}}" value="{{actuals}}" class="form-control" maxlength="5" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
-                                        </td> 
-                                    </tbody>   
-                                    {% endfor %} 
+                                {% for sub_category in fin_data.sub_category %}
+                                <tbody>
+                                    <td>{{sub_category.name}}</td> 
+                                    
+                                    {% disply_indicator_target_values mission_respose_obj.task.id sub_category.id as target_values %}  
+                                    <td>{{target_values}}</td> 
+                                    <td>
+                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'actuals_with_grants_received_' as actuals_with_grants_received %}                                  
+                                        <input type="number"  name="actuals_with_grants_received_{{sub_category.id}}" value="{{actuals_with_grants_received}}" class="form-control" maxlength="5">
+                                    </td> 
+                                    <td>
+                                        {% disply_indicator_values mission_respose_obj.id sub_category.id  'actuals_' as actuals %}                                  
+                                        <input type="number"  name="actuals_{{sub_category.id}}" value="{{actuals}}" class="form-control" maxlength="5" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
+                                    </td> 
+                                </tbody>   
+                                {% endfor %} 
                             </table>
                         </div>
                         {% endfor %} 
@@ -158,7 +149,6 @@
                                 {% endif %}
                             {% endif %}
                     </div>
-
                 </form>
             </div>
         </div>
@@ -179,10 +169,10 @@
         var second_number = document.getElementById("Text2").value !== "" ? parseInt(document.getElementById("Text2").value) : 0;
         var three_number = document.getElementById("Text3").value !== "" ? parseInt(document.getElementById("Text3").value) : 0;
         var four_number = document.getElementById("Text4").value !== "" ? parseInt(document.getElementById("Text4").value) : 0;
-        var four_number = document.getElementById("Text5").value !== "" ? parseInt(document.getElementById("Text5").value) : 0;
-        var four_number = document.getElementById("Text6").value !== "" ? parseInt(document.getElementById("Text6").value) : 0;
+        var five_number = document.getElementById("Text5").value !== "" ? parseInt(document.getElementById("Text5").value) : 0;
+        var six_number = document.getElementById("Text6").value !== "" ? parseInt(document.getElementById("Text6").value) : 0;
 
-        var result = first_number + second_number+ three_number + four_number;
+        var result = first_number + second_number+ three_number + four_number+five_number+six_number;
         document.getElementById("txtresult").value = result;
         }, 50)
         return true;

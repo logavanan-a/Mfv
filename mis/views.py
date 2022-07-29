@@ -21,6 +21,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView, View
 
 from mis.models import MissionIndicatorAchievement, Task
+from datetime import date
 
 pg_size = 10
 def get_pagination(request, users):
@@ -206,6 +207,7 @@ def missiontarget_table_edit(request, ids, id):
 def task_list(request):
     heading= 'Task List'
     user = get_user(request)
+    today = date.today()
     
     if user.groups.filter(name = 'Partner Admin').exists():
         user_lists = UserPartnerMapping.objects.get(user = request.user)
