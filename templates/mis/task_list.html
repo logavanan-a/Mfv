@@ -1,65 +1,172 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block contents %}
+        <div class="row align-items-center">
+            <div class="col-xl-12 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-xl-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <button class="btn btn-primary" type="button" id="current_month" onclick="CurrentMonth()">Current Month</button>
+                                            </div>
+                                            <div class="col">
+                                                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                                    Past Month
+                                                </button>
+                                            </div>
+                                          </div>
+                                        <div class="collapse" id="collapseExample">
+                                        <div class="card card-body">
+                                            <form class="dt_adv_search" method="GET" action="/task-list/">
+                                                <div class="row">
 
-<div class="row align-items-center">
-    <div class="col-xl-12 mx-auto">
-        <div class="card">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-xl-12">
-                        <div class="card">
-                            <div class="card-body">
+                                                    <div class="col-sm-6">
+                                                      <div class="form-group">
+                                                        <label for="mission">Mission:</label>
+                                                            <select class="form-control" id="mission" name="mission">
+                                                                <option value="" selected>Select</option> 
+                                                                {% for mission in mission_objs %}
+                                                                    <option value="{{mission.id}}" >{{mission.name}}</option> 
+                                                                {% endfor %}
+                                                            </select>
+                                                      </div>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label for="project">Project:</label>
+                                                                <select class="form-control" id="project" name="project">
+                                                                    <option value="" selected>Select</option> 
+                                                                    {% for project in project_objs %}
+                                                                        <option value="{{project.id}}" >{{project.name}}</option> 
+                                                                    {% endfor %}
+                                                                </select>
+                                                        </div>
+                                                      </div>
 
-                                <div class="table-responsive">
-                                   
-                                    <p style="float: right;"><b>Periodicity Date : </b>{{today|date:"F Y"}}</p>
-                                    <table class="table mb-0">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>SL No</th>
-                                                <th style="width: 28%;">Mission</th>
-                                                <th>Project</th>
-                                                <!-- <th>Start Date</th>
-                                                <th>End Date</th> -->
-                                                <th>Status</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% if object_list %}
-                                                {% for task in object_list %}
+                                                    <div class="col-sm-6">
+                                                      <div class="form-group">
+                                                        <label for="project">Month:</label>
+                                                        <select class="form-control" id="month", name="month">
+                                                            <option value="" selected>Select</option>
+                                                            <option value="1">January</option>
+                                                            <option value="2">February</option>
+                                                            <option value="3">March</option>
+                                                            <option value="4">April</option>
+                                                            <option value="5">May</option>
+                                                            <option value="6">June</option>
+                                                            <option value="7">July</option>
+                                                            <option value="8">August</option>
+                                                            <option value="9">September</option>
+                                                            <option value="10">October</option>
+                                                            <option value="11">November</option>
+                                                            <option value="12">December</option>
+                                                        </select>
+                                                      </div>
+                                                    </div>
+
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label  for="year">Year:</label>
+                                                                <select class="form-control" id="year", name="year">
+                                                                    <option value="" selected>Select</option>
+                                                                    <option value="2015">2015</option>
+                                                                    <option value="2016">2016</option>
+                                                                    <option value="2017">2017</option>
+                                                                    <option value="2018">2018</option>
+                                                                    <option value="2019">2019</option>
+                                                                    <option value="2020">2020</option>
+                                                                    <option value="2021">2021</option>
+                                                                    <option value="2022">2022</option>
+                                                                    <option value="2023">2023</option>
+                                                                    <option value="2024">2024</option>
+                                                                    <option value="2025">2025</option>
+                                                                    <option value="2026">2026</option>
+                                                                </select>
+                                                        </div>
+                                                    </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="submit" class="btn btn-primary mr-1 waves-effect waves-float waves-light" tabindex="5">Search</button>
+                                                        <span type="reset" class="btn btn-primary mr-1 waves-effect waves-float waves-light" onclick="location.href='/task-list/'" tabindex="7">Reset</span>
+                                                    </div>                                                
+                                                  </div>    
+                                            </form>
+                                        </div>
+                                </div>
+                                        <div class="table-responsive">
+                                            <p style="float: right;"><b>Periodicity Date : </b>{{today|date:"F Y"}}</p>
+                                            <table class="table mb-0">
+                                                <thead class="table-light">
                                                     <tr>
-                                                        <td>{{forloop.counter0|add:object_list.start_index}}</td>
-                                                        <td>{{task.project.partner_mission_mapping.mission.name}}</td>
-                                                        <td>{{task.name}}</td>
-                                                        <!-- <td>{{task.start_date|date:"d-m-Y"}}</td>
-                                                        <td>{{task.end_date|date:"d-m-Y"}}</td> -->
-                                                        <td>{{task.get_task_status_display}}</td>
-                                                        {% if task.get_task %}
-                                                        <td><a href="/mission_edit/{{task.project.partner_mission_mapping.mission.slug}}/{{task.id}}/{{task.get_task.id}}/">{% if task.task_status == 2 %}View{% else %}Edit{% endif %}</a></td>
-                                                        {% else %}
-                                                        <td><a href="/{{task.project.partner_mission_mapping.mission.slug}}/monthly-report/{{task.id}}/">Add</a></td>
-                                                        {% endif %}
+                                                        <th>SL No</th>
+                                                        <th style="width: 28%;">Mission</th>
+                                                        <th>Project</th>
+                                                        <th>Start Date</th>
+                                                        <th>Status</th>
+                                                        <th>Actions</th>
                                                     </tr>
-                                                {% endfor %}  
-                                            {% else %}
-                                                <td colspan="7" class="text-primary">No records found</td>
-                                            {% endif %} 
-                                            </tbody>
-                                    </table><br>
-                                    {% if object_list %}
-                                        {% include 'partials/pagination.html' %}
-                                    {% endif %}
+                                                </thead>
+                                                <tbody>
+                                                    {% if object_list %}
+                                                        {% for task in object_list %}
+                                                            <tr>
+                                                                <td>{{forloop.counter0|add:object_list.start_index}}</td>
+                                                                <td>{{task.project.partner_mission_mapping.mission.name}}</td>
+                                                                <td>{{task.name}}</td>
+                                                                <td>{{task.start_date|date:"d-m-Y"}}</td>
+                                                                <td>{{task.get_task_status_display}}</td>
+                                                                {% if task.get_task %}
+                                                                <td><a href="/mission_edit/{{task.project.partner_mission_mapping.mission.slug}}/{{task.id}}/{{task.get_task.id}}/">{% if task.task_status == 2 %}View{% else %}Edit{% endif %}</a></td>
+                                                                {% else %}
+                                                                <td><a href="/{{task.project.partner_mission_mapping.mission.slug}}/monthly-report/{{task.id}}/">Add</a></td>
+                                                                {% endif %}
+                                                            </tr>
+                                                        {% endfor %}  
+                                                    {% else %}
+                                                        <td colspan="7" class="text-primary">No records found</td>
+                                                    {% endif %} 
+                                                    </tbody>
+                                            </table><br>
+                                            {% if object_list %}
+                                                {% include 'partials/pagination.html' %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <!-- end row --> 
                     </div>
                 </div>
-                <!-- end row --> 
             </div>
-        </div>
-    </div>
+
+<!-- end row -->
+
+<script type="text/javascript">
+function CurrentMonth()
+{
+    var today = new Date();
+    var date = today.getFullYear()+'-'+(today.getMonth()+1)
+    location.href='?month_year='+date
+};
+</script>
+<!-- <script>
+    $(document).ready(function() {
+    var d = new Date();
+    var month = d.getMonth() + 1;
+    var year = d.getFullYear();
+
+    $("#month").val(month); 
+    $("#year").val(year);    
+    
+});
+</script> -->
+
 <style>
     .select2-container .select2-selection {
         min-height: 55px
@@ -69,69 +176,5 @@
         color: red;
     }
 </style>
-<script type="text/javascript">
-    $(document).ready(function(){
-        $('select#state').change(function () {
-            var optionSelected = $(this).find("option:selected");
-            var valueSelected  = optionSelected.val();
-            data = {'selected_state' : valueSelected };
-            $.ajax({
-                type:"GET",
-                url: '/ajax/district/',
-                data:data,
-                success:function(result){
-                    $("#district option").remove();
-                    a = '<option selected disabled value="">Select District</option>';
-                    $("#district").append(a);
-                    $("#shelter option").remove();
-                    b = '<option selected value="">Select Shelter Home</option>';
-                    $("#shelter").append(b);
-                    if(JSON.parse(result) == 0){
-                        $("#district option").remove();
-                        a = '<option selected disabled value="">No district is mapped to this state</option>';
-                        $("#district").append(a);
-                    }
-                    else{
-                        $.each(JSON.parse(result),function(key, value)
-                        {
-                            a = '<option value=' + value['id']+'>' + value['name']+'</option>';
-                            $("#district").append(a);
-                        });
-                    }
-                }
-            });
-        });
-    });  
-    $(document).ready(function(){
-        $('select#district').change(function () {
-            var optionSelected = $(this).find("option:selected");
-            var valueSelected  = optionSelected.val();
-            data = {'selected_district' : valueSelected };
-            $.ajax({
-                type:"GET",
-                url: '/ajax/shelterhome/',
-                data:data,
-                success:function(result){
-                    $("#shelter option").remove();
-                    a = '<option selected disabled value="">Select Shelter Home</option>';
-                    $("#shelter").append(a);
-                    if(JSON.parse(result) == 0){
-                        $("#shelter option").remove();
-                        a = '<option selected disabled value="">No shelter home is mapped to this district</option>';
-                        $("#shelter").append(a);
-                    }
-                    else{
-                        $.each(JSON.parse(result),function(key, value)
-                        {
-                            a = '<option value=' + value['id']+'>' + value['name']+'</option>';
-                            $("#shelter").append(a);
-                        });
-                    }
-                }
-            });
-        });
-    });
-      
-</script>
-</div>
 {% endblock %}
+

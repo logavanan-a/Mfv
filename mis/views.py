@@ -208,15 +208,41 @@ def task_list(request):
     heading= 'Task List'
     user = get_user(request)
     today = date.today()
+    mission_objs = Mission.objects.all()
+    project_objs = Project.objects.all()
+
+    filter_data = request.GET
+    mission = filter_data.get('mission')
+    project = filter_data.get('project')
+    month = filter_data.get('month')
+    year = filter_data.get('year')
+    month_year = filter_data.get('month_year')
+
+    task_obj = Task.objects.filter(user = request.user)
     
+    if mission:
+        task_obj = task_obj.filter(project__partner_mission_mapping__mission__id = mission)
+
+    if project:
+        task_obj = task_obj.filter(project__id = project)
+
+    if year:
+        task_obj = task_obj.filter(start_date__year = year)
+    
+    if month:
+        task_obj = task_obj.filter(start_date__month = month)
+
+    if month_year:
+        month_year_list = month_year.split('-')
+        task_obj = task_obj.filter(start_date__year = month_year_list[0]).filter(start_date__month = month_year_list[1])
+
     if user.groups.filter(name = 'Partner Admin').exists():
         user_lists = UserPartnerMapping.objects.get(user = request.user)
         for user_list in UserPartnerMapping.objects.filter(partner = user_lists.partner).exclude(user = request.user):
             task_obj = Task.objects.filter(user = user_list.user)
             # print(task_obj,obj_list)
     else:
-        task_obj = Task.objects.filter(user = request.user)
-
+        task_obj
     object_list = get_pagination(request, task_obj)
     return render(request, 'mis/task_list.html', locals())
 
@@ -289,7 +315,6 @@ class ProjectUpdate(View):
                 
         return redirect('/project-list/')
         # return render(request, self.template_name, locals())
-
 
 # @ login_required(login_url='/login/')
 # @ user_passes_test(lambda u: u.is_superuser)
@@ -380,31 +405,13 @@ def add_user(request, user_location=None):
             return render(request, 'user/add_user.html', locals())
         return render(request, 'user/add_user.html', locals())
 
-
 # @ login_required(login_url='/login/')
 # @ user_passes_test(lambda u: u.is_superuser)
 def user_profile(request, id):
     user = User.objects.get(id=id)
     # user_location_relation = UserPartnerMapping.objects.filter(
     #     UserRoleLocationLevelConfig__user=user, active=2).order_by('object_id')
-
     return render(request, 'user/user_profile.html', locals())
-
-
-# @ login_required(login_url='/login/')
-# @ user_passes_test(lambda u: u.is_superuser)
-def user_role_location_delete(request, user_id, user_role_location_id=None):
-    if user_role_location_id:
-        user_location_relation = UserLocationRelation.objects.get(
-            id=user_role_location_id)
-        user_location_relation.active = 0
-        user_location_relation.save()
-    else:
-        user_location_relation = UserLocationRelation.objects.filter(
-            UserRoleLocationLevelConfig__user__id=user_id, active=2)
-        user_location_relation.update(active=0)
-    return redirect('child_management:user_profile', user_id=user_id)
-
 
 # @ login_required(login_url='/login/')
 # @ user_passes_test(lambda u: u.is_superuser)
@@ -463,100 +470,3 @@ def user_change_password(request, id):
         user.save()
         return redirect('mis:user_profile', id = id)
     return render(request, 'user/user_change_password.html', locals())
-
-
-
-# @ login_required(login_url='/login/')
-# @ user_passes_test(lambda u: u.is_superuser)
-def add_location(request, user_id):
-    # Group name with permission level objects
-    # 12-'Central WCD Officials': Centre,
-    # 11-'WAIC admin': Centre,
-    # 20-'State WCD Officials': State,
-    # 2-'WAIC Team Member': ShelterHome,
-    # 21-'WAIC Partner User': ShelterHome,
-    # 3-'WAIC Partner Admin': ShelterHome,
-    # 16-'District CWC User': District,
-    # 15-'District CWC Admin': District,
-    # 13-'DCPU Admin': District,
-    # 14-'DCPU User': District,
-    # 4-'Shelter admin': ShelterHome,
-    # 17-'Shelter Home User': ShelterHome,
-    # 18-'SAA Admin': ShelterHome,
-    # 19-'SAA User': ShelterHome,
-    user_group_dict = {'12': ShelterHome,
-                       '11': Centre,
-                       '20': ShelterHome,
-                       '2': ShelterHome,
-                       '21': ShelterHome,
-                       '3': ShelterHome,
-                       '16': ShelterHome,
-                       '15': ShelterHome,
-                       '13': ShelterHome,
-                       '14': ShelterHome,
-                       '4': ShelterHome,
-                       '17': ShelterHome,
-                       '18': ShelterHome,
-                       '19': ShelterHome,
-                       }
-    states = State.objects.filter(active=2)
-    user = User.objects.get(id=user_id)
-    user_role_location_config = UserRoleLocationLevelConfig.objects.get(
-        user=user)
-    heading = user.username + ' - '+user_role_location_config.group.name
-    user_role = str(user_role_location_config.group.id)
-    selected_role_model = user_group_dict.get(user_role)._meta.model_name
-    # Already located location
-    already_located_locations_id = UserLocationRelation.objects.filter(
-        UserRoleLocationLevelConfig=user_role_location_config, active=2).values_list('object_id', flat=True)
-    # User groups for already located
-    located_location_for_centre, located_location_for_district, located_location_for_sheltehome = [], [], []
-    if selected_role_model == 'centre':
-        located_location_for_centre = already_located_locations_id
-    elif selected_role_model == 'state':
-        states = State.objects.exclude(id__in=already_located_locations_id)
-    elif selected_role_model == 'district':
-        located_location_for_district = list(already_located_locations_id)
-    else:
-        located_location_for_sheltehome = list(already_located_locations_id)
-    if request.method == 'POST':
-        data = request.POST
-        user_location_centre = data.getlist('user_location_centre', '')
-        user_location_state = data.getlist('user_location_state', '')
-        user_location_district = data.getlist(
-            'user_location_district', '')
-        user_location_shelterhome = data.getlist(
-            'user_location_shelterhome', '')
-        # object_id based on content type
-        # Selected group while adding user
-        selected_places_with_role = {
-            "centre": [user_location_centre, ],
-            "state": [user_location_state, user_location_centre],
-            "district": [user_location_district, user_location_state]
-        }
-        selected_user_location = selected_places_with_role.get(
-            selected_role_model, [user_location_shelterhome, user_location_district])
-        # For checking the exist location removed
-        all_locations = []
-        if selected_role_model == 'state':
-            all_locations = State.objects.filter(
-                active=2, centre__id__in=selected_user_location[1]).values_list('id', flat=True)
-        elif selected_role_model == 'district':
-            all_locations = District.objects.filter(
-                active=2, state__id__in=selected_user_location[1]).values_list('id', flat=True)
-        elif selected_role_model == 'shelterhome':
-            all_locations = ShelterHome.objects.filter(
-                active=2, district__id__in=selected_user_location[1]).values_list('id', flat=True)
-        # import ipdb
-        # ipdb.set_trace()
-        all_locations = [str(i) for i in all_locations]
-        exists_location_relation_id = set(
-            all_locations) - set(selected_user_location[0])
-        UserLocationRelation.objects.filter(object_id__in=list(
-            exists_location_relation_id)).update(active=0)
-        for location_id in selected_user_location[0]:
-            if int(location_id) not in already_located_locations_id:
-                user_role_location = UserLocationRelation.objects.create(
-                    UserRoleLocationLevelConfig=user_role_location_config, object_id=location_id, content_type=user_role_location_config.location_hierarchy_type)
-        return redirect('child_management:user_profile', user_id=user_id)
-    return render(request, 'user_management/add_user.html', locals())
