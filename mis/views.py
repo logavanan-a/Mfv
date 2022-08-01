@@ -1,4 +1,5 @@
 import json
+from datetime import date
 
 import requests
 from application_master.models import (District, Donor, Menus, Mission,
@@ -11,17 +12,17 @@ from application_master.models import (District, Donor, Menus, Mission,
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User, auth, Group
+from django.contrib.auth.models import Group, User, auth
 from django.contrib.sessions.models import Session
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.shortcuts import (HttpResponse, HttpResponseRedirect, redirect,
                               render)
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView, View
 
 from mis.models import MissionIndicatorAchievement, Task
-from datetime import date
 
 pg_size = 10
 def get_pagination(request, users):
@@ -49,7 +50,6 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user) 
-           
             return redirect('/task-list/')
             # configure_error = load_user_details_to_sessions(request)
             # if not configure_error:
@@ -70,19 +70,8 @@ class LogoutView(RedirectView):
         request.session['partner_key']=''
         return super(LogoutView, self).get(request, *args, **kwargs)
 
-@login_required(login_url='/login/')
-def mission_list(request):
-    heading = "Mission Indicator List" 
-    mission_obj = Mission.objects.filter(mission_template = '1')
-    return render(request, 'mis/mission_list.html', locals())
 
-@login_required(login_url='/login/')
-def mission_form_list(request):
-    heading = "Mission Form List" 
-    mission_obj = Mission.objects.filter(mission_template = '2')
-    return render(request, 'mis/missionform_list.html', locals())
-
-@login_required(login_url='/login/')
+@login_required(login_url='/')
 def missionindicator_add(request, slug,task_id):
     mission_obj = Mission.objects.get(slug = slug)
     heading = mission_obj.name
@@ -118,12 +107,7 @@ def missionindicator_add(request, slug,task_id):
 
     return render(request, 'mis/indicator_list.html', locals())
 
-# @login_required(login_url='/login/')
-# def mission_indicator_edit(request):
-#     mission_indicator_achievement = MissionIndicatorAchievement.objects.all()
-#     return render(request, 'mis/mission_indicator_edit.html', locals())
-
-@login_required(login_url='/login/')
+@login_required(login_url='/')
 def missionindicator_edit(request, slug, id,task_id):
     mission_obj = Mission.objects.get(slug = slug)
     heading = mission_obj.name
@@ -132,13 +116,10 @@ def missionindicator_edit(request, slug, id,task_id):
     finance_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '2', active=2).order_by('listing_order')
     user = get_user(request)
     user_role = str(user.groups.last())
-    # task_obj = Task.objects.get(id = task_id)
 
     if request.method == 'POST':
-
         working_day = request.POST.get('working_day')
         project_reference_file = request.FILES.get('project_reference_file')
-
         data = request.POST
         temp = dict(data)
         results = {}
@@ -153,57 +134,12 @@ def missionindicator_edit(request, slug, id,task_id):
 
         if project_reference_file:
             mission_respose_obj.project_reference_file = project_reference_file 
-
         mission_respose_obj.save()
 
         return redirect('/task-list/')
     return render(request, 'mis/indicator_edit.html', locals())
 
-def missionindicator_target(request, id):
-    mission_obj = Mission.objects.get(id = id)
-    heading = mission_obj.name
-    mic_obj = MissionIndicatorCategory.objects.filter(mission__id = id)
-
-    if request.method == 'POST':
-        data = request.POST
-        # print(data,'data')
-        temp = dict(data)
-        results = {}
-        for key,values in temp.items():
-            if key != 'csrfmiddlewaretoken':
-                results[key] = int(values[0])
-        MissionIndicatorTarget.objects.create(created_by = request.user, mission = mission_obj, response = results)
-        return redirect('/mission-list/')
-    return render(request, 'mis/add_target.html', locals())
-
-@login_required(login_url='/login/')
-def mission_target_edit(request):
-    mission_respons_obj = MissionIndicatorTarget.objects.all()
-    return render(request, 'mis/mission_target_edit.html', locals())
-
-@login_required(login_url='/login/')
-def missiontarget_table_edit(request, ids, id):
-    mission_obj = Mission.objects.get(id = ids)
-    heading = mission_obj.name
-    mic_obj = MissionIndicatorCategory.objects.filter(mission__id = ids)
-    mission_target_obj = MissionIndicatorTarget.objects.get(id = id)
-
-    if request.method == 'POST':
-        data = request.POST
-        temp = dict(data)
-        results = {}
-        for key,values in temp.items():
-            if key != 'csrfmiddlewaretoken':
-                results[key] = int(values[0])
-        mission_respose_obj = MissionIndicatorTarget.objects.get(id = id)
-        mission_respose_obj.response = results
-        mission_respose_obj.save()
-        
-        return redirect('/mission-list/')
-
-    return render(request, 'mis/target_edit.html', locals())
-
-@login_required(login_url='/login/')
+@login_required(login_url='/')
 def task_list(request):
     heading= 'Task List'
     user = get_user(request)
@@ -258,6 +194,7 @@ def task_status_changes(request, task_id):
         return HttpResponse({"message":'true'} , content_type="application/json")
     return HttpResponse({"message":'false'}, content_type="application/json")  
 
+@login_required(login_url='/')
 def project_list(request):
     heading= 'Project List'
 
@@ -269,14 +206,17 @@ def project_list(request):
     object_list = get_pagination(request, project_obj)
     return render(request, 'project/project_list.html', locals())
 
+
 class ProjectAdd(View):
     template_name = 'project/project_add_edit.html'
 
+    @method_decorator(login_required(login_url='/'))
     def get(self, request):
         heading= 'Project Add'
         districts = District.objects.all()
         return render(request,self.template_name,locals())
 
+    @method_decorator(login_required(login_url='/'))
     def post(self, request):
         data = request.POST
         name = data.get('name')
@@ -291,15 +231,18 @@ class ProjectAdd(View):
         return redirect('/project-list/')
         # return render(request,'project/project_list.html', locals())
 
+
 class ProjectUpdate(View):
     template_name = 'project/project_add_edit.html'
-
+    
+    @method_decorator(login_required(login_url='/'))
     def get(self, request, id):
         heading= 'Project Edit'
         districts = District.objects.all()
         project_obj = Project.objects.get(id = id)
         return render(request,self.template_name,locals())
 
+    @method_decorator(login_required(login_url='/'))
     def post(self, request, id):
         data = request.POST
         name = data.get('name')
@@ -316,7 +259,7 @@ class ProjectUpdate(View):
         return redirect('/project-list/')
         # return render(request, self.template_name, locals())
 
-# @ login_required(login_url='/login/')
+@ login_required(login_url='/')
 # @ user_passes_test(lambda u: u.is_superuser)
 def user_listing(request):
     heading = "User Management"
@@ -335,7 +278,7 @@ def user_listing(request):
 
     return render(request, 'user/user_listing.html', locals())
 
-# @ login_required(login_url='/login/')
+@ login_required(login_url='/')
 # @ user_passes_test(lambda u: u.is_superuser)
 def add_user(request, user_location=None):
     heading = "Add User"
@@ -405,7 +348,7 @@ def add_user(request, user_location=None):
             return render(request, 'user/add_user.html', locals())
         return render(request, 'user/add_user.html', locals())
 
-# @ login_required(login_url='/login/')
+@ login_required(login_url='/')
 # @ user_passes_test(lambda u: u.is_superuser)
 def user_profile(request, id):
     user = User.objects.get(id=id)
@@ -413,7 +356,7 @@ def user_profile(request, id):
     #     UserRoleLocationLevelConfig__user=user, active=2).order_by('object_id')
     return render(request, 'user/user_profile.html', locals())
 
-# @ login_required(login_url='/login/')
+@ login_required(login_url='/')
 # @ user_passes_test(lambda u: u.is_superuser)
 def edit_user(request, id):
     groups = Group.objects.all()
@@ -448,7 +391,7 @@ def edit_user(request, id):
     return render(request, 'user/edit_user.html', locals())
 
 
-# @ login_required(login_url='/login/')
+@ login_required(login_url='/')
 # @ user_passes_test(lambda u: u.is_superuser)
 def deactivate_user(request, user_id):
     user = User.objects.get(id=user_id)
@@ -459,7 +402,7 @@ def deactivate_user(request, user_id):
     user.save()
     return redirect('mis:user_profile', user_id=user_id)
 
-# @ login_required(login_url='/login/')
+@ login_required(login_url='/')
 # @ user_passes_test(lambda u: u.is_superuser)
 def user_change_password(request, id):
     user = User.objects.get(id = id)

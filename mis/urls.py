@@ -17,14 +17,6 @@ urlpatterns = [
     path('project-add/', ProjectAdd.as_view(), name='project-add'),
     path('project-edit/<id>/', ProjectUpdate.as_view(), name='project-edit'),
     
-    path('mission-list/', mission_list, name="mission-list"),
-    # path('mission-indicator/edit/list/', mission_indicator_edit),
-    path('mission/target/<id>/', missionindicator_target),
-    path('mission-target/list/', mission_target_edit),
-    path('target_table_edit/<ids>/<id>/', missiontarget_table_edit),
-
-    path('mission_form/list/', mission_form_list, name="mission_form_list"),
-    
     path("ajax-task/<task_id>", task_status_changes, name="submitted_approval"),
 
     path("user_listing/", user_listing, name="user_listing"),
