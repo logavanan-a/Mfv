@@ -1,32 +1,30 @@
 {% extends 'base.html' %}
 {% load static %}
-
 {% block contents %}
-        <div class="row align-items-center">
-            <div class="col-xl-12 mx-auto">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-xl-12">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col">
-                                                <button class="btn btn-primary" type="button" id="current_month" onclick="CurrentMonth()">Current Month</button>
-                                            </div>
-                                            <div class="col">
-                                                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                                                    Past Month
-                                                </button>
-                                            </div>
-                                          </div>
-                                        <div class="collapse" id="collapseExample">
+    <div class="row align-items-center">
+        <div class="col-xl-12 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xl-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col">
+                                            <button class="btn btn-primary" type="button" id="current_month" onclick="CurrentMonth()">Current Month</button>
+                                        </div>
+                                        <div class="col">
+                                            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                                Past Month
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="collapse" id="collapseExample">
                                         <div class="card card-body">
                                             <form class="dt_adv_search" method="GET" action="/task-list/">
                                                 <div class="row">
-
                                                     <div class="col-sm-6">
-                                                      <div class="form-group">
+                                                        <div class="form-group">
                                                         <label for="mission">Mission:</label>
                                                             <select class="form-control" id="mission" name="mission">
                                                                 <option value="" selected>Select</option> 
@@ -34,7 +32,7 @@
                                                                     <option value="{{mission.id}}" >{{mission.name}}</option> 
                                                                 {% endfor %}
                                                             </select>
-                                                      </div>
+                                                        </div>
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <div class="form-group">
@@ -46,10 +44,10 @@
                                                                     {% endfor %}
                                                                 </select>
                                                         </div>
-                                                      </div>
+                                                    </div>
 
                                                     <div class="col-sm-6">
-                                                      <div class="form-group">
+                                                        <div class="form-group">
                                                         <label for="project">Month:</label>
                                                         <select class="form-control" id="month", name="month">
                                                             <option value="" selected>Select</option>
@@ -66,7 +64,7 @@
                                                             <option value="11">November</option>
                                                             <option value="12">December</option>
                                                         </select>
-                                                      </div>
+                                                        </div>
                                                     </div>
 
                                                     <div class="col-sm-6">
@@ -74,18 +72,11 @@
                                                             <label  for="year">Year:</label>
                                                                 <select class="form-control" id="year", name="year">
                                                                     <option value="" selected>Select</option>
-                                                                    <option value="2015">2015</option>
-                                                                    <option value="2016">2016</option>
-                                                                    <option value="2017">2017</option>
-                                                                    <option value="2018">2018</option>
-                                                                    <option value="2019">2019</option>
-                                                                    <option value="2020">2020</option>
-                                                                    <option value="2021">2021</option>
                                                                     <option value="2022">2022</option>
-                                                                    <option value="2023">2023</option>
+                                                                    <!-- <option value="2023">2023</option>
                                                                     <option value="2024">2024</option>
                                                                     <option value="2025">2025</option>
-                                                                    <option value="2026">2026</option>
+                                                                    <option value="2026">2026</option> -->
                                                                 </select>
                                                         </div>
                                                     </div>
@@ -94,59 +85,56 @@
                                                         <button type="submit" class="btn btn-primary mr-1 waves-effect waves-float waves-light" tabindex="5">Search</button>
                                                         <span type="reset" class="btn btn-primary mr-1 waves-effect waves-float waves-light" onclick="location.href='/task-list/'" tabindex="7">Reset</span>
                                                     </div>                                                
-                                                  </div>    
+                                                </div>    
                                             </form>
-                                        </div>
-                                </div>
-                                        <div class="table-responsive">
-                                            <p style="float: right;"><b>Periodicity Date : </b>{{today|date:"F Y"}}</p>
-                                            <table class="table mb-0">
-                                                <thead class="table-light">
-                                                    <tr>
-                                                        <th>SL No</th>
-                                                        <th style="width: 28%;">Mission</th>
-                                                        <th>Project</th>
-                                                        <!-- <th>Start Date</th> -->
-                                                        <th>Status</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {% if object_list %}
-                                                        {% for task in object_list %}
-                                                            <tr>
-                                                                <td>{{forloop.counter0|add:object_list.start_index}}</td>
-                                                                <td>{{task.project.partner_mission_mapping.mission.name}}</td>
-                                                                <td>{{task.name}}</td>
-                                                                <!-- <td>{{task.start_date|date:"d-m-Y"}}</td> -->
-                                                                <td>{{task.get_task_status_display}}</td>
-                                                                {% if task.get_task %}
-                                                                <td><a href="/mission_edit/{{task.project.partner_mission_mapping.mission.slug}}/{{task.id}}/{{task.get_task.id}}/">{% if task.task_status == 2 %}View{% else %}Edit{% endif %}</a></td>
-                                                                {% else %}
-                                                                <td><a href="/{{task.project.partner_mission_mapping.mission.slug}}/monthly-report/{{task.id}}/">Add</a></td>
-                                                                {% endif %}
-                                                            </tr>
-                                                        {% endfor %}  
-                                                    {% else %}
-                                                        <td colspan="7" class="text-primary">No records found</td>
-                                                    {% endif %} 
-                                                    </tbody>
-                                            </table><br>
-                                            {% if object_list %}
-                                                {% include 'partials/pagination.html' %}
-                                            {% endif %}
-                                        </div>
                                     </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <p style="float: right;"><b>Periodicity Date : </b>{{today|date:"F Y"}}</p>
+                                    <table class="table mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>SL No</th>
+                                                <th style="width: 28%;">Mission</th>
+                                                <th>Project</th>
+                                                <!-- <th>Start Date</th> -->
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% if object_list %}
+                                                {% for task in object_list %}
+                                                    <tr>
+                                                        <td>{{forloop.counter0|add:object_list.start_index}}</td>
+                                                        <td>{{task.project.partner_mission_mapping.mission.name}}</td>
+                                                        <td>{{task.name}}</td>
+                                                        <!-- <td>{{task.start_date|date:"d-m-Y"}}</td> -->
+                                                        <td>{{task.get_task_status_display}}</td>
+                                                        {% if task.get_task %}
+                                                        <td><a href="/mission_edit/{{task.project.partner_mission_mapping.mission.slug}}/{{task.id}}/{{task.get_task.id}}/">{% if task.task_status == 2 %}View{% else %}Edit{% endif %}</a></td>
+                                                        {% else %}
+                                                        <td><a href="/{{task.project.partner_mission_mapping.mission.slug}}/monthly-report/{{task.id}}/">Add</a></td>
+                                                        {% endif %}
+                                                    </tr>
+                                                {% endfor %}  
+                                            {% else %}
+                                                <td colspan="7" class="text-primary">No records found</td>
+                                            {% endif %} 
+                                            </tbody>
+                                    </table><br>
+                                    {% if object_list %}
+                                        {% include 'partials/pagination.html' %}
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
-                        <!-- end row --> 
                     </div>
                 </div>
             </div>
-
+        </div>
+    </div>
 <!-- end row -->
-
 <script type="text/javascript">
 function CurrentMonth()
 {
@@ -186,7 +174,6 @@ if(projects != 'None'){
 
     $("#month").val(month); 
     $("#year").val(year);    
-    
 });
 </script> -->
 
