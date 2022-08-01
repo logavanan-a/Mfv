@@ -16,11 +16,12 @@ class MissionIndicatorCategoryInline(admin.TabularInline): #StackedInline
 
 @admin.register(Mission)
 class AdminMission(ImportExportActionModelAdmin,admin.ModelAdmin):
+    list_display = ('name', 'short_description','slug')
     inlines = [MissionIndicatorCategoryInline]
     search_fields = ['name']
     prepopulated_fields = {'slug': ('name',)}
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.concrete_fields]
+    # def get_list_display(self, request):
+    #     return [field.name for field in self.model._meta.concrete_fields]
 
 @admin.register(Menus)
 class AdminMenus(ImportExportActionModelAdmin,admin.ModelAdmin):
