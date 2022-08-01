@@ -155,6 +155,29 @@ function CurrentMonth()
     location.href='?month_year='+date
 };
 </script>
+
+<script>     
+var months = '{{month}}'
+if(months != 'None'){
+    $('#month').val(months)
+}
+
+var years = '{{year}}'
+if(years != 'None'){
+    $('#year').val(years)
+}
+
+var missions = '{{mission}}'
+if(missions != 'None'){
+    $('#mission').val(missions)
+}
+
+var projects = '{{project}}'
+if(projects != 'None'){
+    $('#project').val(projects)
+}
+</script>
+</script>
 <!-- <script>
     $(document).ready(function() {
     var d = new Date();
