@@ -13,7 +13,7 @@ register = template.Library()
 
 
 @register.simple_tag
-def get_usermenu_list(request):
+def get_menu_list(request):
     # role_ids = request.session.get('role_id',None)
     return Menus.objects.filter(active = 2).order_by("menu_order")
 

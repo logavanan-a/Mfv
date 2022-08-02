@@ -42,7 +42,10 @@ class Menus(BaseContent):
             if self.parent.parent:
                 hairarchy_name = hairarchy_name +'--'+ self.parent.parent.name
         return hairarchy_name
-
+    
+    def get_sub_menus(self):
+        # model method to filter menus based parent id
+        return Menus.objects.filter(parent=self)
 
 class State(BaseContent):
     name = models.CharField(max_length=350)

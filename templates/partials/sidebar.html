@@ -9,7 +9,7 @@
       <!-- Left Menu Start -->
       <ul class="metismenu list-unstyled" id="side-menu">
         <li class="menu-title" key="t-menu">Menu</li>
-          {% get_usermenu_list request as menu %}
+          {% get_sub_menus request as menu %}
           {% for i in menu %}
             <li>
                 <a href="{{i.app_link}}" class="waves-effect">
