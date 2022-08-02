@@ -169,6 +169,7 @@ class MissionIndicatorCategory(BaseContent):
     label_configuration = models.IntegerField(default=1)
 
     class Meta:
+        ordering = ['name']
         unique_together = ('name', 'mission')
         verbose_name_plural = "Mission Indicator Category"
 
@@ -196,8 +197,8 @@ class MissionIndicatorTarget(BaseContent):
     mission_indicator = models.ForeignKey(MissionIndicator, on_delete=models.DO_NOTHING, blank=True, null=True)
     project = models.ForeignKey(Project, on_delete=models.DO_NOTHING, blank=True, null=True)
     target = models.IntegerField()
-    periodicity_date = models.DateField(blank=True, null=True)
-    created_by = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True)
+    periodicity_date = models.DateField(blank = True, null = True)
+    created_by = models.ForeignKey(User, on_delete = models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "Mission Indicator Target"

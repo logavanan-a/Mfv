@@ -36,10 +36,10 @@
                     
                 {% csrf_token %}
                 {% if programe_category %}
-                <p class="text-center text-uppercase"><b><br>Program Data.</b></p>
+                <p class="text-center text-uppercase"><b><br>Program Data</b></p>
                     {% for data in programe_category %}
                     <div class="table-responsive">
-                        <h5> {{data.name|title}} </h5>
+                        <h5 class="text-dark card-title"> {{data.name|title}} </h5>
                         <table class="table">
                             <thead class="table-light">
                                 <tr>
@@ -101,7 +101,7 @@
                         {% for fin_data in finance_category %}
                         <div class="table-responsive">
                         
-                            <h5> {{fin_data.name|title}} </h5>
+                            <h5 class="text-dark card-title"> {{fin_data.name|title}} </h5>
                             <table class="table table-hover" id="hospital_report">
                                 <thead class="table-light">
                                     <tr>
@@ -115,7 +115,6 @@
                                         {% endif %}
                                         <th>Comment</th>
                                     </tr>
-                                    
                                 </thead>
                                     {% for sub_category in fin_data.sub_category %}
                                     <tbody>

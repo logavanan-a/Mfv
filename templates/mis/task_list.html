@@ -90,7 +90,7 @@
                                     </div>
                                 </div>
                                 <div class="table-responsive">
-                                    <p style="float: right;"><b>Periodicity Date : </b>{{today|date:"F Y"}}</p>
+                                    <p style="float: right;"><b>Periodicity : </b>{{previous_month|date:"F Y"}}</p>
                                     <table class="table mb-0">
                                         <thead class="table-light">
                                             <tr>
@@ -139,7 +139,7 @@
 function CurrentMonth()
 {
     var today = new Date();
-    var date = today.getFullYear()+'-'+(today.getMonth()+1)
+    var date = today.getFullYear()+'-'+today.getMonth()
     location.href='?month_year='+date
 };
 </script>

@@ -1,5 +1,5 @@
 import json
-from datetime import date
+from datetime import datetime
 
 import requests
 from application_master.models import (District, Donor, Menus, Mission,
@@ -9,6 +9,7 @@ from application_master.models import (District, Donor, Menus, Mission,
                                        PartnerMissionMapping, Project,
                                        ProjectDonorMapping, ProjectFiles,
                                        State, UserPartnerMapping)
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user, login, logout
 from django.contrib.auth.decorators import login_required
@@ -143,7 +144,10 @@ def missionindicator_edit(request, slug, id,task_id):
 def task_list(request):
     heading= 'Task List'
     user = get_user(request)
-    today = date.today()
+
+    previous_month = datetime.now() - relativedelta(months=1)
+    below_last_two_month = datetime.now().date() - relativedelta(months=2)
+
     mission_objs = Mission.objects.all()
     project_objs = Project.objects.all()
 
@@ -154,8 +158,8 @@ def task_list(request):
     year = filter_data.get('year')
     month_year = filter_data.get('month_year')
 
-    task_obj = Task.objects.filter(user = request.user)
-    
+    task_obj = Task.objects.filter(user = request.user,start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year)
+
     if mission:
         task_obj = task_obj.filter(project__partner_mission_mapping__mission__id = mission)
 
@@ -170,7 +174,7 @@ def task_list(request):
 
     if month_year:
         month_year_list = month_year.split('-')
-        task_obj = task_obj.filter(start_date__year = month_year_list[0]).filter(start_date__month = month_year_list[1])
+        task_obj = Task.objects.filter(user = request.user, start_date__year = month_year_list[0]).filter(start_date__month = month_year_list[1])
 
     if user.groups.filter(name = 'Partner Admin').exists():
         user_lists = UserPartnerMapping.objects.get(user = request.user)
