@@ -36,7 +36,7 @@
                     
                 {% csrf_token %}
                 {% if programe_category %}
-                <p class="text-center text-uppercase"><b><br>Program Data</b></p>
+                <p class="text-dark text-center text-uppercase"><b><br>Programme Data</b></p>
                     {% for data in programe_category %}
                     <div class="table-responsive">
                         <h5 class="text-dark card-title"> {{data.name|title}} </h5>
@@ -96,8 +96,8 @@
                         {% endfor %} 
                 {% endif %}
 
-                {% if finance_category and slug == 'mission-jyot' %}
-                <p class="text-center text-uppercase"><b><br>Finance Data.</b></p>
+                {% if finance_category %}
+                <p class="text-dark text-center text-uppercase"><b><br>Finance Data</b></p>
                         {% for fin_data in finance_category %}
                         <div class="table-responsive">
                         

@@ -180,7 +180,7 @@ class MissionIndicatorCategory(BaseContent):
         return f"{self.name} - {self.mission.name}"
     
     def sub_category(self):
-        return MissionIndicator.objects.filter(category = self)
+        return MissionIndicator.objects.filter(category = self).order_by('listing_order')
 
 class MissionIndicator(BaseContent):
     IT_CHOICES = ((1,'Gender Base'),(2,'Total'),(3,'Actuals'),(4,'Actuals With Grants Received'))
