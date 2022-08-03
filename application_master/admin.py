@@ -16,6 +16,7 @@ class MissionIndicatorCategoryInline(admin.TabularInline): #StackedInline
 
 @admin.register(Mission)
 class AdminMission(ImportExportActionModelAdmin,admin.ModelAdmin):
+    exclude = ['mission_template']
     list_display = ('name', 'short_description','slug')
     inlines = [MissionIndicatorCategoryInline]
     search_fields = ['name']

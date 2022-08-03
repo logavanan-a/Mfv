@@ -157,6 +157,7 @@ def task_list(request):
     month = filter_data.get('month')
     year = filter_data.get('year')
     month_year = filter_data.get('month_year')
+    archive = filter_data.get('archive')
 
     task_obj = Task.objects.filter(user = request.user,start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year)
 

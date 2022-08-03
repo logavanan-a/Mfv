@@ -9,15 +9,38 @@
       <!-- Left Menu Start -->
       <ul class="metismenu list-unstyled" id="side-menu">
         <li class="menu-title" key="t-menu">Menu</li>
-          {% get_sub_menus request as menu %}
+          {% get_menu_list request as menu %}
+
           {% for i in menu %}
+            {% if i.get_sub_menus.count > 0 %}
             <li>
-                <a href="{{i.app_link}}" class="waves-effect">
-                  <i class="{{i.icon}}"></i>
-                  <span key="t-file-manager">{{i.name}}</span>
-                </a>
+               <a href="javascript: void(0);" class="has-arrow waves-effect">
+                    <i class="bx bxs-user-detail"></i>
+                    <span key="t-contacts">{{i.name}}</span>
+               </a>
+               <ul class="sub-menu mm-collapse" aria-expanded="false">
+                    {% for submenus in i.get_sub_menus %}
+                      {% if submenus.slug == 'archive' %}
+                        <li><a href="{{i.app_link}}?archive=show" key="t-user-list">{{submenus.name}}</a></li>
+                      
+                      {% elif submenus.slug == 'reporting-month' %}
+                          <li><a onclick='CurrentMonth("{{i.app_link}}")' key="t-user-list">{{submenus.name}}</a></li>
+                      {% else %}
+                      <li><a href="{{i.app_link}}" key="t-user-list">{{submenus.name}}</a></li>
+
+                      {% endif %}
+                    {% endfor %}
+               </ul>
             </li>
-        {% endfor %}
+            {% else %}
+                <li>
+                  <a href="{{i.app_link}}" class="waves-effect">
+                    <i class="{{i.icon}}"></i>
+                    <span key="t-file-manager">{{i.name}}</span>
+                  </a>
+              </li>
+            {% endif %}
+            {% endfor %}
 
         {% if request.user.is_superuser %}
         <li class=''>
@@ -43,5 +66,14 @@
   </div>
 </div>
 <!-- Left Sidebar End -->
+<script type="text/javascript">
+  function CurrentMonth(slug)
+  {
+      var today = new Date();
+      var date = today.getFullYear()+'-'+today.getMonth()
+      var url = slug+'?month_year='+date
+      window.location.href = url
+  };
+  </script>
 {% endblock %}
 

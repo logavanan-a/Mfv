@@ -15,7 +15,7 @@ register = template.Library()
 @register.simple_tag
 def get_menu_list(request):
     # role_ids = request.session.get('role_id',None)
-    return Menus.objects.filter(active = 2).order_by("menu_order")
+    return Menus.objects.filter(active = 2, parent=None).order_by("menu_order")
 
 @register.simple_tag
 def disply_financial_year(start_date):

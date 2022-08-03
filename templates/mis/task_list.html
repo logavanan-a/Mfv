@@ -9,17 +9,7 @@
                         <div class="col-xl-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <div class="row">
-                                        <div class="col">
-                                            <button class="btn btn-primary" type="button" id="current_month" onclick="CurrentMonth()">Current Month</button>
-                                        </div>
-                                        <div class="col">
-                                            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                                                Past Month
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="collapse" id="collapseExample">
+                                    <div class="collapse {{archive}}" id="collapseExample">
                                         <div class="card card-body">
                                             <form class="dt_adv_search" method="GET" action="/task-list/">
                                                 <div class="row">
@@ -135,14 +125,7 @@
         </div>
     </div>
 <!-- end row -->
-<script type="text/javascript">
-function CurrentMonth()
-{
-    var today = new Date();
-    var date = today.getFullYear()+'-'+today.getMonth()
-    location.href='?month_year='+date
-};
-</script>
+
 
 <script>     
 var months = '{{month}}'
