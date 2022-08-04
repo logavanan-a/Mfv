@@ -19,7 +19,7 @@ class Task(BaseContent):
     extension_date = models.DateField(blank=True, null=True)
 
     class Meta:
-        verbose_name_plural = "Task"
+        verbose_name_plural = " Task"
         ordering = ['-id']
 
     def __str__(self):

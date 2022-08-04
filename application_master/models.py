@@ -51,7 +51,7 @@ class State(BaseContent):
     name = models.CharField(max_length=350)
 
     class Meta: 
-        verbose_name_plural = "State"
+        verbose_name_plural = "          State"
 
     def __str__(self):
         return self.name
@@ -61,7 +61,7 @@ class District(BaseContent):
     state =  models.ForeignKey(State, on_delete = models.DO_NOTHING)
 
     class Meta: 
-        verbose_name_plural = "District"
+        verbose_name_plural = "         District"
 
     def __str__(self):
         return self.name
@@ -71,7 +71,7 @@ class Partner(BaseContent):
     slug = models.SlugField(max_length=100, unique=True)
 
     class Meta: 
-        verbose_name_plural = "Partner"
+        verbose_name_plural = "         Partner"
 
     def __str__(self):
         return self.name
@@ -85,7 +85,7 @@ class UserPartnerMapping(BaseContent):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True)
 
     class Meta: 
-        verbose_name_plural = "User Partner Mapping"
+        verbose_name_plural = " User Partner Mapping"
         unique_together = ('partner', 'user')
 
     def __str__(self):
@@ -96,7 +96,7 @@ class Donor(BaseContent):
     logo = models.ImageField(upload_to = 'image_folder/', blank=True)
 
     class Meta:
-        verbose_name_plural = "Donor"
+        verbose_name_plural = "  Donor"
 
     def __str__(self):
         return self.name
@@ -109,7 +109,7 @@ class Mission(BaseContent):
     slug = models.SlugField(max_length=100, unique = True) 
 
     class Meta:
-        verbose_name_plural = "Mission"
+        verbose_name_plural = "        Mission"
 
     def __str__(self):
         return self.name
@@ -126,7 +126,7 @@ class PartnerMissionMapping(BaseContent):
     mission = models.ForeignKey(Mission, on_delete = models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
-        verbose_name_plural = "Partner Mission Mapping"
+        verbose_name_plural = "     Partner Mission Mapping"
 
     def __str__(self):
         return f"{self.partner.name} - {self.mission.name}"
@@ -140,7 +140,7 @@ class Project(BaseContent):
 
     class Meta:
         unique_together = ('name', 'partner_mission_mapping')
-        verbose_name_plural = "Project"
+        verbose_name_plural = "    Project"
 
     def __str__(self):
         return f"{self.name} - {self.partner_mission_mapping.mission.name} - {self.partner_mission_mapping.partner.name}"
@@ -157,7 +157,7 @@ class ProjectDonorMapping(BaseContent):
     donor =  models.ForeignKey(Donor, on_delete = models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
-        verbose_name_plural = "Project Donor Mapping"
+        verbose_name_plural = " Project Donor Mapping"
 
     def __str__(self):
         return f"{self.project.name} - {self.donor.name}"
@@ -174,7 +174,7 @@ class MissionIndicatorCategory(BaseContent):
     class Meta:
         ordering = ['name']
         unique_together = ('name', 'mission')
-        verbose_name_plural = "Mission Indicator Category"
+        verbose_name_plural = "       Mission Indicator Category"
 
     def __str__(self):
         return f"{self.name} - {self.mission.name}"
@@ -191,7 +191,7 @@ class MissionIndicator(BaseContent):
     class Meta:
         ordering = ['name']
         # unique_together = ('name', 'category')
-        verbose_name_plural = "Mission Indicator"
+        verbose_name_plural = "      Mission Indicator"
     
     def __str__(self):
         return f"{self.name} - {self.category.name}"
@@ -204,7 +204,7 @@ class MissionIndicatorTarget(BaseContent):
     created_by = models.ForeignKey(User, on_delete = models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
-        verbose_name_plural = "Mission Indicator Target"
+        verbose_name_plural = "   Mission Indicator Target"
 
     def __str__(self):
         return f"{self.mission_indicator.name} - {self.created_by.username}"
