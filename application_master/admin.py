@@ -72,8 +72,8 @@ class AdminDonor(ImportExportActionModelAdmin,admin.ModelAdmin):
 
 @admin.register(PartnerMissionMapping)
 class AdminPartnerMissionMapping(ImportExportActionModelAdmin,admin.ModelAdmin):
-    search_fields = ['partner__name','mission__name']
-    list_filter = ['mission__name']
+    search_fields = ['partner__name', 'mission__name']
+    list_filter = ['mission__name', 'partner__name']
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
