@@ -25,10 +25,11 @@
                         <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="bx bxs-user bx-sm bx-fw"></i>
-                            <span class="d-none d-xl-inline-block ms-1 h5">
-                                {% if request.user.is_superuser %}  {{ request.user.username }} {% else %} {{request.user.get_full_name}} {% endif %}
-                                <!-- {{request.user.username}} -->
+                            <span class="d-none d-xl-inline-block ms-1 h6">
+                                {% if request.user.is_superuser %}  {{ request.user.username }} {% else %} {{request.user.get_full_name}}  {% endif %}
                             </span>
+                            <br><span class="user-status">{{request.user.groups.all.0}}</span>
+                            <br><span class="user-status">{{request.session.user_partner}}</span>
                             <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
                         </button>
                         <div class="dropdown-menu dropdown-menu-end">

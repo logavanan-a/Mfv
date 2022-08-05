@@ -51,6 +51,11 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user) 
+            try:
+                user_partner = UserPartnerMapping.objects.get(user = user)
+                request.session['user_partner'] = user_partner.partner.name
+            except:
+                user_partner = ''              
             return redirect('/task-list/')
             # configure_error = load_user_details_to_sessions(request)
             # if not configure_error:

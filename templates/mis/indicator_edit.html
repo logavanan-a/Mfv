@@ -18,7 +18,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <h5 id="right_side"><b class="card-title">Partner: </b><span style="font-size: 14px;">{{mission_respose_obj.task.project.partner_mission_mapping.partner.name}}, {{mission_respose_obj.task.project.district.name}}, {{mission_respose_obj.task.project.district.state.name}}</span> </h5>
+                        <h5 id="right_side"><b class="card-title">Partner: </b><span style="font-size: 14px;">{{mission_respose_obj.task.project.partner_mission_mapping.partner.name}}</span> </h5>
                         <h5 id="right_side"><b class="card-title">Month: </b><span style="font-size: 14px;">{{mission_respose_obj.task.start_date|date:"F Y"}}</span> </h5>
 
                         {% disply_financial_year mission_respose_obj.task.start_date as financial_year %} 

@@ -16,7 +16,7 @@
                         <h5><b class="card-title">Project funded by : </b><span style="font-size: 14px;"> {{task_obj.project.get_project_donor_mapping}}</span></h5>
                     </div>
                     <div class="col-md-6" >
-                        <h5 id="right_side"><b class="card-title">Partner : </b><span style="font-size: 14px;">{{task_obj.project.partner_mission_mapping.partner.name}}, {{task_obj.project.district.name}}, {{task_obj.project.district.state.name}}</span></h5>
+                        <h5 id="right_side"><b class="card-title">Partner : </b><span style="font-size: 14px;">{{task_obj.project.partner_mission_mapping.partner.name}}</span></h5>
                         <h5 id="right_side"><b class="card-title">Month : </b><span style="font-size: 14px;">{{task_obj.start_date|date:"F Y"}}</span></h5>
 
                         {% disply_financial_year task_obj.start_date as financial_year %} 
