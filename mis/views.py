@@ -164,28 +164,28 @@ def task_list(request):
     month_year = filter_data.get('month_year')
     archive = filter_data.get('archive')
 
-    task_obj = Task.objects.filter(user = request.user,start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year)
+    task_obj = Task.objects.filter(user = request.user,start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year).order_by('listing_order')
 
     if mission:
-        task_obj = task_obj.filter(project__partner_mission_mapping__mission__id = mission)
+        task_obj = task_obj.filter(project__partner_mission_mapping__mission__id = mission).order_by('listing_order')
 
     if project:
-        task_obj = task_obj.filter(project__id = project)
+        task_obj = task_obj.filter(project__id = project).order_by('listing_order')
 
     if year:
-        task_obj = task_obj.filter(start_date__year = year)
+        task_obj = task_obj.filter(start_date__year = year).order_by('listing_order')
     
     if month:
-        task_obj = task_obj.filter(start_date__month = month)
+        task_obj = task_obj.filter(start_date__month = month).order_by('listing_order')
 
     if month_year:
         month_year_list = month_year.split('-')
-        task_obj = Task.objects.filter(user = request.user, start_date__year = month_year_list[0]).filter(start_date__month = month_year_list[1])
+        task_obj = Task.objects.filter(user = request.user, start_date__year = month_year_list[0]).filter(start_date__month = month_year_list[1]).order_by('listing_order')
 
     if user.groups.filter(name = 'Partner Admin').exists():
         user_lists = UserPartnerMapping.objects.get(user = request.user)
         for user_list in UserPartnerMapping.objects.filter(partner = user_lists.partner).exclude(user = request.user):
-            task_obj = Task.objects.filter(user = user_list.user)
+            task_obj = Task.objects.filter(user = user_list.user).order_by('listing_order')
             # print(task_obj,obj_list)
     else:
         task_obj
@@ -423,3 +423,14 @@ def user_change_password(request, id):
         user.save()
         return redirect('mis:user_profile', id = id)
     return render(request, 'user/user_change_password.html', locals())
+
+
+
+# def task_create():
+#     for user_obj in User.objects.filter(is_superuser = False):
+#         if user_obj:
+#             for visio_ncentre in Project.objects.filter(active=2):
+#                 string_cancate = visio_ncentre.partner_mission_mapping.mission.name +" "+visio_ncentre.name+" July 2022"
+#                 print(string_cancate)
+#                 added = Task(project = visio_ncentre,user=user_obj, name = string_cancate, start_date="2022-07-01",end_date= "2022-07-30")
+#                 added.save()
