@@ -169,5 +169,25 @@ if(projects != 'None'){
         color: red;
     }
 </style>
+
+<script>
+    $('#mission').change(function(){
+        $.ajax({
+            url : "/ajax-project/",
+            type:'POST',
+            data:{
+                mission_id:$(this).val()
+            }, 
+            dataType: 'json',
+            success: function(response) {
+            stateOptions = "<option value='' selected>Select</option>";
+            $.each(response, function(key, row){
+                    stateOptions += '<option value="'+row.id+'">'+row.name+'</option>';
+            });
+            $('#project').html(stateOptions);
+            }
+        });
+    });
+</script>
 {% endblock %}
 

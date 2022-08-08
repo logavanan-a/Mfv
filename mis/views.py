@@ -424,7 +424,17 @@ def user_change_password(request, id):
         return redirect('mis:user_profile', id = id)
     return render(request, 'user/user_change_password.html', locals())
 
-
+@csrf_exempt 
+def project_list_filter(request):
+    if request.method == "POST":
+        mission_id =request.POST.get('mission_id')
+        projects = Project.objects.filter(active=2).order_by('name')
+        if mission_id:
+            project_obj = projects.filter(partner_mission_mapping__mission__id = mission_id)
+        else:
+            project_obj  = projects
+        data=list(project_obj.values('id',"name").order_by("name"))
+        return HttpResponse(json.dumps(data), content_type="application/json")   
 
 # def task_create():
 #     for user_obj in User.objects.filter(is_superuser = False):
