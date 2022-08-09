@@ -102,9 +102,9 @@
                                                         <!-- <td>{{task.start_date|date:"d-m-Y"}}</td> -->
                                                         <td>{{task.get_task_status_display}}</td>
                                                         {% if task.get_task %}
-                                                        <td><a href="/mission_edit/{{task.project.partner_mission_mapping.mission.slug}}/{{task.id}}/{{task.get_task.id}}/">{% if task.task_status == 2 or task.task_status == 3 %}View{% else %}Edit{% endif %}</a></td>
+                                                        <td><b><a href="/mission_edit/{{task.project.partner_mission_mapping.mission.slug}}/{{task.id}}/{{task.get_task.id}}/">{% if task.task_status == 2 or task.task_status == 3 %}View{% else %}Edit{% endif %}</a></b></td>
                                                         {% else %}
-                                                        <td><a href="/{{task.project.partner_mission_mapping.mission.slug}}/monthly-report/{{task.id}}/">Add</a></td>
+                                                        <td><b><a href="/{{task.project.partner_mission_mapping.mission.slug}}/monthly-report/{{task.id}}/">Add</a></b></td>
                                                         {% endif %}
                                                     </tr>
                                                 {% endfor %}  

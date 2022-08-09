@@ -30,8 +30,10 @@
                     <input type="number" id="working_day" name="working_day" style="width: 50px;">
                     {% endif %}
 
-                    {%  if 'Partner Data Entry Operator' == user_role and task_obj.task_status == 1 or task_obj.task_status == 4 %}
+                    {%  if 'Partner Data Entry Operator' == user_role and task_obj.task_status == 1 %}
                     <input type='button' style="float: right;" id='' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{task_id}}',2,'Submit for Approval')">
+                    {% elif 'Partner Data Entry Operator' == user_role and task_obj.task_status == 4 %}
+                    <input type='button' style="float: right;" id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{mission_respose_obj.task.id}}',2,'Submit for Approval')">
                     {% endif %}
                     
                 {% csrf_token %}
