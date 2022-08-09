@@ -22,8 +22,8 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView, View
-
 from mis.models import MissionIndicatorAchievement, Task
+
 
 pg_size = 10
 def get_pagination(request, users):
@@ -189,7 +189,14 @@ def task_list(request):
             # print(task_obj,obj_list)
     else:
         task_obj
+    
     object_list = get_pagination(request, task_obj)
+    page_number_display_count = 5
+    current_page = request.GET.get('page', 1)
+    page_number_start = int(current_page) - 2 if int(current_page) > 2 else 1
+    page_number_end = page_number_start + page_number_display_count if page_number_start + \
+        page_number_display_count < object_list.paginator.num_pages else object_list.paginator.num_pages+1
+    display_page_range = range(page_number_start, page_number_end)
     return render(request, 'mis/task_list.html', locals())
 
 
@@ -214,6 +221,13 @@ def project_list(request):
 
     # project_obj = Project.objects.all()
     object_list = get_pagination(request, project_obj)
+
+    page_number_display_count = 5
+    current_page = request.GET.get('page', 1)
+    page_number_start = int(current_page) - 2 if int(current_page) > 2 else 1
+    page_number_end = page_number_start + page_number_display_count if page_number_start + \
+        page_number_display_count < object_list.paginator.num_pages else object_list.paginator.num_pages+1
+    display_page_range = range(page_number_start, page_number_end)
     return render(request, 'project/project_list.html', locals())
 
 

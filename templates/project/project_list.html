@@ -41,7 +41,33 @@
                                             </tbody>
                                     </table><br>
                                     {% if object_list %}
-                                        {% include 'partials/pagination.html' %}
+                                    <nav aria-label="...">
+                                        {% if object_list.has_other_pages %}
+                                        <ul class="pagination justify-content-end ">
+                                            {% if object_list.has_previous %}
+                                            <li class="paginate_button page-item"><a class="page-link" href="?page={{ 1 }}">First</a></li>
+                                            {% comment %} <li class="paginate_button page-item"><a class="page-link" href="?page={{ object_list.previous_page_number }}">Previous</a></li> {% endcomment %}
+                                            {% else %}
+                                            <li class="paginate_button page-item disabled"><span class="page-link">First</span></li>
+                                                {% comment %} <li class="paginate_button page-item disabled"><span class="page-link">Previous</span></li> {% endcomment %}
+                                            {% endif %}
+                                            {% for i in display_page_range %}
+                                                {% if object_list.number == i %}
+                                                <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
+                                                {% else %}
+                                                <li class="paginate_button paginate_button page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% if object_list.has_next %}
+                                                {% comment %} <li class="paginate_button page-item"><a class="page-link" href="?page={{ object_list.next_page_number }}">Next</a></li> {% endcomment %}
+                                                <li class="paginate_button page-item"><a class="page-link" href="?page={{ object_list.paginator.num_pages }}">Last</a></li>
+                                            {% else %}
+                                                {% comment %} <li class="paginate_button page-item disabled"><span class="page-link">Next</span></li> {% endcomment %}
+                                                <li class="paginate_button page-item disabled"><span class="page-link">Last</span></li>
+                                            {% endif %}
+                                            </ul>
+                                        {% endif %}
+                                    </nav>
                                     {% endif %}
                                 </div>
                             </div>
