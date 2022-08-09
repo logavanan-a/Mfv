@@ -47,6 +47,7 @@ class AdminDistrict(ImportExportActionModelAdmin,admin.ModelAdmin):
 @admin.register(Project)
 class AdminProject(ImportExportActionModelAdmin,admin.ModelAdmin):
     search_fields = ['name']
+    list_filter = ['active']
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
@@ -60,7 +61,7 @@ class AdminMissionIndicatorCategory(ImportExportActionModelAdmin,admin.ModelAdmi
 @admin.register(MissionIndicator)
 class AdminMissionIndicator(ImportExportActionModelAdmin,admin.ModelAdmin):
     search_fields = ['name']
-    list_filter = ['category__name','indicator_type']
+    list_filter = ['category__name','indicator_type','category__mission__name']
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
@@ -98,11 +99,11 @@ class AdminUserPartnerMapping(admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
-@admin.register(ProjectFiles)
-class AdminProjectFiles(ImportExportActionModelAdmin,admin.ModelAdmin):
-    search_fields = ['name','project__name']
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.concrete_fields]
+# @admin.register(ProjectFiles)
+# class AdminProjectFiles(ImportExportActionModelAdmin,admin.ModelAdmin):
+#     search_fields = ['name','project__name']
+#     def get_list_display(self, request):
+#         return [field.name for field in self.model._meta.concrete_fields]
 
 @admin.register(ProjectDonorMapping)
 class AdminProjectDonorMapping(ImportExportActionModelAdmin,admin.ModelAdmin):
