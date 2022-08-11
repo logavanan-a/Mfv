@@ -46,7 +46,7 @@ class AdminDistrict(ImportExportActionModelAdmin,admin.ModelAdmin):
 
 @admin.register(Project)
 class AdminProject(ImportExportActionModelAdmin,admin.ModelAdmin):
-    search_fields = ['name']
+    search_fields = ['name', 'partner_mission_mapping__partner__name']
     list_filter = ['active']
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
