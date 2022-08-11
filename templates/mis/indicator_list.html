@@ -9,7 +9,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         {% if task_obj.task_status%}
-                        <p  class="text-dark"><b>Status : </b>{{task_obj.get_task_status_display}}</p>
+                            <p  class="text-dark"><b>Status : </b>{{task_obj.get_task_status_display}}</p>
                         {% endif %}
                         <h5 ><b class="card-title">Project : </b><span style="font-size: 14px;">{{task_obj.project.name}}</span></h5>
                         <h5><b class="card-title">Dist. & State : </b><span style="font-size: 14px;">{{task_obj.project.district.name}}, {{task_obj.project.district.state.name}}</span></h5>
@@ -65,30 +65,30 @@
                                     {% disply_indicator_target_values task_obj.id sub_category.id as target_values %}  
                                     <td>{{target_values}} </td> 
                                     <td>
-                                        <input type="text" id="txtresult"  name="total_{{sub_category.id}}" value="" class="form-control" maxlength="1" readonly>
+                                        <input type="number" name="total_{{sub_category.id}}" id="total" class="form-control row_total" readonly>
                                         <!-- <div class="invalid-feedback">Please enter the Total value</div> -->
-                                    </td> 
-                                    <td><input type="number" id="Text1"  name="adult_male_{{sub_category.id}}" value="" class="form-control" maxlength="2" onkeypress="return add_number(event)">
+                                     </td>
+                                    <td><input type="number" name="adult_male_{{sub_category.id}}" value=" " class="form-control adult_male" id="adult_male_id">
                                         <!-- <div class="invalid-feedback">Please enter the Adult Male value</div> -->
                                     </td>
                                     <td>
-                                        <input type="number" id="Text2" name="adult_female_{{sub_category.id}}" value="" class="form-control" maxlength="3" onkeypress="return add_number(event)">
+                                        <input type="number" name="adult_female_{{sub_category.id}}" value=" " class="form-control adult_female" id="adult_female_id">
                                         <!-- <div class="invalid-feedback">Please enter the Adult Female value</div> -->
                                     </td>
                                     <td>
-                                        <input type="number" id="Text3" name="adult_transgender_{{sub_category.id}}" value="" class="form-control" maxlength="4" onkeypress="return add_number(event)">
+                                        <input type="number" name="adult_transgender_{{sub_category.id}}" value=" " class="form-control adult_transgender" id="adult_transgender_id">
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                     <td>
-                                        <input type="number" id="Text4" name="child_male_{{sub_category.id}}" value="" class="form-control" maxlength="5" onkeypress="return add_number(event)">
+                                        <input type="number" name="child_male_{{sub_category.id}}" value=" " class="form-control child_male" id="child_male_id">
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                     <td>
-                                        <input type="number" id="Text5" name="child_female_{{sub_category.id}}" value="" class="form-control" maxlength="6" onkeypress="return add_number(event)">
+                                        <input type="number" name="child_female_{{sub_category.id}}" value=" " class="form-control child_female" id="child_female_id">
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                     <td>
-                                        <input type="number" id="Text6" name="child_transgender_{{sub_category.id}}" value="" class="form-control" maxlength="7" onkeypress="return add_number(event)">
+                                        <input type="number" name="child_transgender_{{sub_category.id}}" value=" " class="form-control child_transgender" id="child_transgender_id">
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                 </tbody>   
@@ -184,55 +184,65 @@
 </style>
 
 <script>
-    function add_number(e) {
-    if (isNumberKey(e)) {
-        setTimeout(() => {
-        var first_number = document.getElementById("Text1").value !== "" ? parseInt(document.getElementById("Text1").value) : 0;
-        var second_number = document.getElementById("Text2").value !== "" ? parseInt(document.getElementById("Text2").value) : 0;
-        var three_number = document.getElementById("Text3").value !== "" ? parseInt(document.getElementById("Text3").value) : 0;
-        var four_number = document.getElementById("Text4").value !== "" ? parseInt(document.getElementById("Text4").value) : 0;
-        var five_number = document.getElementById("Text5").value !== "" ? parseInt(document.getElementById("Text5").value) : 0;
-        var six_number = document.getElementById("Text6").value !== "" ? parseInt(document.getElementById("Text6").value) : 0;
+    $('.adult_male,.adult_female,.adult_transgender,.child_male,.child_female,.child_transgender').keyup(function(){
+        var tr = $(this).closest('tr');
+        var a_m = tr.find('#adult_male_id').val();
+        if(a_m == ''){
+            a_m = 0
+        }
 
-        var result = first_number + second_number+ three_number + four_number+five_number+six_number;
-        document.getElementById("txtresult").value = result;
-        }, 50)
-        return true;
-    } else {
-        return false;
-    }
-    }
+        var adult_female = tr.find('#adult_female_id').val();
+        if(adult_female == ''){
+            adult_female = 0
+        }
 
-    function isNumberKey(evt) {
-    var charCode = (evt.which) ? evt.which : event.keyCode
-    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-        return false;
-    }
-    return true;
-    }
+        var adult_transgender = tr.find('#adult_transgender_id').val();
+        if(adult_transgender == ''){
+            adult_transgender=0
+        }
+
+        var child_male = tr.find('#child_male_id').val();
+        if(child_male == ''){
+            child_male = 0
+        }
+
+        var child_female = tr.find('#child_female_id').val();
+        if(child_female == ''){
+            child_female = 0
+        }
+
+        var child_transgender = tr.find('#child_transgender_id').val();
+        if(child_transgender == ''){
+            child_transgender = 0
+        }
+        var total = parseInt(a_m)+parseInt(adult_female)+parseInt(adult_transgender)+parseInt(child_male)+parseInt(child_female)+parseInt(child_transgender);
+        
+        tr.find('.row_total').val(total);
+        // tr.find('.row_total').html(total);
+    });
 </script>
 
-    <script>
-        function Confirm(task_id,val,title){
-            Swal.fire({
-            title: 'Are you sure you want to '+ title +' ?',
-            showCancelButton: true,
-            confirmButtonText: 'Yes',
-            }).then((result) => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed){
-                $.ajax({
-                url: '/ajax-task/'+task_id,
-                type:'POST',
-                data:{status_val:val}, 
-                dataType: 'json',
-                success: function(result) {
-                    window.location.reload();
-                } 
-            });
-            }
-        }).then(function(){ window.location.reload(); })
+<script>
+    function Confirm(task_id,val,title){
+        Swal.fire({
+        title: 'Are you sure you want to '+ title +' ?',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed){
+            $.ajax({
+            url: '/ajax-task/'+task_id,
+            type:'POST',
+            data:{status_val:val}, 
+            dataType: 'json',
+            success: function(result) {
+                window.location.reload();
+            } 
+        });
         }
-    </script>
+    }).then(function(){ window.location.reload(); })
+    }
+</script>
 
 {% endblock %}
