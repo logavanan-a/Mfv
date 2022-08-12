@@ -164,7 +164,7 @@ def task_list(request):
     month_year = filter_data.get('month_year')
     archive = filter_data.get('archive')
 
-    task_obj = Task.objects.filter(user = request.user,start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year).order_by('listing_order')
+    task_obj = Task.objects.filter(active=2)
 
     if mission:
         project_objs = project_objs.filter(partner_mission_mapping__mission__id = mission)
@@ -186,12 +186,12 @@ def task_list(request):
     if user.groups.filter(name = 'Partner Admin').exists():
         user_lists = UserPartnerMapping.objects.get(user = request.user)
         for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
-            task_obj = Task.objects.filter(project__partner_mission_mapping__partner = partner_list.partner).order_by('listing_order')
+            task_obj = task_obj.filter(project__partner_mission_mapping__partner = partner_list.partner).order_by('listing_order')
         # for user_list in UserPartnerMapping.objects.filter(partner = user_lists.partner).exclude(user = request.user):
         #     task_obj = Task.objects.filter(user = user_list.user).order_by('listing_order')
             # print(task_obj,obj_list)
     else:
-        task_obj
+        task_obj.filter(user = request.user,start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year).order_by('listing_order')
     
     object_list = get_pagination(request, task_obj)
     page_number_display_count = 5
