@@ -154,7 +154,7 @@ def task_list(request):
     below_last_two_month = datetime.now().date() - relativedelta(months=2)
 
     mission_objs = Mission.objects.all()
-    project_objs = Project.objects.all()
+    project_objs = Project.objects.filter(active=2).order_by('name')
 
     filter_data = request.GET
     mission = filter_data.get('mission')
@@ -167,6 +167,7 @@ def task_list(request):
     task_obj = Task.objects.filter(user = request.user,start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year).order_by('listing_order')
 
     if mission:
+        project_objs = project_objs.filter(partner_mission_mapping__mission__id = mission)
         task_obj = task_obj.filter(project__partner_mission_mapping__mission__id = mission).order_by('listing_order')
 
     if project:
@@ -444,11 +445,8 @@ def user_change_password(request, id):
 def project_list_filter(request):
     if request.method == "POST":
         mission_id =request.POST.get('mission_id')
-        projects = Project.objects.filter(active=2).order_by('name')
         if mission_id:
-            project_obj = projects.filter(partner_mission_mapping__mission__id = mission_id)
-        else:
-            project_obj  = projects
+            project_obj =  Project.objects.filter(active=2).filter(partner_mission_mapping__mission__id = mission_id)
         data=list(project_obj.values('id',"name").order_by("name"))
         return HttpResponse(json.dumps(data), content_type="application/json")   
 

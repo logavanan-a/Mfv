@@ -3,11 +3,13 @@ import json
 import django
 import requests
 import urllib3
+from application_master.models import *
+import base64
+from dateutil.relativedelta import relativedelta
 from django import template
 from django.conf import settings
 from django.contrib.auth.models import User
 from mis.models import MissionIndicatorAchievement, Task
-from application_master.models import *
 
 register = template.Library()
 
@@ -32,7 +34,6 @@ def disply_indicator_values(res_id, ind_id, keys):
     mission_response = MissionIndicatorAchievement.objects.get(id = res_id)
     return mission_response.response.get(keys + str(ind_id))
 
-from dateutil.relativedelta import relativedelta
 @register.simple_tag
 def disply_indicator_target_values(task_id, ind_id):
     task_obj = Task.objects.get(id = task_id)
@@ -67,3 +68,10 @@ def query_transform(request, **kwargs):
         pass
 
     return updated.urlencode()
+
+# from base64 import b64decode
+# @register.simple_tag
+# def id_to_hash_code(mission, id):
+#     sample_string = mission+''+str(id)
+#     hash_code = base64.b64encode(sample_string.encode()).decode("ascii").replace('=','9')
+#     return hash_code
