@@ -184,8 +184,10 @@ def task_list(request):
 
     if user.groups.filter(name = 'Partner Admin').exists():
         user_lists = UserPartnerMapping.objects.get(user = request.user)
-        for user_list in UserPartnerMapping.objects.filter(partner = user_lists.partner).exclude(user = request.user):
-            task_obj = Task.objects.filter(user = user_list.user).order_by('listing_order')
+        for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
+            task_obj = Task.objects.filter(project__partner_mission_mapping__partner = partner_list.partner).order_by('listing_order')
+        # for user_list in UserPartnerMapping.objects.filter(partner = user_lists.partner).exclude(user = request.user):
+        #     task_obj = Task.objects.filter(user = user_list.user).order_by('listing_order')
             # print(task_obj,obj_list)
     else:
         task_obj
