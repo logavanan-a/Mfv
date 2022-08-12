@@ -90,7 +90,7 @@
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_transgender_' as child_transgender %}
-                                            <input type="number" id="Text6" name="child_transgender_{{sub_category.id}}" value="{{child_transgender}}" class="form-control child_transgender" id="child_transgender_id" >
+                                            <input type="number" name="child_transgender_{{sub_category.id}}" value="{{child_transgender}}" class="form-control child_transgender" id="child_transgender_id" >
                                         </td>
                                     </tbody>    
                                     {% endfor %} 
@@ -180,8 +180,6 @@
 </style>
 
 <script>
-    // $('.adult_male,.adult_female,.adult_transgender,.child_male,.child_female,.child_transgender').keyup(function(){
-
     $('.adult_male,.adult_female,.adult_transgender,.child_male,.child_female,.child_transgender').keyup(function(){
         var tr = $(this).closest('tr');
         var a_m = tr.find('#adult_male_id').val();
@@ -209,8 +207,7 @@
         if(child_transgender == ''){
             child_transgender = 0
         }
-        // +parseInt(child_transgender)
-        var total = parseInt(a_m)+parseInt(adult_female)+parseInt(adult_transgender)+parseInt(child_male)+parseInt(child_female);
+        var total = parseInt(a_m)+parseInt(adult_female)+parseInt(adult_transgender)+parseInt(child_male)+parseInt(child_female)+parseInt(child_transgender);
         tr.find('.row_total').val(total);
     });
 </script>
