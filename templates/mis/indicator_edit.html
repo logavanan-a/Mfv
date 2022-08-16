@@ -66,31 +66,31 @@
                                         <td>{{target_values}} </td> 
                                         <td>     
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'total_' as total %}                                  
-                                            <input type="number" name="total_{{sub_category.id}}" value="{{total}}" class="form-control row_total" readonly > 
+                                            <input type="number" name="total_{{sub_category.id}}" value="{{total}}"  class="form-control row_total" readonly > 
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_male_' as adult_male %} 
-                                            <input type="number" name="adult_male_{{sub_category.id}}" value="{{adult_male}}"  class="form-control adult_male" id="adult_male_id" >
+                                            <input type="text" name="adult_male_{{sub_category.id}}" value="{% if adult_male %}{{adult_male}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)"  class="form-control adult_male" id="adult_male_id" >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_female_' as adult_female %} 
-                                            <input type="number" name="adult_female_{{sub_category.id}}" value="{{adult_female}}" class="form-control adult_female" id="adult_female_id" >
+                                            <input type="text" name="adult_female_{{sub_category.id}}" value="{% if adult_female %}{{adult_female}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_female" id="adult_female_id" >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_transgender_' as adult_transgender %} 
-                                            <input type="number" name="adult_transgender_{{sub_category.id}}" value="{{adult_transgender}}" class="form-control adult_transgender" id="adult_transgender_id" >
+                                            <input type="text" name="adult_transgender_{{sub_category.id}}" value="{% if adult_transgender %}{{adult_transgender}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_transgender" id="adult_transgender_id" >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_male_' as child_male %}
-                                            <input type="number" name="child_male_{{sub_category.id}}" value="{{child_male}}" class="form-control child_male" id="child_male_id" >
+                                            <input type="text" name="child_male_{{sub_category.id}}" value="{% if child_male %}{{child_male}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_male" id="child_male_id" >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_female_' as child_female %}
-                                            <input type="number"  name="child_female_{{sub_category.id}}" value="{{child_female}}" class="form-control child_female" id="child_female_id" >
+                                            <input type="text"  name="child_female_{{sub_category.id}}" value="{% if child_female %}{{child_female}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_female" id="child_female_id" >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_transgender_' as child_transgender %}
-                                            <input type="number" name="child_transgender_{{sub_category.id}}" value="{{child_transgender}}" class="form-control child_transgender" id="child_transgender_id" >
+                                            <input type="text" name="child_transgender_{{sub_category.id}}" value="{% if child_transgender %}{{child_transgender}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_transgender" id="child_transgender_id" >
                                         </td>
                                     </tbody>    
                                     {% endfor %} 

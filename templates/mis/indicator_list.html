@@ -68,27 +68,27 @@
                                         <input type="number" name="total_{{sub_category.id}}" id="total" class="form-control row_total" readonly>
                                         <!-- <div class="invalid-feedback">Please enter the Total value</div> -->
                                      </td>
-                                    <td><input type="number" name="adult_male_{{sub_category.id}}" value=" " class="form-control adult_male" id="adult_male_id">
+                                    <td><input type="text" name="adult_male_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_male" size="5" maxlength="5" id="adult_male_id">
                                         <!-- <div class="invalid-feedback">Please enter the Adult Male value</div> -->
                                     </td>
                                     <td>
-                                        <input type="number" name="adult_female_{{sub_category.id}}" value=" " class="form-control adult_female" id="adult_female_id">
+                                        <input type="text" name="adult_female_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_female" size="5" maxlength="5" id="adult_female_id">
                                         <!-- <div class="invalid-feedback">Please enter the Adult Female value</div> -->
                                     </td>
                                     <td>
-                                        <input type="number" name="adult_transgender_{{sub_category.id}}" value=" " class="form-control adult_transgender" id="adult_transgender_id">
+                                        <input type="text" name="adult_transgender_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_transgender" size="5" maxlength="5" id="adult_transgender_id">
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                     <td>
-                                        <input type="number" name="child_male_{{sub_category.id}}" value=" " class="form-control child_male" id="child_male_id">
+                                        <input type="text" name="child_male_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_male" size="5" maxlength="5" id="child_male_id">
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                     <td>
-                                        <input type="number" name="child_female_{{sub_category.id}}" value=" " class="form-control child_female" id="child_female_id">
+                                        <input type="text" name="child_female_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_female" size="5" maxlength="5" id="child_female_id">
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                     <td>
-                                        <input type="number" name="child_transgender_{{sub_category.id}}" value=" " class="form-control child_transgender" id="child_transgender_id">
+                                        <input type="text" name="child_transgender_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_transgender" size="5" maxlength="5" id="child_transgender_id">
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                 </tbody>   
@@ -216,7 +216,6 @@
             child_transgender = 0
         }
         var total = parseInt(a_m)+parseInt(adult_female)+parseInt(adult_transgender)+parseInt(child_male)+parseInt(child_female)+parseInt(child_transgender);
-        
         tr.find('.row_total').val(total);
         // tr.find('.row_total').html(total);
     });
