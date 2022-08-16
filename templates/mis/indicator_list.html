@@ -125,18 +125,18 @@
                                         {% if fin_data.label_configuration == 2 %}
                                         <td>{{target_values}}</td> 
                                         <td>
-                                            <input type="number" name="actuals_with_grants_received_{{sub_category.id}}" value="" class="form-control" maxlength="6" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
+                                            <input type="text" name="actuals_with_grants_received_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control" size="9" maxlength="9" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
                                         </td> 
                                         <td>
-                                            <input type="number" name="actuals_{{sub_category.id}}" value="" class="form-control" maxlength="5">
+                                            <input type="text" name="actuals_{{sub_category.id}}" class="form-control" onkeypress="return /[0-9]/i.test(event.key)" size="9" maxlength="9" >
                                         </td> 
                                         {% else %}
                                         <td>
-                                            <input type="number" name="amount_{{sub_category.id}}" value="" class="form-control" maxlength="5">
+                                            <input type="text" name="amount_{{sub_category.id}}" class="form-control" onkeypress="return /[0-9]/i.test(event.key)" size="9" maxlength="9" >
                                         </td> 
                                         {% endif %}
                                         <td>
-                                            <input type="text" name="comment_{{sub_category.id}}" value="" class="form-control">
+                                            <input type="text" name="comment_{{sub_category.id}}" class="form-control" >
                                         </td> 
                                     </tbody>   
                                     {% endfor %} 
