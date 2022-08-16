@@ -191,7 +191,7 @@ def task_list(request):
         #     task_obj = Task.objects.filter(user = user_list.user).order_by('listing_order')
             # print(task_obj,obj_list)
     else:
-        task_obj.filter(user = request.user,start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year).order_by('listing_order')
+        task_obj = task_obj.filter(user = request.user,start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year).order_by('listing_order')
     
     object_list = get_pagination(request, task_obj)
     page_number_display_count = 5
