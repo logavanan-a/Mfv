@@ -35,12 +35,16 @@ class Task(BaseContent):
 
 # declare a new model with a name "MissionIndicatorAchievement"
 class MissionIndicatorAchievement(BaseContent):
+    CAMP_OPTION=(
+        (1, 'Drivers'),
+        (2, 'Truckers'),
+        (3, 'Carpenters')
+    )
     task = models.ForeignKey(Task, on_delete=models.DO_NOTHING, blank=True, null=True)
     response = JSONField(default=dict)
     number_working_days = models.IntegerField(default=0)
     project_reference_file = models.FileField(upload_to='file/%Y/%m/%d',blank=True, null=True)
-    
-
+    camp_organized = models.IntegerField(choices = CAMP_OPTION, blank=True, null=True)
     class Meta:
         # ordering = ['-id']
         verbose_name_plural = "Mission Indicator Achievement"

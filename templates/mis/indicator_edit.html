@@ -30,9 +30,18 @@
 
                 <form method='POST' class="" enctype="multipart/form-data" novalidate>
                     {% if slug == 'mission-jyot' %}
-                    <label for="working_day" class="card-title">No. of days VC was functional : </label>
-                    <input type="text" id="working_day" name="working_day" style="width: 50px;" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" >
+                        <label for="working_day" class="card-title">No. of days VC was functional : </label>
+                        <input type="text" id="working_day" name="working_day" style="width: 50px;" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" >
+                    {% elif slug == 'mission-disha' %}
+                        <label for="camp_organized" class="card-title">Camp organized for : </label> 
+                        <select id="camp_organized", name="camp_organized">
+                            <option value="" selected>Select</option>
+                            <option value="1">Drivers</option>
+                            <option value="2">Truckers</option>
+                            <option value="3">Carpenters</option>
+                        </select>
                     {% endif %}
+
                 {% if 'Partner Data Entry Operator' == user_role and mission_respose_obj.task.task_status == 1 %}
                 <input type='button' style="float: right;" id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{mission_respose_obj.task.id}}',2,'Submit for Approval')">
                 {% elif 'Partner Data Entry Operator' == user_role and mission_respose_obj.task.task_status == 4 %}
@@ -51,14 +60,14 @@
                                         <th>Indicator Type</th> 
                                         <th>Target</th>
                                         <th>Total </th>
-                                        <!-- <th>Total Adult</th> -->
                                         <th>Adult Male</th>
                                         <th>Adult Female</th>
                                         <th>Adult Transgender</th>
-                                        <!-- <th>Total Adult</th> -->
+                                        <th>Total Adult</th>
                                         <th>Child Child</th>
                                         <th>Child Female</th>
                                         <th>Child Transgender</th>
+                                        <th>Total Child</th>
                                     </tr>
                                 </thead>
                                     {% for sub_category in data.sub_category %}
@@ -72,9 +81,7 @@
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'total_' as total %}                                  
                                             <input type="number" name="total_{{sub_category.id}}" value="{{total}}"  class="form-control row_total" readonly > 
                                         </td>
-                                        <!-- <td>
-                                            <input type="text" name="adult_male_{{sub_category.id}}" value="{% if adult_male %}{{adult_male}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)"  class="form-control adult_male" id="adult_male_id" {% if sub_category.indicator_type == 2 %}readonly{% endif %} >
-                                        </td> -->
+                                        
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_male_' as adult_male %} 
                                             <input type="text" name="adult_male_{{sub_category.id}}" value="{% if adult_male %}{{adult_male}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)"  class="form-control adult_male" id="adult_male_id" {% if sub_category.indicator_type == 2 %}readonly{% endif %} >
@@ -87,9 +94,10 @@
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_transgender_' as adult_transgender %} 
                                             <input type="text" name="adult_transgender_{{sub_category.id}}" value="{% if adult_transgender %}{{adult_transgender}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_transgender" id="adult_transgender_id" {% if sub_category.indicator_type == 2 %}readonly{% endif %} >
                                         </td>
-                                        <!-- <td>
-                                            <input type="text" name="child_male_{{sub_category.id}}" value="{% if child_male %}{{child_male}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_male" id="child_male_id" {% if sub_category.indicator_type == 2 %}readonly{% endif %} >
-                                        </td> -->
+                                        <td>
+                                            {% disply_indicator_values mission_respose_obj.id sub_category.id  'total_adult_' as total_adult %} 
+                                            <input type="number" name="total_adult_{{sub_category.id}}" value="{% if total_adult %}{{total_adult}}{% endif %}" class="form-control row_total_adult" readonly >
+                                        </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_male_' as child_male %}
                                             <input type="text" name="child_male_{{sub_category.id}}" value="{% if child_male %}{{child_male}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_male" id="child_male_id" {% if sub_category.indicator_type == 2 %}readonly{% endif %} >
@@ -101,6 +109,10 @@
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_transgender_' as child_transgender %}
                                             <input type="text" name="child_transgender_{{sub_category.id}}" value="{% if child_transgender %}{{child_transgender}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_transgender" id="child_transgender_id" {% if sub_category.indicator_type == 2 %}readonly{% endif %} >
+                                        </td>
+                                        <td>
+                                            {% disply_indicator_values mission_respose_obj.id sub_category.id  'total_child_' as total_child %} 
+                                            <input type="number" name="total_child_{{sub_category.id}}" value="{% if total_child %}{{total_child}}{% endif %}" class="form-control row_total_child" readonly >
                                         </td>
                                     </tbody>    
                                     {% endfor %} 
@@ -217,10 +229,18 @@
         if(child_transgender == ''){
             child_transgender = 0
         }
+
+        var total_adult = parseInt(a_m)+parseInt(adult_female)+parseInt(adult_transgender);
+        tr.find('.row_total_adult').val(total_adult);
+
+        var total_child = parseInt(child_male)+parseInt(child_female)+parseInt(child_transgender);
+        tr.find('.row_total_child').val(total_child);
+
         var total = parseInt(a_m)+parseInt(adult_female)+parseInt(adult_transgender)+parseInt(child_male)+parseInt(child_female)+parseInt(child_transgender);
         tr.find('.row_total').val(total);
     });
 </script>
+
 <script>
     function Confirm(task_id,val,title){
         Swal.fire({

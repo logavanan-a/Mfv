@@ -69,6 +69,7 @@ class District(BaseContent):
 class Partner(BaseContent):
     name = models.CharField(max_length=350, unique=True)
     slug = models.SlugField(max_length=100, unique=True)
+    partner_logo = models.ImageField(upload_to = 'image_folder/', blank=True, null=True)
 
     class Meta: 
         verbose_name_plural = "         Partner"
@@ -107,6 +108,7 @@ class Mission(BaseContent):
     short_description  = models.TextField(blank=True, null=True)
     mission_template = models.IntegerField(choices = MISSION_CHOICES, default = 1)
     slug = models.SlugField(max_length=100, unique = True) 
+    age_group_option = models.IntegerField(default=1)
 
     class Meta:
         verbose_name_plural = "        Mission"

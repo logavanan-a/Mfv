@@ -90,18 +90,22 @@ def missionindicator_add(request, slug,task_id):
     if request.method == 'POST':
         data = request.POST
         working_day = request.POST.get('working_day')
+        camp_organized = request.POST.get('camp_organized')
         project_reference_file = request.FILES.get('project_reference_file')
 
         temp = dict(data)
         results = {}
         for key,values in temp.items():
-            if key != 'csrfmiddlewaretoken' and key != 'working_day' and values[0] != '':
+            if key != 'csrfmiddlewaretoken' and key != 'working_day' and key != 'camp_organized' and values[0] != '':
                 results[key] = values[0]
 
         mission_add = MissionIndicatorAchievement.objects.create(task = task_obj , response = results)
 
         if working_day:
             mission_add.number_working_days = working_day
+            
+        if camp_organized:
+            mission_add.camp_organized = camp_organized
 
         if project_reference_file:
             mission_add.project_reference_file = project_reference_file  
@@ -125,18 +129,22 @@ def missionindicator_edit(request, slug, id,task_id):
 
     if request.method == 'POST':
         working_day = request.POST.get('working_day')
+        camp_organized = request.POST.get('camp_organized')
         project_reference_file = request.FILES.get('project_reference_file')
         data = request.POST
         temp = dict(data)
         results = {}
         for key,values in temp.items():
-            if key != 'csrfmiddlewaretoken' and values[0] != '':
+            if key != 'csrfmiddlewaretoken' and key != 'working_day' and key != 'camp_organized' and values[0] != '':
                 results[key] = values[0]
         mission_respose_obj = MissionIndicatorAchievement.objects.get(id = id)
         mission_respose_obj.response = results
 
         if working_day:
             mission_respose_obj.number_working_days = working_day
+        
+        if camp_organized:
+            mission_respose_obj.camp_organized = camp_organized
 
         if project_reference_file:
             mission_respose_obj.project_reference_file = project_reference_file 
