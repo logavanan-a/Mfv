@@ -12,7 +12,8 @@
                             <p  class="text-dark"><b>Status : </b>{{task_obj.get_task_status_display}}</p>
                         {% endif %}
                         <h5 ><b class="card-title">Project : </b><span style="font-size: 14px;">{{task_obj.project.name}}</span></h5>
-                        <h5><b class="card-title">Dist. & State : </b><span style="font-size: 14px;">{{task_obj.project.district.name}}, {{task_obj.project.district.state.name}}</span></h5>
+                        <h5><b class="card-title">District & State : </b><span style="font-size: 14px;">{{task_obj.project.district.name}}, {{task_obj.project.district.state.name}}</span></h5>
+                        <h5><b class="card-title">Location: </b><span style="font-size: 14px;">{{task_obj.project.location}}</span> </h5>
                         <h5><b class="card-title">Project funded by : </b><span style="font-size: 14px;"> {{task_obj.project.get_project_donor_mapping}}</span></h5>
                     </div>
                     <div class="col-md-6" >
@@ -26,7 +27,7 @@
 
                 <form method='POST' class="" enctype="multipart/form-data"  novalidate>
                     {% if slug == 'mission-jyot' %}
-                    <label for="working_day" class="card-title">Number of days the Vision Centre was open : </label>
+                    <label for="working_day" class="card-title">No. of days VC was functional : </label>
                     <input type="text" id="working_day" name="working_day" style="width: 50px;" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" >
                     {% endif %}
 
@@ -49,9 +50,11 @@
                                     <th>Indicator Type</th> 
                                     <th>Target </th>
                                     <th>Total </th>
+                                    <!-- <th>Total Adult</th> -->
                                     <th>Adult Male</th>
                                     <th>Adult Female</th>
                                     <th>Adult Transgender</th>
+                                    <!-- <th>Total Child</th> -->
                                     <th>Child Male</th>
                                     <th>Child Female</th>
                                     <th>Child Transgender</th>
@@ -68,6 +71,8 @@
                                         <input type="number" name="total_{{sub_category.id}}" id="total" class="form-control row_total" readonly>
                                         <!-- <div class="invalid-feedback">Please enter the Total value</div> -->
                                      </td>
+                                    <!-- <td><input type="text" name="adult_male_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_male" size="5" maxlength="5" id="adult_male_id" {% if sub_category.indicator_type == 2 %}readonly{% endif %}>
+                                    </td> -->
                                     <td><input type="text" name="adult_male_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_male" size="5" maxlength="5" id="adult_male_id" {% if sub_category.indicator_type == 2 %}readonly{% endif %}>
                                         <!-- <div class="invalid-feedback">Please enter the Adult Male value</div> -->
                                     </td>
@@ -79,6 +84,9 @@
                                         <input type="text" name="adult_transgender_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_transgender" size="5" maxlength="5" id="adult_transgender_id" {% if sub_category.indicator_type == 2 %}readonly{% endif %} >
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
+                                    <!-- <td>
+                                        <input type="text" name="child_male_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_male" size="5" maxlength="5" id="child_male_id" {% if sub_category.indicator_type == 2 %}readonly{% endif %} >
+                                    </td> -->
                                     <td>
                                         <input type="text" name="child_male_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_male" size="5" maxlength="5" id="child_male_id" {% if sub_category.indicator_type == 2 %}readonly{% endif %} >
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->

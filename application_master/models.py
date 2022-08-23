@@ -48,7 +48,7 @@ class Menus(BaseContent):
         return Menus.objects.filter(parent=self).order_by('menu_order')
 
 class State(BaseContent):
-    name = models.CharField(max_length=350)
+    name = models.CharField(max_length=350, unique=True)
 
     class Meta: 
         verbose_name_plural = "          State"
@@ -57,7 +57,7 @@ class State(BaseContent):
         return self.name
     
 class District(BaseContent):
-    name = models.CharField(max_length=350)
+    name = models.CharField(max_length=350, unique=True)
     state =  models.ForeignKey(State, on_delete = models.DO_NOTHING)
 
     class Meta: 
@@ -67,7 +67,7 @@ class District(BaseContent):
         return self.name
 
 class Partner(BaseContent):
-    name = models.CharField(max_length=350)
+    name = models.CharField(max_length=350, unique=True)
     slug = models.SlugField(max_length=100, unique=True)
 
     class Meta: 
