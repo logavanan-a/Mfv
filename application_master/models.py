@@ -86,7 +86,9 @@ class Partner(BaseContent):
 
 class UserPartnerMapping(BaseContent):
     partner =  models.ForeignKey(Partner, on_delete = models.DO_NOTHING)
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True)
+    user = models.OneToOneField(User, on_delete = models.CASCADE, blank=True, null=True)
+    # user = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True)
+
 
     class Meta: 
         verbose_name_plural = " User Partner Mapping"
