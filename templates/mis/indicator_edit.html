@@ -31,7 +31,7 @@
                 <form method='POST' class="" enctype="multipart/form-data" novalidate>
                     {% if slug == 'mission-jyot' %}
                         <label for="working_day" class="card-title">No. of days VC was functional : </label>
-                        <input type="text" id="working_day" name="working_day" style="width: 50px;" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" >
+                        <input type="text" id="working_day" name="working_day" value="{% if mission_respose_obj.number_working_days %}{{mission_respose_obj.number_working_days}}{% endif %}" style="width: 50px;" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" >
                     {% elif slug == 'mission-disha' %}
                         <label for="camp_organized" class="card-title">Camp organized for : </label> 
                         <select id="camp_organized", name="camp_organized">
@@ -202,6 +202,16 @@
         margin-left: 50%
     }
 </style>
+{% if mission_respose_obj %}
+<script>
+    $(document).ready(function(){
+		var camp_organized = parseInt("{{mission_respose_obj.camp_organized}}")
+        if(camp_organized){
+            $("#camp_organized").val(due)
+        } 
+    });
+</script>
+{% endif %}
 
 <script>
     $('.adult_male,.adult_female,.adult_transgender,.child_male,.child_female,.child_transgender').keyup(function(){
