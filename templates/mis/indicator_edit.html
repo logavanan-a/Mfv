@@ -165,7 +165,7 @@
                                     {% endif %}
                                     <td>
                                         {% disply_indicator_values mission_respose_obj.id sub_category.id  'comment_' as comment %}                                  
-                                        <input type="text"  name="comment_{{sub_category.id}}" value="{% if comment %}{{comment}}{% endif %}" class="form-control" >
+                                        <textarea rows="2" cols="20" name="comment_{{sub_category.id}}" >{% if comment %}{{comment}}{% endif %}</textarea>
                                     </td> 
                                 </tbody>   
                                 {% endfor %} 
