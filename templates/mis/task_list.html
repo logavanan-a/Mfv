@@ -99,7 +99,14 @@
                                                     <td>{{task.project.partner_mission_mapping.mission.name}}</td>
                                                     <td>{{task.name}}</td>
                                                     <!-- <td>{{task.start_date|date:"d-m-Y"}}</td> -->
-                                                    <td>{{task.get_task_status_display}}</td>
+                                                    <td {% if task.task_status  == 1 %}class="badge-soft-danger"
+                                                        {% elif task.task_status == 2 %}class="badge-soft-warning"
+                                                        {% elif task.task_status == 3 %}class="badge-soft-success"
+                                                        {% elif task.task_status == 4 %}style="color:red;"
+                                                        {% elif task.task_status == 5 %}style="color:blue;"
+                                                        {% endif %} >
+                                                    {{task.get_task_status_display}}
+                                                    </td>
                                                     {% if task.get_task %}
                                                     <td><b><a href="/mission_edit/{{task.project.partner_mission_mapping.mission.slug}}/{{task.id}}/{{task.get_task.id}}/">{% if task.task_status == 2 or task.task_status == 3 %}View{% else %}Edit{% endif %}</a></b></td>
                                                     {% else %}

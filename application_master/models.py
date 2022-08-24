@@ -51,6 +51,7 @@ class State(BaseContent):
     name = models.CharField(max_length=350, unique=True)
 
     class Meta: 
+        ordering = ('name',)
         verbose_name_plural = "          State"
 
     def __str__(self):
@@ -61,6 +62,7 @@ class District(BaseContent):
     state =  models.ForeignKey(State, on_delete = models.DO_NOTHING)
 
     class Meta: 
+        ordering = ('name',)
         verbose_name_plural = "         District"
 
     def __str__(self):
@@ -72,6 +74,7 @@ class Partner(BaseContent):
     partner_logo = models.ImageField(upload_to = 'image_folder/', blank=True, null=True)
 
     class Meta: 
+        ordering = ('name',)
         verbose_name_plural = "         Partner"
 
     def __str__(self):
@@ -97,6 +100,7 @@ class Donor(BaseContent):
     logo = models.ImageField(upload_to = 'image_folder/', blank=True)
 
     class Meta:
+        ordering = ('name',)
         verbose_name_plural = "  Donor"
 
     def __str__(self):
@@ -111,6 +115,7 @@ class Mission(BaseContent):
     age_group_option = models.IntegerField(default=1)
 
     class Meta:
+        ordering = ('name',)
         verbose_name_plural = "        Mission"
 
     def __str__(self):
@@ -128,6 +133,7 @@ class PartnerMissionMapping(BaseContent):
     mission = models.ForeignKey(Mission, on_delete = models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
+        ordering = ('partner__name',)
         verbose_name_plural = "     Partner Mission Mapping"
 
     def __str__(self):
@@ -141,6 +147,7 @@ class Project(BaseContent):
     additional_info = models.TextField(blank=True, null=True)
 
     class Meta:
+        ordering = ('name',)
         unique_together = ('name', 'partner_mission_mapping')
         verbose_name_plural = "    Project"
 

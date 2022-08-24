@@ -50,10 +50,11 @@
 
                 {% csrf_token %}
                     {% if programe_category %}
-                    <p class="text-dark text-center text-uppercase"><b><br>Programme Data</b></p>
+                    <p></p>
+                    <p class="card-title text-center text-uppercase p-1 mb-1 text-white" style="background-color:#13437e;">Programme Data</b></p>
                     {% for data in programe_category %}
                         <div class="table-responsive">
-                            <h5 class="text-dark card-title"> <b>{{data.name}}</b></h5>
+                            <h5 class="text-dark card-title bg-warning"> <b>{{data.name}}</b></h5>
                             <table class="table table-hover">
                                 <thead class="table-light">
                                     <tr><th>Indicator</th>
@@ -84,15 +85,15 @@
                                         
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_male_' as adult_male %} 
-                                            <input type="text" name="adult_male_{{sub_category.id}}" value="{% if adult_male %}{{adult_male}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)"  class="form-control adult_male" id="adult_male_id" {% if sub_category.indicator_type == 2 %}readonly{% endif %} >
+                                            <input type="text" name="adult_male_{{sub_category.id}}" value="{% if adult_male %}{{adult_male}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)"  class="form-control adult_male" id="adult_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_female_' as adult_female %} 
-                                            <input type="text" name="adult_female_{{sub_category.id}}" value="{% if adult_female %}{{adult_female}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_female" id="adult_female_id" {% if sub_category.indicator_type == 2 %}readonly{% endif %} >
+                                            <input type="text" name="adult_female_{{sub_category.id}}" value="{% if adult_female %}{{adult_female}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_female" id="adult_female_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'adult_transgender_' as adult_transgender %} 
-                                            <input type="text" name="adult_transgender_{{sub_category.id}}" value="{% if adult_transgender %}{{adult_transgender}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_transgender" id="adult_transgender_id" {% if sub_category.indicator_type == 2 %}readonly{% endif %} >
+                                            <input type="text" name="adult_transgender_{{sub_category.id}}" value="{% if adult_transgender %}{{adult_transgender}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_transgender" id="adult_transgender_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'total_adult_' as total_adult %} 
@@ -100,15 +101,15 @@
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_male_' as child_male %}
-                                            <input type="text" name="child_male_{{sub_category.id}}" value="{% if child_male %}{{child_male}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_male" id="child_male_id" {% if sub_category.indicator_type == 2 %}readonly{% endif %} >
+                                            <input type="text" name="child_male_{{sub_category.id}}" value="{% if child_male %}{{child_male}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_male" id="child_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_female_' as child_female %}
-                                            <input type="text"  name="child_female_{{sub_category.id}}" value="{% if child_female %}{{child_female}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_female" id="child_female_id" {% if sub_category.indicator_type == 2 %}readonly{% endif %} >
+                                            <input type="text"  name="child_female_{{sub_category.id}}" value="{% if child_female %}{{child_female}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_female" id="child_female_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'child_transgender_' as child_transgender %}
-                                            <input type="text" name="child_transgender_{{sub_category.id}}" value="{% if child_transgender %}{{child_transgender}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_transgender" id="child_transgender_id" {% if sub_category.indicator_type == 2 %}readonly{% endif %} >
+                                            <input type="text" name="child_transgender_{{sub_category.id}}" value="{% if child_transgender %}{{child_transgender}}{% endif %}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_transgender" id="child_transgender_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'total_child_' as total_child %} 
@@ -122,10 +123,11 @@
                     {% endif %}
 
                     {% if finance_category %}
-                    <p class="text-dark text-center text-uppercase"><b><br>Finance Data</b></p>
+                    <p></p>
+                    <p class="card-title text-center text-uppercase p-1 mb-1 text-white" style="background-color:#13437e;">Finance Data</b></p>
                     {% for fin_data in finance_category %}
                     <div class="table-responsive">
-                            <h5 class="text-dark card-title"> {{fin_data.name}} </h5>
+                            <h5 class="text-dark card-title bg-warning"> {{fin_data.name}} </h5>
                             <table class="table table-hover" id="hospital_report">
                                 <thead class="table-light">
                                     <tr>
