@@ -57,18 +57,19 @@
                             <h5 class="text-dark card-title bg-warning"> <b>{{data.name}}</b></h5>
                             <table class="table table-hover">
                                 <thead class="table-light">
-                                    <tr><th>Indicator</th>
-                                        <th>Indicator Type</th> 
-                                        <th>Target</th>
-                                        <th>Total </th>
-                                        <th>Adult Male</th>
-                                        <th>Adult Female</th>
-                                        <th>Adult Transgender</th>
-                                        <th>Total Adult</th>
-                                        <th>Child Child</th>
-                                        <th>Child Female</th>
-                                        <th>Child Transgender</th>
-                                        <th>Total Child</th>
+                                    <tr>
+                                        <th class="table-active">Indicator</th>
+                                        <th class="table-active">Indicator Type</th> 
+                                        <th class="table-active">Target </th>
+                                        <th class="table-active">Total </th>
+                                        <th class="table-info">Adult Male</th>
+                                        <th class="table-info">Adult Female</th>
+                                        <th class="table-info">Adult Transgender</th>
+                                        <th class="table-info">Total Adult</th>
+                                        <th class="table-warning">Child Male</th>
+                                        <th class="table-warning">Child Female</th>
+                                        <th class="table-warning">Child Transgender</th>
+                                        <th class="table-warning">Total Child</th>
                                     </tr>
                                 </thead>
                                     {% for sub_category in data.sub_category %}
@@ -131,15 +132,15 @@
                             <table class="table table-hover" id="hospital_report">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Particulars</th>
+                                        <th class="table-active">Particulars</th>
                                         {% if fin_data.label_configuration == 2 %}
-                                        <th>Approved Budget</th>
-                                        <th>Grants Received</th>
-                                        <th>Expenses</th>
+                                        <th class="table-active">Approved Budget</th>
+                                        <th class="table-active">Grants Received</th>
+                                        <th class="table-active">Expenses</th>
                                         {% else %}
-                                        <th>Amount</th>
+                                        <th class="table-active">Amount</th>
                                         {% endif %}
-                                        <th>Comment</th>
+                                        <th class="table-active">Comment</th>
                                     </tr>
                                 </thead>
                                 {% for sub_category in fin_data.sub_category %}
@@ -165,7 +166,7 @@
                                     {% endif %}
                                     <td>
                                         {% disply_indicator_values mission_respose_obj.id sub_category.id  'comment_' as comment %}                                  
-                                        <textarea rows="2" cols="20" name="comment_{{sub_category.id}}" >{% if comment %}{{comment}}{% endif %}</textarea>
+                                        <textarea rows="2" cols="50" name="comment_{{sub_category.id}}" >{% if comment %}{{comment}}{% endif %}</textarea>
                                     </td> 
                                 </tbody>   
                                 {% endfor %} 

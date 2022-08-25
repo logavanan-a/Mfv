@@ -26,6 +26,8 @@
                 </div>
 
                 <form method='POST' class="" enctype="multipart/form-data"  novalidate>
+                    <label for="working_day" class="card-title">No. of days VC was functional : </label>
+                    <input type="text" id="working_day" name="working_day" style="width: 50px;" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" >
                     {% if slug == 'mission-jyot' %}
                     <label for="working_day" class="card-title">No. of days VC was functional : </label>
                     <input type="text" id="working_day" name="working_day" style="width: 50px;" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" >
@@ -37,6 +39,8 @@
                             <option value="2">Truckers</option>
                             <option value="3">Carpenters</option>
                         </select>
+                    {% else %}    
+                    <label class="card-title"> </label>
                     {% endif %}
 
                     {%  if 'Partner Data Entry Operator' == user_role and task_obj.task_status == 1 %}
@@ -58,18 +62,18 @@
                         <table class="table">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Indicator</th>
-                                    <th>Indicator Type</th> 
-                                    <th>Target </th>
-                                    <th>Total </th>
-                                    <th>Adult Male</th>
-                                    <th>Adult Female</th>
-                                    <th>Adult Transgender</th>
-                                    <th>Total Adult</th>
-                                    <th>Child Male</th>
-                                    <th>Child Female</th>
-                                    <th>Child Transgender</th>
-                                    <th>Total Child</th>
+                                    <th class="table-active">Indicator</th>
+                                    <th class="table-active">Indicator Type</th> 
+                                    <th class="table-active">Target </th>
+                                    <th class="table-active">Total </th>
+                                    <th class="table-info">Adult Male</th>
+                                    <th class="table-info">Adult Female</th>
+                                    <th class="table-info">Adult Transgender</th>
+                                    <th class="table-info">Total Adult</th>
+                                    <th class="table-warning">Child Male</th>
+                                    <th class="table-warning">Child Female</th>
+                                    <th class="table-warning">Child Transgender</th>
+                                    <th class="table-warning">Total Child</th>
                                 </tr>
                             </thead>
                                 {% for sub_category in data.sub_category %}
@@ -129,15 +133,15 @@
                             <table class="table table-hover" id="hospital_report">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Particulars</th>
+                                        <th class="table-active">Particulars</th>
                                         {% if fin_data.label_configuration == 2 %}
-                                        <th>Approved Budget</th>
-                                        <th>Grants Received</th>
-                                        <th>Expenses</th>
+                                        <th class="table-active">Approved Budget</th>
+                                        <th class="table-active">Grants Received</th>
+                                        <th class="table-active">Expenses</th>
                                         {% else %}
-                                        <th>Amount</th>
+                                        <th class="table-active">Amount</th>
                                         {% endif %}
-                                        <th>Comment</th>
+                                        <th class="table-active">Comment</th>
                                     </tr>
                                 </thead>
                                     {% for sub_category in fin_data.sub_category %}
@@ -158,7 +162,7 @@
                                         </td> 
                                         {% endif %}
                                         <td>
-                                            <textarea rows="2" cols="20" name="comment_{{sub_category.id}}" class="form-control" ></textarea>
+                                            <textarea rows="2" cols="50" name="comment_{{sub_category.id}}" class="form-control" ></textarea>
                                         </td> 
                                     </tbody>   
                                     {% endfor %} 
