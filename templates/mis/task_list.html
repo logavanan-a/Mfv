@@ -98,7 +98,7 @@
                                                     <td>{{forloop.counter0|add:object_list.start_index}}</td>
                                                     <td>{{task.project.partner_mission_mapping.mission.name}}</td>
                                                     <td>{{task.name}}</td>
-                                                    <!-- <td>{{task.start_date|date:"d-m-Y"}}</td> -->
+                                                    <!-- <td>{{task.start_date|date:"d-m-Y"}} -   {{task.user.username}}</td> -->
                                                     <td {% if task.task_status  == 1 %}class="badge-soft-danger"
                                                         {% elif task.task_status == 2 %}class="badge-soft-warning"
                                                         {% elif task.task_status == 3 %}class="badge-soft-success"
@@ -124,7 +124,7 @@
                                     {% if object_list.has_other_pages %}
                                     <ul class="pagination justify-content-end ">
                                         {% if object_list.has_previous %}
-                                        <li class="paginate_button page-item"><a class="page-link" href="?page={{ 1 }}">First</a></li>
+                                        <li class="paginate_button page-item"><a class="page-link" href="?page={{ 1 }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}">First</a></li>
                                         {% comment %} <li class="paginate_button page-item"><a class="page-link" href="?page={{ object_list.previous_page_number }}">Previous</a></li> {% endcomment %}
                                         {% else %}
                                         <li class="paginate_button page-item disabled"><span class="page-link">First</span></li>
@@ -134,12 +134,12 @@
                                             {% if object_list.number == i %}
                                             <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
                                             {% else %}
-                                            <li class="paginate_button paginate_button page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                            <li class="paginate_button paginate_button page-item"><a class="page-link" href="?page={{ i }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}">{{ i }}</a></li>
                                             {% endif %}
                                         {% endfor %}
                                         {% if object_list.has_next %}
-                                            {% comment %} <li class="paginate_button page-item"><a class="page-link" href="?page={{ object_list.next_page_number }}">Next</a></li> {% endcomment %}
-                                            <li class="paginate_button page-item"><a class="page-link" href="?page={{ object_list.paginator.num_pages }}">Last</a></li>
+                                            {% comment %} <li class="paginate_button page-item"><a class="page-link" href="?page={{ object_list.next_page_number }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}">Next</a></li> {% endcomment %}
+                                            <li class="paginate_button page-item"><a class="page-link" href="?page={{ object_list.paginator.num_pages }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}">Last</a></li>
                                         {% else %}
                                             {% comment %} <li class="paginate_button page-item disabled"><span class="page-link">Next</span></li> {% endcomment %}
                                             <li class="paginate_button page-item disabled"><span class="page-link">Last</span></li>

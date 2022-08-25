@@ -158,48 +158,49 @@ def task_list(request):
     heading= 'Task List'
     user = get_user(request)
 
-    previous_month = datetime.now() - relativedelta(months=1)
+    one_month = datetime.now() - relativedelta(months=1)
     below_last_two_month = datetime.now().date() - relativedelta(months=2)
 
     mission_objs = Mission.objects.all()
     project_objs = Project.objects.filter(active=2).order_by('name')
 
     filter_data = request.GET
-    mission = filter_data.get('mission')
-    project = filter_data.get('project')
-    month = filter_data.get('month')
-    year = filter_data.get('year')
-    month_year = filter_data.get('month_year')
-    archive = filter_data.get('archive')
+    mission = filter_data.get('mission') if(filter_data.get('mission') != 'None') else None
+    project = filter_data.get('project') if(filter_data.get('project') != 'None') else None
+    month = filter_data.get('month') if(filter_data.get('month') != 'None') else None
+    year = filter_data.get('year') if(filter_data.get('year') != 'None') else None
+    month_year = filter_data.get('month_year') if(filter_data.get('month_year') != 'None') else None
+    archive = filter_data.get('archive') if(filter_data.get('archive') != 'None') else None
 
-    task_obj = Task.objects.filter(active=2)
+    if(archive != None or month != None or year != None or project != None or mission != None):
+        task_obj = Task.objects.filter(start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year).order_by('listing_order')
+    else:
+        task_obj = Task.objects.filter(start_date__month = one_month.month, start_date__year = one_month.year).order_by('listing_order')
 
     if mission:
         project_objs = project_objs.filter(partner_mission_mapping__mission__id = mission)
-        task_obj = task_obj.filter(project__partner_mission_mapping__mission__id = mission).order_by('listing_order')
+        task_obj = task_obj.filter(project__partner_mission_mapping__mission__id = mission)
 
     if project:
-        task_obj = task_obj.filter(project__id = project).order_by('listing_order')
+        task_obj = task_obj.filter(project__id = project)
 
     if year:
-        task_obj = task_obj.filter(start_date__year = year).order_by('listing_order')
+        task_obj = task_obj.filter(start_date__year = year)
     
     if month:
-        task_obj = task_obj.filter(start_date__month = month).order_by('listing_order')
+        task_obj = task_obj.filter(start_date__month = month)
 
-    if month_year:
+    if month_year != 'None' and month_year:
         month_year_list = month_year.split('-')
-        task_obj = Task.objects.filter(user = request.user, start_date__year = month_year_list[0]).filter(start_date__month = month_year_list[1]).order_by('listing_order')
+        task_obj = Task.objects.filter(user = request.user, start_date__year = month_year_list[0]).filter(start_date__month = month_year_list[1])
 
     if user.groups.filter(name = 'Partner Admin').exists():
         user_lists = UserPartnerMapping.objects.get(user = request.user)
         for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
             task_obj = task_obj.filter(project__partner_mission_mapping__partner = partner_list.partner).order_by('listing_order')
-        # for user_list in UserPartnerMapping.objects.filter(partner = user_lists.partner).exclude(user = request.user):
-        #     task_obj = Task.objects.filter(user = user_list.user).order_by('listing_order')
-            # print(task_obj,obj_list)
     else:
-        task_obj = task_obj.filter(user = request.user,start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year).order_by('listing_order')
+        task_obj = task_obj.filter(user = request.user).order_by('listing_order')
+        # task_obj = task_obj.filter(user = request.user,start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year).order_by('listing_order')
     
     object_list = get_pagination(request, task_obj)
     page_number_display_count = 5
