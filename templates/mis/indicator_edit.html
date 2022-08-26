@@ -153,16 +153,16 @@
                                     <td>{{target_values}}</td> 
                                     <td>
                                         {% disply_indicator_values mission_respose_obj.id sub_category.id  'actuals_with_grants_received_' as actuals_with_grants_received %}                                  
-                                        <input type="text"  name="actuals_with_grants_received_{{sub_category.id}}" value="{{actuals_with_grants_received|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" maxlength="9" class="form-control" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
+                                        <input type="text"  name="actuals_with_grants_received_{{sub_category.id}}" value="{{actuals_with_grants_received|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="8" maxlength="8" class="form-control" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
                                     </td> 
                                     <td>
                                         {% disply_indicator_values mission_respose_obj.id sub_category.id  'actuals_' as actuals %}                                  
-                                        <input type="text"  name="actuals_{{sub_category.id}}" value="{{actuals|default_if_none:''}}" class="form-control" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" maxlength="9" >
+                                        <input type="text"  name="actuals_{{sub_category.id}}" value="{{actuals|default_if_none:''}}" class="form-control" onkeypress="return /[0-9]/i.test(event.key)" size="8" maxlength="8" >
                                     </td> 
                                     {% else %}
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id  'amount_' as amount %}                                  
-                                            <input type="text" name="amount_{{sub_category.id}}" value="{{amount|default_if_none:''}}" class="form-control" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" maxlength="9" >
+                                            <input type="text" name="amount_{{sub_category.id}}" value="{{amount|default_if_none:''}}" class="form-control" onkeypress="return /[0-9]/i.test(event.key)" size="8" maxlength="8" >
                                         </td> 
                                     {% endif %}
                                     <td>
