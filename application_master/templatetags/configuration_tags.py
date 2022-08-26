@@ -37,10 +37,15 @@ def disply_indicator_values(res_id, ind_id, keys):
 @register.simple_tag
 def disply_indicator_target_values(task_id, ind_id):
     task_obj = Task.objects.get(id = task_id)
-    start_date = task_obj.start_date
-    end_date = start_date+relativedelta(months=12)
+
+    financial_year = ''
+    if task_obj.start_date.month in [1,2,3]:
+        financial_year = f"{start_date.year-1}"        
+    else:
+        financial_year =  f"{start_date.year+1}"
+
     try:
-        mission_indicator_target = MissionIndicatorTarget.objects.get(periodicity_date__range=[start_date, end_date], mission_indicator__id = ind_id, project__id = task_obj.project.id).target
+        mission_indicator_target = MissionIndicatorTarget.objects.get(periodicity_date__year=financial_year, mission_indicator__id = ind_id, project__id = task_obj.project.id).target
     except:
         mission_indicator_target = ''
     return mission_indicator_target

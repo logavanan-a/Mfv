@@ -172,6 +172,7 @@
                     <input type="file" name="project_reference_file">
 
                     <div class="modal-footer">
+                    <input type='button' style="margin-right:810px;" class="btn btn-primary w-md" value='Move To Top' onclick="window.scrollTo({ top: 0, behavior: 'smooth'})">                 
                     {%  if 'Partner Data Entry Operator' == user_role %}
                         {% if task_obj.task_status == 1 or task_obj.task_status == 4 %}
                         <button type="submit" class="btn btn-primary  ml-2">Save</button>
@@ -210,13 +211,11 @@
 </style>
 <script>
     // Get the element
-let topBtn = document.querySelector(".top-btn");
-
-// On Click, Scroll to the page's top, replace 'smooth' with 'auto' if you don't want smooth scrolling
-topBtn.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
-
-// On scroll, Show/Hide the btn with animation
-window.onscroll = () => window.scrollY > 500 ? topBtn.style.opacity = 1 : topBtn.style.opacity = 0
+        window.scroll({
+        top: 200, 
+        left: 0, 
+        behavior: 'smooth'
+        });
 </script>
 
 <script>

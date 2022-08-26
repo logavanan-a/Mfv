@@ -181,6 +181,7 @@
                     <input type="file" name="project_reference_file">
 
                     <div class="modal-footer">
+                        <input type='button' style="margin-right:810px;" class="btn btn-primary w-md" value='Move To Top' onclick="window.scrollTo({ top: 0, behavior: 'smooth'})">
                             {%  if 'Partner Data Entry Operator' == user_role %}
                                 {% if mission_respose_obj.task.task_status == 1 or mission_respose_obj.task.task_status == 4 %}
                                 <button type="submit" class="btn btn-primary  ml-2">Save</button>
@@ -205,6 +206,14 @@
         margin-left: 50%
     }
 </style>
+<script>
+    // Get the element
+        window.scroll({
+        top: 200, 
+        left: 0, 
+        behavior: 'smooth'
+        });
+</script>
 {% if mission_respose_obj %}
 <script>
     $(document).ready(function(){
