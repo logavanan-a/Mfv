@@ -158,7 +158,7 @@ def task_list(request):
     heading= 'Task List'
     user = get_user(request)
 
-    one_month = datetime.now() - relativedelta(months=1)
+    previous_month = datetime.now() - relativedelta(months=1)
     below_last_two_month = datetime.now().date() - relativedelta(months=2)
 
     mission_objs = Mission.objects.all()
@@ -175,7 +175,7 @@ def task_list(request):
     if(archive != None or month != None or year != None or project != None or mission != None):
         task_obj = Task.objects.filter(start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year).order_by('listing_order')
     else:
-        task_obj = Task.objects.filter(start_date__month = one_month.month, start_date__year = one_month.year).order_by('listing_order')
+        task_obj = Task.objects.filter(start_date__month = previous_month.month, start_date__year = previous_month.year).order_by('listing_order')
 
     if mission:
         project_objs = project_objs.filter(partner_mission_mapping__mission__id = mission)
