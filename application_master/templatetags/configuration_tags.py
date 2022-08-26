@@ -42,7 +42,9 @@ def disply_indicator_target_values(task_id, ind_id):
     if task_obj.start_date.month in [1,2,3]:
         financial_year = f"{task_obj.start_date.year-1}"        
     else:
-        financial_year =  f"{task_obj.start_date.year+1}"
+        financial_year =  f"{task_obj.start_date.year}"
+    
+    # print(financial_year,'financial_year', task_obj.start_date)
 
     try:
         mission_indicator_target = MissionIndicatorTarget.objects.get(periodicity_date__year=financial_year, mission_indicator__id = ind_id, project__id = task_obj.project.id).target
