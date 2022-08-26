@@ -40,15 +40,17 @@
                             <option value="2">Truckers</option>
                             <option value="3">Carpenters</option>
                         </select>
+                    {% else %}    
+                    <label class="card-title"></label>
                     {% endif %}
 
-                {% if 'Partner Data Entry Operator' == user_role and mission_respose_obj.task.task_status == 1 %}
-                <input type='button' style="float: right;" id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{mission_respose_obj.task.id}}',2,'Submit for Approval')">
-                {% elif 'Partner Data Entry Operator' == user_role and mission_respose_obj.task.task_status == 4 %}
-                <input type='button' style="float: right;" id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{mission_respose_obj.task.id}}',2,'Submit for Approval')">
-                {% endif %}
+                    {% if 'Partner Data Entry Operator' == user_role and mission_respose_obj.task.task_status == 1 %}
+                    <input type='button' style="float: right;" id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{mission_respose_obj.task.id}}',2,'Submit for Approval')">
+                    {% elif 'Partner Data Entry Operator' == user_role and mission_respose_obj.task.task_status == 4 %}
+                    <input type='button' style="float: right;" id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{mission_respose_obj.task.id}}',2,'Submit for Approval')">
+                    {% endif %}
 
-                {% csrf_token %}
+                    {% csrf_token %}
                     {% if programe_category %}
                     <p></p>
                     <p class="card-title text-center text-uppercase p-1 mb-1 text-white" style="background-color:#13437e;">Programme Data</b></p>

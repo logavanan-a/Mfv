@@ -25,9 +25,7 @@
                     </div>
                 </div>
 
-                <form method='POST' class="" enctype="multipart/form-data"  novalidate>
-                    <label for="working_day" class="card-title">No. of days VC was functional : </label>
-                    <input type="text" id="working_day" name="working_day" style="width: 50px;" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" >
+                <form method='POST' class="" enctype="multipart/form-data" novalidate>
                     {% if slug == 'mission-jyot' %}
                     <label for="working_day" class="card-title">No. of days VC was functional : </label>
                     <input type="text" id="working_day" name="working_day" style="width: 50px;" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" >
@@ -207,7 +205,19 @@
     #right_side{
         margin-left: 50%
     }
+
+
 </style>
+<script>
+    // Get the element
+let topBtn = document.querySelector(".top-btn");
+
+// On Click, Scroll to the page's top, replace 'smooth' with 'auto' if you don't want smooth scrolling
+topBtn.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+// On scroll, Show/Hide the btn with animation
+window.onscroll = () => window.scrollY > 500 ? topBtn.style.opacity = 1 : topBtn.style.opacity = 0
+</script>
 
 <script>
     $('.adult_male,.adult_female,.adult_transgender,.child_male,.child_female,.child_transgender').keyup(function(){

@@ -39,12 +39,10 @@ def disply_indicator_target_values(task_id, ind_id):
     task_obj = Task.objects.get(id = task_id)
     start_date = task_obj.start_date
     end_date = start_date+relativedelta(months=12)
-
     try:
-        mission_indicator_target = MissionIndicatorTarget.objects.get(periodicity_date__range=[start_date, end_date ], mission_indicator__id = ind_id, project__id = task_obj.project.id).target
+        mission_indicator_target = MissionIndicatorTarget.objects.get(periodicity_date__range=[start_date, end_date], mission_indicator__id = ind_id, project__id = task_obj.project.id).target
     except:
         mission_indicator_target = ''
-
     return mission_indicator_target
 
 @register.simple_tag
