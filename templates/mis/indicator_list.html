@@ -149,14 +149,14 @@
                                         {% if fin_data.label_configuration == 2 %}
                                         <td>{{target_values}}</td> 
                                         <td>
-                                            <input type="text" name="actuals_with_grants_received_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control" size="9" maxlength="9" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
+                                            <input type="text" name="actuals_with_grants_received_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control" size="3" maxlength="3" maxlength="9" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
                                         </td> 
                                         <td>
-                                            <input type="text" name="actuals_{{sub_category.id}}" class="form-control" onkeypress="return /[0-9]/i.test(event.key)" size="9" maxlength="9" >
+                                            <input type="text" name="actuals_{{sub_category.id}}" class="form-control" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" maxlength="9" >
                                         </td> 
                                         {% else %}
                                         <td>
-                                            <input type="text" name="amount_{{sub_category.id}}" class="form-control" onkeypress="return /[0-9]/i.test(event.key)" size="9" maxlength="9" >
+                                            <input type="text" name="amount_{{sub_category.id}}" class="form-control" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" maxlength="9" >
                                         </td> 
                                         {% endif %}
                                         <td>
