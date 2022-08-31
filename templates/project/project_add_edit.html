@@ -11,50 +11,65 @@
                 {% else %}
                     <form method='POST' action="/project-add/" class="needs-validation" enctype="multipart/form-data" autocomplete="off" novalidate>
                 {% endif %}
-                    
-                {% csrf_token %}
-						<div class="card-body">
-							<div class="row">
-								<div class="col-lg-4 col-12">
-									<div class="form-group">
-									   <label for="name">Name<span class="text-danger">*</span></label>
-									    <input Type="text" id="name" value="{{project_obj.name}}" name="name" class="form-control" placeholder="Name" required = "" tabindex="1"/>
-									    <div class="invalid-feedback">Please enter the name</div>
-                                    </div>
-								</div>
 
-                                <div class="col-lg-4 col-12">
-                                    <div class="form-group">
-                                        <label for="district">District<span class="text-danger">*</span></label>
-                                        <select class="form-control select2" aria-label="Floating label select example" id="district" name="district" required = ""  tabindex="2">
-                                            <option value="" selected>Select</option>
-                                            {% for district in districts %}
-                                                <option value="{{district.id}}" {% if district.name == project_obj.district.name %}selected{% endif %}>{{district.name}}</option>
-                                            {% endfor %}
-                                        </select>
-                                        <div class="invalid-feedback">Please select a valid District.</div>
-                                    </div>
+                    {% csrf_token %}
+                    <div class="card-body">
+                        <div class="row">
+                            
+                            <div class="col-lg-6 col-12">
+                                <div class="form-group">
+                                    <label for="name">Mission<span class="text-danger">*</span></label>
+                                    <select class="form-control select2" aria-label="Floating label select example" id="partner_mission_mapping" name="partner_mission_mapping" required {% if project_obj.partner_mission_mapping.mission.id %} disabled {% endif %}>
+                                        <option value="" selected>Select</option>
+                                        {% for mission in mission_obj %}
+                                            <option value="{{mission.id}}" {% if mission.mission.id == project_obj.partner_mission_mapping.mission.id %}selected{% endif %}> {{mission.mission.name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="invalid-feedback">Please enter the Mission.</div>
                                 </div>
+                            </div>
 
-                                <div class="col-lg-4 col-12">
-									<div class="form-group">
-									   <label for="location">Location<span class="text-danger">*</span></label>
-									<input Type="text" id="location" value="{{project_obj.location}}" name="location" class="form-control" placeholder="Location" required = "" tabindex="3"/>
-                                    <div class="invalid-feedback">Please enter the Location</div>	
-                                    </div>
-								</div>
-							</div> 
-						</div>
+                            <div class="col-lg-6 col-12">
+                                <div class="form-group">
+                                    <label for="name">Name<span class="text-danger">*</span></label>
+                                    <input Type="text" id="name" value="{{project_obj.name}}" name="name" class="form-control" placeholder="Name" required/>
+                                    <div class="invalid-feedback">Please enter the name.</div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 col-12">
+                                <div class="form-group">
+                                    <label for="district">District<span class="text-danger">*</span></label>
+                                    <select class="form-control select2" aria-label="Floating label select example" id="district" name="district" required>
+                                        <option value="" selected>Select</option>
+                                        {% for district in districts %}
+                                            <option value="{{district.id}}" {% if district.name == project_obj.district.name %}selected{% endif %}>{{district.name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="invalid-feedback">Please select a valid District.</div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 col-12">
+                                <div class="form-group">
+                                    <label for="location">Location<span class="text-danger">*</span></label>
+                                <input Type="text" id="location" value="{{project_obj.location}}" name="location" class="form-control" placeholder="Location" required>
+                                <div class="invalid-feedback">Please enter the Location.</div>	
+                                </div>
+                            </div>
+
+                        </div> 
+                    </div>
 						
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary ml-2"> 
                             {% if project_obj %}
                                 Update 
-                            {% else %}
+                                {% else %}
                                 Save
                             {% endif %}
                         </button>
-                        <span type="reset" class="btn btn-outline-secondary" tabindex="51" onclick="location.href='/project-list/'">Cancel</span>
+                        <span type="reset" class="btn btn-outline-secondary" onclick="location.href='/project-list/'">Cancel</span>
                     </div>
                 </form>
             </div>

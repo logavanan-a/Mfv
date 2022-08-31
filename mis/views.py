@@ -53,7 +53,9 @@ def login_view(request):
             login(request, user) 
             try:
                 user_partner = UserPartnerMapping.objects.get(user = user)
+                partner_mission_mapping_id = PartnerMissionMapping.objects.filter(mission__id__in= [1,2],partner=user_partner.partner).values_list('id', flat = True)
                 request.session['user_partner'] = user_partner.partner.name
+                request.session['partner_mission_mapping_id'] = list(partner_mission_mapping_id)
             except:
                 user_partner = ''              
             return redirect('/task-list/')
@@ -226,12 +228,9 @@ def task_status_changes(request, task_id):
 @login_required(login_url='/')
 def project_list(request):
     heading= 'Project List'
-
     partner = UserPartnerMapping.objects.get(user = request.user).partner
     partner_mission_mapping_ids = PartnerMissionMapping.objects.filter(partner = partner).values_list('id', flat=True)
-    project_obj = Project.objects.filter(partner_mission_mapping__id__in = partner_mission_mapping_ids, partner_mission_mapping__mission__id = 2 )
-
-    # project_obj = Project.objects.all()
+    project_obj = Project.objects.filter(partner_mission_mapping__id__in = partner_mission_mapping_ids, partner_mission_mapping__mission__id__in = [2,1])
     object_list = get_pagination(request, project_obj)
 
     page_number_display_count = 5
@@ -250,6 +249,7 @@ class ProjectAdd(View):
     def get(self, request):
         heading= 'Project Add'
         districts = District.objects.all()
+        mission_obj = PartnerMissionMapping.objects.filter(id__in = request.session['partner_mission_mapping_id'])
         return render(request,self.template_name,locals())
 
     @method_decorator(login_required(login_url='/'))
@@ -259,11 +259,13 @@ class ProjectAdd(View):
         district = data.get('district')
         location = data.get('location')
         district_obj = District.objects.get(id = district)
+        partner_mission_mapping_id = data.get('partner_mission_mapping')
 
-        partner = UserPartnerMapping.objects.get(user = request.user).partner
-        partner_mission_mapping_obj = PartnerMissionMapping.objects.get(partner = partner,mission__id = 2)
-        project_add = Project.objects.create(name = name, partner_mission_mapping = partner_mission_mapping_obj, district = district_obj, location=location )
+        if partner_mission_mapping_id:
+            partner = UserPartnerMapping.objects.get(user = request.user).partner
+            partner_mission_mapping_obj = PartnerMissionMapping.objects.get(partner = partner, id = partner_mission_mapping_id)
         
+        project_add = Project.objects.create(name = name, partner_mission_mapping = partner_mission_mapping_obj, district = district_obj, location=location )
         return redirect('/project-list/')
         # return render(request,'project/project_list.html', locals())
 
@@ -275,6 +277,7 @@ class ProjectUpdate(View):
     def get(self, request, id):
         heading= 'Project Edit'
         districts = District.objects.all()
+        mission_obj = PartnerMissionMapping.objects.filter(id__in = request.session['partner_mission_mapping_id'])
         project_obj = Project.objects.get(id = id)
         return render(request,self.template_name,locals())
 
@@ -284,8 +287,13 @@ class ProjectUpdate(View):
         name = data.get('name')
         district = data.get('district')
         location = data.get('location')
-                
         district_obj = District.objects.get(id = district)
+        
+        # partner_mission_mapping_id = data.get('partner_mission_mapping')
+        # if partner_mission_mapping_id:
+            # partner = UserPartnerMapping.objects.get(user = request.user).partner
+            # partner_mission_mapping_obj = PartnerMissionMapping.objects.get(partner = partner, id = partner_mission_mapping_id)
+        
         project_update = Project.objects.get(id = id)
         project_update.name = name
         project_update.district = district_obj

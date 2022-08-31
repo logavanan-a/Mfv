@@ -33,12 +33,14 @@
                </ul>
             </li>
             {% else %}
-                <li>
-                  <a href="{{i.app_link}}" class="waves-effect">
-                    <i class="{{i.icon}}"></i>
-                    <span key="t-file-manager">{{i.name}}</span>
-                  </a>
-              </li>
+            {% if request.session.partner_mission_mapping_id and request.user|has_group:"Partner Data Entry Operator" %}
+            <li>
+              <a href="{{i.app_link}}" class="waves-effect">
+                <i class="{{i.icon}}"></i>
+                <span key="t-file-manager">{{i.name}}</span>
+              </a>
+            </li>
+            {% endif %}
             {% endif %}
             {% endfor %}
 
