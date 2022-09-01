@@ -83,7 +83,7 @@
                                         <td>{{target_values}} </td> 
                                         <td>     
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'total_' as total %}                                  
-                                            <input type="text" style="width: 70px;" name="total_{{sub_category.id}}" value="{{total|default_if_none:''}}" size="5" maxlength="5" class="form-control row_total" readonly > 
+                                            <input type="text" style="width: 70px;" name="total_{{sub_category.id}}" value="{{total|default_if_none:''}}" size="5" maxlength="5" class="form-control row_total" {% if sub_category.indicator_type != 2 %}readonly{% endif %} > 
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'adult_male_' as adult_male %} 
