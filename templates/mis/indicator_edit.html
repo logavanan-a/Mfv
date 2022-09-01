@@ -83,39 +83,39 @@
                                         <td>{{target_values}} </td> 
                                         <td>     
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'total_' as total %}                                  
-                                            <input type="text" style="width: 50px;" name="total_{{sub_category.id}}" value="{{total|default_if_none:''}}"  class="form-control row_total" readonly > 
+                                            <input type="text" style="width: 70px;" name="total_{{sub_category.id}}" value="{{total|default_if_none:''}}" size="5" maxlength="5" class="form-control row_total" readonly > 
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'adult_male_' as adult_male %} 
-                                            <input type="text" style="width: 50px;" name="adult_male_{{sub_category.id}}" value="{{adult_male|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" class="form-control adult_male" id="adult_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
+                                            <input type="text" style="width: 60px;" name="adult_male_{{sub_category.id}}" value="{{adult_male|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="4" maxlength="4" class="form-control adult_male" id="adult_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'adult_female_' as adult_female %} 
-                                            <input type="text" name="adult_female_{{sub_category.id}}" value="{{adult_female|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" class="form-control adult_female" id="adult_female_id"  {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
+                                            <input type="text" style="width: 60px;" name="adult_female_{{sub_category.id}}" value="{{adult_female|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="4" maxlength="4" class="form-control adult_female" id="adult_female_id"  {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'adult_transgender_' as adult_transgender %} 
-                                            <input type="text" name="adult_transgender_{{sub_category.id}}" value="{{adult_transgender|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" class="form-control adult_transgender" id="adult_transgender_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
+                                            <input type="text" name="adult_transgender_{{sub_category.id}}" value="{{adult_transgender|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="4" maxlength="4" class="form-control adult_transgender" id="adult_transgender_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'total_adult_' as total_adult %} 
-                                            <input type="text" style="width: 50px;" name="total_adult_{{sub_category.id}}" value="{{total_adult|default_if_none:''}}" class="form-control row_total_adult" readonly >
+                                            <input type="text" style="width: 70px;" name="total_adult_{{sub_category.id}}" value="{{total_adult|default_if_none:''}}" class="form-control row_total_adult" size="5" maxlength="5" readonly >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'child_male_' as child_male %}
-                                            <input type="text" style="width: 50px;" name="child_male_{{sub_category.id}}" value="{{child_male|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" class="form-control child_male" id="child_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
+                                            <input type="text" style="width: 60px;"" name="child_male_{{sub_category.id}}" value="{{child_male|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="4" maxlength="4" class="form-control child_male" id="child_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'child_female_' as child_female %}
-                                            <input type="text" name="child_female_{{sub_category.id}}" value="{{child_female|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" class="form-control child_female" id="child_female_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
+                                            <input type="text" style="width: 60px;" name="child_female_{{sub_category.id}}" value="{{child_female|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="4" maxlength="4" class="form-control child_female" id="child_female_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'child_transgender_' as child_transgender %}
-                                            <input type="text" name="child_transgender_{{sub_category.id}}" value="{{child_transgender|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" class="form-control child_transgender" id="child_transgender_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
+                                            <input type="text" name="child_transgender_{{sub_category.id}}" value="{{child_transgender|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="4" maxlength="4" class="form-control child_transgender" id="child_transgender_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'total_child_' as total_child %} 
-                                            <input type="text" style="width: 50px;" name="total_child_{{sub_category.id}}" value="{{total_child|default_if_none:''}}" class="form-control row_total_child" readonly >
+                                            <input type="text" style="width: 70px;" name="total_child_{{sub_category.id}}" value="{{total_child|default_if_none:''}}" size="5" maxlength="5" class="form-control row_total_child" readonly >
                                         </td>
                                     </tbody>    
                                     {% endfor %} 

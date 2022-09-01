@@ -82,37 +82,37 @@
                                     {% disply_indicator_target_values task_obj.id sub_category.id as target_values %}  
                                     <td>{{target_values}} </td> 
                                     <td>
-                                        <input type="text" style="width: 50px;" name="total_{{sub_category.id}}" id="total" class="form-control row_total" readonly>
+                                        <input type="text" style="width: 70px;" name="total_{{sub_category.id}}" id="total" class="form-control row_total" readonly>
                                         <!-- <div class="invalid-feedback">Please enter the Total value</div> -->
                                     </td>
-                                    <td><input type="text" style="width: 50px;" name="adult_male_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" class="form-control adult_male" size="5" maxlength="5" id="adult_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %}>
+                                    <td><input type="text" style="width: 60px;" name="adult_male_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_male" size="4" maxlength="4" id="adult_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %}>
                                         <!-- <div class="invalid-feedback">Please enter the Adult Male value</div> -->
                                     </td>
                                     <td>
-                                        <input type="text" name="adult_female_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" class="form-control adult_female" size="5" maxlength="5" id="adult_female_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
+                                        <input type="text" style="width: 60px;" name="adult_female_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_female" size="4" maxlength="4" id="adult_female_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
                                         <!-- <div class="invalid-feedback">Please enter the Adult Female value</div> -->
                                     </td>
                                     <td>
-                                        <input type="text" name="adult_transgender_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" class="form-control adult_transgender" size="5" maxlength="5" id="adult_transgender_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
+                                        <input type="text" name="adult_transgender_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_transgender"  size="4" maxlength="4" id="adult_transgender_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                     <td>
-                                        <input type="text" style="width: 50px;" name="total_adult_{{sub_category.id}}" id="total_adult" class="form-control row_total_adult" readonly >
+                                        <input type="text" style="width: 70px;" name="total_adult_{{sub_category.id}}" id="total_adult" class="form-control row_total_adult" readonly >
                                     </td>
                                     <td>
-                                        <input type="text" style="width: 50px;" name="child_male_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" class="form-control child_male" size="5" maxlength="5" id="child_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
+                                        <input type="text" style="width: 60px;" name="child_male_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_male"  size="4" maxlength="4" id="child_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                     <td>
-                                        <input type="text" name="child_female_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" class="form-control child_female" size="5" maxlength="5" id="child_female_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
+                                        <input type="text" style="width: 60px;" name="child_female_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_female"  size="4" maxlength="4" id="child_female_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                     <td>
-                                        <input type="text" name="child_transgender_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" size="3" maxlength="3" class="form-control child_transgender" size="5" maxlength="5" id="child_transgender_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
+                                        <input type="text" name="child_transgender_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_transgender"  size="4" maxlength="4" id="child_transgender_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                     <td>
-                                        <input type="text" style="width: 50px;" name="total_child_{{sub_category.id}}" id="total_child" class="form-control row_total_child" readonly >
+                                        <input type="text" style="width: 70px;" name="total_child_{{sub_category.id}}" id="total_child" class="form-control row_total_child" readonly >
                                     </td>
                                 </tbody>   
                                 {% endfor %} 
