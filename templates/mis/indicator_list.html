@@ -61,7 +61,7 @@
                             <thead class="table-light">
                                 <tr>
                                     <th class="table-active">Indicator</th>
-                                    <th class="table-active">Indicator Type</th> 
+                                    <!-- <th class="table-active">Indicator Type</th>  -->
                                     <th class="table-active">Target </th>
                                     <th class="table-active">Total </th>
                                     <th class="table-info">Adult Male</th>
@@ -77,7 +77,7 @@
                                 {% for sub_category in data.sub_category %}
                                 <tbody>
                                     <td>{{sub_category.name}}</td> 
-                                    <td>{{sub_category.get_indicator_type_display}}</td> 
+                                    <!-- <td>{{sub_category.get_indicator_type_display}}</td>  -->
                                     
                                     {% disply_indicator_target_values task_obj.id sub_category.id as target_values %}  
                                     <td>{{target_values}} </td> 

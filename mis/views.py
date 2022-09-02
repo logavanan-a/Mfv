@@ -258,6 +258,7 @@ class ProjectAdd(View):
         name = data.get('name')
         district = data.get('district')
         location = data.get('location')
+        start_date = data.get('start_date')
         district_obj = District.objects.get(id = district)
         partner_mission_mapping_id = data.get('partner_mission_mapping')
 
@@ -265,7 +266,7 @@ class ProjectAdd(View):
             partner = UserPartnerMapping.objects.get(user = request.user).partner
             partner_mission_mapping_obj = PartnerMissionMapping.objects.get(partner = partner, id = partner_mission_mapping_id)
         
-        project_add = Project.objects.create(name = name, partner_mission_mapping = partner_mission_mapping_obj, district = district_obj, location=location )
+        project_add = Project.objects.create(name = name, start_date = start_date, partner_mission_mapping = partner_mission_mapping_obj, district = district_obj, location=location )
         return redirect('/project-list/')
         # return render(request,'project/project_list.html', locals())
 
@@ -287,6 +288,7 @@ class ProjectUpdate(View):
         name = data.get('name')
         district = data.get('district')
         location = data.get('location')
+        start_date = data.get('start_date')
         district_obj = District.objects.get(id = district)
         
         # partner_mission_mapping_id = data.get('partner_mission_mapping')
@@ -296,6 +298,7 @@ class ProjectUpdate(View):
         
         project_update = Project.objects.get(id = id)
         project_update.name = name
+        project_update.start_date = start_date
         project_update.district = district_obj
         project_update.location = location
         project_update.save()

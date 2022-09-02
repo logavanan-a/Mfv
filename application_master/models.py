@@ -147,6 +147,8 @@ class Project(BaseContent):
     district = models.ForeignKey(District, on_delete = models.DO_NOTHING, blank=True, null=True)
     location = models.CharField(max_length = 350)
     additional_info = models.TextField(blank=True, null=True)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
 
     class Meta:
         ordering = ('name',)
