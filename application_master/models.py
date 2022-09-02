@@ -222,6 +222,19 @@ class MissionIndicatorTarget(BaseContent):
     def __str__(self):
         return f"{self.mission_indicator.name} - {self.created_by.username}"
 
+class UserProjectMapping(BaseContent):
+    project =  models.ForeignKey(Project, on_delete = models.DO_NOTHING, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete = models.CASCADE, blank=True, null=True)
+    deactivated_date = models.DateField(blank=True, null=True)
+
+    class Meta: 
+        verbose_name_plural = "User Project Mapping"
+        # unique_together = ('project', 'user')
+
+    def __str__(self):
+        return self.project.name
+
+
 class ProjectFiles(BaseContent):
     name = models.CharField(max_length=350) 
     project = models.ForeignKey(Project, on_delete = models.DO_NOTHING, blank=True, null=True)

@@ -1,5 +1,6 @@
 from django.contrib import admin
 from import_export.admin import ImportExportActionModelAdmin
+from django.contrib.auth.models import User
 
 from application_master.models import (District, Donor, Menus, Mission,
                                        MissionIndicator,
@@ -7,11 +8,16 @@ from application_master.models import (District, Donor, Menus, Mission,
                                        MissionIndicatorTarget, Partner,
                                        PartnerMissionMapping, Project,
                                        ProjectDonorMapping, ProjectFiles,
-                                       State, UserPartnerMapping)
+                                       State, UserPartnerMapping,
+                                       UserProjectMapping)
 
 
 class MissionIndicatorCategoryInline(admin.TabularInline): #StackedInline
     model = MissionIndicatorCategory
+    extra = 0
+
+class UserInline(admin.TabularInline): #StackedInline
+    model = User
     extra = 0
 
 @admin.register(Mission)
@@ -21,6 +27,13 @@ class AdminMission(ImportExportActionModelAdmin,admin.ModelAdmin):
     inlines = [MissionIndicatorCategoryInline]
     search_fields = ['name']
     prepopulated_fields = {'slug': ('name',)}
+    def get_list_display(self, request):
+        return [field.name for field in self.model._meta.concrete_fields]
+
+@admin.register(UserProjectMapping)
+class AdminUserProjectMapping(ImportExportActionModelAdmin,admin.ModelAdmin):
+    # inlines = [UserInline]
+    search_fields = ['project__name',]
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
@@ -99,6 +112,8 @@ class AdminUserPartnerMapping(admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
+
+        
 # @admin.register(ProjectFiles)
 # class AdminProjectFiles(ImportExportActionModelAdmin,admin.ModelAdmin):
 #     search_fields = ['name','project__name']

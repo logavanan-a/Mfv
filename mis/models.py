@@ -17,6 +17,11 @@ class Task(BaseContent):
     end_date = models.DateField()
     task_status = models.IntegerField(choices = STATUS_CHOICES, default=1)
     extension_date = models.DateField(blank=True, null=True)
+    task_approval = models.ForeignKey(User, on_delete = models.CASCADE, blank=True, null=True, related_name='task_approval')
+    project_in_charge = models.ForeignKey(User, on_delete = models.CASCADE, blank=True, null=True, related_name='project_in_charge')
+
+
+    
 
     class Meta:
         verbose_name_plural = " Task"
