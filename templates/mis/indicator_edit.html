@@ -41,13 +41,11 @@
                             <option value="3">Carpenters</option>
                         </select>
                     {% else %}    
-                    <label class="card-title"></label>
+                    <label class="card-title"></label>  
                     {% endif %}
 
-                    {% if 'Partner Data Entry Operator' == user_role and mission_respose_obj.task.task_status == 1 %}
-                    <input type='button' style="float: right;" id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{mission_respose_obj.task.id}}',2,'Submit for Approval')">
-                    {% elif 'Partner Data Entry Operator' == user_role and mission_respose_obj.task.task_status == 4 %}
-                    <input type='button' style="float: right;" id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{mission_respose_obj.task.id}}',2,'Submit for Approval')">
+                    {% if mission_respose_obj.task.task_status == 1 or mission_respose_obj.task.task_status == 5 and 'Partner Data Entry Operator' == user_role %}
+                        <input type='button' style="float: right;" id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{mission_respose_obj.task.id}}',2,'Submit for Approval')">
                     {% endif %}
 
                     {% csrf_token %}
@@ -177,29 +175,30 @@
                     {% endif %}
                     
                     <label for="project_reference_file">Project Reference File : </label>
-                    <input type="file" name="project_reference_file">                  
+                    <a href="{% if mission_respose_obj.project_reference_file %}{{mission_respose_obj.project_reference_file.url}}{% else %}#{% endif %}">{{mission_respose_obj.project_reference_file}}</a>             
+                    <input type="file" name="project_reference_file">   
                     
-                    <div class="modal-footer">
-                        <input type='button' style="margin-right:810px;" class="btn btn-primary w-md" value='Move To Top' onclick="window.scrollTo({ top: 0, behavior: 'smooth'})">
+                    <div class="relative">
+                        <input type='button' class="btn btn-primary w-md" value='Move To Top' onclick="window.scrollTo({ top: 0, behavior: 'smooth'})">
                             {% if 'Partner Data Entry Operator' == user_role %}
                                 {% if mission_respose_obj.task.task_status == 1 or mission_respose_obj.task.task_status == 5 %}
-                                <button type="submit" class="btn btn-primary ml-2">Save</button>
+                                <button type="submit"  class="btn btn-primary float-end ml-2">Save</button>
                                 {% endif %}
 
                             {% elif 'Partner Admin' == user_role %}
                                 {% if mission_respose_obj.task.task_status == 2 %}
-                                <button type="button" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{mission_respose_obj.task.id}}',3,'Approve')">Approved</button>
-                                <button type="button" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{mission_respose_obj.task.id}}',5,'Reject')">Reject</button>
+                                <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="Confirm('{{mission_respose_obj.task.id}}',3,'Approve')">Approved</button>
+                                <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="Confirm('{{mission_respose_obj.task.id}}',5,'Reject')">Reject</button>
                                 {% endif %}
 
                             {% elif 'Project In-charge' == user_role %}
                                 {% if mission_respose_obj.task.task_status == 3 %}
-                                    <button type="button" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{mission_respose_obj.task.id}}',4,'Approve')">Approved</button>
-                                    <button type="button" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{mission_respose_obj.task.id}}',1,'Need Revesion')">Need Revesion</button>
-                                    <button type="button" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{mission_respose_obj.task.id}}',5,'Reject')">Reject</button>
+                                    <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="Confirm('{{mission_respose_obj.task.id}}',4,'Approve')">Approved</button>
+                                    <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="Confirm('{{mission_respose_obj.task.id}}',1,'Need Revesion')">Need Revesion</button>
+                                    <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="Confirm('{{mission_respose_obj.task.id}}',5,'Reject')">Reject</button>
                                 {% endif %}
                             {% endif %}
-                        <button type="reset" onclick="location.href='/task-list/'" class="btn btn-secondary waves-effect">Cancel</button>
+                        <button type="reset" style='margin-right:5px' onclick="location.href='/task-list/'" class="btn float-end btn-secondary waves-effect">Cancel</button>
                     </div>
                 </form>
             </div>
