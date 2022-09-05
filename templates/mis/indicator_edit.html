@@ -83,15 +83,15 @@
                                         <td>{{target_values}} </td> 
                                         <td>     
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'total_' as total %}                                  
-                                            <input type="text" style="width: 70px;" name="total_{{sub_category.id}}" value="{{total|default_if_none:''}}" size="5" maxlength="5" class="form-control row_total" {% if sub_category.indicator_type != 2 %}readonly{% endif %} > 
+                                            <input type="text" style="width:70px;" name="total_{{sub_category.id}}" value="{{total|default_if_none:''}}" size="5" maxlength="5" class="form-control row_total" {% if sub_category.indicator_type != 2 %}readonly{% endif %} > 
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'adult_male_' as adult_male %} 
-                                            <input type="text" style="width: 60px;" name="adult_male_{{sub_category.id}}" value="{{adult_male|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="4" maxlength="4" class="form-control adult_male" id="adult_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
+                                            <input type="text" style="width:60px;" name="adult_male_{{sub_category.id}}" value="{{adult_male|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="4" maxlength="4" class="form-control adult_male" id="adult_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'adult_female_' as adult_female %} 
-                                            <input type="text" style="width: 60px;" name="adult_female_{{sub_category.id}}" value="{{adult_female|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="4" maxlength="4" class="form-control adult_female" id="adult_female_id"  {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
+                                            <input type="text" style="width:60px;" name="adult_female_{{sub_category.id}}" value="{{adult_female|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="4" maxlength="4" class="form-control adult_female" id="adult_female_id"  {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'adult_transgender_' as adult_transgender %} 
@@ -99,15 +99,15 @@
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'total_adult_' as total_adult %} 
-                                            <input type="text" style="width: 70px;" name="total_adult_{{sub_category.id}}" value="{{total_adult|default_if_none:''}}" class="form-control row_total_adult" size="5" maxlength="5" readonly >
+                                            <input type="text" style="width:70px;" name="total_adult_{{sub_category.id}}" value="{{total_adult|default_if_none:''}}" class="form-control row_total_adult" size="5" maxlength="5" readonly >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'child_male_' as child_male %}
-                                            <input type="text" style="width: 60px;"" name="child_male_{{sub_category.id}}" value="{{child_male|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="4" maxlength="4" class="form-control child_male" id="child_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
+                                            <input type="text" style="width:60px;" name="child_male_{{sub_category.id}}" value="{{child_male|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="4" maxlength="4" class="form-control child_male" id="child_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'child_female_' as child_female %}
-                                            <input type="text" style="width: 60px;" name="child_female_{{sub_category.id}}" value="{{child_female|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="4" maxlength="4" class="form-control child_female" id="child_female_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
+                                            <input type="text" style="width:60px;" name="child_female_{{sub_category.id}}" value="{{child_female|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="4" maxlength="4" class="form-control child_female" id="child_female_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'child_transgender_' as child_transgender %}
@@ -115,7 +115,7 @@
                                         </td>
                                         <td>
                                             {% disply_indicator_values mission_respose_obj.id sub_category.id 'total_child_' as total_child %} 
-                                            <input type="text" style="width: 70px;" name="total_child_{{sub_category.id}}" value="{{total_child|default_if_none:''}}" size="5" maxlength="5" class="form-control row_total_child" readonly >
+                                            <input type="text" style="width:70px;" name="total_child_{{sub_category.id}}" value="{{total_child|default_if_none:''}}" size="5" maxlength="5" class="form-control row_total_child" readonly >
                                         </td>
                                     </tbody>    
                                     {% endfor %} 
@@ -153,11 +153,11 @@
                                     <td>{{target_values}}</td> 
                                     <td>
                                         {% disply_indicator_values mission_respose_obj.id sub_category.id  'actuals_with_grants_received_' as actuals_with_grants_received %}                                  
-                                        <input type="text"  name="actuals_with_grants_received_{{sub_category.id}}" value="{{actuals_with_grants_received|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="8" maxlength="8" class="form-control" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
+                                        <input type="text" name="actuals_with_grants_received_{{sub_category.id}}" value="{{actuals_with_grants_received|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="8" maxlength="8" class="form-control" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
                                     </td> 
                                     <td>
                                         {% disply_indicator_values mission_respose_obj.id sub_category.id  'actuals_' as actuals %}                                  
-                                        <input type="text"  name="actuals_{{sub_category.id}}" value="{{actuals|default_if_none:''}}" class="form-control" onkeypress="return /[0-9]/i.test(event.key)" size="8" maxlength="8" >
+                                        <input type="text" name="actuals_{{sub_category.id}}" value="{{actuals|default_if_none:''}}" class="form-control" onkeypress="return /[0-9]/i.test(event.key)" size="8" maxlength="8" >
                                     </td> 
                                     {% else %}
                                         <td>
@@ -177,22 +177,29 @@
                     {% endif %}
                     
                     <label for="project_reference_file">Project Reference File : </label>
-                    <input type="file" name="project_reference_file">
-
+                    <input type="file" name="project_reference_file">                  
+                    
                     <div class="modal-footer">
                         <input type='button' style="margin-right:810px;" class="btn btn-primary w-md" value='Move To Top' onclick="window.scrollTo({ top: 0, behavior: 'smooth'})">
-                            {%  if 'Partner Data Entry Operator' == user_role %}
-                                {% if mission_respose_obj.task.task_status == 1 or mission_respose_obj.task.task_status == 4 %}
-                                <button type="submit" class="btn btn-primary  ml-2">Save</button>
-                                <button type="reset" onclick="location.href='/task-list/'" class="btn btn-secondary waves-effect">Cancel</button>
+                            {% if 'Partner Data Entry Operator' == user_role %}
+                                {% if mission_respose_obj.task.task_status == 1 or mission_respose_obj.task.task_status == 5 %}
+                                <button type="submit" class="btn btn-primary ml-2">Save</button>
                                 {% endif %}
-                            {%  elif 'Partner Admin' == user_role %}
+
+                            {% elif 'Partner Admin' == user_role %}
                                 {% if mission_respose_obj.task.task_status == 2 %}
                                 <button type="button" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{mission_respose_obj.task.id}}',3,'Approve')">Approved</button>
-                                <button type="button" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{mission_respose_obj.task.id}}',4,'Reject')">Reject</button>
-                                <button type="reset" onclick="location.href='/task-list/'" class="btn btn-secondary waves-effect">Cancel</button>
+                                <button type="button" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{mission_respose_obj.task.id}}',5,'Reject')">Reject</button>
+                                {% endif %}
+
+                            {% elif 'Project In-charge' == user_role %}
+                                {% if mission_respose_obj.task.task_status == 3 %}
+                                    <button type="button" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{mission_respose_obj.task.id}}',4,'Approve')">Approved</button>
+                                    <button type="button" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{mission_respose_obj.task.id}}',1,'Need Revesion')">Need Revesion</button>
+                                    <button type="button" value="{{task_id}}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{mission_respose_obj.task.id}}',5,'Reject')">Reject</button>
                                 {% endif %}
                             {% endif %}
+                        <button type="reset" onclick="location.href='/task-list/'" class="btn btn-secondary waves-effect">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -207,11 +214,11 @@
 </style>
 <script>
     // Get the element
-        window.scroll({
-        top: 200, 
-        left: 0, 
-        behavior: 'smooth'
-        });
+    window.scroll({
+    top: 200, 
+    left: 0, 
+    behavior: 'smooth'
+    });
 </script>
 {% if mission_respose_obj %}
 <script>
@@ -286,5 +293,4 @@
     }).then(function(){ window.location.reload(); })
     }
 </script>
-
 {% endblock %}

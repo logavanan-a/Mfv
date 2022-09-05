@@ -9,7 +9,7 @@ from datetime import  timedelta
 
 # declare a new model with a name "Task"
 class Task(BaseContent):
-    STATUS_CHOICES = ((1, 'Pending'), (2, 'Submitted for approval'), (3, 'Approved'), (4,  'Rejected'), (5, 'Cancelled'))
+    STATUS_CHOICES = ((1, 'Pending'), (2, 'Submitted for Partner Admin'),(3, 'Submitted for Project In-charge'), (4, 'Approved'), (5,  'Rejected'))
     name = models.CharField(max_length = 150)
     user = models.ForeignKey(User, on_delete = models.DO_NOTHING)
     project = models.ForeignKey(Project, on_delete = models.DO_NOTHING, blank=True, null=True)

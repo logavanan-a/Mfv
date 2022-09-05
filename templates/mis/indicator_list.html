@@ -82,14 +82,14 @@
                                     {% disply_indicator_target_values task_obj.id sub_category.id as target_values %}  
                                     <td>{{target_values}} </td> 
                                     <td>
-                                        <input type="text" style="width: 70px;" name="total_{{sub_category.id}}" id="total" class="form-control row_total" {% if sub_category.indicator_type != 2 %}readonly{% endif %}>
+                                        <input type="text" style="width:70px;" name="total_{{sub_category.id}}" id="total" class="form-control row_total" {% if sub_category.indicator_type != 2 %}readonly{% endif %}>
                                         <!-- <div class="invalid-feedback">Please enter the Total value</div> -->
                                     </td>
-                                    <td><input type="text" style="width: 60px;" name="adult_male_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_male" size="4" maxlength="4" id="adult_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %}>
+                                    <td><input type="text" style="width:60px;" name="adult_male_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_male" size="4" maxlength="4" id="adult_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %}>
                                         <!-- <div class="invalid-feedback">Please enter the Adult Male value</div> -->
                                     </td>
                                     <td>
-                                        <input type="text" style="width: 60px;" name="adult_female_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_female" size="4" maxlength="4" id="adult_female_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
+                                        <input type="text" style="width:60px;" name="adult_female_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_female" size="4" maxlength="4" id="adult_female_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 %}readonly{% endif %} >
                                         <!-- <div class="invalid-feedback">Please enter the Adult Female value</div> -->
                                     </td>
                                     <td>
@@ -97,14 +97,14 @@
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                     <td>
-                                        <input type="text" style="width: 70px;" name="total_adult_{{sub_category.id}}" id="total_adult" class="form-control row_total_adult" readonly >
+                                        <input type="text" style="width:70px;" name="total_adult_{{sub_category.id}}" id="total_adult" class="form-control row_total_adult" readonly >
                                     </td>
                                     <td>
-                                        <input type="text" style="width: 60px;" name="child_male_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_male"  size="4" maxlength="4" id="child_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
+                                        <input type="text" style="width:60px;" name="child_male_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_male"  size="4" maxlength="4" id="child_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                     <td>
-                                        <input type="text" style="width: 60px;" name="child_female_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_female"  size="4" maxlength="4" id="child_female_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
+                                        <input type="text" style="width:60px;" name="child_female_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_female"  size="4" maxlength="4" id="child_female_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 %}readonly{% endif %} >
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                     <td>
@@ -112,7 +112,7 @@
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                     <td>
-                                        <input type="text" style="width: 70px;" name="total_child_{{sub_category.id}}" id="total_child" class="form-control row_total_child" readonly >
+                                        <input type="text" style="width:70px;" name="total_child_{{sub_category.id}}" id="total_child" class="form-control row_total_child" readonly >
                                     </td>
                                 </tbody>   
                                 {% endfor %} 
@@ -170,52 +170,40 @@
                     {% endif %}
                     <label for="project_reference_file">Project Reference File : </label>
                     <input type="file" name="project_reference_file">
-
+                    
                     <div class="modal-footer">
-                    <input type='button' style="margin-right:810px;" class="btn btn-primary w-md" value='Move To Top' onclick="window.scrollTo({ top: 0, behavior: 'smooth'})">                 
-                    {%  if 'Partner Data Entry Operator' == user_role %}
-                        {% if task_obj.task_status == 1 or task_obj.task_status == 4 %}
-                        <button type="submit" class="btn btn-primary  ml-2">Save</button>
-                        <!-- <button type="submit" value="" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{task_id}}',2,'Submit for Approval')" >
-                            Submit for Approval
-                        </button> -->
-                        <button type="reset" onclick="location.href='/task-list/'" class="btn btn-secondary waves-effect">Cancel</button>
+                        <input type='button' style="margin-right:810px;" class="btn btn-primary w-md" value='Move To Top' onclick="window.scrollTo({ top: 0, behavior: 'smooth'})">                 
+                        {% if 'Partner Data Entry Operator' == user_role %}
+                            {% if task_obj.task_status == 1 or task_obj.task_status == 4 %}
+                            <button type="submit" class="btn btn-primary ml-2">Save</button>
+                            {% endif %}
+                        {% elif 'Partner Admin' == user_role %}
+                            {% if task_obj.task_status == 2 %}
+                            <button type="submit" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{task_id}}',4,'Approve')">Approve</button>
+                            <button type="submit" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{task_id}}',5,'Reject')">Reject</button>
+                            {% endif %}
                         {% endif %}
-                    {%  elif 'Partner Admin' == user_role %}
-                        {% if task_obj.task_status == 2 %}
-                        <button type="submit" value="" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{task_id}}',3,'Approve')" >    
-                            Approve
-                        </button>
-                        <button type="submit" value="}" class="confirm_btn btn btn-info ml-2" onclick="Confirm('{{task_id}}',4,'Reject')" >
-                            Reject
-                        </button>
                         <button type="reset" onclick="location.href='/task-list/'" class="btn btn-secondary waves-effect">Cancel</button>
-                        {% endif %}
+                    </div>   
 
-                    {% endif %}
-
-                    </div>          
                 </form>
             </div>
         </div>
     </div>
 </div>
-
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
     #right_side{
         margin-left: 50%
     }
-
-
 </style>
+
 <script>
-    // Get the element
-        window.scroll({
-        top: 200, 
-        left: 0, 
-        behavior: 'smooth'
-        });
+    window.scroll({
+    top: 200, 
+    left: 0, 
+    behavior: 'smooth'
+    });
 </script>
 
 <script>
@@ -284,5 +272,4 @@
     }).then(function(){ window.location.reload(); })
     }
 </script>
-
 {% endblock %}

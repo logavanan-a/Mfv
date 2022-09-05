@@ -194,9 +194,9 @@ def task_list(request):
 
     if month_year != 'None' and month_year:
         month_year_list = month_year.split('-')
-        task_obj = Task.objects.filter(user = request.user, start_date__year = month_year_list[0]).filter(start_date__month = month_year_list[1])
+        task_obj = Task.objects.filter(start_date__year = month_year_list[0]).filter(start_date__month = month_year_list[1])
 
-    if user.groups.filter(name = 'Partner Admin').exists():
+    if user.groups.filter(name__in = ['Project In-charge', 'Partner Admin']).exists():
         user_lists = UserPartnerMapping.objects.get(user = request.user)
         for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
             task_obj = task_obj.filter(project__partner_mission_mapping__partner = partner_list.partner).order_by('listing_order')
@@ -212,7 +212,6 @@ def task_list(request):
         page_number_display_count < object_list.paginator.num_pages else object_list.paginator.num_pages+1
     display_page_range = range(page_number_start, page_number_end)
     return render(request, 'mis/task_list.html', locals())
-
 
 @csrf_exempt 
 def task_status_changes(request, task_id):
