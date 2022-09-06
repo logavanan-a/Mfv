@@ -201,7 +201,9 @@ def task_list(request):
         for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
             task_obj = task_obj.filter(project__partner_mission_mapping__partner = partner_list.partner).order_by('listing_order')
     else:
-        task_obj = task_obj.filter(user = request.user).order_by('listing_order')
+        user_lists = UserPartnerMapping.objects.get(user = request.user)
+        for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
+            task_obj = task_obj.filter(user = request.user, project__partner_mission_mapping__partner = partner_list.partner).order_by('listing_order')
         # task_obj = task_obj.filter(user = request.user,start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year).order_by('listing_order')
     
     object_list = get_pagination(request, task_obj)
@@ -469,13 +471,16 @@ def project_list_filter(request):
         data=list(project_obj.values('id',"name").order_by("name"))
         return HttpResponse(json.dumps(data), content_type="application/json")   
 
+# from mis.models import Task
+# from application_master.models import Project
+# from mis.views import *
+# from django.contrib.auth.models import User
+
 # def task_create():
-#     for user_obj in User.objects.filter(is_superuser = False):
-#         if user_obj:
-#             for visio_ncentre in Project.objects.filter(active=2):
-#                 string_cancate = visio_ncentre.name
-#                 print(string_cancate)
-#                 added = Task(project = visio_ncentre,user=user_obj, name = string_cancate, start_date="2022-08-01",end_date= "2022-08-31")
+#      for user_obj in User.objects.filter(is_superuser = False):
+#          if user_obj:
+#             for project_obj in Project.objects.filter(active=2):
+#                 print(project_obj.name)
+#                 added = Task(project = project_obj,user=user_obj, name = project_obj.name, start_date="2022-08-01",end_date= "2022-08-30")
 #                 added.save()
 
-# task_create()
