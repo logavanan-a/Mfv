@@ -187,15 +187,15 @@
 
                             {% elif 'Partner Admin' == user_role %}
                                 {% if mission_respose_obj.task.task_status == 2 %}
-                                <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="Confirm('{{mission_respose_obj.task.id}}',3,'Approve')">Approved</button>
-                                <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="Confirm('{{mission_respose_obj.task.id}}',1,'Need Revesion')">Need Revesion</button>
+                                <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="Confirm('{{mission_respose_obj.task.id}}',3,'Approve')">Approve</button>
+                                <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="Confirm('{{mission_respose_obj.task.id}}',1,'Need Revision')">Need Revision</button>
                                 <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="Confirm('{{mission_respose_obj.task.id}}',5,'Reject')">Reject</button>
                                 {% endif %}
 
                             {% elif 'Project In-charge' == user_role %}
                                 {% if mission_respose_obj.task.task_status == 3 %}
-                                    <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="Confirm('{{mission_respose_obj.task.id}}',4,'Approve')">Approved</button>
-                                    <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="Confirm('{{mission_respose_obj.task.id}}',1,'Need Revesion')">Need Revesion</button>
+                                    <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="Confirm('{{mission_respose_obj.task.id}}',4,'Approve')">Approve</button>
+                                    <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="Confirm('{{mission_respose_obj.task.id}}',2,'Need Revision')">Need Revision</button>
                                     <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="Confirm('{{mission_respose_obj.task.id}}',5,'Reject')">Reject</button>
                                 {% endif %}
                             {% endif %}

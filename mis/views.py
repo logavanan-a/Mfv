@@ -196,10 +196,14 @@ def task_list(request):
         month_year_list = month_year.split('-')
         task_obj = Task.objects.filter(start_date__year = month_year_list[0]).filter(start_date__month = month_year_list[1])
 
-    if user.groups.filter(name__in = ['Project In-charge', 'Partner Admin']).exists():
+    if user.groups.filter(name = 'Partner Admin').exists():
         user_lists = UserPartnerMapping.objects.get(user = request.user)
         for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
             task_obj = task_obj.filter(project__partner_mission_mapping__partner = partner_list.partner).order_by('listing_order')
+    
+    elif user.groups.filter(name = 'Project In-charge').exists():
+        task_obj = task_obj.filter(project_in_charge = request.user).order_by('listing_order')
+    
     else:
         user_lists = UserPartnerMapping.objects.get(user = request.user)
         for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
