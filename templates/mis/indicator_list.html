@@ -41,7 +41,7 @@
                     <label class="card-title"> </label>
                     {% endif %}
 
-                    {% if mission_respose_obj.task.task_status == 1 or mission_respose_obj.task.task_status == 5 and 'Partner Data Entry Operator' == user_role %}
+                    {% if mission_respose_obj.task.task_status == 1 and 'Partner Data Entry Operator' == user_role %}
                         <input type='button' style="float: right;" class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{task_id}}',2,'Submit for Approval')">
                     {% endif %}
                 {% csrf_token %}

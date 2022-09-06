@@ -473,7 +473,9 @@ def project_list_filter(request):
 #     for user_obj in User.objects.filter(is_superuser = False):
 #         if user_obj:
 #             for visio_ncentre in Project.objects.filter(active=2):
-#                 string_cancate = visio_ncentre.partner_mission_mapping.mission.name +" "+visio_ncentre.name+" July 2022"
+#                 string_cancate = visio_ncentre.name
 #                 print(string_cancate)
-#                 added = Task(project = visio_ncentre,user=user_obj, name = string_cancate, start_date="2022-07-01",end_date= "2022-07-30")
+#                 added = Task(project = visio_ncentre,user=user_obj, name = string_cancate, start_date="2022-08-01",end_date= "2022-08-31")
 #                 added.save()
+
+# task_create()

@@ -44,7 +44,7 @@
                     <label class="card-title"></label>  
                     {% endif %}
 
-                    {% if mission_respose_obj.task.task_status == 1 or mission_respose_obj.task.task_status == 5 and 'Partner Data Entry Operator' == user_role %}
+                    {% if mission_respose_obj.task.task_status == 1 and 'Partner Data Entry Operator' == user_role %}
                         <input type='button' style="float: right;" id='download_button' class="btn btn-primary w-md" value='Submit for Approval' onclick="Confirm('{{mission_respose_obj.task.id}}',2,'Submit for Approval')">
                     {% endif %}
 
@@ -181,13 +181,14 @@
                     <div class="relative">
                         <input type='button' class="btn btn-primary w-md" value='Move To Top' onclick="window.scrollTo({ top: 0, behavior: 'smooth'})">
                             {% if 'Partner Data Entry Operator' == user_role %}
-                                {% if mission_respose_obj.task.task_status == 1 or mission_respose_obj.task.task_status == 5 %}
+                                {% if mission_respose_obj.task.task_status == 1 %}
                                 <button type="submit"  class="btn btn-primary float-end ml-2">Save</button>
                                 {% endif %}
 
                             {% elif 'Partner Admin' == user_role %}
                                 {% if mission_respose_obj.task.task_status == 2 %}
                                 <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="Confirm('{{mission_respose_obj.task.id}}',3,'Approve')">Approved</button>
+                                <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="Confirm('{{mission_respose_obj.task.id}}',1,'Need Revesion')">Need Revesion</button>
                                 <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="Confirm('{{mission_respose_obj.task.id}}',5,'Reject')">Reject</button>
                                 {% endif %}
 
