@@ -177,7 +177,7 @@
                         {% elif 'Partner Admin' == user_role %}
                             {% if task_obj.task_status == 2 %}
                             <button type="submit" style='margin-right:5px' class="confirm_btn btn btn-info float-end" onclick="Confirm('{{task_id}}',4,'Approve')">Approve</button>
-                            <button type="submit" style='margin-right:5px' class="confirm_btn btn btn-info float-end" onclick="Confirm('{{task_id}}',5,'Reject')">Reject</button>
+                            <!-- <button type="submit" style='margin-right:5px' class="confirm_btn btn btn-info float-end" onclick="Confirm('{{task_id}}',5,'Reject')">Reject</button> -->
                             {% endif %}
                         {% endif %}
                         <button type="reset" style='margin-right:5px' onclick="location.href='/task-list/'" class="btn btn-secondary float-end waves-effect">Cancel</button>
