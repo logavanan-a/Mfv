@@ -22,7 +22,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView, View
-from mis.models import MissionIndicatorAchievement, Task
+from mis.models import MissionIndicatorAchievement, Task, DataEntryRemark
 
 
 pg_size = 10
@@ -129,6 +129,7 @@ def missionindicator_edit(request, slug, id,task_id):
     user = get_user(request)
     user_role = str(user.groups.last())
 
+    dataentry_obj = DataEntryRemark.objects.filter(task__id=task_id).order_by('-id')
     if request.method == 'POST':
         working_day = request.POST.get('working_day')
         camp_organized = request.POST.get('camp_organized')
@@ -223,10 +224,12 @@ def task_list(request):
 def task_status_changes(request, task_id):
     if request.method == "POST":
         status_val = request.POST.get('status_val')
-        print(status_val,'status_val')
+        remark =request.POST.get('remark')
         task_obj = Task.objects.get(id = task_id)
         task_obj.task_status = status_val
         task_obj.save()
+        if status_val in ['1', '2']:
+            DataEntryRemark.objects.create(task = task_obj, remark = remark, user_name = request.user)
         return HttpResponse({"message":'true'} , content_type="application/json")
     return HttpResponse({"message":'false'}, content_type="application/json")  
 
@@ -246,6 +249,14 @@ def project_list(request):
     display_page_range = range(page_number_start, page_number_end)
     return render(request, 'project/project_list.html', locals())
 
+def get_district(request, state_id):
+    if request.method == 'GET' and request.is_ajax():
+        result_set = []
+        fossilahsessions = District.objects.filter(state__id=state_id)
+        for fossilahsession in fossilahsessions:
+            result_set.append(
+                {'id': fossilahsession.id, 'name': fossilahsession.name,})
+        return HttpResponse(json.dumps(result_set))
 
 class ProjectAdd(View):
     template_name = 'project/project_add_edit.html'
@@ -253,7 +264,8 @@ class ProjectAdd(View):
     @method_decorator(login_required(login_url='/'))
     def get(self, request):
         heading= 'Project Add'
-        districts = District.objects.all()
+        states = State.objects.all()
+        # districts = District.objects.all()
         mission_obj = PartnerMissionMapping.objects.filter(id__in = request.session['partner_mission_mapping_id'])
         return render(request,self.template_name,locals())
 
@@ -266,11 +278,9 @@ class ProjectAdd(View):
         start_date = data.get('start_date')
         district_obj = District.objects.get(id = district)
         partner_mission_mapping_id = data.get('partner_mission_mapping')
-
         if partner_mission_mapping_id:
             partner = UserPartnerMapping.objects.get(user = request.user).partner
             partner_mission_mapping_obj = PartnerMissionMapping.objects.get(partner = partner, id = partner_mission_mapping_id)
-        
         project_add = Project.objects.create(name = name, start_date = start_date, partner_mission_mapping = partner_mission_mapping_obj, district = district_obj, location=location )
         return redirect('/project-list/')
         # return render(request,'project/project_list.html', locals())
@@ -282,9 +292,10 @@ class ProjectUpdate(View):
     @method_decorator(login_required(login_url='/'))
     def get(self, request, id):
         heading= 'Project Edit'
-        districts = District.objects.all()
+        states = State.objects.all()
         mission_obj = PartnerMissionMapping.objects.filter(id__in = request.session['partner_mission_mapping_id'])
         project_obj = Project.objects.get(id = id)
+        districts = District.objects.filter(id = project_obj.district.id)
         return render(request,self.template_name,locals())
 
     @method_decorator(login_required(login_url='/'))

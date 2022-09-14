@@ -57,8 +57,16 @@ class MissionIndicatorAchievement(BaseContent):
     def __str__(self):
         return self.task.name
     
+class DataEntryRemark(BaseContent):
+    task = models.ForeignKey(Task, on_delete = models.DO_NOTHING, blank=True, null=True)
+    user_name = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True)
+    remark = models.TextField(blank=True, null=True)
 
-    
+    class Meta:
+        verbose_name_plural = "Data Entry Remark"
+
+    def __str__(self):
+        return self.task.name 
 
 
 

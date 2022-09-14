@@ -24,5 +24,6 @@ urlpatterns = [
     path("user-change-password/<id>/", user_change_password, name="user_change_password"),
     path("user-edit/<id>/", edit_user, name="edit_user"),
     path('ajax-project/', project_list_filter),
+    path('ajax/state/<state_id>/', get_district, name="get_district"),
 	]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

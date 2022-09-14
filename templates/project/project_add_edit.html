@@ -30,30 +30,30 @@
                             </div>
                             <div class="col-lg-6 col-12">
                                 <div class="form-group">
-                                    <label for="floatingemailInput">Start Date<span class="required-field"></span></label>
-                                    <input type="date" class="form-control"  name='start_date' value="{{project_obj.start_date|date:'Y-m-d'}}"  id="previous_data"
-                                        placeholder="Enter the Start Date" required>
-                                    <div class="invalid-feedback">
-                                        Please provide a valid Start Date.
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6 col-12">
-                                <div class="form-group">
                                     <label for="name">Project Name<span class="text-danger">*</span></label>
                                     <input Type="text" id="name" value="{{project_obj.name}}" name="name" class="form-control" placeholder="Project Name" required/>
                                     <div class="invalid-feedback">Please enter the Project name.</div>
                                 </div>
                             </div>
-
+                            <div class="col-lg-6 col-12">
+                                <div class="form-group">
+                                    <label for="district">State<span class="text-danger">*</span></label>
+                                    <select class="form-control select2" aria-label="Floating label select example" id="state" name="state" required>
+                                        <option value="" selected>Select</option>
+                                        {% for state in states %}
+                                            <option value="{{state.id}}" {% if state.id == project_obj.district.state.id %}selected{% endif %}>{{state.name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="invalid-feedback">Please select a valid District.</div>
+                                </div>
+                            </div>
                             <div class="col-lg-6 col-12">
                                 <div class="form-group">
                                     <label for="district">District<span class="text-danger">*</span></label>
                                     <select class="form-control select2" aria-label="Floating label select example" id="district" name="district" required>
                                         <option value="" selected>Select</option>
                                         {% for district in districts %}
-                                            <option value="{{district.id}}" {% if district.name == project_obj.district.name %}selected{% endif %}>{{district.name}}</option>
+                                            <option value="{{district.id}}" {% if district.id == project_obj.district.id %}selected{% endif %}>{{district.name}}</option>
                                         {% endfor %}
                                     </select>
                                     <div class="invalid-feedback">Please select a valid District.</div>
@@ -68,6 +68,16 @@
                                 </div>
                             </div>
 
+                            <div class="col-lg-6 col-12">
+                                <div class="form-group">
+                                    <label for="floatingemailInput">Start Date<span class="required-field"></span></label>
+                                    <input type="date" class="form-control" max="2022-08-31" name='start_date' value="{{project_obj.start_date|date:'Y-m-d'}}"  id="start_date"
+                                        placeholder="Enter the Start Date" required>
+                                    <div class="invalid-feedback">
+                                        Please provide a valid Start Date.
+                                    </div>
+                                </div>
+                            </div>
                         </div> 
                     </div>
 						
@@ -82,4 +92,39 @@
         </div>
     </div>
 </div>
+<!-- <script>
+    const today = new Date()
+    const oneMonthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate())
+    alert(oneMonthAgo)
+    $("#start_date").append(oneMonthAgo);
+</script> -->
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {                          
+        $('#state').change(function () {
+            var optionSelected = $(this).find("option:selected");
+            var valueSelected  = optionSelected.val();
+            $.ajax({
+                type:"GET",
+                url: '/ajax/state/'+valueSelected+'/',
+                success:function(result){
+                    $("#district option").remove();
+                    a = '<option selected value="">Choose District</option>';
+                    $("#district").append(a);
+                    if(JSON.parse(result) == 0){
+                        $("#district option").remove();
+                        a = '<option selected value="">No District is mapped to this fossil AH session category</option>';
+                        $("#district").append(a);
+                    }
+                    else{
+                        $.each(JSON.parse(result),function(key, value)
+                        {
+                            a = '<option value=' + value['id']+'>' + value['name']+'</option>';
+                            $("#district").append(a);
+                        });
+                    }
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}
