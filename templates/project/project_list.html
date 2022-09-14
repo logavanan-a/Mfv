@@ -21,6 +21,7 @@
                                                 <th>Start Date</th>
                                                 <th>Mission Name</th>
                                                 <th>Name</th>
+                                                <th>State</th>
                                                 <th>District</th>
                                                 <th>Location</th>
                                                 <th>Action</th>
@@ -34,6 +35,7 @@
                                                         <td>{{project.start_date|default_if_none:""}}</td>
                                                         <td>{{project.partner_mission_mapping.mission.name}}</td>
                                                         <td>{{project.name}}</td>
+                                                        <td>{{project.district.state.name}}</td>
                                                         <td>{{project.district.name}}</td>
                                                         <td>{{project.location}}</td>
                                                         <td><a href="/project-edit/{{project.id}}/">Edit</a></td>
