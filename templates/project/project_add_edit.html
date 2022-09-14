@@ -94,18 +94,17 @@
 </div>
 <script>
     var today = new Date();
-    var lastDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-    var dd = lastDayOfMonth.getDate();
-    var mm = lastDayOfMonth.getMonth()+1; //January is 0!
-    var yyyy = lastDayOfMonth.getFullYear();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1;
+    var yyyy = today.getFullYear();
     if(dd<10){
             dd='0'+dd
         } 
         if(mm<10){
             mm='0'+mm
         } 
-    lastDayOfMonth = yyyy+'-'+mm+'-'+dd;
-    document.getElementById("datefield").setAttribute("max", lastDayOfMonth);
+    today = yyyy+'-'+mm+'-'+dd;
+    document.getElementById("datefield").setAttribute("max", today);
 </script>
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function() {                          
