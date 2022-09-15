@@ -8,7 +8,7 @@ from application_master.models import (District, Donor, Menus, Mission,
                                        MissionIndicatorTarget, Partner,
                                        PartnerMissionMapping, Project,
                                        ProjectDonorMapping, ProjectFiles,
-                                       State, UserPartnerMapping)
+                                       State, UserPartnerMapping, UserProjectMapping)
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user, login, logout
@@ -200,16 +200,18 @@ def task_list(request):
     if user.groups.filter(name = 'Partner Admin').exists():
         user_lists = UserPartnerMapping.objects.get(user = request.user)
         for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
-            task_obj = task_obj.filter(project__partner_mission_mapping__partner = partner_list.partner).order_by('listing_order')
+            task_obj = task_obj.filter(project__partner_mission_mapping__partner = partner_list.partner).order_by('-modified')
     
     elif user.groups.filter(name = 'Project In-charge').exists():
         task_obj = task_obj.filter(project_in_charge = request.user).order_by('listing_order')
+        # pro_lists = UserProjectMapping.objects.get(user = request.user)
+        # for project_list in UserProjectMapping.objects.filter(project = pro_lists.project):
+        #     task_obj = Task.objects.filter(project = project_list.project).order_by('-modified')
     
     else:
         user_lists = UserPartnerMapping.objects.get(user = request.user)
         for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
-            task_obj = task_obj.filter(user = request.user, project__partner_mission_mapping__partner = partner_list.partner).order_by('listing_order')
-        # task_obj = task_obj.filter(user = request.user,start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year).order_by('listing_order')
+            task_obj = task_obj.filter(user = request.user, project__partner_mission_mapping__partner = partner_list.partner).order_by('-modified')
     
     object_list = get_pagination(request, task_obj)
     page_number_display_count = 5
