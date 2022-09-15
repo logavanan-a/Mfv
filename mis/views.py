@@ -228,8 +228,8 @@ def task_status_changes(request, task_id):
         task_obj = Task.objects.get(id = task_id)
         task_obj.task_status = status_val
         task_obj.save()
-        if status_val in ['1', '2']:
-            DataEntryRemark.objects.create(task = task_obj, remark = remark, user_name = request.user)
+        if remark:
+            DataEntryRemark.objects.create(task = task_obj, remark = remark, user_name = request.user)         
         return HttpResponse({"message":'true'} , content_type="application/json")
     return HttpResponse({"message":'false'}, content_type="application/json")  
 
