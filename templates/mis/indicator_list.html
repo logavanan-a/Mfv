@@ -166,7 +166,11 @@
                         {% endfor %} 
                     {% endif %}
                     <label for="project_reference_file">Project Reference File : </label>
-                    <input type="file" name="project_reference_file">
+                        {% if 'Partner Data Entry Operator' == user_role %}
+                            {% if task_obj.task_status == 1 or task_obj.task_status == 4 %}
+                                <input type="file" name="project_reference_file">
+                            {% endif %}
+                        {% endif %}
                     
                     <div class="relative">
                         <input type='button' class="btn btn-primary w-md" value='Move To Top' onclick="window.scrollTo({ top: 0, behavior: 'smooth'})">                 
