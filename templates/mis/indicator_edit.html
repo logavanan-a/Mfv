@@ -181,7 +181,7 @@
                     <div>
                         <button type="button" class="btn btn-info"><b>Remark</b></button>
                         {% for i in dataentry_obj %}
-                            <P><b>Updated by:</b>{{user}}, {{i.created}}  </P>
+                            <P><b>Updated by:</b>{{i.user_name}}, {{i.created}}  </P>
                             <P><b>Status:</b> {{i.remark}}.</P>
                         {% endfor %}
                     </div> 
