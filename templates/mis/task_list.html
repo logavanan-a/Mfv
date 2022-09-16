@@ -11,7 +11,9 @@
                             <form class="dt_adv_search" method="GET" action="/task-list/">
                                 <div class="row">
 
-                                    <div class="col-sm-6">
+                                    <input type="hidden" value="{{archive}}" name="archive">
+                                    <input type="hidden" value="{{month_year}}" name="month_year">
+                                    <div class="col-sm-4">
                                         <div class="form-group">
                                         <label for="mission">Mission:</label>
                                             <select class="form-control" id="mission" name="mission">
@@ -23,7 +25,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="project">Project:</label>
                                                 <select class="form-control" id="project" name="project">
@@ -35,8 +37,20 @@
                                         </div>
                                     </div>
 
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                        <label for="task_status">Status:</label>
+                                        <select class="form-control" id="task_status", name="task_status">
+                                            <option value="" selected>Select</option>
+                                            <option value="1">Pending</option>
+                                            <option value="2">Submitted for Partner Admin</option>
+                                            <option value="3">Submitted for Project In-charge</option>
+                                        </select>
+                                        </div>
+                                    </div>
+
                                     <!-- <div class="collapse {{archive}}" id="collapseExample"> -->
-                                        <div class="col-sm-6 collapse {{archive}}">
+                                        <div class="col-sm-4 collapse {{archive}}">
                                             <div class="form-group">
                                             <label for="project">Month:</label>
                                             <select class="form-control" id="month", name="month">
@@ -57,7 +71,7 @@
                                             </div>
                                         </div>
                                 
-                                        <div class="col-sm-6 collapse {{archive}}">
+                                        <div class="col-sm-4 collapse {{archive}}">
                                             <div class="form-group">
                                                 <label  for="year">Year:</label>
                                                     <select class="form-control" id="year", name="year">
@@ -124,7 +138,7 @@
                                     {% if object_list.has_other_pages %}
                                     <ul class="pagination justify-content-end ">
                                         {% if object_list.has_previous %}
-                                        <li class="paginate_button page-item"><a class="page-link" href="?page={{ 1 }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}">First</a></li>
+                                        <li class="paginate_button page-item"><a class="page-link" href="?page={{ 1 }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}&task_status={{task_status}}">First</a></li>
                                         {% comment %} <li class="paginate_button page-item"><a class="page-link" href="?page={{ object_list.previous_page_number }}">Previous</a></li> {% endcomment %}
                                         {% else %}
                                         <li class="paginate_button page-item disabled"><span class="page-link">First</span></li>
@@ -134,12 +148,12 @@
                                             {% if object_list.number == i %}
                                             <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
                                             {% else %}
-                                            <li class="paginate_button paginate_button page-item"><a class="page-link" href="?page={{ i }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}">{{ i }}</a></li>
+                                            <li class="paginate_button paginate_button page-item"><a class="page-link" href="?page={{ i }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}&task_status={{task_status}}">{{ i }}</a></li>
                                             {% endif %}
                                         {% endfor %}
                                         {% if object_list.has_next %}
-                                            {% comment %} <li class="paginate_button page-item"><a class="page-link" href="?page={{ object_list.next_page_number }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}">Next</a></li> {% endcomment %}
-                                            <li class="paginate_button page-item"><a class="page-link" href="?page={{ object_list.paginator.num_pages }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}">Last</a></li>
+                                            {% comment %} <li class="paginate_button page-item"><a class="page-link" href="?page={{ object_list.next_page_number }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}&task_status={{task_status}}">Next</a></li> {% endcomment %}
+                                            <li class="paginate_button page-item"><a class="page-link" href="?page={{ object_list.paginator.num_pages }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}&task_status={{task_status}}">Last</a></li>
                                         {% else %}
                                             {% comment %} <li class="paginate_button page-item disabled"><span class="page-link">Next</span></li> {% endcomment %}
                                             <li class="paginate_button page-item disabled"><span class="page-link">Last</span></li>
@@ -162,6 +176,11 @@
 var months = '{{month}}'
 if(months != 'None'){
     $('#month').val(months)
+}
+
+var task_status = '{{task_status}}'
+if(task_status != 'None'){
+    $('#task_status').val(task_status)
 }
 
 var years = '{{year}}'
