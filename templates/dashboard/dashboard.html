@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+{% load static %} 
+{% block contents %}
+
+
+
+<div class="row align-items-center">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <form action="{{form_url}}" class="form-horizontal" method="POST" id="filters">
+                    {%csrf_token%}
+                    <div class="row">
+                        <div class="col-auto mt-2">
+                            Filter by:
+                        </div>
+                        <div class="col-3">
+                            <input type="month" class="form-control" name='start_filter' value="{{start_month}}" id="start_filter" >
+                        </div>
+                        <div class="col-3">
+                            <input type="month" class="form-control" name='end_filter' value="{{end_month}}" id="end_filter" >
+                        </div>
+                    </div>
+                    <div class="row justify-content-end mt-3">
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-square btn-success btn-lg float-right">Filter</button>
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" id="reset" class="btn btn-square btn-primary btn-lg float-right">Reset</button>
+                        </div>
+                    </div>
+            
+                </form>
+                <table class="table t1">
+                    <tbody>
+                        <!--Mission Jyot-->
+                        <tr height='20%' class=" t1_tr">
+                            <td class=" t1_td">
+                                <div class="cross">
+                                    <div class="text">Mission Jyot</div>
+                                        <div class="triangle">
+                                        </div>
+                                </div>
+                            </td>
+                            <td  class=" t1_td">
+                                <section id="advanced-search-datatable" class='mt-3'>
+                                    <div class="row">
+                                        <div class="table-responsive">
+                                        <table class="table table-bordered mb-0">
+
+                                            <tbody class=" t1_tr">
+                                                <tr >
+                                                    <th>Total number of Vision Centres - {{data.0.0}}</th>
+                                                    <th>Eye Screening at Vision Centre & Camp - {{data.0.1}}</th>
+                                                    <th>Spectacles dispensed - {{data.0.2}}</th>
+                                                    <th>Surgeries - {{data.0.3}}</th>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    </div>
+                                </section>
+                            </td>
+                        </tr>
+                        <!--Mission Nayan-->
+                        <tr height='20%' class=" t1_tr">
+                            <td class=" t1_td">
+                                <div class="cross">
+                                    <div class="text">Mission Nayan</div>
+                                        <div class="triangle">
+                                        </div>
+                                </div>
+                            </td>
+                            <td  class=" t1_td">
+                                <section id="advanced-search-datatable" class='mt-3'>
+                                    <div class="row">
+                                        <div class="table-responsive">
+                                        <table class="table table-bordered mb-0">
+
+                                            <tbody class=" t1_tr">
+                                                <tr >
+                                                    <th>Neonates screened for ROP - {{data.0.9}}</th>
+                                                    <th>Children found ROP positive - {{data.0.10}}</th>
+                                                    <th>No. of Treatments done - {{data.0.11}}</th>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    </div>
+                                </section>
+                            </td>
+                        </tr> 
+                        <!--Mission Jeevan-->
+                        <tr height='20%' class=" t1_tr">
+                            <td class=" t1_td">
+                                <div class="cross">
+                                    <div class="text">Mission Jeevan</div>
+                                        <div class="triangle">
+                                        </div>
+                                </div>
+                            </td>
+                            <td  class=" t1_td">
+                                <section id="advanced-search-datatable" class='mt-3'>
+                                    <div class="row">
+                                        <div class="table-responsive">
+                                        <table class="table table-bordered mb-0">
+
+                                            <tbody class=" t1_tr">
+                                                <tr >
+                                                    <th>Children enrolled - {{data.0.12}}</th>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    </div>
+                                </section>
+                            </td>
+                        </tr> 
+                        <!--Mission Roshni-->
+                        <tr height='20%' class=" t1_tr">
+                            <td class=" t1_td">
+                                <div class="cross">
+                                    <div class="text">Mission Roshni</div>
+                                        <div class="triangle">
+                                        </div>
+                                </div>
+                            </td>
+                            <td  class=" t1_td">
+                                <section id="advanced-search-datatable" class='mt-3'>
+                                    <div class="row">
+                                        <div class="table-responsive">
+                                        <table class="table table-bordered mb-0">
+
+                                            <tbody class=" t1_tr">
+                                                <tr >
+                                                    <th>No. of School Camps - 0</th>
+                                                    <th>Children Screened - {{data.0.13}}</th>
+                                                    <th>Spectacles Dispensed - {{data.0.14}}</th>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    </div>
+                                </section>
+                            </td>
+                        </tr> 
+                        <!--Mission Disha-->
+                        <tr height='20%' class=" t1_tr">
+                            <td class=" t1_td">
+                                <div class="cross">
+                                    <div class="text">Mission Disha</div>
+                                        <div class="triangle">
+                                        </div>
+                                </div>
+                            </td>
+                            <td  class=" t1_td">
+                                <section id="advanced-search-datatable" class='mt-3'>
+                                    <div class="row">
+                                        <div class="table-responsive">
+                                        <table class="table table-bordered mb-0">
+
+                                            <tbody class=" t1_tr">
+                                                <tr >
+                                                    <th>No. of Camps - 0</th>
+                                                    <th>People screened - {{data.0.15}}</th>
+                                                    <th>Spectacles dispensed - {{data.0.16}}</th>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    </div>
+                                </section>
+                            </td>
+                        </tr> 
+                        <!--Mission Saksham-->
+                        <tr height='20%' class=" t1_tr">
+                            <td class=" t1_td">
+                                <div class="cross">
+                                    <div class="text">Mission Saksham</div>
+                                        <div class="triangle">
+                                        </div>
+                                </div>
+                            </td>
+                            <td  class=" t1_td">
+                                <section id="advanced-search-datatable" class='mt-3'>
+                                    <div class="row">
+                                        <div class="table-responsive">
+                                        <table class="table table-bordered mb-0">
+
+                                            <tbody class=" t1_tr">
+                                                <tr >
+                                                    <th>AOP Completed training - {{data.0.17}}</th>
+                                                    <th>AOP in training - {{data.0.18}}</th>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    </div>
+                                </section>
+                            </td>
+                        </tr> 
+                        <!--Mission Netra-->
+                        <tr height='20%' class=" t1_tr">
+                            <td class=" t1_td">
+                                <div class="cross">
+                                    <div class="text">Mission Netra</div>
+                                        <div class="triangle">
+                                        </div>
+                                </div>
+                            </td>
+                            <td  class=" t1_td">
+                                <section id="advanced-search-datatable" class='mt-3'>
+                                    <div class="row">
+                                        <div class="table-responsive">
+                                        <table class="table table-bordered mb-0">
+
+                                            <tbody class=" t1_tr">
+                                                <tr >
+                                                    <th>Surgeries - {{data.0.19}}</th>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    </div>
+                                </section>
+                            </td>
+                        </tr>
+                        <!--Hospital-->
+                        <tr height='20%' class=" t1_tr">
+                            <td class=" t1_td">
+                                <div class="cross">
+                                    <div class="text">Hospital</div>
+                                        <div class="triangle">
+                                        </div>
+                                </div>
+                            </td>
+                            <td  class=" t1_td">
+                                <section id="advanced-search-datatable" class='mt-3'>
+                                    <div class="row">
+                                        <div class="table-responsive">
+                                        <table class="table table-bordered mb-0">
+
+                                            <tbody class=" t1_tr">
+                                                <tr >
+                                                    <th>Screening - {{data.0.20}}</th>
+                                                    <th>Cataract surgeries - {{data.0.21}}</th>
+                                                    <th>Other surgeries - {{data.0.22}}</th>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    </div>
+                                </section>
+                            </td>
+                        </tr>
+                    <tbody>                
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .t1, .t1_tr, .t1_td {
+        border: none;
+    }
+    
+    .cross {
+        background-color: skyblue;
+        width: 100px;
+        height: 50px;
+        margin-top: 10%;
+    }
+    .text{ 
+        height: 50px;
+        display: flex;
+        justify-content:center;
+        align-items: center;
+    }
+    .triangle {
+        width: 0;
+        height: 0;
+        border-top: 40px solid transparent;
+        border-left: 40px solid skyblue;
+        border-bottom: 40px solid transparent;
+        margin: auto;
+        margin-top: 5%;
+        margin-left: 100px;
+        position: relative;
+        top: -70px;
+    }
+</style>
+<script>
+    /*Resetting the Dropdown selected options while clicking Reset Button*/
+    $("#reset").click(function() {
+        $('#start_filter').val('');
+        $('#end_filter').val('');
+        this.form.submit();
+    });
+</script>
+{% endblock %}
+{% block extra_javascript %}
+{% endblock %}      

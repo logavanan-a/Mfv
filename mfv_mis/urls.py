@@ -19,6 +19,7 @@ from django.urls import path, include, reverse_lazy
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('mis.urls')),
+    path('dashboard/', include('dashboard.urls')),
     path('application_master/', include('application_master.urls')),
 ]
 admin.site.site_header = "MFV MIS administration"  
