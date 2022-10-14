@@ -14,9 +14,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         import datetime
         # logger = logging.getLogger('dashboard')
-        refresh_query_list = {"mat_partner_mission_meta_view":"refresh materialized view concurrently mat_partner_mission_meta_view", 
-                      "mat_target_view":"refresh materialized view concurrently mat_target_view", 
-                      "mat_dashboard_achievement_view":"refresh materialized view concurrently mat_dashboard_achievement_view"}
+        refresh_query_list = {"mat_partner_mission_meta_view":"refresh materialized view mat_partner_mission_meta_view", 
+                      "mat_target_view":"refresh materialized view mat_target_view", 
+                      "mat_dashboard_achievement_view":"refresh materialized view mat_dashboard_achievement_view"}
         for key,query in refresh_query_list.items():
             with connection.cursor() as cursor:
                 try:
@@ -29,6 +29,7 @@ class Command(BaseCommand):
                     logdata.most_recent_update_status = 'Success'
                     logdata.save()
                 except Exception as e:
+                    print('---------',e,'-------------')
                     exc_type, exc_value, exc_traceback = sys.exc_info()
                     error_stack = repr(traceback.format_exception(
                         exc_type, exc_value, exc_traceback))
