@@ -50,12 +50,22 @@ def login_view(request):
             username = findUser.get_username()
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            login(request, user) 
+            login(request, user)
+            if user.groups.filter(name__in = ['Partner Data Entry Operator','Partner Admin']).exists():
+                partner_list=UserPartnerMapping.objects.filter(user_id=request.user.id).values_list('partner__id',flat=True)
+                request.session['user_mission_list']=list(PartnerMissionMapping.objects.filter(partner__id__in=partner_list).values_list('mission_id',flat=True))
+            elif user.groups.filter(name__in = ['Project In-charge','M & E']).exists():
+                partner_mission_ids=UserProjectMapping.objects.filter(user_id=request.user.id).values_list('project__partner_mission_mapping_id',flat=True)
+                request.session['user_mission_list']=list(PartnerMissionMapping.objects.filter(id__in=partner_mission_ids).values_list('mission_id',flat=True))
+            elif user.is_superuser:
+                request.session['user_mission_list']=list(Mission.objects.all().values_list('id',flat=True))
+
             try:
                 user_partner = UserPartnerMapping.objects.get(user = user)
                 partner_mission_mapping_id = PartnerMissionMapping.objects.filter(mission__id__in= [1,2],partner=user_partner.partner).values_list('id', flat = True)
                 request.session['user_partner'] = user_partner.partner.name
                 request.session['partner_mission_mapping_id'] = list(partner_mission_mapping_id)
+                
             except:
                 user_partner = ''              
             return redirect('/task-list/')

@@ -31,11 +31,12 @@
                     </div>
             
                 </form>
-                <table class="table t1">
+                <table class="table t1" >
                     <tbody>
+                        {% if 5 in request.session.user_mission_list %}
                         <!--Mission Jyot-->
-                        <tr height='20%' class=" t1_tr">
-                            <td class=" t1_td">
+                        <tr height='20%' class=" t1_tr" >
+                            <td class=" t1_td" width='20%'>
                                 <div class="cross">
                                     <div class="text">Mission Jyot</div>
                                         <div class="triangle">
@@ -50,10 +51,10 @@
 
                                             <tbody class=" t1_tr">
                                                 <tr >
-                                                    <th>Total number of Vision Centres - {{data.0.0}}</th>
-                                                    <th>Eye Screening at Vision Centre & Camp - {{data.0.1}}</th>
-                                                    <th>Spectacles dispensed - {{data.0.2}}</th>
-                                                    <th>Surgeries - {{data.0.3}}</th>
+                                                    <th style='text-align: center;'>Total number of Vision Centres </br> <span >{{data.0.0|default_if_none:'0'}}</span></th>
+                                                    <th style='text-align: center;'>Eye Screening at Vision Centre & Camp </br><span >{{data.0.1|default_if_none:'0'}}</span></th>
+                                                    <th style='text-align: center;'>Spectacles dispensed </br> {{data.0.2|default_if_none:'0'}}</th>
+                                                    <th style='text-align: center;'>Surgeries </br> {{data.0.3|default_if_none:'0'}}</th>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -63,6 +64,8 @@
                                 </section>
                             </td>
                         </tr>
+                        {% endif %}
+                        {% if 9 in request.session.user_mission_list %}
                         <!--Mission Nayan-->
                         <tr height='20%' class=" t1_tr">
                             <td class=" t1_td">
@@ -80,9 +83,9 @@
 
                                             <tbody class=" t1_tr">
                                                 <tr >
-                                                    <th>Neonates screened for ROP - {{data.0.9}}</th>
-                                                    <th>Children found ROP positive - {{data.0.10}}</th>
-                                                    <th>No. of Treatments done - {{data.0.11}}</th>
+                                                    <th style='text-align: center;'>Neonates screened for ROP - {{data.0.9|default_if_none:'0'}}</th>
+                                                    <th style='text-align: center;'>Children found ROP positive - {{data.0.10|default_if_none:'0'}}</th>
+                                                    <th style='text-align: center;'>No. of Treatments done - {{data.0.11|default_if_none:'0'}}</th>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -92,6 +95,8 @@
                                 </section>
                             </td>
                         </tr> 
+                        {% endif %}
+                        {% if 6 in request.session.user_mission_list %}
                         <!--Mission Jeevan-->
                         <tr height='20%' class=" t1_tr">
                             <td class=" t1_td">
@@ -109,7 +114,7 @@
 
                                             <tbody class=" t1_tr">
                                                 <tr >
-                                                    <th>Children enrolled - {{data.0.12}}</th>
+                                                    <th style='text-align: center;'>Children enrolled - {{data.0.12|default_if_none:'0'}}</th>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -119,6 +124,8 @@
                                 </section>
                             </td>
                         </tr> 
+                        {% endif %}
+                        {% if 2 in request.session.user_mission_list %}
                         <!--Mission Roshni-->
                         <tr height='20%' class=" t1_tr">
                             <td class=" t1_td">
@@ -136,9 +143,9 @@
 
                                             <tbody class=" t1_tr">
                                                 <tr >
-                                                    <th>No. of School Camps - 0</th>
-                                                    <th>Children Screened - {{data.0.13}}</th>
-                                                    <th>Spectacles Dispensed - {{data.0.14}}</th>
+                                                    <th style='text-align: center;'>No. of School Camps - 0</th>
+                                                    <th style='text-align: center;'>Children Screened - {{data.0.13|default_if_none:'0'}}</th>
+                                                    <th style='text-align: center;'>Spectacles Dispensed - {{data.0.14|default_if_none:'0'}}</th>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -148,6 +155,8 @@
                                 </section>
                             </td>
                         </tr> 
+                        {% endif %}
+                        {% if 1 in request.session.user_mission_list %}
                         <!--Mission Disha-->
                         <tr height='20%' class=" t1_tr">
                             <td class=" t1_td">
@@ -165,9 +174,9 @@
 
                                             <tbody class=" t1_tr">
                                                 <tr >
-                                                    <th>No. of Camps - 0</th>
-                                                    <th>People screened - {{data.0.15}}</th>
-                                                    <th>Spectacles dispensed - {{data.0.16}}</th>
+                                                    <th style='text-align: center;'>No. of Camps - 0</th>
+                                                    <th style='text-align: center;'>People screened - {{data.0.15|default_if_none:'0'}}</th>
+                                                    <th style='text-align: center;'>Spectacles dispensed - {{data.0.16|default_if_none:'0'}}</th>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -177,6 +186,8 @@
                                 </section>
                             </td>
                         </tr> 
+                        {% endif %}
+                        {% if 3 in request.session.user_mission_list %}
                         <!--Mission Saksham-->
                         <tr height='20%' class=" t1_tr">
                             <td class=" t1_td">
@@ -194,8 +205,8 @@
 
                                             <tbody class=" t1_tr">
                                                 <tr >
-                                                    <th>AOP Completed training - {{data.0.17}}</th>
-                                                    <th>AOP in training - {{data.0.18}}</th>
+                                                    <th style='text-align: center;'>AOP Completed training - {{data.0.17|default_if_none:'0'}}</th>
+                                                    <th style='text-align: center;'>AOP in training - {{data.0.18|default_if_none:'0'}}</th>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -205,6 +216,8 @@
                                 </section>
                             </td>
                         </tr> 
+                        {% endif %}
+                        {% if 4 in request.session.user_mission_list %}
                         <!--Mission Netra-->
                         <tr height='20%' class=" t1_tr">
                             <td class=" t1_td">
@@ -222,7 +235,7 @@
 
                                             <tbody class=" t1_tr">
                                                 <tr >
-                                                    <th>Surgeries - {{data.0.19}}</th>
+                                                    <th style='text-align: center;'>Surgeries - {{data.0.19|default_if_none:'0'}}</th>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -232,6 +245,8 @@
                                 </section>
                             </td>
                         </tr>
+                        {% endif %}
+                        {% if 7 in request.session.user_mission_list %}
                         <!--Hospital-->
                         <tr height='20%' class=" t1_tr">
                             <td class=" t1_td">
@@ -246,12 +261,11 @@
                                     <div class="row">
                                         <div class="table-responsive">
                                         <table class="table table-bordered mb-0">
-
                                             <tbody class=" t1_tr">
                                                 <tr >
-                                                    <th>Screening - {{data.0.20}}</th>
-                                                    <th>Cataract surgeries - {{data.0.21}}</th>
-                                                    <th>Other surgeries - {{data.0.22}}</th>
+                                                    <th style='text-align: center;'>Screening - {{data.0.20|default_if_none:'0'}}</th>
+                                                    <th style='text-align: center;'>Cataract surgeries - {{data.0.21|default_if_none:'0'}}</th>
+                                                    <th style='text-align: center;'>Other surgeries - {{data.0.22|default_if_none:'0'}}</th>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -261,6 +275,7 @@
                                 </section>
                             </td>
                         </tr>
+                        {% endif %}
                     <tbody>                
                 </table>
             </div>

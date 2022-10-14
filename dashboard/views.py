@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.db import connection
 from dashboard.models import DashboardSummaryLog
-from application_master.models import UserPartnerMapping,PartnerMissionMapping,UserProjectMapping
+from application_master.models import UserPartnerMapping,UserProjectMapping,PartnerMissionMapping
 from django.shortcuts import render
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -18,6 +18,14 @@ def dashboard(request):
     cursor = connection.cursor()
     cursor.execute(query)
     data = cursor.fetchall()
+
+    # if UserPartnerMapping.objects.filter(user_id=request.user.id).exists():
+    #     partner_list=UserPartnerMapping.objects.filter(user_id=request.user.id).values_list('partner__id',flat=True)
+    #     user_mission_list=list(PartnerMissionMapping.objects.filter(partner__id__in=partner_list).values_list('mission_id',flat=True))
+    # elif UserProjectMapping.objects.filter(user_id=request.user.id).exists():
+    #     partner_mission_ids=UserProjectMapping.objects.filter(user_id=request.user.id).values_list('project__partner_mission_mapping_id',flat=True)
+    #     user_mission_list=list(PartnerMissionMapping.objects.filter(id__in=partner_mission_ids).values_list('mission_id',flat=True))
+
     dash_summary = DashboardSummaryLog.objects.filter(log_key="mat_partner_mission_meta_view").first()
     last_updated_on = ''
     if dash_summary and dash_summary.last_successful_update:
@@ -27,23 +35,22 @@ def dashboard(request):
 def build_query(request):
     start_month =  request.POST.get('start_filter','')#request_get start_filter 
     end_month = request.POST.get('end_filter','')#request_get end_filter
-    start_date,end_date='',''
+    start_date,end_date,start_month_condition,end_month_condition='','','',''
     if start_month:
         start_date = start_month + "-01"
         # start_date = datetime.strptime(start_date,'%Y%m%d')
         # start_date = datetime.strrtime(start_date,'%Y-%m-%d')
-        start_month='and ach.task_month >= ' + start_month.replace('-', '')
-        print(start_month)
+        start_month_condition='and ach.task_month >= ' + start_month.replace('-', '')
     if end_month:
         end_date = end_month + "-01"
         end_date = datetime.strptime(end_date,'%Y-%m-%d')
         end_date = end_date + relativedelta('1 months')
         end_date = datetime.strftime(end_date,'%Y-%m-%d')
-        end_month='and ach.task_month <= ' + end_month.replace('-', '')
+        end_month_condition='and ach.task_month <= ' + end_month.replace('-', '')
 
     logged_in_user_id = request.user.id#request_get user_id
 
-    query = """select jyot_vcs.vcs_count as jyot_vcs_count, a.* from (select sum(case when key in ('total_33','total_296') then value else 0 end)::integer as jyot_eye_screening,
+    query = """select coalesce(jyot_vcs.vcs_count,0) as jyot_vcs_count, a.* from (select sum(case when key in ('total_33','total_296') then value else 0 end)::integer as jyot_eye_screening,
         sum(case when key in ('total_40','total_346') then value else 0 end)::integer as jyot_spectacles_dispensed,
         sum(case when key in ('total_301','total_46','total_292','total_304') then value else 0 end)::integer as jyot_surgeries,
         0 as jyot_average_opd_vc,
@@ -69,12 +76,12 @@ def build_query(request):
         where 1=1 @@fvalue_start_month @@fvalue_end_month @@user_project_filter 
         @@user_partner_filter
     ) as a 
-    cross join (select mission_id, count(distinct project_id) as vcs_count
+    left outer join (select mission_id, count(distinct project_id) as vcs_count
         from mat_partner_mission_meta_view 
-        where mission_id = 5 @@fvalue_start_date and (project_end_date is null @@fvalue_end_date) 
+        where mission_id = 5 @@fvalue_start_date @@fvalue_end_date
         @@user_project_filter @@user_partner_filter
-        group by mission_id
-    ) as jyot_vcs"""
+        group by mission_id 
+    ) as jyot_vcs on true"""
 
     user_partner_filter_cond = ""
     user_project_filter_cond = ""
@@ -92,14 +99,19 @@ def build_query(request):
                                             from application_master_userprojectmapping 
                                             where user_id = """ + str(logged_in_user_id) + """)"""
 
-    end_date="or project_end_date >= '" + end_date +"'" if end_date != '' else ''
-    start_date="and project_start_date < '" + start_date +"'" if start_date != '' else ''
+    end_date_condition=''
+    if start_date != '':
+        end_date_condition="and (project_end_date is null or project_end_date >= '" + start_date +"')" 
+
+    start_date_condition=''
+    if end_date != '':
+        start_date_condition="and project_start_date < '" + end_date +"'" 
 
 
     query = query.replace("@@user_partner_filter",user_partner_filter_cond) 
     query = query.replace("@@user_project_filter",user_project_filter_cond)
-    query = query.replace("@@fvalue_start_date",start_date) #should be of format 2022-01-25
-    query = query.replace("@@fvalue_end_date",end_date) #should be of format 2022-01-25
-    query = query.replace("@@fvalue_start_month",start_month) #should be of format 202201
-    query = query.replace("@@fvalue_end_month",end_month) #should be of format 202201
+    query = query.replace("@@fvalue_start_date",start_date_condition) #should be of format 2022-01-25
+    query = query.replace("@@fvalue_end_date",end_date_condition) #should be of format 2022-01-25
+    query = query.replace("@@fvalue_start_month",start_month_condition) #should be of format 202201
+    query = query.replace("@@fvalue_end_month",end_month_condition) #should be of format 202201
     return query
