@@ -64,21 +64,21 @@
                         <div class="col-auto mb-1">
                             <button type="submit" class="form-control btn btn-success waves-effect btn-lg float-right data_reload{{forloop.counter0}}" id="sort_{{forloop.counter0}}">Sort</button>
                         </div>
-
-                        {%if forloop.counter0 == 0 %}
-                        <!-- This text and the export button is shown only on the first table in the report page -->
-                        <div class="col-auto mb-1">
-                            <form action="/report/{{page_slug}}/" method="POST">
-                                {% csrf_token %}
-                                {% for filter in filter_values %}
-                                    <input type="hidden" id="__hd1__{{filter.0}}" name='{{filter.0}}' value="{{filter.2}}"/>
-                                {% endfor %}
-                                <button type="submit" name='export' class="form-control btn btn-primary waves-effect btn-lg float-right" value="True">Export</button>
-                            </form>
-                        </div>
-                        {% endif %}
                     </div>
-                {%endif%}
+                    {%endif%}
+                {%if forloop.counter0 == 0 %}
+                <!-- This text and the export button is shown only on the first table in the report page -->
+                <div class="col-lg-1 col-sm-1 col-md-1 mb-2 float-end">
+                    <form action="/report/{{page_slug}}/" method="POST">
+                        {% csrf_token %}
+                        {% for filter in filter_values %}
+                            <input type="hidden" id="__hd1__{{filter.0}}" name='{{filter.0}}' value="{{filter.2}}"/>
+                        {% endfor %}
+                        <button type="submit" name='export' class="form-control btn btn-primary waves-effect btn-lg float-right" value="True">Export</button>
+                    </form>
+                </div>
+                {% endif %}
+                    
                 <!-- Report Table  -->
                 <div id="div_data_{{forloop.counter0}}">
                     <div class="table-rep-plugin">

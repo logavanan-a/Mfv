@@ -127,7 +127,7 @@ def custom_report(request, page_slug):
     total_header_cols = []
     report_slug_list = []
     data = []
-    # nowrap_cols = []
+    nowrap_cols = []
     user_sort_field = []
     user_sort_order = []
     page_info = []
@@ -145,7 +145,7 @@ def custom_report(request, page_slug):
         r_query = report.report_query
         d_query = r_query['sql_query']
         c_query = r_query['count_query'] if r_query['count_query'] else ''
-        # nw_cols = r_query['nowrap_cols']
+        nw_cols = r_query['nowrap_cols']
         headers = report.report_header
         e_header = report.custom_export_header
         # all filter settings are set based on the first report filters
@@ -177,7 +177,6 @@ def custom_report(request, page_slug):
             colspan = item.get('colspan', 0)
             header_col_count += colspan if colspan > 0 else 1
 
-
         data_query_list.append(data_query)
         data.append(return_sql_results(data_query))
 
@@ -185,16 +184,16 @@ def custom_report(request, page_slug):
         report_slug_list.append(r_slug)
         custom_export_headers.append(e_header)
         section_title.append(s_title)
-        # nowrap_cols.append(nw_cols)
+        nowrap_cols.append(nw_cols)
         sorting_field.append(s_info)
 
         # if not for export, prepare pagination details
         if export_flag == False:
             # fetch record count and calcualte pagination info
             total_records = 0
-            # count_result = return_sql_results(count_query)
-            # if count_result:
-            #     total_records = count_result[0][0]
+            count_result = return_sql_results(count_query)
+            if count_result:
+                total_records = count_result[0][0]
             p_info = calculate_pagination_info(total_records, 1, rows_per_page)
             page_info.append(p_info)
             # pagination_range will be same for all reports in the page
@@ -336,8 +335,6 @@ def get_filter_data(request, req_data, f_info):
     loc_data = None
     for i in display_order:
         filter_values.append([])
-    data_id=0
-    filter_type=''
     for k in filter_keys:
         data_list = []
         filter_display_order = -1
