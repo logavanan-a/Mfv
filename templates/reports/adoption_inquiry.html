@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+
+{% block contents %}
+
+<div class="row">
+
+    <div class="col-12">
+
+        <div class="card">
+            <div class="card-body">
+                <form action="/family-visit-listing/" method="GET">
+                    {% include 'partials/filters.html' %}
+                        <div class="col-auto mt-3 ">
+                            <button type="button" class="btn btn-primary waves-effect waves-light" onclick="">Export</button>
+                        </div> 
+                    </div> 
+                </form> 
+
+                    <div class="table-responsive " >
+                        <table  class="table report_table table-striped ">
+                            <thead>
+                            <tr>
+                                {% comment %} <th>Sl.No</th> {% endcomment %}
+                                <th scope="col">State</th>
+                                <th scope="col">District</th>
+                                <th scope="col">Shelter Home</th>
+                                <th scope="col">Child Name</th>
+                                <th scope="col">Case Number</th>
+                                <th scope="col">Gender</th>
+                                <th scope="col">Date of Birth</th>
+                                <th scope="col">Age</th>
+                                <th scope="col">Child Classification</th>      
+                                <th scope="col">Reason for admission</th>                                
+                                <th scope="col">Reason for flagging the child</th>
+                                <th scope="col">Family Visit Tracking</th>
+                                <th scope="col">Family Phone Call Tracking</th>
+                                <th scope="col">Guardian Listed</th>
+                                <th scope="col">Siblings</th>
+                                <th scope="col">Length of stay in the shelter(s)</th>
+                                <th scope="col">Date of last CWC review/order</th>
+                                <th scope="col">Last CWC order</th>
+                                <th scope="col">Case History</th>
+                                {% comment %} <th scope="col">Flagged for adoption inquiry since</th> {% endcomment %}
+                                <th scope="col">Documents Completed</th>
+                                <th scope="col">Documents Pending</th>
+                                <th scope="col">Newspaper Publication Pending Since</th>
+                                <th scope="col">Final Police Report Pending Since</th>
+                                <th scope="col">Surrender Deed</th>
+
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for a in data %}
+                                <tr>
+                                    {% comment %} <td>{{forloop.counter}}</td> {% endcomment %}
+                                    <td>{{a.case_number}}</td>
+                                    <td>{{a.state_name}}</td>
+                                    <td>{{a.district_name}}</td>
+                                    <td>{{a.shelter_home_name}}</td>
+                                    <td>{{a.child_name}}</td>
+                                    {% comment %} <td>{{a.middle_name}}</td>
+                                    <td>{{a.last_name}}</td> {% endcomment %}
+                                    <td>{{a.linked_with_saa}}</td>
+                                    <td>{{a.gender}}</td>
+                                    <td nowrap>{{a.dob}}</td>
+                                    <td>{{a.age}}</td>
+                                    <td>{{a.classification}}</td>
+                                    <td>{{a.reco_adoption_inquiry}}</td>
+                                    <td nowrap>{{a.date_of_admission}}</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>{{a.guardian_relation}}</td>
+                                    <td nowrap>{{a.guardian_most_recent_visit}}</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td nowrap>{{a.last_review_date}}</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    
+                                </tr>
+                                {% endfor %}
+                            
+                            </tbody>
+                        </table>
+                    </div>
+
+
+                    <nav aria-label="...">
+                        {% if data.has_other_pages %}
+                        <ul class="pagination justify-content-end ">
+                            {% if data.has_previous %}
+                            <li class="paginate_button page-item"><a class="page-link" href="?page={{ 1 }}&field={{sorting_field}}&q={{search}}&start_date={{start_date}}&end_date={{end_date}}&q_case_number={{q_case_number}}&state={{state}}&district={{district}}&shelter={{shelter}}">First</a></li>
+                            {% comment %} <li class="paginate_button page-item"><a class="page-link" href="?page={{ data.previous_page_number }}">Previous</a></li> {% endcomment %}
+                            {% else %}
+                            <li class="paginate_button page-item disabled"><span class="page-link">First</span></li>
+                                {% comment %} <li class="paginate_button page-item disabled"><span class="page-link">Previous</span></li> {% endcomment %}
+                            {% endif %}
+                            {% for i in display_page_range %}
+                                {% if data.number == i %}
+                                <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
+                                {% else %}
+                                <li class="paginate_button paginate_button page-item"><a class="page-link" href="?page={{ i }}&field={{sorting_field}}&q={{search}}&start_date={{start_date}}&end_date={{end_date}}&q_case_number={{q_case_number}}&state={{state}}&district={{district}}&shelter={{shelter}}">{{ i }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if data.has_next %}
+                                {% comment %} <li class="paginate_button page-item"><a class="page-link" href="?page={{ data.next_page_number }}">Next</a></li> {% endcomment %}
+                                <li class="paginate_button page-item"><a class="page-link" href="?page={{ data.paginator.num_pages }}&field={{sorting_field}}&q={{search}}&start_date={{start_date}}&end_date={{end_date}}&q_case_number={{q_case_number}}&state={{state}}&district={{district}}&shelter={{shelter}}">Last</a></li>
+                            {% else %}
+                                {% comment %} <li class="paginate_button page-item disabled"><span class="page-link">Next</span></li> {% endcomment %}
+                                <li class="paginate_button page-item disabled"><span class="page-link">Last</span></li>
+                            {% endif %}
+                            </ul>
+                        {% endif %}
+                    </nav> 
+                </div> 
+            </div>
+
+        </div>
+    </div> <!-- end col -->
+</div> <!-- end row -->
+
+{% endblock %}

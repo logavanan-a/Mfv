@@ -1,0 +1,59 @@
+{% load static %}
+{% load report_tags %}
+<!-- responseive table and pagination section with the new set of data based on the change in the sort fields and page -->
+<div id="check_session_valid">{%comment%}<!--Dummy div added to check for session timeout in the ajax response-->{%endcomment%}</div>
+<div class="table-rep-plugin">
+    <input type="hidden" id="sort_order_hd_{{report_idx}}" name="sort_order_hd_{{report_idx}}" value="{{user_sort_order.0}}"/>
+    <input type="hidden" id="sort_field_hd_{{report_idx}}" name="sort_field_hd_{{report_idx}}" value="{{user_sort_field.0}}"/>
+    <input type="hidden" id="page_hd_{{report_idx}}" name="page_hd_{{report_idx}}" value="{{page_info.0|get_item:'current_page'}}"/>
+    <input type="hidden" id="rec_count_hd_{{report_idx}}" name="rec_count_hd_{{report_idx}}" value="{{page_info.0|get_item:'rec_count'}}"/>
+    <div class="table-responsive mb-0" data-pattern="priority-columns"  id="tb_resp_{{report_idx}}">
+        <table id="report_data_{{report_idx}}" class="table table-bordered report_table">
+            <thead>
+                {% for header in table_header.0%}
+                    <tr>
+                    {%for hrow in header %}
+                    <th {%if hrow|get_item:'colspan' > 1 %} style="text-align:center;word-wrap: break-word;"{%endif%}{%if hrow|get_item:'colspan' > 0 %} colspan="{{hrow|get_item:'colspan'}}" {% endif %} {%if hrow|get_item:'rowspan' > 0 %} rowspan="{{hrow|get_item:'rowspan'}}" {% endif %}>
+                            {{hrow|get_item:'label'|safe}}
+                        </th>
+                    {% endfor %}
+                    </tr>
+                {% endfor %}
+            </thead>
+            <tbody>
+                {% for row in data.0 %}
+                    <tr>
+                    {% for item in row %}
+                        <td {%comment%}{%if forloop.counter in nowrap_cols.0 %}nowrap{%endif%}{%endcomment%}>{{item|safe}}</td>
+                    {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12 col-md-12 col-lg-12" style="margin-top:5px;">
+        {% if page_info.0|get_item:'num_pages' > 1 %}
+        <ul class="pagination justify-content-end ">
+            {% if page_info.0|get_item:'current_page' > 1 %}
+                <li class="paginate_button page-item"><a href="" class="page-link data_reload{{report_idx}}" id="pg_{{report_idx}}_1">First</a></li>
+            {% else %}
+                <li class="paginate_button page-item disabled"><span class="page-link">First</span></li>
+            {% endif %}
+            {% for i in pagination_range %}
+                {% if page_info.0|get_item:'current_page' == i %}
+                    <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
+                {% else %}
+                    <li class="paginate_button paginate_button page-item"><a href="" class="page-link data_reload{{report_idx}}" id="pg_{{report_idx}}_{{i}}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if page_info.0|get_item:'current_page' < page_info.0|get_item:'num_pages' %}
+                <li class="paginate_button page-item"><a href="" class="page-link data_reload{{report_idx}}" id="pg_{{report_idx}}_{{page_info.0|get_item:'num_pages'}}" >Last</a></li>
+            {% else %}
+                <li class="paginate_button page-item disabled"><span class="page-link">Last</span></li>
+            {% endif %}
+            </ul>
+        {% endif %}
+    </div>  
+</div>

@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block extra_css %}
+<!-- Responsive Table css -->
+<link href="{% static 'libs/admin-resources/rwd-table/rwd-table.min.css' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block contents %}
+
+<div class="row">
+
+    <div class="col-12">
+
+        <div class="card">
+            <div class="card-body">
+                <form action="/report/{{report_slug}}/" method="GET">
+                    {% include 'partials/filters.html' %}
+                    {% comment %} {% include 'reports/report_dropdown_filter.html' %} {% endcomment %}
+
+                        {% comment %} <div class="row justify-content-end"> {% endcomment %}
+
+                            <div class="col mt-3 ">
+                                <i class="fa fa-info-circle float-end" data-html="true" data-toggle="tooltip" data-placement="top" title="The report will be exported as a CSV file. Please save it as an Excel file to format/sort/filter the data as required." style="margin-top: 14px;"></i>
+                                <button type="button" class="btn btn-primary waves-effect waves-light mb-2 float-end" onclick="location.href='?page={{ 1 }}&field={{sorting_field}}&order={{sorting_order}}&q={{search}}&start_date={{start_date}}&end_date={{end_date}}&q_case_number={{q_case_number}}&state={{state}}&district={{district}}&shelter={{shelter}}&export=true'">Export</button>
+                            </div> 
+                        {% comment %} </div>  {% endcomment %}
+                    </div> 
+
+                </form> 
+                
+                <div class="table-rep-plugin">
+                    <div class="table-responsive mb-0" data-pattern="priority-columns">
+                        <table id="tech-companies-1" class="table table-bordered report_table">
+                            <thead>
+                            <tr>
+                                {% for header in table_header %}
+                                    <th scope="col" >{{header}}</th>
+                                {% endfor %}
+                                {% comment %} <th>Sl.No</th> 
+                                <th scope="col" nowrap>State</th>
+                                <th scope="col">District</th>
+                                <th scope="col">Shelter Home</th>
+                                <th scope="col">Child Name</th>
+                                <th scope="col"  >Linked with SAA</th>
+                                <th scope="col"  >Case Number</th>
+                                <th scope="col"  >Gender</th>
+                                <th scope="col"  >Date of Birth</th>
+                                <th scope="col"  >Age</th>
+                                <th scope="col"  >Child Classification</th>
+                                <th scope="col"  >Recommended for Adoption Inquiry(Yes/No)</th>
+                                <th scope="col"  >Date of Admission</th>
+                                <th scope="col"  >Reason for admission</th>
+                                <th scope="col"  >Case History</th>
+                                <th scope="col"  >Guardian listed</th>
+                                <th scope="col"  >Family Visits / Phone Call</th>
+                                <th scope="col"  >Siblings (Yes/No)</th>
+                                <th scope="col"  >Last Date of CWC Order or Review</th>
+                                <th scope="col"  >Length of stay in the shelter</th>
+                                <th scope="col"  >Carings Registration Number</th>
+                                <th scope="col"  >LFA,CSR,MER Uploaded in CARINGS?</th>
+                                {% endcomment %}
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for a in data %}
+                                <tr>
+                                {% for i in a %}
+                                    {% comment %} <td>{{forloop.counter}}</td> {% endcomment %}
+                                    <td>{{a|get_item:i}}</td>
+                                    {% comment %} <td>{{a.state_name}}</td>
+                                    <td>{{a.district_name}}</td>
+                                    <td>{{a.shelter_home_name}}</td>
+                                    <td>{{a.child_name}}</td>
+                                    <td>{{a.middle_name}}</td>
+                                    <td>{{a.last_name}}</td>
+                                    <td>{{a.linked_with_saa}}</td>
+                                    <td>{{a.case_number}}</td>
+                                    <td>{{a.gender}}</td>
+                                    <td nowrap>{{a.dob}}</td>
+                                    <td>{{a.age}}</td>
+                                    <td>{{a.classification}}</td>
+                                    <td>{{a.reco_adoption_inquiry}}</td>
+                                    <td nowrap>{{a.date_of_admission}}</td>
+                                    <td >{{a.reason_for_adminssion}}</td>
+                                    <td>-</td>
+                                    <td>{{a.guardian_list}}</td>
+                                    <td nowrap>{{a.family_tacking}}</td>
+                                    <td>{{a.has_siblings}}</td>
+                                    <td nowrap>{{a.last_review_date}}</td>
+                                    <td >{{a.total_shelter_home_stay}}</td>
+                                    <td>{{a.caring_registration_number}}</td>
+                                    <td>{{a.carings_document_uploaded}}</td>
+                                     {% endcomment %}
+                                {% endfor %}
+                                </tr>
+
+                                {% endfor %}
+                            
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+
+                    <nav aria-label="...">
+                        {% if data.has_other_pages %}
+                        <ul class="pagination justify-content-end ">
+                            {% if data.has_previous %}
+                            <li class="paginate_button page-item"><a class="page-link" href="?page={{ 1 }}&field={{sorting_field}}&order={{sorting_order}}&q={{search}}&start_date={{start_date}}&end_date={{end_date}}&q_case_number={{q_case_number}}&state={{state}}&district={{district}}&shelter={{shelter}}{% for filter in filter_values %}&{{filter.0}}={{req_data|get_item:filter.0}}{% endfor %}">First</a></li>
+                            {% comment %} <li class="paginate_button page-item"><a class="page-link" href="?page={{ data.previous_page_number }}">Previous</a></li> {% endcomment %}
+                            {% else %}
+                            <li class="paginate_button page-item disabled"><span class="page-link">First</span></li>
+                                {% comment %} <li class="paginate_button page-item disabled"><span class="page-link">Previous</span></li> {% endcomment %}
+                            {% endif %}
+                            {% for i in display_page_range %}
+                                {% if data.number == i %}
+                                <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
+                                {% else %}
+                                <li class="paginate_button paginate_button page-item"><a class="page-link" href="?page={{ i }}&field={{sorting_field}}&order={{sorting_order}}&q={{search}}&start_date={{start_date}}&end_date={{end_date}}&q_case_number={{q_case_number}}&state={{state}}&district={{district}}&shelter={{shelter}}{% for filter in filter_values %}&{{filter.0}}={{req_data|get_item:filter.0}}{% endfor %}">{{ i }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if data.has_next %}
+                                {% comment %} <li class="paginate_button page-item"><a class="page-link" href="?page={{ data.next_page_number }}">Next</a></li> {% endcomment %}
+                                <li class="paginate_button page-item"><a class="page-link" href="?page={{ data.paginator.num_pages }}&field={{sorting_field}}&order={{sorting_order}}&q={{search}}&start_date={{start_date}}&end_date={{end_date}}&q_case_number={{q_case_number}}&state={{state}}&district={{district}}&shelter={{shelter}}{% for filter in filter_values %}&{{filter.0}}={{req_data|get_item:filter.0}}{% endfor %}">Last</a></li>
+                            {% else %}
+                                {% comment %} <li class="paginate_button page-item disabled"><span class="page-link">Next</span></li> {% endcomment %}
+                                <li class="paginate_button page-item disabled"><span class="page-link">Last</span></li>
+                            {% endif %}
+                            </ul>
+                        {% endif %}
+                    </nav> 
+                </div> 
+            </div>
+        </div>
+    </div> <!-- end col -->
+</div> <!-- end row -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.js"></script>
+
+{% comment %} <script>
+    let ans= document.querySelectorAll('dropdown-menu');
+    //items=ans.getElementsByTagName("li");
+    //Cookies.set('toggle-tech-companies-1-col-5')
+    console.log(ans)
+    for (let i = 0; i < ans.length; i++){
+        console.log(items[i])
+    }
+</script> {% endcomment %}
+<script>
+    $(document).ready(function () {
+        $("i").tooltip({
+            'selector': '',
+            'placement': 'top',
+            'container':'body'
+        });
+    });
+</script>
+{% endblock %}
+{% block extra_javascript %}
+        <!-- Responsive Table js -->
+        <script src="{% static 'libs/admin-resources/rwd-table/rwd-table.min.js' %}"></script>
+
+        <!-- Init js -->
+        <script src="{% static 'js/pages/table-responsive.init.js' %}"></script>
+        
+{% endblock %}

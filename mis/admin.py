@@ -6,7 +6,7 @@ from mis.models import MissionIndicatorAchievement, Task, DataEntryRemark
 
 @admin.register(MissionIndicatorAchievement)
 class AdminMissionIndicatorAchievement(ImportExportActionModelAdmin,admin.ModelAdmin):
-    exclude = ['response']
+    # exclude = ['response']
     search_fields = ['task__name']
     list_display = ('id', 'active', 'created', 'modified', 'listing_order', 'task', 'number_working_days', 'project_reference_file', 'camp_organized')
     # def get_list_display(self, request):

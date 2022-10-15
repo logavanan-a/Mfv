@@ -1,0 +1,920 @@
+import os
+from django.conf import settings
+import pandas as pd
+import traceback
+import sys
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import render, get_list_or_404
+from django.contrib.auth.decorators import login_required
+from django.db import connection
+from .models import ReportMeta
+from dashboard.models import DashboardSummaryLog
+# from master_data.models import Centre, State, District, ShelterHome, UserRoleLocationLevelConfig, UserLocationRelation, Menu, ChildClassification
+from django.contrib.contenttypes.models import ContentType
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from dateutil.relativedelta import relativedelta
+import copy
+import json
+import re
+import csv
+import logging
+from application_master.models import Donor,Mission,Project,MissionIndicator,MissionIndicatorCategory,Partner
+from django.contrib.auth.models import User
+
+
+logger = logging.getLogger(__name__)
+# ****************************************************************************
+# execute Raw SQL
+# ****************************************************************************
+
+
+def return_sql_results(sql):
+    #logger.error('query:'+ sql)
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    rows = cursor.fetchall()
+    return rows
+
+
+# ****************************************************************************
+# Excel function for export
+# ****************************************************************************
+
+
+def write_to_excel_from_normalized_table(conn_str, sql_query, headers_list, custom_export_header, rows_in_chunk, sheetname, excelWriter):
+    # read from sql table into the pandas dataframe in chucks, this returns a list of dataframes - one for each chunk
+    import pandas
+
+    # create headers rows and write to excel sheet
+    header_row_count = 1
+    row_data = {}
+    # build a empty row dataframe with only the header information with below structure - dict
+    # {(tuple with headers):{empty data dict}}
+    # {('header level1','header level2'):{}}
+    if custom_export_header:
+        # custom export header is used to add custom header info - mostly multi level headers like the child classification report
+        for i in custom_export_header:
+            row_data.update({tuple(i): {}})
+        header_row_count = len(custom_export_header[0])
+        header_df = pd.DataFrame.from_dict(row_data)
+    else:
+        # when custom export header is None, then add the report headers as the export excel headers
+        col_list = []
+        for i in headers_list[0]:
+            # remove any <br/> added in the header as formatting on the html pages
+            header_text = i.get('label', '').replace('<br/>', '')
+            col_list.append(header_text)
+        header_df = pd.DataFrame([], columns=col_list)
+        header_row_count = 1
+    normalized_df_list = pandas.read_sql_query(
+        sql_query, con=conn_str, chunksize=rows_in_chunk)
+    start_row = header_row_count
+    # set header to False indicating not to add the header data/row
+    header_info = False
+    df_count = 0
+    try:
+        for chunk_df in normalized_df_list:
+            chunk_df.index += (df_count * rows_in_chunk)+1
+            df_count = df_count + 1
+            chunk_df.to_excel(excelWriter, sheet_name=sheetname,
+                              startrow=start_row, header=header_info, encoding='utf-8')
+            # add the dataframe size (rows read from table/ chunk size) and header rows count (1 for first iteration and 0 for further iterations)
+            start_row = start_row + chunk_df.shape[0] #+ header_row_count
+            # set flags to indicate first dataframe is written to excel
+            # set header row count used in the calcuation of start row to 0 as no further header rows will be added
+            header_row_count = 0
+            # unset flag for header info to false as no further header details will be written to sheet
+            header_info = False
+
+        # add the header row rowas at row 0 - insert it as a new data frame with empty data and the header rows
+        header_df.to_excel(excelWriter, sheet_name=sheetname,
+                           startrow=0, encoding='utf-8')
+    except Exception as e:
+        df_count = 0
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        error_stack = repr(traceback.format_exception(
+            exc_type, exc_value, exc_traceback))
+        logger.error(error_stack)
+        raise
+
+
+@ login_required(login_url='/login/')
+def custom_report(request, page_slug):
+    # TODO:settings reports_row_per_page
+    rows_per_page = 10
+    if request.method == "POST":
+        req_data = request.POST
+    elif request.method == "GET":
+        req_data = request.GET
+    mat_view_last_updated = DashboardSummaryLog.objects.get(
+        active=2, log_key='mat_partner_mission_meta_view').last_successful_update
+    # TODO: check the value to check in request
+    # print(req_data.get('export'))
+    export_flag = True if req_data.get('export') and req_data.get(
+        'export').lower() == 'true' else False
+    # order of reports is specified in the ReportMeta default ordering
+    # page_reports = get_list_or_404(ReportMeta, page_slug=page_slug, active=2)
+    page_reports = ReportMeta.objects.filter(
+        page_slug=page_slug, active=2).order_by('display_order')
+    # temp veriable
+    data_query_list = []
+    #report_tabs = []
+    section_title = []
+    table_header = []
+    custom_export_headers = []
+    total_header_cols = []
+    report_slug_list = []
+    data = []
+    # nowrap_cols = []
+    user_sort_field = []
+    user_sort_order = []
+    page_info = []
+    sorting_field = []
+    # user_filter_values = {}
+    user_location_data = None
+    filter_values = None
+
+    # get user selected filter data and merge with the user configured location heirarcy
+    for idx, report in enumerate(page_reports):
+        r_slug = report.report_slug
+        s_title = report.report_title
+        f_info = report.filter_info
+        s_info = report.sort_info
+        r_query = report.report_query
+        d_query = r_query['sql_query']
+        c_query = r_query['count_query'] if r_query['count_query'] else ''
+        # nw_cols = r_query['nowrap_cols']
+        headers = report.report_header
+        e_header = report.custom_export_header
+        # all filter settings are set based on the first report filters
+        if idx == 0:
+            page_slug = report.page_slug
+            user_location_data, filter_values, user_filter_values, extended_filter_dict = get_filter_data(
+                request, req_data, f_info)
+        # update any variable_location_names  - in query, count query, sort and headers
+        default_sort = r_query['default_sort'] if 'default_sort' in r_query else None
+
+
+        headers, e_header, data_query, count_query, s_info, default_sort = apply_variable_location_info(
+            headers, e_header, d_query, c_query, s_info, default_sort, user_filter_values, user_location_data)
+        sort_field, sort_order = set_sort_options(
+            req_data, idx, s_info, default_sort)
+        user_sort_field.append(sort_field)
+        user_sort_order.append(sort_order)
+
+        # page reloads on click of filter, so current page is always set to 1
+        current_page = 1
+        data_query, count_query = apply_filters_to_query(
+            data_query, count_query, f_info, sort_field, sort_order, user_filter_values, current_page, rows_per_page, extended_filter_dict, export_flag)
+
+        # table header details
+        table_header.append(headers)
+        # get total columns count (colspan sum) - used to display the no records found row
+        header_col_count = 0
+        for item in headers[0]:
+            colspan = item.get('colspan', 0)
+            header_col_count += colspan if colspan > 0 else 1
+
+
+        data_query_list.append(data_query)
+        data.append(return_sql_results(data_query))
+
+        total_header_cols.append(header_col_count)
+        report_slug_list.append(r_slug)
+        custom_export_headers.append(e_header)
+        section_title.append(s_title)
+        # nowrap_cols.append(nw_cols)
+        sorting_field.append(s_info)
+
+        # if not for export, prepare pagination details
+        if export_flag == False:
+            # fetch record count and calcualte pagination info
+            total_records = 0
+            # count_result = return_sql_results(count_query)
+            # if count_result:
+            #     total_records = count_result[0][0]
+            p_info = calculate_pagination_info(total_records, 1, rows_per_page)
+            page_info.append(p_info)
+            # pagination_range will be same for all reports in the page
+            pagination_range = range(p_info.get(
+                'start_page'), p_info.get('end_page')+1)
+    sidebar_active = 'Report'
+    heading = section_title[0]
+    # if export button click, create excel and return as response
+    if export_flag == True:
+        return generate_export_excel(section_title[0], data_query_list, table_header, custom_export_headers, section_title)
+    return render(request, 'reports/multitab_report.html', locals())
+
+
+def generate_export_excel(report_title, data_query_list, table_headers, custom_export_headers, sheet_names):
+    from django.conf import settings
+    excelWriter = None
+    try:
+        # Excel path
+        rows_in_chunk = 20000
+        db_name = settings.DATABASES['default'].get('NAME')
+        username = settings.DATABASES['default'].get('USER')
+        password = settings.DATABASES['default'].get('PASSWORD')
+        hostname = settings.DATABASES['default'].get('HOST')
+        # IMPORTANT : Please ensure @ not used in the username and password. This will affect the connection string
+        conn_str = "postgresql+psycopg2://" + username + ":" + password + \
+            "@" + hostname + "/" + db_name + "?client_encoding=UTF8"
+        MEDIA_ROOT = str(settings.MEDIA_ROOT) + '/temp_export_data/'
+        import datetime
+        file_name = re.sub("(\s)|(')|(-)", '_', report_title)
+        folder_file_name = file_name + "_" + \
+            datetime.datetime.today().strftime("%d%m%y%H%M%S%f") + ".xlsx"
+        attachment_name = file_name + "_" + \
+            datetime.datetime.today().strftime("%d%m%y%H%M") + ".xlsx"
+        excelWriter = pd.ExcelWriter(MEDIA_ROOT+folder_file_name, mode='w')
+        for idx, sql_query in enumerate(data_query_list):
+            # sheetname is limited to 30 chars othewise excel gives an error while opening
+            write_to_excel_from_normalized_table(
+                conn_str, sql_query, table_headers[idx], custom_export_headers[idx], rows_in_chunk, sheet_names[idx][0:30], excelWriter)
+
+    finally:
+        if excelWriter:
+            excelWriter.save()
+
+    if os.path.exists(MEDIA_ROOT+folder_file_name):
+        excel = open(MEDIA_ROOT+folder_file_name, "rb")
+        data = excel.read()
+        response = HttpResponse(
+            data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=%s' % attachment_name
+        os.remove(MEDIA_ROOT+folder_file_name)
+        return response
+
+
+def get_loc_filter_value(user_filter_value, user_location_data_value):
+    loc_id = ''
+    if user_filter_value != '':
+        loc_id = user_filter_value
+    elif user_location_data_value != 0:
+        loc_id = str(user_location_data_value)
+    return loc_id
+
+
+def update_location_data_with_user_filter(model, loc_data_index, selected_loc_id, user_location_data):
+    loc_data = user_location_data[loc_data_index]
+    # import ipdb;ipdb.set_trace()
+    # if locaiton_level is not configured data for the user, fetch all sub locations for the selected location id
+    if loc_data[2] == False:
+        # if model == State and user_location_data[1][0] != '0':
+        #     loc_list = list(State.objects.filter(
+        #         active=2,id=user_location_data[0][0]).values_list('id', 'name').order_by('name'))
+        #     loc_data[4].update({str(0): loc_list})
+        # elif model == State:
+        if model == State:
+            loc_list = list(State.objects.filter(
+                active=2).values_list('id', 'name').order_by('name'))
+            loc_data[4].update({str(0): loc_list})
+        elif model == District and user_location_data[1][0] != '0':
+            loc_list = list(District.objects.filter(
+                state_id=user_location_data[0][0], active=2).values_list('id', 'name').order_by('name'))
+            loc_data[4].update({str(user_location_data[0][0]): loc_list})
+        elif model == ShelterHome and user_location_data[1][0] != '0':
+            loc_list = list(ShelterHome.objects.filter(
+                district_id=user_location_data[1][0],excluded_shelterhome=False, active=2).values_list('id', 'name').order_by('name'))
+            loc_data[4].update({str(user_location_data[1][0]): loc_list})
+    user_location_data[loc_data_index] = loc_data
+    user_location_data[loc_data_index][0] = int(
+        selected_loc_id) if selected_loc_id != '' else 0
+    return user_location_data
+
+
+def get_filter_data(request, req_data, f_info):
+    from datetime import datetime as dt
+    filter_values = []
+    quarter_month_mapper = {"1": 4, "2": 4, "3": 4, "4": 1, "5": 1,
+                            "6": 1, "7": 2, "8": 2, "9": 2, "10": 3, "11": 3, "12": 3}
+    current_month = dt.now().strftime('%Y%-m')
+    current_qtr = quarter_month_mapper.get(current_month[4:])
+    current_year = int(current_month[0:4])
+    current_year = current_year - 1 if current_qtr == 4 else current_year
+    extended_filters_dict = {}
+    # prepare the filter values with fixed order - state, district, shelter and rest of the filters added at the end
+    filter_display_order = -1
+    f_labels = f_info['filter_labels']
+    filter_keys = f_info['filter_labels'].keys()
+    user_filter_values = {}
+    display_order = f_info['display_order']
+    for key in filter_keys:
+        str_val = req_data.get(key, '')
+        if key == 'start_month':
+            str_val=str_val.replace('-','')
+        user_filter_values.update({key: str_val})
+        # if key in ['state', 'district', 'shelter']:
+        #     filter_values.append([])
+
+    # logger.error('user_filter_values:' + str(user_filter_values))
+    user_location_data = request.session['user_location_data'] if 'user_location_data' in request.session else None
+    # if user_location_data == None:
+        # logger.error('load session-----------------------------')
+        # load_user_details_to_sessions(request)
+        # user_location_data = request.session['user_location_data']
+    # user_location_data = copy.deepcopy(user_location_data)
+    # logger.error("get_filter_data(user_location_data*COPY:"+ str(user_location_data))
+    # state_id = get_loc_filter_value(user_filter_values.get(
+    #     'state', ''), user_location_data[0][0])
+    # district_id = get_loc_filter_value(user_filter_values.get(
+    #     'district', ''), user_location_data[1][0])
+    # shelter_id = get_loc_filter_value(user_filter_values.get(
+    #     'shelter', ''), user_location_data[2][0])
+    
+    # user_location_data = update_location_data_with_user_filter(
+    #     State, 0, state_id, user_location_data)
+    # user_location_data = update_location_data_with_user_filter(
+    #     District, 1, district_id, user_location_data)
+    # user_location_data = update_location_data_with_user_filter(
+    #     ShelterHome, 2, shelter_id, user_location_data)
+    # prepare filter values for the template
+    user_location_dict = request.session['user_location_dict'] if 'user_location_dict' in request.session else None
+    logger.error("user_location_dict:" + str(user_location_dict))
+    loc_data = None
+    for i in display_order:
+        filter_values.append([])
+    data_id=0
+    filter_type=''
+    for k in filter_keys:
+        data_list = []
+        filter_display_order = -1
+        if k in display_order:
+            filter_display_order = display_order.index(k)
+
+        # if k == 'state':
+        #     loc_data = user_location_data[0][4]
+        #     data_id = str(user_location_data[0][0])
+        #     data_list = loc_data.get('0', [])
+        #     # logger.error('state-data_id:'+data_id)
+        #     # logger.error('user_location_data[0][2]:'+str(user_location_data[0][2]))
+        #     if (data_id == '0' or len(data_list) == 1) and user_location_data[0][2] == True:
+        #         query_data_id = user_location_dict.get('state', [])
+        #         query_data_id = ','.join([str(i) for i in query_data_id])
+        #         user_filter_values.update({'state': query_data_id})
+        #     filter_type = 'select'
+        # elif k == 'district':
+        #     loc_data = user_location_data[1][4]
+        #     data_id = str(user_location_data[1][0])
+        #     state_id = str(user_location_data[0][0])
+        #     data_list = loc_data.get(state_id, [])
+        #     # logger.error('district-data_id:'+data_id)
+        #     # logger.error('user_location_data[1][2]:'+str(user_location_data[1][2]))
+        #     if (data_id == '0' or len(data_list) == 1) and user_location_data[1][2] == True:
+        #         query_data_id = user_location_dict.get('district', [])
+        #         query_data_id = ','.join([str(i) for i in query_data_id])
+        #         # logger.error('query_data_id:'+str(query_data_id))
+        #         user_filter_values.update({'district': query_data_id})
+        #     filter_type = 'select'
+        # elif k == 'shelter':
+        #     loc_data = user_location_data[2][4]
+        #     data_id = str(user_location_data[2][0])
+        #     district_id = str(user_location_data[1][0])
+        #     data_list = loc_data.get(district_id, [])
+        #     if (data_id == '0' or len(data_list) == 1) and user_location_data[2][2] == True:
+        #         query_data_id = user_location_dict.get('shelter', [])
+        #         query_data_id = ','.join([str(i) for i in query_data_id])
+        #         user_filter_values.update({'shelter': query_data_id})
+        #     filter_type = 'select'
+        if k == 'donor':
+            donor_list = Donor.objects.filter(
+                active=2).values_list('id', 'name')
+            data_list = [(str(item[0]), item[1])
+                         for item in donor_list]
+            data_id = user_filter_values.get('donor', '')
+            filter_type = 'select'
+        elif k == 'partner':
+            partner_list = Partner.objects.filter(
+                active=2).values_list('id', 'name')
+            data_list = [(str(item[0]), item[1])
+                         for item in partner_list]
+            data_id = user_filter_values.get('partner', '')
+            filter_type = 'select'
+        elif k == 'project':
+            project_list = Project.objects.filter(
+                active=2).values_list('id', 'name')
+            data_list = [(str(item[0]), item[1])
+                         for item in project_list]
+            data_id = user_filter_values.get('project', '')
+            filter_type = 'select'
+        elif k == 'category':
+            category_list = MissionIndicatorCategory.objects.filter(
+                active=2).values_list('id', 'name')
+            data_list = [(str(item[0]), item[1])
+                         for item in category_list]
+            data_id = user_filter_values.get('category', '')
+            filter_type = 'select'
+        elif k == 'indicator':
+            indicator_list = MissionIndicator.objects.filter(
+                active=2).values_list('id', 'name')
+            data_list = [(str(item[0]), item[1])
+                         for item in indicator_list]
+            data_id = user_filter_values.get('indicator', '')
+            filter_type = 'select'
+        elif k == 'start_month':
+            data_list = []
+            data_id = user_filter_values.get('start_month', '')
+            if data_id != '':
+                data_id='-'.join([data_id[:4],data_id[4:6]])
+            filter_type = 'month'
+        # elif k == 'end_month':
+        #     data_list = []
+        #     data_id = user_filter_values.get('end_month', '')
+            # filter_type = 'month'
+        elif k == 'case_worker_qtr_start':
+            # TODO: Hardcoded quarters needs to be change to display current quarter and previous 4 quarters
+            data_list = [("202102", "FY'21 Q2"), ("202103", "FY'21 Q3"), ("202104",
+                                                                          "FY'21 Q4"), ("202201", "FY'22 Q1"), ("202202", "FY'22 Q2")]
+            data_id = user_filter_values.get('case_worker_qtr_start', '')
+            data_id = str(current_year*100 +
+                          current_qtr) if data_id == '' else data_id
+            filter_type = 'select'
+            qtr_end = user_filter_values.get('case_worker_qtr_end', '')
+            qtr_end = str(current_year*100 +
+                          current_qtr) if qtr_end == '' else qtr_end
+            extended_filters_dict = add_extended_filters(data_id, qtr_end)
+        elif k == 'case_worker_qtr_end':
+            # TODO: Hardcoded quarters needs to be change to display current quarter and previous 4 quarters
+            data_list = [("202102", "FY'21 Q2"), ("202103", "FY'21 Q3"), ("202104",
+                                                                          "FY'21 Q4"), ("202201", "FY'22 Q1"), ("202202", "FY'22 Q2")]
+            data_id = user_filter_values.get('case_worker_qtr_end', '')
+            data_id = str(current_year*100 +
+                          current_qtr) if data_id == '' else data_id
+            filter_type = 'select'
+        if filter_display_order == -1:
+            filter_values.append(
+                [k, data_list, data_id, f_labels.get(k, ''), filter_type])
+        else:
+            filter_values[filter_display_order] = [
+                k, data_list, data_id, f_labels.get(k, ''), filter_type]
+
+    return user_location_data, filter_values, user_filter_values, extended_filters_dict
+
+
+def add_extended_filters(qtr_start, qtr_end):
+    import datetime
+    qtr_start_months = {"1": 4, "2": 7, "3": 10, "4": 1}
+    qtr_end_months = {"1": 6, "2": 9, "3": 12, "4": 3}
+    extended_filters_dict = {}
+    fy_start_year = qtr_start[:4]
+    start_qtr = int(qtr_start[-2:])
+    end_qtr = int(qtr_end[-2:])
+    qtr_start_month = qtr_start_months.get(str(start_qtr))
+    fy_start_year = int(fy_start_year) + \
+        1 if qtr_start_month == 1 else int(fy_start_year)
+    fy_end_year = int(qtr_end[:4])
+    qtr_end_month = qtr_end_months.get(str(end_qtr))
+    # generate the list of quearters to be included as per the start and end quarters
+    qtr_range = []
+    sq = start_qtr
+    cy = fy_start_year
+    while True:
+        for i in range(sq, 5):
+            qtr_range.append(str(cy*100+i))
+            if cy == fy_end_year and i >= end_qtr:
+                break
+        if cy < fy_end_year:
+            cy = cy + 1
+            sq = 1
+        else:
+            break
+    qtr_range_str = ''
+    for idx, i in enumerate(qtr_range):
+        if idx >= 1:
+            qtr_range_str = qtr_range_str + ","
+        qtr_range_str = qtr_range_str + "'" + i + "'"
+    
+    # caluclate the end and start months to be used in the query
+    fy_end_year = int(
+        fy_end_year) + 1 if qtr_end_month == 3 else int(fy_end_year)
+    filter_start_date = str(fy_start_year)+"-" + \
+        str(qtr_start_month).rjust(2, '0')+"-01"
+    filter_end_date = str(fy_end_year)+"-" + \
+        str(qtr_end_month).rjust(2, '0')+"-01"
+    filter_end_date = datetime.datetime.strptime(filter_end_date, '%Y-%m-%d')
+    filter_end_date = filter_end_date + relativedelta(months=1)
+    filter_end_date = filter_end_date.strftime('%Y-%m-%d')
+    qtr_range = []
+
+    extended_filters_dict.update({'case_worker_qtr_ext_filter': """ and (case_worker_start_date < '""" + filter_end_date + """'::date 
+                                and (case_worker_pause_date is null or case_worker_pause_date >= '""" + filter_start_date + """'::date)
+                                and (case_worker_end_date is null 
+                                    or case_worker_end_date >= '""" + filter_start_date + """'::date)
+                                )"""})
+    # extended_filters_dict.update({'case_worker_qtr_ext_filter': """ and ((case_worker_start_date >= '""" + filter_start_date + """'::date and case_worker_start_date < '""" + filter_end_date + """'::date)
+    #     or (case_worker_pause_date >= '""" + filter_start_date + """'::date and case_worker_pause_date < '""" + filter_end_date + """'::date)
+    #     or (case_worker_end_date >= '""" + filter_start_date + """'::date and case_worker_end_date < '""" + filter_end_date + """'::date))"""})
+    extended_filters_dict.update({'qtr_range_ext_filter': qtr_range_str})
+    #logger.error("EXTENDED FILTER: " + str(extended_filters_dict))
+    return extended_filters_dict
+
+
+def update_variable_sort_details(sort_info, default_sort, location_name, location_filter, const_variable_location_name):
+    # update sort info
+    # key_list = sort_info.keys()
+    updated_sort_info = {}
+    # for key in sort_info:
+    #     value = sort_info.get(key)
+    #     if value == const_variable_location_name and key == const_variable_location_name:
+    #         # sort_info.pop(key)
+    #         updated_sort_info.update(
+    #             {location_filter.capitalize(): location_name})
+    #     else:
+    #         updated_sort_info.update({key: value})
+    # update default sort
+    if default_sort:
+        default_sort_field = default_sort.get('sort_field', '')
+        default_sort.update({'sort_field': default_sort_field.replace(
+            const_variable_location_name, location_name)})
+    return default_sort, updated_sort_info
+
+
+def apply_variable_location_info(header, custom_export_header, data_query, count_query, sort_info, default_sort, user_filter_values, user_location_data):
+    location_name = ''
+    # state_id = ''
+    # district_id = ''
+    # shelter_home_id = ''
+    const_variable_location_name = '@@variable_location_name'
+    # for key in user_filter_values:
+    #     if key == 'state':
+    #         state_id = user_filter_values.get('state','')
+    #     elif key == 'district':
+    #         district_id = user_filter_values.get('district','')
+    #     elif key == 'shelter':
+    #         shelter_home_id = user_filter_values.get('shelter','')
+    # get the location_name based on the filter values
+    # if user_location_data[0][0] == 0:
+    #     location_name = "state_name"
+    #     location_filter = 'State'
+    # # elif state_id != '' and (district_id == '' or (district_id != '' and ('shelter' in user_filter_values or shelter_home_id == ''))):
+    # elif user_location_data[0][0] != 0 and (user_location_data[1][0] == 0 or (user_location_data[1][0] != 0 and ('shelter' in user_filter_values or user_location_data[2][0] == 0))):
+    #     location_name = "district_name"
+    #     location_filter = 'District'
+    # else:
+    #     location_name = "shelter_home_name"
+    #     location_filter = 'Shelterhome'
+    location_filter = ''
+
+    # update custom export header
+    if custom_export_header:
+        for row_idx, row in enumerate(custom_export_header):
+            for col_idx, item in enumerate(row):
+                if item == const_variable_location_name:
+                    custom_export_header[row_idx][col_idx] = location_filter
+
+    # update header data
+    for row in header:
+        for col in row:
+            col_label = col.get('label')
+            if col_label == const_variable_location_name:
+                col_label = col_label.replace(
+                    const_variable_location_name, location_filter)
+                col.update({'label': col_label})
+    default_sort, sort_info = update_variable_sort_details(
+        sort_info, default_sort, location_name, location_filter, const_variable_location_name)
+    # update data and count queries
+    data_query = data_query.replace(
+        const_variable_location_name, location_name)
+    count_query = count_query.replace(
+        const_variable_location_name, location_name)
+    return header, custom_export_header, data_query, count_query, sort_info, default_sort
+
+
+def set_sort_options(req_data, idx, s_info, default_sort):
+    sort_field = req_data.get('sort_field_'+str(idx), '')
+    sort_order = req_data.get('sort_order_'+str(idx), 'asc')
+    # set the default sort order if configured in the report_query section - key : default_sort and value is a dict with sort_order and sort_fields
+    # "default_sort":{"sort_field":"classification","sort_order":"asc"}
+    if default_sort:
+        if 'sort_field' in default_sort and sort_field == '':
+            sort_field = default_sort.get('sort_field', '')
+        if 'sort_order ' in default_sort and sort_field == '':
+            sort_order = default_sort.get('sort_order', 'asc')
+    elif sort_field == '':
+        # when default sort not specified, set the sort field to first key in the list and order to asc
+        for key in s_info:
+            sort_field = s_info.get(key, '')
+            sort_order = 'asc'
+            break
+    return sort_field, sort_order
+
+
+def apply_filters_to_query(data_query, count_query, filter_info, sort_field, sort_order, user_filter_values, current_page, rows_per_page, extended_filter_dict, export_flag):
+    # apply filters and sort conditions to query
+    filter_cond = filter_info['filter_cond']
+    # IMPORTANT - Please cast all timezone aware timestamp fields to timestamps without timezone in the query
+    # or use the to_char function and pass required format
+    # logger.error("user_filter_values:"+str(user_filter_values))
+    for key in filter_cond.keys():
+        filter_value = user_filter_values.get(key)
+        updated_cond = ''
+        if filter_value != None and filter_value != '' and filter_value != '0':
+            f_cond = filter_cond[key]
+            if f_cond.lower().replace(' ','').find("in(@@filter_value)") == -1:
+                updated_cond = filter_cond[key].replace('@@filter_value',filter_value)
+            else:
+                updated_cond = filter_cond[key].replace(
+                    '@@filter_value', filter_value)
+        data_query = data_query.replace('@@'+key+'_filter', updated_cond)
+        count_query = count_query.replace('@@'+key+'_filter', updated_cond)
+    # apply extended filters dict
+    for f_key, f_value in extended_filter_dict.items():
+        data_query = data_query.replace('@@'+f_key, f_value)
+        count_query = count_query.replace('@@'+f_key, f_value)
+    limits_query = ''
+    if export_flag is None or export_flag == False:
+        limits_query = ' LIMIT ' + \
+            str(rows_per_page) + ' OFFSET ' + \
+            str(rows_per_page*(current_page-1))
+    else:
+        data_query = data_query.replace('<br/>', '')
+    data_query = data_query.replace('@@LIMITS', limits_query)
+
+    sortings = ''
+    if sort_field != None and sort_field != '':
+        sort_order = '' if sort_order == None else sort_order
+        sortings = ' order by ' + sort_field + ' ' + sort_order + ' '
+    data_query = data_query.replace('@@sortings', sortings)
+    # logger.error("Report Query" + report_query)
+    # logger.error("Count Query" + count_query)
+    return data_query, count_query
+
+# [
+#   [4, 'Telangana', [[4, 'Telangana']], True, {'4': [[401, 'Hyderabad'], [405, 'Nizamabad']]}],
+#   [0, '', [[401, 'Hyderabad'], [405, 'Nizamabad']], True, {}],
+#   [0, '', [], False, {}]
+# ]
+
+
+def calculate_pagination_info(total_records, current_page, rows_per_page):
+    # TODO: get display page range from settings
+    display_page_range = 10
+    num_pages = int(total_records/rows_per_page)
+    num_pages = num_pages if total_records % rows_per_page == 0 else num_pages + 1
+    start_page = (current_page - int(display_page_range/2))
+    start_page = 1 if start_page < 1 else start_page
+    end_page = start_page + display_page_range - 1
+    end_page = num_pages if end_page > num_pages else end_page
+    first_row = ((current_page-1)*rows_per_page) + 1
+    last_row = (current_page*rows_per_page)
+    last_row = total_records if last_row > total_records else last_row
+    # logger.error("total:" + str(total_records) + "/ current_page:" + str(current_page) + "/ rows_per_page:"+str(rows_per_page))
+    dicta = {"rec_count": total_records, "current_page": current_page, "rows_per_page": rows_per_page, "display_page_range": display_page_range,
+             "num_pages": num_pages, "start_page": start_page, "end_page": end_page, "first_row": first_row, "last_row": last_row}
+    # for key in dicta.keys():
+    # print(key+":" + str(dicta.get(key)))
+    return {"rec_count": total_records, "current_page": current_page, "rows_per_page": rows_per_page, "display_page_range": display_page_range,
+            "num_pages": num_pages, "start_page": start_page, "end_page": end_page, "first_row": first_row, "last_row": last_row}
+
+
+@ login_required(login_url='/login/')
+def custom_report_reload(request, page_slug, report_slug):
+    import sys
+    import traceback
+    html = ''
+    # TODO:settings reports_row_per_page
+    rows_per_page = 10
+    try:
+        if request.method == 'POST' and request.is_ajax():
+            if request.method == "POST":
+                req_data = request.POST
+            elif request.method == "GET":
+                req_data = request.GET
+
+            # order of reports is specified in the ReportMeta default ordering
+            # page_reports = get_list_or_404(ReportMeta, page_slug=page_slug, active=2)
+            page_reports = ReportMeta.objects.filter(
+                page_slug=page_slug, active=2).order_by('display_order')
+            table_header = []
+            report_slug_list = []
+            data = []
+            nowrap_cols = []
+            user_sort_field = []
+            user_sort_order = []
+            sorting_field = []
+            page_info = []
+            user_filter_values = {}
+            total_header_cols = []
+            report_idx = 0
+            for idx, report in enumerate(page_reports):
+                if report.report_slug == report_slug:
+                    report_idx = idx
+                else:
+                    continue
+                report_slug_list.append(report.report_slug)
+                # filter_keys = filter_info['filter_labels'].keys()
+                # for key in filter_keys:
+                #     str_val = req_data.get(key,'')
+                #     user_filter_values.update({key:str_val})
+                r_query = report.report_query
+                d_query = r_query['sql_query']
+                c_query = r_query['count_query'] if r_query['count_query'] else ''
+                f_info = report.filter_info
+                s_info = report.sort_info
+                e_header = report.custom_export_header
+                headers = report.report_header  # table_header
+                # nowrap_cols.append(report.report_query['nowrap_cols'])
+                user_location_data, filter_values, user_filter_values, extended_filter_dict = get_filter_data(
+                    request, req_data, f_info)
+                # update any variable_location_names  - in query, count query, sort and headers
+                default_sort = r_query['default_sort'] if 'default_sort' in r_query else None
+                headers, e_header, data_query, count_query, s_info, default_sort = apply_variable_location_info(
+                    headers, e_header, d_query, c_query, s_info, default_sort, user_filter_values, user_location_data)
+                sort_field, sort_order = set_sort_options(
+                    req_data, report_idx, s_info, default_sort)
+                user_sort_field.append(sort_field)
+                user_sort_order.append(sort_order)
+
+                current_page = int(req_data.get('page_'+str(report_idx), '0'))
+                data_query, count_query = apply_filters_to_query(
+                    data_query, count_query, f_info, sort_field, sort_order, user_filter_values, current_page, rows_per_page, extended_filter_dict, False)
+                data.append(return_sql_results(data_query))
+
+                # table header details
+                table_header.append(headers)
+                # get total columns count (colspan sum) - used to display the no records found row
+                total_records = int(req_data.get(
+                    'rec_count_'+str(report_idx), '0'))
+                total_header_cols.append(total_records)
+
+                p_info = calculate_pagination_info(
+                    total_records, current_page, rows_per_page)
+                pagination_range = range(p_info.get(
+                    'start_page'), p_info.get('end_page')+1)
+                page_info.append(p_info)
+                sorting_field.append(s_info)
+            html = render_to_string('reports/report_ajax_reload.html', {"req_data": req_data, "report_idx": report_idx, "table_header": table_header, "data": data,
+                                                                        "nowrap_cols": nowrap_cols, "user_sort_field": user_sort_field, "user_sort_order": user_sort_order, "page_info": page_info,
+                                                                        "pagination_range": pagination_range})
+    except Exception as ex1:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        error_stack = repr(traceback.format_exception(
+            exc_type, exc_value, exc_traceback))
+        logger.error(error_stack)
+    return HttpResponse(html)
+
+
+def load_user_details_to_sessions(request):
+    # Getting the user role config if not it will raise exception
+    # [loc_id, "loc_name", loc_config, {loc_data}]
+    # - config True if the location is from user location config, false if its a user selected location from filter dropdown
+    # [district_id, "district_name", True, [district_id1, distrit_id2, district_id3], {"state_id":[(district_id1, "district_name1"),(district_id2, "district_name2")]}]
+    try:
+
+        # user_role_location_level_config = User.objects.get(
+        #     id=request.user.id)
+        # user_group = user_role_location_level_config.groups.first()
+        # # content type id of the user location level - state/district/shelter
+        # location_hierarchy_type_id = user_role_location_level_config.location_hierarchy_type.id
+        # location_relations = UserLocationRelation.objects.filter(
+        #     UserRoleLocationLevelConfig=user_role_location_level_config, active=2).values_list('object_id', flat=True)
+        # location_hierarchy_type_model = ContentType.objects.get(
+        #     id=location_hierarchy_type_id)
+        loc_ids = location_relations
+        loc_id = ''
+        loc_name = ''
+        config_loc = False
+        shelter_list, district_list, state_list = [], [], []
+        shelter_data, district_data, state_data = {}, {}, {}
+        shelter_config, district_config, state_config = False, False, False
+        # if location_hierarchy_type_model.model == 'shelterhome':
+        #     loc_list = ShelterHome.objects.filter(id__in=loc_ids).values_list(
+        #         'district__state__id', 'district__state__name', 'district__id', 'district__name', 'id', 'name').order_by('district__state__name', 'district__name', 'name')
+        #     shelter_config, district_config, state_config = True, True, True
+        #     attrib_len = 6
+        # elif location_hierarchy_type_model.model == 'district':
+        #     loc_list = District.objects.filter(id__in=loc_ids).values_list(
+        #         'state__id', 'state__name', 'id', 'name').order_by('state__name', 'name')
+        #     district_config, state_config = True, True
+        #     attrib_len = 4
+        # elif location_hierarchy_type_model.model == 'state':
+        #     loc_list = State.objects.filter(id__in=loc_ids).values_list(
+        #         'id', 'name',).order_by('name')
+        #     state_config = True
+        #     attrib_len = 2
+        # else:
+            # loc_list = State.objects.all().values_list('id', 'name').order_by('name')
+            # state_config = True
+            # attrib_len = 2
+        # logger.error('-----loc_list' + str(loc_list))
+        for item in loc_list:
+            new_state = (item[0], item[1])
+            state_list.append(new_state[0])
+            s_list = state_data.get('0', [])
+            s_list.append(new_state)
+            # s_list = list(set(s_list))
+            state_data.update({'0': s_list})
+            # logger.error('----------state_data' + str(state_data))
+            if attrib_len > 2:
+                new_district = (item[2], item[3])
+                district_list.append(new_district[0])
+                district_for_state = district_data.get(str(new_state[0]), [])
+                district_for_state.append(new_district)
+                district_data.update({str(new_state[0]): district_for_state})
+            if attrib_len > 4:
+                new_shelter = (item[4], item[5])
+                shelter_list.append(new_shelter[0])
+                shelter_for_district = shelter_data.get(
+                    str(new_district[0]), [])
+                shelter_for_district.append(new_shelter)
+                shelter_data.update(
+                    {str(new_district[0]): shelter_for_district})
+        user_location_data = []
+        state_list = list(set(state_list))
+        district_list = list(set(district_list))
+        shelter_list = list(set(shelter_list))
+        state_id, state_name = 0, ''
+        if len(state_list) == 1:
+            state_id = state_list[0]
+            state_name = state_list[0]
+        for loc_item in state_data:
+            state_data.update(
+                {loc_item: sorted(list(set(state_data.get(loc_item, []))), key=lambda x: x[1])})
+        user_location_data.append(
+            [state_id, state_name, state_config, state_list, state_data])
+        district_id, district_name = 0, ''
+        if len(district_list) == 1:
+            district_id = district_list[0]
+            district_name = district_list[0]
+        for loc_item in district_data:
+            district_data.update({loc_item: sorted(
+                list(set(district_data.get(loc_item, []))), key=lambda x: x[1])})
+        user_location_data.append(
+            [district_id, district_name, district_config, district_list, district_data])
+        shelter_id, shelter_name = 0, ''
+        if len(shelter_list) == 1:
+            shelter_id = shelter_list[0]
+            shelter_name = shelter_list[0]
+        for loc_item in shelter_data:
+            shelter_data.update({loc_item: sorted(
+                list(set(shelter_data.get(loc_item, []))), key=lambda x: x[1])})
+        user_location_data.append(
+            [shelter_id, shelter_name, shelter_config, shelter_list, shelter_data])
+        user_location_dict = {'state': state_list,
+                              'district': district_list, 'shelter': shelter_list}
+    except User.DoesNotExist:
+        configure_error = 'Username not configured . Please contact administration.'
+        return configure_error
+
+    menus = Menu.objects.filter(active=2).values_list(
+        'name', 'slug', 'icon', 'feature_link', 'model_permission__id')
+    permissions_list = [item[4] for item in menus]
+    permissions_list = list(set(permissions_list))
+
+    menu_to_display = []
+    user_grp_permissions = user_group.permissions.filter(
+        id__in=permissions_list).values_list('id', flat=True)
+    for menu in menus:
+        if menu[4] in user_grp_permissions:
+            menu_to_display.append(menu)
+    # logger.error("user_location_data(SESSION):"+str(user_location_data))
+    request.session['menus'] = menu_to_display
+    request.session['location_hierarchy_type_id'] = location_hierarchy_type_id
+    request.session['user_location_data'] = user_location_data
+    request.session['user_location_dict'] = user_location_dict
+
+
+@ login_required(login_url='/login/')
+def get_district(request):
+    if request.method == 'GET' and request.is_ajax():
+        selected_state = request.GET.get('selected_state', '')
+        user_location_data = request.session['user_location_data'] if 'user_location_data' in request.session else None
+        if user_location_data == None:
+            # logger.error('load session-----------------------------')
+            load_user_details_to_sessions(request)
+            user_location_data = request.session['user_location_data']
+        loc_data = user_location_data[1]  # index 1 is districts data
+        result_set = []
+        if loc_data[2] == True:  # user configured districts
+            districts = loc_data[4].get(selected_state, [])
+        else:  # all distrcts for state
+            districts = District.objects.filter(state_id=int(
+                selected_state), active=2).order_by('name').values_list('id', 'name')
+        for district in districts:
+            result_set.append(
+                {'id': district[0], 'name': district[1], })
+        return HttpResponse(json.dumps(result_set))
+
+
+@ login_required(login_url='/login/')
+def get_shelterhome(request):
+    if request.method == 'GET' and request.is_ajax():
+        selected_district = request.GET.get('selected_district', '')
+        user_location_data = request.session['user_location_data'] if 'user_location_data' in request.session else None
+        if user_location_data == None:
+            # logger.error('load session-----------------------------')
+            load_user_details_to_sessions(request)
+            user_location_data = request.session['user_location_data']
+        loc_data = user_location_data[2]  # index 2 is shelterhome data
+        result_set = []
+        if loc_data[2] == True:  # user configured shelterhomes
+            districts = loc_data[4].get(selected_district, [])
+        else:  # all shelterhomes for district
+            districts = ShelterHome.objects.filter(district_id=int(
+                selected_district),excluded_shelterhome=False, active=2).order_by('name').values_list('id', 'name')
+        for district in districts:
+            result_set.append(
+                {'id': district[0], 'name': district[1], })
+        return HttpResponse(json.dumps(result_set))

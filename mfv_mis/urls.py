@@ -20,6 +20,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('mis.urls')),
     path('dashboard/', include('dashboard.urls')),
+    path('', include('reports.urls')),
     path('application_master/', include('application_master.urls')),
 ]
 admin.site.site_header = "MFV MIS administration"  

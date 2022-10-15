@@ -1,0 +1,141 @@
+{% load static %}
+{% load report_tags %}
+{% block filters %}
+    {% if excluding_filters %}
+        <script>
+            document.getElementById('{{excluding_filters}}').style.display = 'none';
+        </script>
+    {% endif %}
+    <form action="/report/{{page_slug}}/" method="POST" id='filter_form'>
+        {% csrf_token %}
+        <div class="row">
+            {% for filter in filter_values %}
+                <!-- display all filter values based on the filters configured for the report -->
+                <!-- handled drop down/select filters-->
+                <!-- TODO: text search, date range, month filters yet to be configured -->
+                <div class="col-lg-3 col-sm-3 col-md-3 mt-3">
+                    {% if filter.4 == 'select' %}
+                        <select  style="width: 100%" class="select2 form-select {{filter.0}}" id='{{filter.0}}' name='{{filter.0}}'>
+                            {%if filter.1|dict_len != 1 %}
+                                <option value='' selected>Select {{filter.3}}</option>
+                            {% endif %}
+                            {% for filter_item in filter.1 %}
+                            <option value="{{filter_item.0}}" {% if filter_item.0|slugify == filter.2|slugify %}selected{% endif %}>
+                                {{filter_item.1}}</option>
+                            {% endfor %}
+                        </select>
+                    {% elif filter.4 == 'month' %}
+                            <input type="text" name="{{filter.0}}" style='color: #545b62 !important;font-size: 14px !important;font-weight: 500 !important;' value="{{filter.2}}"  class="form-control {{filter.0}}" onclick='this.type="month"'
+                                    id="{{filter.0}}" placeholder='{{filter.3}}' >
+                    {% endif %}
+                    <input type="hidden" id="__hd__{{filter.0}}" name="__hd__{{filter.0}}" value="{{filter.2}}"/>
+                </div>
+            {% endfor %}
+            <div class="col-auto mt-3 ">
+                <button type="submit" class="form-control btn btn-success waves-effect btn-lg float-right">Filter</button>
+            </div>
+            <div class="col-auto mt-3 ">
+                <button type="reset" id="filter_reset"  class="form-control btn btn-primary waves-effect btn-lg float-right" value="True">Reset</button>
+            </div>
+        </div>
+    </form>
+    <div class="row">     
+        <div class="col-md-12 col-lg-12 col-sm-12 mt-2">
+            <p class="text-info" style="font-size:.7rem !important">Note: Use the Focus button to review data in a single row without losing focus while scrolling back and forth. Click the focus button and select a row in the table. The selected row is highlighted and highlight is retained till you click the same row again or click on a different row.</p>
+        </div>
+    </div>
+    <script>
+        $("button[type='reset']").on("click", function(event){
+            {% for filter in filter_values %}
+                {% if filter.4 == 'select' %}
+                    $('select.select2#{{filter.0}}').val('');
+                {% elif filter.4 == 'month' %}
+                    $("#{{filter.0}}").val("");
+                {% endif %}
+            {% endfor %}
+            $('#filter_form').submit();
+
+        });
+        
+    </script>
+
+    <script type="text/javascript">
+        //TODO: yet to test the onchange state/district
+        $(document).ready(function () {
+            $('select#state').change(function () {
+                var optionSelected = $(this).find("option:selected");
+                var valueSelected = optionSelected.val();
+                if (valueSelected == ''){
+                    $("#district option").remove();
+                    $("#shelter option").remove();
+                }else{
+                    data = {
+                        'selected_state': valueSelected
+                    };
+                    $.ajax({
+                        type: "GET",
+                        url: '/ajax/report_district/',
+                        data: data,
+                        success: function (result) {
+                            $("#district option").remove();
+                            a = '<option selected value="0">Select District</option>';
+                            $("#district").append(a);
+                            $("#shelter option").remove();
+                            b = '<option selected value="0">Select Shelter Home</option>';
+                            $("#shelter").append(b);
+                            if (JSON.parse(result) == 0) {
+                                $("#district option").remove();
+                                a =
+                                '<option selected disabled value="">Select District</option>';
+                                $("#district").append(a);
+                            } else {
+                                $.each(JSON.parse(result), function (key, value) {
+                                    a = '<option value=' + value['id'] + '>' +
+                                        value['name'] + '</option>';
+                                    $("#district").append(a);
+                                });
+                            }
+                        }
+                    });
+                }
+
+            });
+        });
+        $(document).ready(function () {
+            $('select#district').change(function () {
+                var optionSelected = $(this).find("option:selected");
+                var valueSelected = optionSelected.val();
+                if (valueSelected == ''){
+                    $("#shelter option").remove();
+                }else{
+                    data = {
+                        'selected_district': valueSelected
+                    };
+                    $.ajax({
+                        type: "GET",
+                        url: '/ajax/report_shelterhome/',
+                        data: data,
+                        success: function (result) {
+                            $("#shelter option").remove();
+                            a = '<option selected value="0">Select Shelter Home</option>';
+                            $("#shelter").append(a);
+                            if (JSON.parse(result) == 0) {
+                                $("#shelter option").remove();
+                                a =
+                                '<option selected disabled value="0">Select Shelter Home</option>';
+                                $("#shelter").append(a);
+                            } else {
+                                $.each(JSON.parse(result), function (key, value) {
+                                    a = '<option value=' + value['id'] + '>' +
+                                        value['name'] + '</option>';
+                                    $("#shelter").append(a);
+                                });
+                            }
+                        }
+                    });  
+                }              
+            });
+        });
+    </script>
+
+{% endblock  %}

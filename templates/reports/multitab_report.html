@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load report_tags %}
+
+
+{% block extra_css %}
+<!-- Responsive Table css -->
+<link href="{% static 'libs/admin-resources/rwd-table/rwd-table.min.css' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block contents %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                {% include 'partials/report_filters.html' %}
+                <div class="col-lg-3 col-md-3 col-sm-3 mt-3 justify-content-center">
+                    <p class="text-muted text-right" style="padding-right: .85rem !important;">Data as on {{mat_view_last_updated|date:'d-m-Y g:iA'}}</p>
+                </div>   
+                
+                {% for sub_title in section_title %}
+                {%if forloop.counter0 > 0 %}
+                <div class="row justify-content-left" style="margin-top:25px;">
+                    <h4>{{sub_title|capfirst}}</h4>
+                </div>
+                {% endif %}
+                <!-- Sort Section. Has to be different for each report in the page -->
+                {% if sorting_field|index:forloop.counter0|dict_len > 0 %}
+                    <div class="row justify-content-start"  id='sorting_listing_{{forloop.counter0}}'>
+                        {%if forloop.counter0 == 0 %}
+                            <div class="col-lg-3 col-md-3 col-sm-3 mt-3 justify-content-center">
+                                <p class="text-muted text-right" style="padding-right: .85rem !important;">Data as on {{mat_view_last_updated|date:'d-m-Y g:iA'}}</p>
+                            </div>     
+                        {% else %}  
+                            <!-- This text and the export button is shown only on the first table in the report page. 
+                                Hence changed the class to take up the additional space of the export button-->
+                            <div class="col-lg-5 col-md-5 col-sm-5 mt-4 justify-content-center">
+                                <p class="text-muted text-right" style="padding-right: .85rem !important;">&nbsp;</p>
+                            </div>     
+                        {% endif %}
+                        <div class="col-lg-1 col-md-1 col-sm-1 mt-3">
+                            <div class="col">
+                                Sort By:
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 mt-1">
+                            <div class="col" >
+                                <select id="formrow-inputState" class="form-select sort_by" name='sort_field_{{forloop.counter0}}' id='sort_field_{{forloop.counter0}}'>
+                                    {% for key in sorting_field|index:forloop.counter0 %}
+                                            <option value="{{sorting_field|index:forloop.parentloop.counter0|get_item:key}}" {% if sorting_field|index:forloop.parentloop.counter0|get_item:key == user_sort_field|index:forloop.parentloop.counter0 %}selected{% endif %}>
+                                                {{key}}
+                                            </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-sm-2 col-md-2 mt-1 mb-1">
+                            <div class="col">
+                                <select id="formrow-inputState" class="form-select" name='sort_order_{{forloop.counter0}}' id='sort_order_{{forloop.counter0}}'>
+                                    <option value="asc" {% if sorting_order == "asc" %}selected{% endif %}>Ascending</option>
+                                    <option value="desc" {% if sorting_order == "desc" %}selected{% endif %}>Descending</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-auto mb-1">
+                            <button type="submit" class="form-control btn btn-success waves-effect btn-lg float-right data_reload{{forloop.counter0}}" id="sort_{{forloop.counter0}}">Sort</button>
+                        </div>
+
+                        {%if forloop.counter0 == 0 %}
+                        <!-- This text and the export button is shown only on the first table in the report page -->
+                        <div class="col-auto mb-1">
+                            <form action="/report/{{page_slug}}/" method="POST">
+                                {% csrf_token %}
+                                {% for filter in filter_values %}
+                                    <input type="hidden" id="__hd1__{{filter.0}}" name='{{filter.0}}' value="{{filter.2}}"/>
+                                {% endfor %}
+                                <button type="submit" name='export' class="form-control btn btn-primary waves-effect btn-lg float-right" value="True">Export</button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                {%endif%}
+                <!-- Report Table  -->
+                <div id="div_data_{{forloop.counter0}}">
+                    <div class="table-rep-plugin">
+                        <input type="hidden" id="sort_order_hd_{{forloop.counter0}}" name="sort_order_hd_{{forloop.counter0}}" value="{{user_sort_order|index:forloop.counter0}}"/>
+                        <input type="hidden" id="sort_field_hd_{{forloop.counter0}}" name="sort_field_hd_{{forloop.counter0}}" value="{{user_sort_field|index:forloop.counter0}}"/>
+                        <input type="hidden" id="page_hd_{{forloop.counter0}}" name="page_hd_{{forloop.counter0}}" value="1"/>
+                        <input type="hidden" id="rec_count_hd_{{forloop.counter0}}" name="rec_count_hd_{{forloop.counter0}}" value="{{page_info|index:forloop.counter0|get_item:'rec_count'}}"/>
+                        <div class="table-responsive mb-0" data-pattern="priority-columns" id="tb_resp_{{forloop.counter0}}">
+                            <table id="report_data_{{forloop.counter0}}" class="table table-bordered report_table">
+                                <thead>
+                                    <!-- Report Header - multiple level headers  -->
+                                    {% for header in table_header|index:forloop.counter0%}
+                                        <tr>
+                                        {%for hrow in header %}
+                                            <!-- header defined with label, colspan and rowspan  -->
+                                            <!-- TODO: handling of variable location levels - state, district and shelterhome  -->
+                                            <th {%if hrow|get_item:'colspan' > 1 %} style="text-align:center;word-wrap: break-word;"{%endif%}{%if hrow|get_item:'colspan' > 0 %} colspan="{{hrow|get_item:'colspan'}}" {% endif %} {%if hrow|get_item:'rowspan' > 0 %} rowspan="{{hrow|get_item:'rowspan'}}" {% endif %}>
+                                                {{hrow|get_item:'label'|safe}}
+                                            </th>
+                                        {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </thead>
+                                <tbody>
+                                    {%if data|index:forloop.counter0|dict_len == 0 %}
+                                        <tr>
+                                            <td colspan="{{total_header_cols|index:forloop.counter0}}"> No records found</td>
+                                        </tr>
+                                    {% endif %}
+                                    {% for row in data|index:forloop.counter0 %}
+                                        <tr>
+                                        {% for item in row %}
+                                            <td {%comment%}{%if forloop.counter in nowrap_cols|index:forloop.counter0 %}nowrap{%endif%}{%endcomment%}>{{item|safe}}</td>
+                                        {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- Pagination Section -->
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12 col-lg-12" style="margin-top:5px;">
+                            {% if page_info|index:forloop.counter0|get_item:'num_pages' > 1 %}
+                            <ul class="pagination justify-content-end ">
+                                {% if page_info|index:forloop.counter0|get_item:'current_page' > 1 %}
+                                    <li class="paginate_button page-item"><a href="" class="page-link data_reload{{forloop.counter0}}" id="pg_{{forloop.counter0}}_1">First</a></li>
+                                    {%comment%}<li class="paginate_button page-item"><a href="" class="page-link data_reload{{forloop.counter0}}" id="pg_{{forloop.counter0}}_x">>Previous</a></li> {% endcomment %}
+                                {% else %}
+                                    <li class="paginate_button page-item disabled"><span class="page-link">First</span></li>
+                                    {% comment %} <li class="paginate_button page-item disabled"><span class="page-link">Previous</span></li> {% endcomment %}
+                                {% endif %}
+                                {% for i in pagination_range %}
+                                    {% if page_info|index:forloop.parentloop.counter0|get_item:'current_page' == i %}
+                                        <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
+                                    {% else %}
+                                        <li class="paginate_button paginate_button page-item"><a href="" class="page-link data_reload{{forloop.parentloop.counter0}}" id="pg_{{forloop.parentloop.counter0}}_{{i}}">{{ i }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if page_info|index:forloop.counter0|get_item:'current_page' < page_info|index:forloop.counter0|get_item:'num_pages' %}
+                                    {% comment %} <li class="paginate_button page-item"><a href="" class="page-link data_reload{{forloop.counter0}}" id="pg_{{forloop.counter0}}_y">Next</a></li> {% endcomment %}
+                                    <li class="paginate_button page-item"><a href="" class="page-link data_reload{{forloop.counter0}}" id="pg_{{forloop.counter0}}_{{page_info|index:forloop.counter0|get_item:'num_pages'}}">Last</a></li>
+                                {% else %}
+                                    {% comment %} <li class="paginate_button page-item disabled"><span class="page-link">Next</span></li> {% endcomment %}
+                                    <li class="paginate_button page-item disabled"><span class="page-link">Last</span></li>
+                                {% endif %}
+                                </ul>
+                            {% endif %}
+                        </div>  
+                    </div>
+                </div>
+                <script>
+                    //Each report will have a on click defined for handling the sorrt and pagination ajax reload
+                    $(document).on("click", ".data_reload{{forloop.counter0}}", function(e){
+                        //Prevent default action of click of sort button and pagination links
+                        e.preventDefault();
+                        // console.log($(this).attr("id"));
+                        // console.log(e);
+                        //Get data from hidden fields to get the sort details and total count and current page
+                        //- hidden fields stored on page load or on ajax reload of report data
+                        var new_sort_field = $("#sort_field_hd_{{forloop.counter0}}").val();
+                        var new_sort_order = $("#sort_order_hd_{{forloop.counter0}}").val();
+                        var rec_count = $("#rec_count_hd_{{forloop.counter0}}").val();
+                        var new_page_num = $("#page_hd_{{forloop.counter0}}").val();
+                        //get the new sort values on click of sort button
+                        if(($(this).attr("id")).startsWith('sort_'))
+                        {
+                            new_sort_field = $('select[name="sort_field_{{forloop.counter0}}"] option:selected').val();
+                            new_sort_order = $('select[name="sort_order_{{forloop.counter0}}"] option:selected').val();
+                        }
+                        else 
+                        {
+                            //get the new page number onclick of the pagination links
+                            new_page_num = ($(this).attr("id")).replace('pg_{{forloop.counter0}}_','');
+                        }
+                        var url = '/ajax/custom_report_reload/{{page_slug}}/{{report_slug_list|index:forloop.counter0}}/';
+                        var data = {
+                            //get all filter values for the report
+                            {% for filter in filter_values %}
+                            '{{filter.0}}':$('#__hd__{{filter.0}}').val(),
+                            {% endfor %}
+                            'sort_field_{{forloop.counter0}}':new_sort_field,
+                            'sort_order_{{forloop.counter0}}':new_sort_order,
+                            'page_{{forloop.counter0}}':new_page_num,
+                            'rec_count_{{forloop.counter0}}':rec_count,
+                            //csfr token set for the ajax call
+                            'csrfmiddlewaretoken':$('input[name="csrfmiddlewaretoken"]').val()
+                        };
+                        //console.log(new_sort_field + " : " + new_page_num + " : " + rec_count);
+                        $.ajax({
+                            type: "POST",
+                            url: url,
+                            data: data,
+                            success: function (result,status,xhr) {
+                                console.log(xhr);
+                                //alert('status:'+xhr.status);
+                                if (xhr.status == 200 && result.includes("check_session_valid")){
+                                    // replace the ajax reponse to the report table
+                                    $('#div_data_{{forloop.counter0}}').html(result);
+                                    // re-initialize the responsive table after ajax data load
+                                    $('.table-responsive').responsiveTable({
+                                        addDisplayAllBtn: 'btn btn-secondary'
+                                    });
+                                    $('.btn-toolbar [data-toggle=dropdown]').attr('data-bs-toggle', "dropdown");
+                                }else{
+                                    location.reload();
+                                }
+                            }
+                            //TODO: add the complete, failure functions 
+                        });
+                        return false;
+                    });
+                </script>            
+                {% endfor %}
+            </div> 
+        </div>
+    </div> <!-- end col -->
+</div> <!-- end row -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $("i").tooltip({
+            'selector': '',
+            'placement': 'top',
+            'container':'body'
+        });
+    });
+</script>
+{% endblock %}
+{% block extra_javascript %}
+        <!-- Responsive Table js -->
+        <script src="{% static 'libs/admin-resources/rwd-table/rwd-table.min.js' %}"></script>
+
+        <!-- Init js -->
+        <script src="{% static 'js/pages/table-responsive.init.js' %}"></script>
+        
+{% endblock %}

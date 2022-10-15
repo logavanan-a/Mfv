@@ -15,7 +15,7 @@
             {% if i.get_sub_menus.count > 0 %}
             <li>
                <a href="javascript: void(0);" class="has-arrow waves-effect">
-                    <i class="bx bxs-user-detail"></i>
+                    <i class="{{i.icon}}"></i>
                     <span key="t-contacts">{{i.name}}</span>
                </a>
                <ul class="sub-menu mm-collapse" aria-expanded="false">
@@ -26,7 +26,7 @@
                       {% elif submenus.slug == 'reporting-month' %}
                           <li><a onclick='CurrentMonth("{{i.app_link}}")' key="t-user-list">{{submenus.name}}</a></li>
                       {% else %}
-                      <li><a href="{{i.app_link}}" key="t-user-list">{{submenus.name}}</a></li>
+                      <li><a href="{{submenus.app_link}}" key="t-user-list">{{submenus.name}}</a></li>
 
                       {% endif %}
                     {% endfor %}
@@ -43,7 +43,12 @@
             {% endif %}
             {% endif %}
             {% endfor %}
-
+          <li>
+            <a href="/dashboard/" class="waves-effect">
+              <i class="bx bxs-dashboard"></i>
+              <span key="t-file-manager">Dashboards</span>
+            </a>
+          </li>
         {% if request.user.is_superuser %}
         <li class=''>
             <a href="javascript: void(0);" class="has-arrow waves-effect ">
