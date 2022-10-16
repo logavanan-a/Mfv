@@ -50,43 +50,82 @@ def build_query(request):
 
     logged_in_user_id = request.user.id#request_get user_id
 
-    query = """select coalesce(jyot_vcs.vcs_count,0) as jyot_vcs_count, a.* from (select sum(case when key in ('total_33','total_296') then value else 0 end)::integer as jyot_eye_screening,
-        sum(case when key in ('total_40','total_346') then value else 0 end)::integer as jyot_spectacles_dispensed,
-        sum(case when key in ('total_301','total_46','total_292','total_304') then value else 0 end)::integer as jyot_surgeries,
-        0 as jyot_average_opd_vc,
-        sum(case when key in ('total_40') then value else 0 end)::integer as jyot_spectacles_conversion_vc_numerator,
-        sum(case when key in ('total_39') then value else 0 end)::integer as jyot_spectacles_conversion_vc_denominator,
-        0 as jyot_avg_spec_transaction_value_vc_numerator,
-        0 as jyot_avg_spec_transaction_value_vc_denominator,
-        sum(case when key in ('total_121','total_221','total_122','total_222','total_223') then value else 0 end)::integer as nayan_neonates_screened_rop,
-        sum(case when key in ('total_224','total_225') then value else 0 end)::integer as nayan_children_rop_positive,
-        sum(case when key in ('total_229','total_230','total_232','total_231') then value else 0 end)::integer as nayan_num_treatments_done,
-        0 as jeevan_child_enrolled,
-        sum(case when key in ('total_16') then value else 0 end)::integer as roshni_children_screened,
-        sum(case when key in ('total_132') then value else 0 end)::integer as roshni_spectacles_dispensed,
-        sum(case when key in ('total_1') then value else 0 end)::integer as disha_screening,
-        sum(case when key in ('total_2') then value else 0 end)::integer as disha_spectacles_dispensed,
-        0 as saksham_aop_completed_training,
-        sum(case when key in ('total_284') then value else 0 end)::integer as saksham_aop_in_training, 
-        0 as netra_cataract_surgeries,
-        sum(case when key in ('total_112','total_273','total_264') then value else 0 end)::integer as base_screening,
-        sum(case when key in ('total_274','total_265','total_113') then value else 0 end)::integer as base_cataract_surgeries,
-        sum(case when key in ('total_281','total_272','total_263') then value else 0 end)::integer as base_other_surgeries
-        from mat_dashboard_achievement_view as ach 
-        where 1=1 @@fvalue_start_month @@fvalue_end_month @@user_project_filter 
-        @@user_partner_filter
-    ) as a 
-    left outer join (select mission_id, count(distinct project_id) as vcs_count
-        from mat_partner_mission_meta_view 
-        where mission_id = 5 @@fvalue_start_date @@fvalue_end_date
-        @@user_project_filter @@user_partner_filter
-        group by mission_id 
-    ) as jyot_vcs on true"""
+    # query = """select coalesce(jyot_vcs.vcs_count,0) as jyot_vcs_count, a.* from (select sum(case when key in ('total_33','total_296') then value else 0 end)::integer as jyot_eye_screening,
+    #     sum(case when key in ('total_40','total_346') then value else 0 end)::integer as jyot_spectacles_dispensed,
+    #     sum(case when key in ('total_301','total_46','total_292','total_304') then value else 0 end)::integer as jyot_surgeries,
+    #     0 as jyot_average_opd_vc,
+    #     sum(case when key in ('total_40') then value else 0 end)::integer as jyot_spectacles_conversion_vc_numerator,
+    #     sum(case when key in ('total_39') then value else 0 end)::integer as jyot_spectacles_conversion_vc_denominator,
+    #     0 as jyot_avg_spec_transaction_value_vc_numerator,
+    #     0 as jyot_avg_spec_transaction_value_vc_denominator,
+    #     sum(case when key in ('total_121','total_221','total_122','total_222','total_223') then value else 0 end)::integer as nayan_neonates_screened_rop,
+    #     sum(case when key in ('total_224','total_225') then value else 0 end)::integer as nayan_children_rop_positive,
+    #     sum(case when key in ('total_229','total_230','total_232','total_231') then value else 0 end)::integer as nayan_num_treatments_done,
+    #     0 as jeevan_child_enrolled,
+    #     sum(case when key in ('total_16') then value else 0 end)::integer as roshni_children_screened,
+    #     sum(case when key in ('total_132') then value else 0 end)::integer as roshni_spectacles_dispensed,
+    #     sum(case when key in ('total_1') then value else 0 end)::integer as disha_screening,
+    #     sum(case when key in ('total_2') then value else 0 end)::integer as disha_spectacles_dispensed,
+    #     0 as saksham_aop_completed_training,
+    #     sum(case when key in ('total_284') then value else 0 end)::integer as saksham_aop_in_training, 
+    #     0 as netra_cataract_surgeries,
+    #     sum(case when key in ('total_112','total_273','total_264') then value else 0 end)::integer as base_screening,
+    #     sum(case when key in ('total_274','total_265','total_113') then value else 0 end)::integer as base_cataract_surgeries,
+    #     sum(case when key in ('total_281','total_272','total_263') then value else 0 end)::integer as base_other_surgeries
+    #     from mat_dashboard_achievement_view as ach 
+    #     where 1=1 @@fvalue_start_month @@fvalue_end_month @@user_project_filter 
+    #     @@user_partner_filter
+    # ) as a 
+    # left outer join (select mission_id, count(distinct project_id) as vcs_count
+    #     from mat_partner_mission_meta_view 
+    #     where mission_id = 5 @@fvalue_start_date @@fvalue_end_date
+    #     @@user_project_filter @@user_partner_filter
+    #     group by mission_id 
+    # ) as jyot_vcs on true"""
+    query="""select coalesce(jyot_vcs.vcs_count,0) as jyot_vcs_count, a.* from (select sum(case when key in ('total_33','total_296') then value else 0 end) as jyot_eye_screening,
+            sum(case when key in ('total_40','total_346') then value else 0 end) as jyot_spectacles_dispensed,
+            sum(case when key in ('total_301','total_46','total_292','total_304') then value else 0 end) as jyot_surgeries,
+            0 as jyot_average_opd_vc,
+            sum(case when key in ('total_40') then value else 0 end) as jyot_spectacles_conversion_vc_numerator,
+            sum(case when key in ('total_39') then value else 0 end) as jyot_spectacles_conversion_vc_denominator,
+            0 as jyot_avg_spec_transaction_value_vc_numerator,
+            0 as jyot_avg_spec_transaction_value_vc_denominator,
+            sum(case when key in ('total_121','total_221','total_122','total_222','total_223') then value else 0 end) as nayan_neonates_screened_rop,
+            sum(case when key in ('total_224','total_225') then value else 0 end) as nayan_children_rop_positive,
+            sum(case when key in ('total_229','total_230','total_232','total_231') then value else 0 end) as nayan_num_treatments_done,
+            0 as jeevan_child_enrolled,
+            sum(case when key in ('total_16') then value else 0 end) as roshni_children_screened,
+            sum(case when key in ('total_132') then value else 0 end) as roshni_spectacles_dispensed,
+            sum(case when key in ('total_1') then value else 0 end) as disha_screening,
+            sum(case when key in ('total_2') then value else 0 end) as disha_spectacles_dispensed,
+            0 as saksham_aop_completed_training,
+            sum(case when key in ('total_284') then value else 0 end) as saksham_aop_in_training,
+            0 as netra_cataract_surgeries,
+            sum(case when key in ('total_112','total_273','total_264') then value else 0 end) as base_screening,
+            sum(case when key in ('total_274','total_265','total_113') then value else 0 end) as base_cataract_surgeries,
+            sum(case when key in ('total_281','total_272','total_263') then value else 0 end) as base_other_surgeries,
+            (case when coalesce(sum(case when key in ('total_33','total_296') then value else 0 end),0) = 0 then 0::numeric else round(sum(case when key in ('total_40','total_346') then value else 0 end) * 100/sum(case when key in ('total_33','total_296') then value else 0 end)::numeric,0) end)::integer as jyot_spectacles_dispensed_percentage,
+            (case when coalesce(sum(case when key in ('total_33','total_296') then value else 0 end),0) = 0 then 0::numeric else round(sum(case when key in ('total_301','total_46','total_292','total_304') then value else 0 end) * 100/sum(case when key in ('total_33','total_296') then value else 0 end)::numeric,0) end)::integer as jyot_surgeries_percentage,
+            (case when coalesce(sum(case when key in ('total_16') then value else 0 end),0) = 0 then 0::numeric else round(sum(case when key in ('total_132') then value else 0 end) * 100/sum(case when key in ('total_16') then value else 0 end)::numeric,0) end)::integer as roshni_spectacles_dispensed_percentage,
+            (case when coalesce(sum(case when key in ('total_1') then value else 0 end),0) = 0 then 0::numeric else round(sum(case when key in ('total_2') then value else 0 end) * 100/sum(case when key in ('total_1') then value else 0 end)::numeric,0) end)::integer as disha_spectacles_dispensed_percentage,
+            (case when coalesce(sum(case when key in ('total_112','total_273','total_264') then value else 0 end),0) = 0 then 0::numeric else round(sum(case when key in ('total_274','total_265','total_113') then value else 0 end) * 100/sum(case when key in ('total_112','total_273','total_264') then value else 0 end)::numeric,0) end)::integer as base_cataract_surgeries_percentage,
+            (case when coalesce(sum(case when key in ('total_112','total_273','total_264') then value else 0 end),0) = 0 then 0::numeric else round(sum(case when key in ('total_281','total_272','total_263') then value else 0 end) * 100/sum(case when key in ('total_112','total_273','total_264') then value else 0 end)::numeric,0) end)::integer as base_other_surgeries_percentage
+            from mat_dashboard_achievement_view as ach
+            where 1=1 @@fvalue_start_month @@fvalue_end_month @@user_project_filter @@user_partner_filter
+            ) as a
+            left outer join (select mission_id, count(distinct project_id) as vcs_count
+            from mat_partner_mission_meta_view
+            where mission_id = 5 @@fvalue_start_date @@fvalue_end_date
+            @@user_project_filter @@user_partner_filter
+            group by mission_id
+            ) as jyot_vcs on true"""
 
     user_partner_filter_cond = ""
     user_project_filter_cond = ""
 
-    if UserPartnerMapping.objects.filter(user=request.user).exists() :#and user is partner_level_user then 
+    if request.user.is_superuser:
+        user_project_filter_cond=''
+    elif UserPartnerMapping.objects.filter(user=request.user).exists() :#and user is partner_level_user then 
         user_partner_filter_cond = """ and project_id in (select distinct project_id 
                                                     from mat_partner_mission_meta_view 
                                                     where partner_id in (select partner_id 
@@ -98,7 +137,7 @@ def build_query(request):
         user_project_filter_cond = """ and project_id in (select project_id 
                                             from application_master_userprojectmapping 
                                             where user_id = """ + str(logged_in_user_id) + """)"""
-
+    
     end_date_condition=''
     if start_date != '':
         end_date_condition="and (project_end_date is null or project_end_date >= '" + start_date +"')" 
