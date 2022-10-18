@@ -48,7 +48,7 @@ def disply_indicator_target_values(task_id, ind_id):
     else:
         financial_year =  task_obj.start_date.year
     try:
-        mission_indicator_target = MissionIndicatorTarget.objects.get(active = 2, periodicity_date__year=financial_year, mission_indicator__id = ind_id, project = task_obj.project).target
+        mission_indicator_target = MissionIndicatorTarget.objects.get(active = 2, periodicity__range=[financial_year,financial_year], mission_indicator__id = ind_id, project = task_obj.project).target
     except:
         mission_indicator_target = ''
     return mission_indicator_target
