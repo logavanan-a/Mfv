@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+{% load static %} 
+{% block contents %}
+<div class="row align-items-center">
+    <div class="col-xl-12 mx-auto">
+        <div class="row">
+            <div class="col-xl-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Program Report</h4>  
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Report Name</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if 5 in request.session.user_mission_list %}
+                                    <tr>
+                                        <th scope="row">1</th>
+                                        <td>Monthly Programme Report - Mission Jyot</td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/mission-jyot/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/mission-jyot/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if 9 in request.session.user_mission_list %}
+                                    <tr>
+                                        <th scope="row">2</th>
+                                        <td>Monthly Programme Report - Mission Nayan</td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/mission-nayan/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/mission-nayan/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if 6 in request.session.user_mission_list %}
+                                    <tr>
+                                        <th scope="row">3</th>
+                                        <td>Monthly Programme Report - Mission Jeevan</td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/mission-jeevan/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/mission-jeevan/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if 2 in request.session.user_mission_list %}
+                                    <tr>
+                                        <th scope="row">4</th>
+                                        <td>Monthly Programme Report - Mission Roshni</td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/mission-roshni/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/mission-roshni/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if 1 in request.session.user_mission_list %}
+                                    <tr>
+                                        <th scope="row">5</th>
+                                        <td>Monthly Programme Report - Mission Disha</td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/mission-disha/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/mission-disha/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if 3 in request.session.user_mission_list %}
+                                    <tr>
+                                        <th scope="row">6</th>
+                                        <td>Monthly Programme Report - Mission Saksham</td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/mission-saksham/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/mission-saksham/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if 4 in request.session.user_mission_list %}
+                                    <tr>
+                                        <th scope="row">7</th>
+                                        <td>Monthly Programme Report - Mission Netra</td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/mission-netra/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/mission-netra/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if 7 in request.session.user_mission_list %}
+                                    <tr>
+                                        <th scope="row">8</th>
+                                        <td>Monthly Programme Report - Hospital</td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/base-hospital/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/base-hospital/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Finance Report</h4>  
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Report Name</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% comment %} <tr>
+                                        <th scope="row">1</th>
+                                        <td>Finance Report - Mission Jyot</td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/mission-jyot/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/mission-jyot/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr> {% endcomment %}
+                                    {% if 9 in request.session.user_mission_list %}
+                                    <tr>
+                                        <th scope="row">2</th>
+                                        <td>Finance Report - Mission Nayan</td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/finance-mission-nayan/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/finance-mission-nayan/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if 6 in request.session.user_mission_list %}
+                                    <tr>
+                                        <th scope="row">3</th>
+                                        <td>Finance Report - Mission Jeevan</td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/finance-mission-jeevan/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/finance-mission-jeevan/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if 2 in request.session.user_mission_list %}
+                                    <tr>
+                                        <th scope="row">4</th>
+                                        <td>Finance Report - Mission Roshni</td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/finance-mission-roshni/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/finance-mission-roshni/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if 1 in request.session.user_mission_list %}
+                                    <tr>
+                                        <th scope="row">5</th>
+                                        <td>Finance Report - Mission Disha</td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/finance-mission-disha/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/finance-mission-disha/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% comment %} <tr>
+                                        <th scope="row">6</th>
+                                        <td>Finance Report - Mission Saksham</td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/finance-mission-saksham/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/finance-mission-saksham/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr> {% endcomment %}
+                                    {% if 4 in request.session.user_mission_list %}
+                                    <tr>
+                                        <th scope="row">7</th>
+                                        <td>Finance Report - Mission Netra</td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/finance-mission-netra/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/finance-mission-netra/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% comment %} <tr>
+                                        <th scope="row">8</th>
+                                        <td>Finance Report - Hospital</td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/finance-hospital/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/finance-hospital/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr> {% endcomment %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            {% comment %} <div class="col-xl-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Program Report</h4>  
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Report Name</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">1</th>
+                                        <td>Monthly Programme Report - Mission Jyot</td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/mission-jyot/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/mission-jyot/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">2</th>
+                                        <td>Monthly Programme Report - Mission Nayan</td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/mission-jyot/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">3</th>
+                                        <td>Monthly Programme Report - Mission Jeevan</td>
+                                        <td>
+                                            <button type="button" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">4</th>
+                                        <td>Monthly Programme Report - Mission Roshni</td>
+                                        <td>
+                                            <button type="button" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">5</th>
+                                        <td>Monthly Programme Report - Mission Disha</td>
+                                        <td>
+                                            <button type="button" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">6</th>
+                                        <td>Monthly Programme Report - Mission Saksham</td>
+                                        <td>
+                                            <button type="button" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">7</th>
+                                        <td>Monthly Programme Report - Mission Netra</td>
+                                        <td>
+                                            <button type="button" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">8</th>
+                                        <td>Monthly Programme Report - Hospital</td>
+                                        <td>
+                                            <button type="button" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div> {% endcomment %}
+        </div>
+
+    </div>
+</div>
+<style>
+    table, th, td {
+        border: 0px solid #eff2f7;
+      }
+</style>
+{% endblock %}
+{% block extra_javascript %}
+{% endblock %}      

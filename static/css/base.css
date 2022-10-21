@@ -54,13 +54,13 @@ h5 {
     cursor: default !important;
 }
 
-/* .table-bordered {
+.table-bordered {
     border: 1px solid #616161 !important;
-} */
+}
 
-/* #datatable-buttons thead tr th {
+#datatable-buttons thead tr th {
     border-bottom: 1px solid #616161;
-} */
+}
 
 #info {
     font-size: 12px;

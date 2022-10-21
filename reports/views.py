@@ -20,9 +20,9 @@ import json
 import re
 import csv
 import logging
-from application_master.models import Donor,Mission,Project,MissionIndicator,MissionIndicatorCategory,Partner
+from application_master.models import Mission,Project,MissionIndicator,MissionIndicatorCategory,UserPartnerMapping,UserProjectMapping,ProjectDonorMapping
 from django.contrib.auth.models import User
-
+from datetime import datetime as dt
 
 logger = logging.getLogger(__name__)
 # ****************************************************************************
@@ -99,6 +99,12 @@ def write_to_excel_from_normalized_table(conn_str, sql_query, headers_list, cust
         logger.error(error_stack)
         raise
 
+@ login_required(login_url='/login/')
+def reports_listing(request):
+    heading='Reports'
+    page_reports = ReportMeta.objects.filter(active=2).order_by('display_order')
+    return render(request, 'reports/reports.html', locals())
+    
 
 @ login_required(login_url='/login/')
 def custom_report(request, page_slug):
@@ -159,6 +165,7 @@ def custom_report(request, page_slug):
 
         headers, e_header, data_query, count_query, s_info, default_sort = apply_variable_location_info(
             headers, e_header, d_query, c_query, s_info, default_sort, user_filter_values, user_location_data)
+
         sort_field, sort_order = set_sort_options(
             req_data, idx, s_info, default_sort)
         user_sort_field.append(sort_field)
@@ -168,7 +175,6 @@ def custom_report(request, page_slug):
         current_page = 1
         data_query, count_query = apply_filters_to_query(
             data_query, count_query, f_info, sort_field, sort_order, user_filter_values, current_page, rows_per_page, extended_filter_dict, export_flag)
-
         # table header details
         table_header.append(headers)
         # get total columns count (colspan sum) - used to display the no records found row
@@ -179,6 +185,7 @@ def custom_report(request, page_slug):
 
         data_query_list.append(data_query)
         data.append(return_sql_results(data_query))
+        print(data_query)
 
         total_header_cols.append(header_col_count)
         report_slug_list.append(r_slug)
@@ -285,7 +292,7 @@ def update_location_data_with_user_filter(model, loc_data_index, selected_loc_id
 
 
 def get_filter_data(request, req_data, f_info):
-    from datetime import datetime as dt
+    import dateutil.relativedelta
     filter_values = []
     quarter_month_mapper = {"1": 4, "2": 4, "3": 4, "4": 1, "5": 1,
                             "6": 1, "7": 2, "8": 2, "9": 2, "10": 3, "11": 3, "12": 3}
@@ -304,10 +311,33 @@ def get_filter_data(request, req_data, f_info):
         str_val = req_data.get(key, '')
         if key == 'start_month':
             str_val=str_val.replace('-','')
+        if key == 'fv_month_year' and str_val == '':
+            previous_month=dt.now() + dateutil.relativedelta.relativedelta(months=-1)
+            previous_year_month=previous_month.strftime('%Y%-m')
+            current_filtered_qtr = quarter_month_mapper.get(previous_year_month[4:])
+            previous_year = int(previous_year_month[0:4])
+            previous_year = previous_year - 1 if current_filtered_qtr == 4 else previous_year
+            str_val=previous_month.strftime('%Y%#m')
+            user_filter_values.update({'fv_fy_start_month_year': str(previous_year)+'04'})
+            user_filter_values.update({'fv_fy_year': str(previous_year)})
+        elif key == 'fv_month_year':
+            str_val=str_val.replace('-','')
+            current_filtered_qtr = quarter_month_mapper.get(str_val[4:].lstrip('0'))
+            selected_year = int(str_val[0:4])
+            selected_year = selected_year - 1 if current_filtered_qtr == 4 else selected_year
+            user_filter_values.update({'fv_fy_start_month_year': str(selected_year)+'04'})
+            user_filter_values.update({'fv_fy_year': str(selected_year)})
+
+        # if (key == 'fv_fy_start_month_year' or key == 'fv_fy_year') and str_val != '':
+        #     # import ipdb;ipdb.set_trace()
+        #     filtered_qtr = quarter_month_mapper.get(str_val[5:])
+        #     filtered_year = int(str_val[0:4])
+        #     filtered_year = filtered_year - 1 if filtered_qtr == 4 else filtered_year
+        #     str_val=str(filtered_year) if key == 'fv_fy_year' else str(filtered_year)+'04'
+        #     print(str_val)
         user_filter_values.update({key: str_val})
         # if key in ['state', 'district', 'shelter']:
         #     filter_values.append([])
-
     # logger.error('user_filter_values:' + str(user_filter_values))
     user_location_data = request.session['user_location_data'] if 'user_location_data' in request.session else None
     # if user_location_data == None:
@@ -376,22 +406,20 @@ def get_filter_data(request, req_data, f_info):
         #         user_filter_values.update({'shelter': query_data_id})
         #     filter_type = 'select'
         if k == 'donor':
-            donor_list = Donor.objects.filter(
-                active=2).values_list('id', 'name')
+            projects=UserProjectMapping.objects.filter(user=request.user,active=2).values_list('project_id',flat=True)
+            donor_list = ProjectDonorMapping.objects.filter(project_id__in=projects,active=2).values_list('donor_id', 'donor__name')
             data_list = [(str(item[0]), item[1])
                          for item in donor_list]
             data_id = user_filter_values.get('donor', '')
             filter_type = 'select'
         elif k == 'partner':
-            partner_list = Partner.objects.filter(
-                active=2).values_list('id', 'name')
+            partner_list = UserPartnerMapping.objects.filter(user=request.user,active=2).values_list('partner_id', 'partner__name')
             data_list = [(str(item[0]), item[1])
                          for item in partner_list]
             data_id = user_filter_values.get('partner', '')
             filter_type = 'select'
         elif k == 'project':
-            project_list = Project.objects.filter(
-                active=2).values_list('id', 'name')
+            project_list = UserProjectMapping.objects.filter(user=request.user,active=2).values_list('project_id', 'project__name')
             data_list = [(str(item[0]), item[1])
                          for item in project_list]
             data_id = user_filter_values.get('project', '')
@@ -416,6 +444,24 @@ def get_filter_data(request, req_data, f_info):
             if data_id != '':
                 data_id='-'.join([data_id[:4],data_id[4:6]])
             filter_type = 'month'
+        elif k == 'fv_month_year':
+            data_list = []
+            data_id = user_filter_values.get('fv_month_year') if user_filter_values.get('fv_month_year') != '' else current_month
+            if data_id != '' and '-' not in data_id:
+                data_id='-'.join([data_id[:4],data_id[4:6]])
+            filter_type = 'month'
+        # elif k == 'fv_fy_start_month_year':
+        #     data_list = []
+        #     data_id = user_filter_values.get('fv_fy_start_month_year') 
+        #     if data_id != '':
+        #         data_id='-'.join([data_id[:4],data_id[4:6]])
+        #     filter_type = 'month'
+        # elif k == 'fv_fy_year':
+        #     data_list = []
+        #     data_id = user_filter_values.get('fv_fy_year')
+        #     if data_id != '':
+        #         data_id='-'.join([data_id[:4],'04'])
+        #     filter_type = 'month'
         # elif k == 'end_month':
         #     data_list = []
         #     data_id = user_filter_values.get('end_month', '')
@@ -607,6 +653,8 @@ def apply_filters_to_query(data_query, count_query, filter_info, sort_field, sor
     for key in filter_cond.keys():
         filter_value = user_filter_values.get(key)
         updated_cond = ''
+        # if key == 'fv_fy_start_month_year':
+        #   import ipdb;ipdb.set_trace()
         if filter_value != None and filter_value != '' and filter_value != '0':
             f_cond = filter_cond[key]
             if f_cond.lower().replace(' ','').find("in(@@filter_value)") == -1:

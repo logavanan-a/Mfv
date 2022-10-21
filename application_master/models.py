@@ -210,10 +210,10 @@ class MissionIndicator(BaseContent):
         return f"{self.name} - {self.category.name}"
 
 class MissionIndicatorTarget(BaseContent):
-    mission_indicator = models.ForeignKey(MissionIndicator, on_delete=models.DO_NOTHING, blank=True, null=True)
-    project = models.ForeignKey(Project, on_delete=models.DO_NOTHING, blank=True, null=True)
+    mission_indicator = models.ForeignKey(MissionIndicator, on_delete=models.DO_NOTHING)
+    project = models.ForeignKey(Project, on_delete=models.DO_NOTHING)
     target = models.IntegerField()
-    periodicity   = models.PositiveIntegerField(blank = True, null = True)
+    periodicity   = models.PositiveIntegerField()
     approved_budget   = models.PositiveIntegerField(blank = True, null = True)
     # periodicity_date = models.DateField(blank = True, null = True)  ##TODO positive integer --periodicity
     ##TODO: approved_budget --postive integer blank = True, null = True
