@@ -417,7 +417,7 @@ def get_filter_data(request, req_data, f_info):
         #     filter_type = 'select'
         if k == 'donor':
             projects=UserProjectMapping.objects.filter(user=request.user,active=2).values_list('project_id',flat=True)
-            donor_list = ProjectDonorMapping.objects.filter(project_id__in=projects,active=2).values_list('donor_id', 'donor__name')
+            donor_list = ProjectDonorMapping.objects.filter(project_id__in=projects,active=2).values_list('donor_id', 'donor__name').distinct()
             data_list = [(str(item[0]), item[1])
                          for item in donor_list]
             data_id = user_filter_values.get('donor', '')
