@@ -62,37 +62,33 @@
     <script type="text/javascript">
         //TODO: yet to test the onchange state/district
         $(document).ready(function () {
-            $('select#state').change(function () {
+            $('select#category').change(function () {
                 var optionSelected = $(this).find("option:selected");
                 var valueSelected = optionSelected.val();
                 if (valueSelected == ''){
-                    $("#district option").remove();
-                    $("#shelter option").remove();
+                    $("#indicator option").remove();
                 }else{
                     data = {
-                        'selected_state': valueSelected
+                        'selected_category': valueSelected
                     };
                     $.ajax({
                         type: "GET",
-                        url: '/ajax/report_district/',
+                        url: '/ajax/report_indicator/',
                         data: data,
                         success: function (result) {
-                            $("#district option").remove();
-                            a = '<option selected value="0">Select District</option>';
-                            $("#district").append(a);
-                            $("#shelter option").remove();
-                            b = '<option selected value="0">Select Shelter Home</option>';
-                            $("#shelter").append(b);
+                            $("#indicator option").remove();
+                            a = '<option selected value="0">Select Indicator</option>';
+                            $("#indicator").append(a);
                             if (JSON.parse(result) == 0) {
-                                $("#district option").remove();
+                                $("#indicator option").remove();
                                 a =
-                                '<option selected disabled value="">Select District</option>';
-                                $("#district").append(a);
+                                '<option selected disabled value="">Select Indicator</option>';
+                                $("#indicator").append(a);
                             } else {
                                 $.each(JSON.parse(result), function (key, value) {
                                     a = '<option value=' + value['id'] + '>' +
                                         value['name'] + '</option>';
-                                    $("#district").append(a);
+                                    $("#indicator").append(a);
                                 });
                             }
                         }
@@ -101,7 +97,7 @@
 
             });
         });
-        $(document).ready(function () {
+        {% comment %} $(document).ready(function () {
             $('select#district').change(function () {
                 var optionSelected = $(this).find("option:selected");
                 var valueSelected = optionSelected.val();
@@ -135,7 +131,7 @@
                     });  
                 }              
             });
-        });
+        }); {% endcomment %}
     </script>
 
 {% endblock  %}

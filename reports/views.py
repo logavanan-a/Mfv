@@ -273,18 +273,18 @@ def update_location_data_with_user_filter(model, loc_data_index, selected_loc_id
         #         active=2,id=user_location_data[0][0]).values_list('id', 'name').order_by('name'))
         #     loc_data[4].update({str(0): loc_list})
         # elif model == State:
-        if model == State:
-            loc_list = list(State.objects.filter(
+        if model == MissionIndicatorCategory:
+            loc_list = list(MissionIndicatorCategory.objects.filter(
                 active=2).values_list('id', 'name').order_by('name'))
             loc_data[4].update({str(0): loc_list})
-        elif model == District and user_location_data[1][0] != '0':
-            loc_list = list(District.objects.filter(
-                state_id=user_location_data[0][0], active=2).values_list('id', 'name').order_by('name'))
+        elif model == MissionIndicator and user_location_data[1][0] != '0':
+            loc_list = list(MissionIndicator.objects.filter(
+                category_id=user_location_data[0][0], active=2).values_list('id', 'name').order_by('name'))
             loc_data[4].update({str(user_location_data[0][0]): loc_list})
-        elif model == ShelterHome and user_location_data[1][0] != '0':
-            loc_list = list(ShelterHome.objects.filter(
-                district_id=user_location_data[1][0],excluded_shelterhome=False, active=2).values_list('id', 'name').order_by('name'))
-            loc_data[4].update({str(user_location_data[1][0]): loc_list})
+        # elif model == ShelterHome and user_location_data[1][0] != '0':
+        #     loc_list = list(ShelterHome.objects.filter(
+        #         district_id=user_location_data[1][0],excluded_shelterhome=False, active=2).values_list('id', 'name').order_by('name'))
+        #     loc_data[4].update({str(user_location_data[1][0]): loc_list})
     user_location_data[loc_data_index] = loc_data
     user_location_data[loc_data_index][0] = int(
         selected_loc_id) if selected_loc_id != '' else 0
@@ -311,22 +311,32 @@ def get_filter_data(request, req_data, f_info):
         str_val = req_data.get(key, '')
         if key == 'start_month':
             str_val=str_val.replace('-','')
-        if key == 'fv_month_year' and str_val == '':
-            previous_month=dt.now() + dateutil.relativedelta.relativedelta(months=-1)
-            previous_year_month=previous_month.strftime('%Y%-m')
-            current_filtered_qtr = quarter_month_mapper.get(previous_year_month[4:])
-            previous_year = int(previous_year_month[0:4])
-            previous_year = previous_year - 1 if current_filtered_qtr == 4 else previous_year
-            str_val=previous_month.strftime('%Y%#m')
-            user_filter_values.update({'fv_fy_start_month_year': str(previous_year)+'04'})
-            user_filter_values.update({'fv_fy_year': str(previous_year)})
-        elif key == 'fv_month_year':
-            str_val=str_val.replace('-','')
-            current_filtered_qtr = quarter_month_mapper.get(str_val[4:].lstrip('0'))
-            selected_year = int(str_val[0:4])
-            selected_year = selected_year - 1 if current_filtered_qtr == 4 else selected_year
+        elif key == 'fv_month_year' :
+            if str_val == '':
+                previous_month=dt.now() + dateutil.relativedelta.relativedelta(months=-1)
+                previous_year_month=previous_month.strftime('%Y%-m')
+                current_filtered_qtr = quarter_month_mapper.get(previous_year_month[4:])
+                selected_year = int(previous_year_month[0:4])
+                selected_year = selected_year - 1 if current_filtered_qtr == 4 else selected_year
+                str_val=previous_month.strftime('%Y%#m')
+                # user_filter_values.update({'fv_fy_start_month_year': str(previous_year)+'04'})
+                # user_filter_values.update({'fv_fy_year': str(previous_year)})
+            else:
+                str_val=str_val.replace('-','')
+                current_filtered_qtr = quarter_month_mapper.get(str_val[4:].lstrip('0'))
+                selected_year = int(str_val[0:4])
+                selected_year = selected_year - 1 if current_filtered_qtr == 4 else selected_year
             user_filter_values.update({'fv_fy_start_month_year': str(selected_year)+'04'})
             user_filter_values.update({'fv_fy_year': str(selected_year)})
+        elif key == 'partner' and str_val == '' :
+            str_val=str(request.session['user_partner_list'])[1:-1]
+        elif key == 'project' and str_val == '' :
+            str_val=str(request.session['user_project_list'])[1:-1]
+        elif key == 'donor' and str_val == '' :
+            str_val=str(request.session['user_donor_list'])[1:-1]
+        # elif key == 'category' and str_val == '' :
+        #     str_val=str(request.session['user_category_list'])[1:-1]
+
 
         # if (key == 'fv_fy_start_month_year' or key == 'fv_fy_year') and str_val != '':
         #     # import ipdb;ipdb.set_trace()
@@ -340,23 +350,23 @@ def get_filter_data(request, req_data, f_info):
         #     filter_values.append([])
     # logger.error('user_filter_values:' + str(user_filter_values))
     user_location_data = request.session['user_location_data'] if 'user_location_data' in request.session else None
-    # if user_location_data == None:
-        # logger.error('load session-----------------------------')
-        # load_user_details_to_sessions(request)
-        # user_location_data = request.session['user_location_data']
-    # user_location_data = copy.deepcopy(user_location_data)
-    # logger.error("get_filter_data(user_location_data*COPY:"+ str(user_location_data))
-    # state_id = get_loc_filter_value(user_filter_values.get(
-    #     'state', ''), user_location_data[0][0])
-    # district_id = get_loc_filter_value(user_filter_values.get(
-    #     'district', ''), user_location_data[1][0])
+    if user_location_data == None:
+        logger.error('load session-----------------------------')
+        load_user_details_to_sessions(request)
+        user_location_data = request.session['user_location_data']
+    user_location_data = copy.deepcopy(user_location_data)
+    logger.error("get_filter_data(user_location_data*COPY:"+ str(user_location_data))
+    category_id = get_loc_filter_value(user_filter_values.get(
+        'category', ''), user_location_data[0][0])
+    indicator_id = get_loc_filter_value(user_filter_values.get(
+        'indicator', ''), user_location_data[1][0])
     # shelter_id = get_loc_filter_value(user_filter_values.get(
     #     'shelter', ''), user_location_data[2][0])
     
-    # user_location_data = update_location_data_with_user_filter(
-    #     State, 0, state_id, user_location_data)
-    # user_location_data = update_location_data_with_user_filter(
-    #     District, 1, district_id, user_location_data)
+    user_location_data = update_location_data_with_user_filter(
+        MissionIndicatorCategory, 0, category_id, user_location_data)
+    user_location_data = update_location_data_with_user_filter(
+        MissionIndicator, 1, indicator_id, user_location_data)
     # user_location_data = update_location_data_with_user_filter(
     #     ShelterHome, 2, shelter_id, user_location_data)
     # prepare filter values for the template
@@ -425,18 +435,47 @@ def get_filter_data(request, req_data, f_info):
             data_id = user_filter_values.get('project', '')
             filter_type = 'select'
         elif k == 'category':
-            category_list = MissionIndicatorCategory.objects.filter(
-                active=2).values_list('id', 'name')
-            data_list = [(str(item[0]), item[1])
-                         for item in category_list]
-            data_id = user_filter_values.get('category', '')
+            # category_list = MissionIndicatorCategory.objects.filter(
+            #     active=2).values_list('id', 'name')
+            # data_list = [(str(item[0]), item[1])
+            #              for item in category_list]
+            # data_id = user_filter_values.get('category', '')
+            # filter_type = 'select'
+
+            ##
+            # import ipdb;ipdb.set_trace()
+
+            loc_data = user_location_data[0][4]
+            data_id = str(user_location_data[0][0])
+            data_list = loc_data.get('0', [])
+            # logger.error('state-data_id:'+data_id)
+            # logger.error('user_location_data[0][2]:'+str(user_location_data[0][2]))
+            if (data_id == '0' or len(data_list) == 1) and user_location_data[0][2] == True:
+                query_data_id = user_location_dict.get('category', [])
+                query_data_id = ','.join([str(i) for i in query_data_id])
+                user_filter_values.update({'category': query_data_id})
             filter_type = 'select'
         elif k == 'indicator':
-            indicator_list = MissionIndicator.objects.filter(
-                active=2).values_list('id', 'name')
-            data_list = [(str(item[0]), item[1])
-                         for item in indicator_list]
-            data_id = user_filter_values.get('indicator', '')
+            # indicator_list = MissionIndicator.objects.filter(
+            #     active=2).values_list('id', 'name')
+            # data_list = [(str(item[0]), item[1])
+            #              for item in indicator_list]
+            # data_id = user_filter_values.get('indicator', '')
+            # filter_type = 'select'
+
+
+            print(user_location_data)
+            loc_data = user_location_data[1][4]
+            data_id = str(user_location_data[1][0])
+            state_id = str(user_location_data[0][0])
+            data_list = loc_data.get(state_id, [])
+            # logger.error('district-data_id:'+data_id)
+            # logger.error('user_location_data[1][2]:'+str(user_location_data[1][2]))
+            if (data_id == '0' or len(data_list) == 1) and user_location_data[1][2] == True:
+                query_data_id = user_location_dict.get('indicator', [])
+                query_data_id = ','.join([str(i) for i in query_data_id])
+                # logger.error('query_data_id:'+str(query_data_id))
+                user_filter_values.update({'indicator': query_data_id})
             filter_type = 'select'
         elif k == 'start_month':
             data_list = []
@@ -813,11 +852,10 @@ def load_user_details_to_sessions(request):
         # user_group = user_role_location_level_config.groups.first()
         # # content type id of the user location level - state/district/shelter
         # location_hierarchy_type_id = user_role_location_level_config.location_hierarchy_type.id
-        # location_relations = UserLocationRelation.objects.filter(
-        #     UserRoleLocationLevelConfig=user_role_location_level_config, active=2).values_list('object_id', flat=True)
+        user_based_categories =request.session['user_category_list']
         # location_hierarchy_type_model = ContentType.objects.get(
         #     id=location_hierarchy_type_id)
-        loc_ids = location_relations
+        loc_ids = user_based_categories
         loc_id = ''
         loc_name = ''
         config_loc = False
@@ -829,16 +867,16 @@ def load_user_details_to_sessions(request):
         #         'district__state__id', 'district__state__name', 'district__id', 'district__name', 'id', 'name').order_by('district__state__name', 'district__name', 'name')
         #     shelter_config, district_config, state_config = True, True, True
         #     attrib_len = 6
-        # elif location_hierarchy_type_model.model == 'district':
+        # if location_hierarchy_type_model.model == 'district':
         #     loc_list = District.objects.filter(id__in=loc_ids).values_list(
         #         'state__id', 'state__name', 'id', 'name').order_by('state__name', 'name')
         #     district_config, state_config = True, True
         #     attrib_len = 4
         # elif location_hierarchy_type_model.model == 'state':
-        #     loc_list = State.objects.filter(id__in=loc_ids).values_list(
-        #         'id', 'name',).order_by('name')
-        #     state_config = True
-        #     attrib_len = 2
+        loc_list = MissionIndicatorCategory.objects.filter(id__in=user_based_categories).values_list(
+            'id', 'name',).order_by('name')        
+        state_config = True
+        attrib_len = 2
         # else:
             # loc_list = State.objects.all().values_list('id', 'name').order_by('name')
             # state_config = True
@@ -903,63 +941,63 @@ def load_user_details_to_sessions(request):
         configure_error = 'Username not configured . Please contact administration.'
         return configure_error
 
-    menus = Menu.objects.filter(active=2).values_list(
-        'name', 'slug', 'icon', 'feature_link', 'model_permission__id')
-    permissions_list = [item[4] for item in menus]
-    permissions_list = list(set(permissions_list))
+    # menus = Menu.objects.filter(active=2).values_list(
+    #     'name', 'slug', 'icon', 'feature_link', 'model_permission__id')
+    # permissions_list = [item[4] for item in menus]
+    # permissions_list = list(set(permissions_list))
 
-    menu_to_display = []
-    user_grp_permissions = user_group.permissions.filter(
-        id__in=permissions_list).values_list('id', flat=True)
-    for menu in menus:
-        if menu[4] in user_grp_permissions:
-            menu_to_display.append(menu)
+    # menu_to_display = []
+    # user_grp_permissions = user_group.permissions.filter(
+    #     id__in=permissions_list).values_list('id', flat=True)
+    # for menu in menus:
+    #     if menu[4] in user_grp_permissions:
+    #         menu_to_display.append(menu)
     # logger.error("user_location_data(SESSION):"+str(user_location_data))
-    request.session['menus'] = menu_to_display
-    request.session['location_hierarchy_type_id'] = location_hierarchy_type_id
+    # request.session['menus'] = menu_to_display
+    # request.session['location_hierarchy_type_id'] = location_hierarchy_type_id
     request.session['user_location_data'] = user_location_data
     request.session['user_location_dict'] = user_location_dict
 
 
 @ login_required(login_url='/login/')
-def get_district(request):
+def get_indicator(request):
     if request.method == 'GET' and request.is_ajax():
-        selected_state = request.GET.get('selected_state', '')
+        selected_category = request.GET.get('selected_category', '')
         user_location_data = request.session['user_location_data'] if 'user_location_data' in request.session else None
         if user_location_data == None:
             # logger.error('load session-----------------------------')
             load_user_details_to_sessions(request)
             user_location_data = request.session['user_location_data']
-        loc_data = user_location_data[1]  # index 1 is districts data
+        loc_data = user_location_data[1]  # index 1 is category data
         result_set = []
         if loc_data[2] == True:  # user configured districts
-            districts = loc_data[4].get(selected_state, [])
-        else:  # all distrcts for state
-            districts = District.objects.filter(state_id=int(
-                selected_state), active=2).order_by('name').values_list('id', 'name')
+            districts = loc_data[4].get(selected_category, [])
+        else:  # all indicators for category
+            districts = MissionIndicator.objects.filter(category_id=int(
+                selected_category), active=2).order_by('name').values_list('id', 'name')
         for district in districts:
             result_set.append(
                 {'id': district[0], 'name': district[1], })
         return HttpResponse(json.dumps(result_set))
 
 
-@ login_required(login_url='/login/')
-def get_shelterhome(request):
-    if request.method == 'GET' and request.is_ajax():
-        selected_district = request.GET.get('selected_district', '')
-        user_location_data = request.session['user_location_data'] if 'user_location_data' in request.session else None
-        if user_location_data == None:
-            # logger.error('load session-----------------------------')
-            load_user_details_to_sessions(request)
-            user_location_data = request.session['user_location_data']
-        loc_data = user_location_data[2]  # index 2 is shelterhome data
-        result_set = []
-        if loc_data[2] == True:  # user configured shelterhomes
-            districts = loc_data[4].get(selected_district, [])
-        else:  # all shelterhomes for district
-            districts = ShelterHome.objects.filter(district_id=int(
-                selected_district),excluded_shelterhome=False, active=2).order_by('name').values_list('id', 'name')
-        for district in districts:
-            result_set.append(
-                {'id': district[0], 'name': district[1], })
-        return HttpResponse(json.dumps(result_set))
+# @ login_required(login_url='/login/')
+# def get_shelterhome(request):
+#     if request.method == 'GET' and request.is_ajax():
+#         selected_district = request.GET.get('selected_district', '')
+#         user_location_data = request.session['user_location_data'] if 'user_location_data' in request.session else None
+#         if user_location_data == None:
+#             # logger.error('load session-----------------------------')
+#             load_user_details_to_sessions(request)
+#             user_location_data = request.session['user_location_data']
+#         loc_data = user_location_data[2]  # index 2 is shelterhome data
+#         result_set = []
+#         if loc_data[2] == True:  # user configured shelterhomes
+#             districts = loc_data[4].get(selected_district, [])
+#         else:  # all shelterhomes for district
+#             districts = ShelterHome.objects.filter(district_id=int(
+#                 selected_district),excluded_shelterhome=False, active=2).order_by('name').values_list('id', 'name')
+#         for district in districts:
+#             result_set.append(
+#                 {'id': district[0], 'name': district[1], })
+#         return HttpResponse(json.dumps(result_set))
