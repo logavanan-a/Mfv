@@ -193,8 +193,8 @@ def task_list(request):
     previous_month = datetime.now() - relativedelta(months=1)
     below_last_two_month = datetime.now().date() - relativedelta(months=2)
 
-    mission_objs = Mission.objects.filter(active=2)
-    project_objs = Project.objects.filter(active=2).order_by('name')
+    mission_objs = Mission.objects.filter(active=2,id__in=request.session['user_mission_list'])
+    project_objs = Project.objects.filter(active=2,id__in=request.session['user_project_list']).order_by('name')
 
     filter_data = request.GET
     archive = filter_data.get('archive') if(filter_data.get('archive') != 'None') else None
