@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import custom_report, custom_report_reload, get_indicator,reports_listing
+from reports.views import custom_report, custom_report_reload, get_indicator,reports_listing
 
 
 app_name = "reports"

@@ -45,7 +45,7 @@ def return_sql_results(sql):
 
 def write_to_excel_from_normalized_table(conn_str, sql_query, headers_list, custom_export_header, rows_in_chunk, sheetname, excelWriter):
     # read from sql table into the pandas dataframe in chucks, this returns a list of dataframes - one for each chunk
-    import pandas
+    # import pandas
 
     # create headers rows and write to excel sheet
     header_row_count = 1
@@ -68,7 +68,7 @@ def write_to_excel_from_normalized_table(conn_str, sql_query, headers_list, cust
             col_list.append(header_text)
         header_df = pd.DataFrame([], columns=col_list)
         header_row_count = 1
-    normalized_df_list = pandas.read_sql_query(
+    normalized_df_list = pd.read_sql_query(
         sql_query, con=conn_str, chunksize=rows_in_chunk)
     start_row = header_row_count
     # set header to False indicating not to add the header data/row
