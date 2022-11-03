@@ -25,7 +25,7 @@ class Task(BaseContent):
     
 
     class Meta:
-        verbose_name_plural = " Task"
+        verbose_name_plural = "Task"
         ordering = ['-id']
 
     def __str__(self):
