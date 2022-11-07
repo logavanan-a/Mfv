@@ -9,7 +9,6 @@ from django.contrib.auth.decorators import login_required
 from django.db import connection
 from .models import ReportMeta
 from dashboard.models import DashboardSummaryLog
-# from master_data.models import Centre, State, District, ShelterHome, UserRoleLocationLevelConfig, UserLocationRelation, Menu, ChildClassification
 from django.contrib.contenttypes.models import ContentType
 from django.template.loader import render_to_string
 from django.http import HttpResponse
@@ -45,7 +44,6 @@ def return_sql_results(sql):
 
 def write_to_excel_from_normalized_table(conn_str, sql_query, headers_list, custom_export_header, rows_in_chunk, sheetname, excelWriter):
     # read from sql table into the pandas dataframe in chucks, this returns a list of dataframes - one for each chunk
-    # import pandas
 
     # create headers rows and write to excel sheet
     header_row_count = 1
@@ -182,10 +180,10 @@ def custom_report(request, page_slug):
         for item in headers[0]:
             colspan = item.get('colspan', 0)
             header_col_count += colspan if colspan > 0 else 1
+        print(data_query)
 
         data_query_list.append(data_query)
         data.append(return_sql_results(data_query))
-        print(data_query)
 
         total_header_cols.append(header_col_count)
         report_slug_list.append(r_slug)
@@ -311,6 +309,10 @@ def get_filter_data(request, req_data, f_info):
         str_val = req_data.get(key, '')
         if key == 'start_month':
             str_val=str_val.replace('-','')
+        elif key == 'fv_start_month_year':
+            str_val=str_val.replace('-','')
+        elif key == 'fv_end_month_year':
+            str_val=str_val.replace('-','')
         elif key == 'fv_month_year' :
             if str_val == '':
                 previous_month=dt.now() + dateutil.relativedelta.relativedelta(months=-1)
@@ -435,42 +437,23 @@ def get_filter_data(request, req_data, f_info):
             data_id = user_filter_values.get('project', '')
             filter_type = 'select'
         elif k == 'category':
-            # category_list = MissionIndicatorCategory.objects.filter(
-            #     active=2).values_list('id', 'name')
-            # data_list = [(str(item[0]), item[1])
-            #              for item in category_list]
-            # data_id = user_filter_values.get('category', '')
-            # filter_type = 'select'
-
-            ##
-            # import ipdb;ipdb.set_trace()
-
             loc_data = user_location_data[0][4]
             data_id = str(user_location_data[0][0])
             data_list = loc_data.get('0', [])
-            # logger.error('state-data_id:'+data_id)
-            # logger.error('user_location_data[0][2]:'+str(user_location_data[0][2]))
+            logger.error('category-data_id:'+data_id)
+            logger.error('user_location_data[0][2]:'+str(user_location_data[0][2]))
             if (data_id == '0' or len(data_list) == 1) and user_location_data[0][2] == True:
                 query_data_id = user_location_dict.get('category', [])
                 query_data_id = ','.join([str(i) for i in query_data_id])
                 user_filter_values.update({'category': query_data_id})
             filter_type = 'select'
         elif k == 'indicator':
-            # indicator_list = MissionIndicator.objects.filter(
-            #     active=2).values_list('id', 'name')
-            # data_list = [(str(item[0]), item[1])
-            #              for item in indicator_list]
-            # data_id = user_filter_values.get('indicator', '')
-            # filter_type = 'select'
-
-
-            print(user_location_data)
             loc_data = user_location_data[1][4]
             data_id = str(user_location_data[1][0])
             state_id = str(user_location_data[0][0])
             data_list = loc_data.get(state_id, [])
-            # logger.error('district-data_id:'+data_id)
-            # logger.error('user_location_data[1][2]:'+str(user_location_data[1][2]))
+            logger.error('indicator-data_id:'+data_id)
+            logger.error('user_location_data[1][2]:'+str(user_location_data[1][2]))
             if (data_id == '0' or len(data_list) == 1) and user_location_data[1][2] == True:
                 query_data_id = user_location_dict.get('indicator', [])
                 query_data_id = ','.join([str(i) for i in query_data_id])
@@ -489,12 +472,25 @@ def get_filter_data(request, req_data, f_info):
             if data_id != '' and '-' not in data_id:
                 data_id='-'.join([data_id[:4],data_id[4:6]])
             filter_type = 'month'
-        # elif k == 'fv_fy_start_month_year':
-        #     data_list = []
-        #     data_id = user_filter_values.get('fv_fy_start_month_year') 
-        #     if data_id != '':
-        #         data_id='-'.join([data_id[:4],data_id[4:6]])
-        #     filter_type = 'month'
+        elif k == 'fv_start_month_year':
+            data_list = []
+            data_id = user_filter_values.get('fv_start_month_year') 
+            if data_id != '':
+                data_id='-'.join([data_id[:4],data_id[4:6]])
+            filter_type = 'month'
+        elif k == 'fv_end_month_year':
+            data_list = []
+            data_id = user_filter_values.get('fv_end_month_year') 
+            if data_id != '':
+                data_id='-'.join([data_id[:4],data_id[4:6]])
+            filter_type = 'month'
+        elif k == 'grading':
+            # TODO: Hardcoded grading 
+            data_list = [(" A ", " A "), (" B ", " B "), (" C "," C "), (" D ", " D "), (" E ", " E "),(" O ", " O ")]
+            data_id = user_filter_values.get('grading', '')
+            
+            filter_type = 'select'
+            
         # elif k == 'fv_fy_year':
         #     data_list = []
         #     data_id = user_filter_values.get('fv_fy_year')

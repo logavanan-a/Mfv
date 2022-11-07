@@ -67,10 +67,10 @@ def login_view(request):
                 user_category_list=MissionIndicatorCategory.objects.filter(mission__id__in=user_mission_id,active=2).values_list('id',flat=True)
 
             elif user.is_superuser:
-                user_mission_id=Mission.objects.all(active=2).values_list('id',flat=True)
-                user_project_ids=Project.objects.all(active=2).values_list('id',flat=True)
-                user_partner_id=Partner.objects.all(active=2).values_list('id',flat=True)
-                user_donor_id=Donor.objects.all(active=2).values_list('id',flat=True).distinct()
+                user_mission_id=Mission.objects.filter(active=2).values_list('id',flat=True)
+                user_project_ids=Project.objects.filter(active=2).values_list('id',flat=True)
+                user_partner_id=Partner.objects.filter(active=2).values_list('id',flat=True)
+                user_donor_id=Donor.objects.filter(active=2).values_list('id',flat=True).distinct()
                 user_category_list=MissionIndicatorCategory.objects.filter(active=2).values_list('id',flat=True)
             
             request.session['user_mission_list']=list(user_mission_id)

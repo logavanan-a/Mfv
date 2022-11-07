@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 from reports.views import custom_report, custom_report_reload, get_indicator,reports_listing
 
 
