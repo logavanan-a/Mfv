@@ -17,6 +17,6 @@ class Command(BaseCommand):
         for user_obj in User.objects.filter(groups__name = 'Partner Data Entry Operator'):
             for project in Project.objects.all():
                 string_cancate = project.partner_mission_mapping.mission.name +" - "+project.name+" - April 2022"
-                print(string_cancate)
+                # print(string_cancate)
                 # added = Task(project = project,user=user_obj, name = string_cancate, start_date="2022-04-01",end_date= "2022-04-30")
                 # added.save()

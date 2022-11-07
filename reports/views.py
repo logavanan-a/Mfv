@@ -180,7 +180,7 @@ def custom_report(request, page_slug):
         for item in headers[0]:
             colspan = item.get('colspan', 0)
             header_col_count += colspan if colspan > 0 else 1
-        print(data_query)
+        # print(data_query)
 
         data_query_list.append(data_query)
         data.append(return_sql_results(data_query))
@@ -353,11 +353,11 @@ def get_filter_data(request, req_data, f_info):
     # logger.error('user_filter_values:' + str(user_filter_values))
     user_location_data = request.session['user_location_data'] if 'user_location_data' in request.session else None
     if user_location_data == None:
-        logger.error('load session-----------------------------')
+        # logger.error('load session-----------------------------')
         load_user_details_to_sessions(request)
         user_location_data = request.session['user_location_data']
     user_location_data = copy.deepcopy(user_location_data)
-    logger.error("get_filter_data(user_location_data*COPY:"+ str(user_location_data))
+    # logger.error("get_filter_data(user_location_data*COPY:"+ str(user_location_data))
     category_id = get_loc_filter_value(user_filter_values.get(
         'category', ''), user_location_data[0][0])
     indicator_id = get_loc_filter_value(user_filter_values.get(
@@ -373,7 +373,7 @@ def get_filter_data(request, req_data, f_info):
     #     ShelterHome, 2, shelter_id, user_location_data)
     # prepare filter values for the template
     user_location_dict = request.session['user_location_dict'] if 'user_location_dict' in request.session else None
-    logger.error("user_location_dict:" + str(user_location_dict))
+    # logger.error("user_location_dict:" + str(user_location_dict))
     loc_data = None
     for i in display_order:
         filter_values.append([])
@@ -440,8 +440,8 @@ def get_filter_data(request, req_data, f_info):
             loc_data = user_location_data[0][4]
             data_id = str(user_location_data[0][0])
             data_list = loc_data.get('0', [])
-            logger.error('category-data_id:'+data_id)
-            logger.error('user_location_data[0][2]:'+str(user_location_data[0][2]))
+            # logger.error('category-data_id:'+data_id)
+            # logger.error('user_location_data[0][2]:'+str(user_location_data[0][2]))
             if (data_id == '0' or len(data_list) == 1) and user_location_data[0][2] == True:
                 query_data_id = user_location_dict.get('category', [])
                 query_data_id = ','.join([str(i) for i in query_data_id])
@@ -452,8 +452,8 @@ def get_filter_data(request, req_data, f_info):
             data_id = str(user_location_data[1][0])
             state_id = str(user_location_data[0][0])
             data_list = loc_data.get(state_id, [])
-            logger.error('indicator-data_id:'+data_id)
-            logger.error('user_location_data[1][2]:'+str(user_location_data[1][2]))
+            # logger.error('indicator-data_id:'+data_id)
+            # logger.error('user_location_data[1][2]:'+str(user_location_data[1][2]))
             if (data_id == '0' or len(data_list) == 1) and user_location_data[1][2] == True:
                 query_data_id = user_location_dict.get('indicator', [])
                 query_data_id = ','.join([str(i) for i in query_data_id])
@@ -832,7 +832,7 @@ def custom_report_reload(request, page_slug, report_slug):
         exc_type, exc_value, exc_traceback = sys.exc_info()
         error_stack = repr(traceback.format_exception(
             exc_type, exc_value, exc_traceback))
-        logger.error(error_stack)
+        # logger.error(error_stack)
     return HttpResponse(html)
 
 
