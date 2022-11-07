@@ -25,7 +25,7 @@ class Task(BaseContent):
     
 
     class Meta:
-        verbose_name_plural = " Task"
+        verbose_name_plural = "Task"
         ordering = ['-id']
 
     def __str__(self):
@@ -48,6 +48,7 @@ class MissionIndicatorAchievement(BaseContent):
     )
     task = models.ForeignKey(Task, on_delete=models.DO_NOTHING, blank=True, null=True)
     response = JSONField(default=dict)
+    # response = models.JSONField(default=dict, blank=True)
     number_working_days = models.IntegerField(default=0)
     project_reference_file = models.FileField(upload_to='file/%Y/%m/%d',blank=True, null=True)
     camp_organized = models.IntegerField(choices = CAMP_OPTION, blank=True, null=True)

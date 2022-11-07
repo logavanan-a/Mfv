@@ -208,7 +208,7 @@ def task_list(request):
     if(archive != None or month != None or year != None or project != None or mission != None or task_status != None) and (archive != None):
         task_obj = Task.objects.filter(active=2, start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year).order_by('-modified')
     else:
-        task_obj = Task.objects.filter(active=2, start_date__month = previous_month.month, start_date__year = previous_month.year).order_by('-modified')
+        task_obj = Task.objects.filter(active=2,  task_status=1, start_date__month = previous_month.month, start_date__year = previous_month.year).order_by('-modified')
 
     if mission:
         project_objs = project_objs.filter(active=2, partner_mission_mapping__mission__id = mission)
