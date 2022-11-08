@@ -19,7 +19,7 @@ import json
 import re
 import csv
 import logging
-from application_master.models import Mission,Project,MissionIndicator,MissionIndicatorCategory,UserPartnerMapping,UserProjectMapping,ProjectDonorMapping
+from application_master.models import Mission,Project,Donor,Partner,MissionIndicator,MissionIndicatorCategory,UserPartnerMapping,UserProjectMapping,ProjectDonorMapping
 from django.contrib.auth.models import User
 from datetime import datetime as dt
 
@@ -180,7 +180,7 @@ def custom_report(request, page_slug):
         for item in headers[0]:
             colspan = item.get('colspan', 0)
             header_col_count += colspan if colspan > 0 else 1
-        # print(data_query)
+        print(data_query)
 
         data_query_list.append(data_query)
         data.append(return_sql_results(data_query))
@@ -418,20 +418,20 @@ def get_filter_data(request, req_data, f_info):
         #         user_filter_values.update({'shelter': query_data_id})
         #     filter_type = 'select'
         if k == 'donor':
-            projects=UserProjectMapping.objects.filter(user=request.user,active=2).values_list('project_id',flat=True)
-            donor_list = ProjectDonorMapping.objects.filter(project_id__in=projects,active=2).values_list('donor_id', 'donor__name').distinct()
+            # projects=UserProjectMapping.objects.filter(user=request.user,active=2).values_list('project_id',flat=True)
+            donor_list = Donor.objects.filter(id__in=request.session['user_donor_list'],active=2).values_list('id', 'name')
             data_list = [(str(item[0]), item[1])
                          for item in donor_list]
             data_id = user_filter_values.get('donor', '')
             filter_type = 'select'
         elif k == 'partner':
-            partner_list = UserPartnerMapping.objects.filter(user=request.user,active=2).values_list('partner_id', 'partner__name')
+            partner_list = Partner.objects.filter(id__in=request.session['user_partner_list'],active=2).values_list('id', 'name')
             data_list = [(str(item[0]), item[1])
                          for item in partner_list]
             data_id = user_filter_values.get('partner', '')
             filter_type = 'select'
         elif k == 'project':
-            project_list = UserProjectMapping.objects.filter(user=request.user,active=2).values_list('project_id', 'project__name')
+            project_list = Project.objects.filter(id__in=request.session['user_project_list'],active=2).values_list('id', 'name')
             data_list = [(str(item[0]), item[1])
                          for item in project_list]
             data_id = user_filter_values.get('project', '')
