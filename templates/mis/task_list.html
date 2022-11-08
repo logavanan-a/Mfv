@@ -111,7 +111,7 @@
                                                 <tr>
                                                     <td>{{forloop.counter0|add:object_list.start_index}}</td>
                                                     <td>{{task.project.partner_mission_mapping.mission.name}}</td>
-                                                    <td>{{task.name}}</td>
+                                                    <td>{{task.project.name}}</td>
                                                     <!-- <td>{{task.start_date|date:"d-m-Y"}} -   {{task.user.username}}</td> -->
                                                     <td {% if task.task_status  == 1 %}class="badge-soft-danger"
                                                         {% elif task.task_status == 2 %}class="badge-soft-warning"

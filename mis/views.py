@@ -52,9 +52,11 @@ def login_view(request):
         if user is not None:
             login(request, user)
             if user.groups.filter(name__in = ['Partner Data Entry Operator','Partner Admin']).exists():
-                user_project_ids=UserProjectMapping.objects.filter(user=request.user,active=2).values_list('project_id',flat=True)
                 user_partner_id=UserPartnerMapping.objects.filter(user=request.user,active=2).values_list('partner__id',flat=True)
-                user_mission_id=PartnerMissionMapping.objects.filter(partner__id__in=user_partner_id,active=2).values_list('mission_id',flat=True)
+                partner_mission_mapping=PartnerMissionMapping.objects.filter(partner__id__in=user_partner_id,active=2)
+                partner_mission_mapping_ids=partner_mission_mapping.values_list('id',flat=True)
+                user_mission_id=partner_mission_mapping.values_list('mission_id',flat=True)
+                user_project_ids=Project.objects.filter(partner_mission_mapping_id__in=partner_mission_mapping_ids,active=2).values_list('id',flat=True)
                 user_donor_id=ProjectDonorMapping.objects.filter(project__id__in=user_project_ids,active=2).values_list('donor__id',flat=True).distinct()
                 user_category_list=MissionIndicatorCategory.objects.filter(mission__id__in=user_mission_id,active=2).values_list('id',flat=True)
 
