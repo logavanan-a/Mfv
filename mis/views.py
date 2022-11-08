@@ -61,7 +61,7 @@ def login_view(request):
             elif user.groups.filter(name__in = ['Project In-charge','M & E']).exists():
                 user_project_ids=UserProjectMapping.objects.filter(user=request.user,active=2).values_list('project_id',flat=True)
                 user_partner_id=UserPartnerMapping.objects.filter(user=request.user,active=2).values_list('partner__id',flat=True)
-                partner_mission_ids=Project.objects.filter(id__id=user_project_ids,active=2).values_list('partner_mission_mapping_id',flat=True)
+                partner_mission_ids=Project.objects.filter(id__in=user_project_ids,active=2).values_list('partner_mission_mapping_id',flat=True)
                 user_mission_id=PartnerMissionMapping.objects.filter(id__in=partner_mission_ids,active=2).values_list('mission_id',flat=True)
                 user_donor_id=ProjectDonorMapping.objects.filter(project__id__in=user_project_ids,active=2).values_list('donor__id',flat=True).distinct()
                 user_category_list=MissionIndicatorCategory.objects.filter(mission__id__in=user_mission_id,active=2).values_list('id',flat=True)
