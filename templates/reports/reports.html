@@ -4,6 +4,7 @@
 <div class="row align-items-center">
     <div class="col-xl-12 mx-auto">
         <div class="row">
+            {% if request.session.user_mission_list %}
             <div class="col-xl-6">
                 <div class="card">
                     <div class="card-body">
@@ -96,6 +97,8 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
+            {% if request.session.user_mission_list %}
             <div class="col-xl-6">
                 <div class="card">
                     <div class="card-body">
@@ -109,6 +112,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {% if 5 in request.session.user_mission_list %}
                                     <tr>
                                         <td>Finance Report - Mission Jyot</td>
                                         <td>
@@ -116,6 +120,7 @@
                                             <button type="button" onclick="location.href='/report/finance-mission-jyot/?export=True';" class="btn btn-light btn-sm">Download</button>
                                         </td>
                                     </tr>
+                                    {% endif %}
                                     {% if 9 in request.session.user_mission_list %}
                                     <tr>
                                         <td>Finance Report - Mission Nayan</td>
@@ -182,6 +187,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
             {% comment %} <div class="col-xl-6">
                 <div class="card">
                     <div class="card-body">
