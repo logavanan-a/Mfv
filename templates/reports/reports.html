@@ -26,6 +26,13 @@
                                             <button type="button" onclick="location.href='/report/mission-jyot/?export=True';" class="btn btn-light btn-sm">Download</button>
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td>Programme Summary Report - Mission Jyot </td>
+                                        <td>
+                                            <button type="button" onclick="location.href='/report/summary-mission-jyot/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/summary-mission-jyot/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                        </td>
+                                    </tr>
                                     {% endif %}
                                     {% if 9 in request.session.user_mission_list %}
                                     <tr>
@@ -63,12 +70,12 @@
                                         </td>
                                     </tr>
                                     {% endif %}
-                                    {% if 3 in request.session.user_mission_list %}
+                                    {% if 8 in request.session.user_mission_list %}
                                     <tr>
-                                        <td>Monthly Programme Report - Mission Saksham</td>
+                                        <td>Monthly Programme Report - Saksham</td>
                                         <td>
-                                            <button type="button" onclick="location.href='/report/mission-saksham/';" class="btn btn-light btn-sm">View</button>
-                                            <button type="button" onclick="location.href='/report/mission-saksham/?export=True';" class="btn btn-light btn-sm">Download</button>
+                                            <button type="button" onclick="location.href='/report/saksham/';" class="btn btn-light btn-sm">View</button>
+                                            <button type="button" onclick="location.href='/report/saksham/?export=True';" class="btn btn-light btn-sm">Download</button>
                                         </td>
                                     </tr>
                                     {% endif %}
