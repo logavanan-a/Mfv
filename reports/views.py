@@ -334,12 +334,12 @@ def get_filter_data(request, req_data, f_info):
                 selected_year = selected_year - 1 if current_filtered_qtr == 4 else selected_year
             user_filter_values.update({'fv_fy_start_month_year': str(selected_year)+'04'})
             user_filter_values.update({'fv_fy_year': str(selected_year)})
-        # elif key == 'partner' and str_val == '' :
-        #     str_val=str(0)
-        # elif key == 'project' and str_val == '' :
-        #     str_val=str(0)
-        # elif key == 'donor' and str_val == '' :
-        #     str_val=str(0)
+        elif key == 'partner' and str_val == '' :
+            str_val=str(request.session['user_partner_list'])[1:-1]
+        elif key == 'project' and str_val == '' :
+            str_val=str(request.session['user_project_list'])[1:-1]
+        elif key == 'donor' and str_val == '' :
+            str_val=str(request.session['user_donor_list'])[1:-1]
         # elif key == 'category' and str_val == '' :
         #     str_val=str(request.session['user_category_list'])[1:-1]
 
