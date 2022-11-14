@@ -150,13 +150,14 @@ def custom_report(request, page_slug):
         d_query = r_query['sql_query']
         c_query = r_query['count_query'] if r_query['count_query'] else ''
         nw_cols = r_query['nowrap_cols']
+        mission_id = r_query['mission_id']
         headers = report.report_header
         e_header = report.custom_export_header
         # all filter settings are set based on the first report filters
         if idx == 0:
             page_slug = report.page_slug
             user_location_data, filter_values, user_filter_values, extended_filter_dict = get_filter_data(
-                request, req_data, f_info)
+                request, req_data, f_info,mission_id)
         # update any variable_location_names  - in query, count query, sort and headers
         default_sort = r_query['default_sort'] if 'default_sort' in r_query else None
 
@@ -293,7 +294,7 @@ def update_location_data_with_user_filter(model, loc_data_index, selected_loc_id
     return user_location_data
 
 
-def get_filter_data(request, req_data, f_info):
+def get_filter_data(request, req_data, f_info,mission_id):
     import dateutil.relativedelta
     filter_values = []
     quarter_month_mapper = {"1": 4, "2": 4, "3": 4, "4": 1, "5": 1,
@@ -435,7 +436,7 @@ def get_filter_data(request, req_data, f_info):
             data_id = user_filter_values.get('partner', '')
             filter_type = 'select'
         elif k == 'project':
-            project_list = Project.objects.filter(id__in=request.session['user_project_list'],active=2).values_list('id', 'name')
+            project_list = Project.objects.filter(id__in=request.session['user_project_list'],partner_mission_mapping__mission_id=mission_id,active=2).values_list('id', 'name')
             data_list = [(str(item[0]), item[1])
                          for item in project_list]
             data_id = user_filter_values.get('project', '')
@@ -795,13 +796,14 @@ def custom_report_reload(request, page_slug, report_slug):
                 r_query = report.report_query
                 d_query = r_query['sql_query']
                 c_query = r_query['count_query'] if r_query['count_query'] else ''
+                mission_id = r_query['mission_id']
                 f_info = report.filter_info
                 s_info = report.sort_info
                 e_header = report.custom_export_header
                 headers = report.report_header  # table_header
                 # nowrap_cols.append(report.report_query['nowrap_cols'])
                 user_location_data, filter_values, user_filter_values, extended_filter_dict = get_filter_data(
-                    request, req_data, f_info)
+                    request, req_data, f_info,mission_id)
                 # update any variable_location_names  - in query, count query, sort and headers
                 default_sort = r_query['default_sort'] if 'default_sort' in r_query else None
                 headers, e_header, data_query, count_query, s_info, default_sort = apply_variable_location_info(
