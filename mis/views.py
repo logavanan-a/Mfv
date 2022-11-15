@@ -146,7 +146,9 @@ def missionindicator_add(request, slug,task_id):
         }
         read_only_field=[349,307]
         mission_jyot_column_total_ids=[48,293,303,306]
-
+    else:
+        v_calc_dict={}
+        total_cal_dict={}
     if request.method == 'POST':
         data = request.POST
         working_day = request.POST.get('working_day')
