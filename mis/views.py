@@ -119,6 +119,22 @@ def missionindicator_add(request, slug,task_id):
     task_obj = Task.objects.get(id = task_id)
     user = get_user(request)
     user_role = str(user.groups.last())
+    if slug == 'mission-jyot':
+        v_calc_dict={
+            46:1,
+            47:1,
+            48:1,
+            292:2,
+            49:2,
+            293:2,
+        }
+        total_cal_dict={
+            48:[46,47],
+            293:[292,49],
+            349:[293,48],
+            
+        }
+        mission_jyot_column_total_ids=[48,293]
 
     if request.method == 'POST':
         data = request.POST
