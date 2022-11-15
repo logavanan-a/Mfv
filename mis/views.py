@@ -134,7 +134,7 @@ def missionindicator_add(request, slug,task_id):
             349:[293,48],
             
         }
-        mission_jyot_column_total_ids=[48,293,349]
+        mission_jyot_column_total_ids=[48,293]
 
     if request.method == 'POST':
         data = request.POST
