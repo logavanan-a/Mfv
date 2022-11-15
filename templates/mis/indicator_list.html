@@ -74,7 +74,7 @@
                             </thead>
                                 {% for sub_category in data.sub_category %}
                                 <tbody>
-                                    <td>{{sub_category.name}}</td> 
+                                    <td>{{sub_category.name}}{{sub_category.id}}</td> 
                                     <!-- <td>{{sub_category.get_indicator_type_display}}</td>  -->
                                     
                                     {% disply_indicator_target_values task_obj.id sub_category.id as target_values %}  
@@ -83,30 +83,30 @@
                                         <input type="text" style="width:70px;" name="total_{{sub_category.id}}" id="total" class="form-control row_total vertical_add_total_{{sub_category.id}}" {% if sub_category.indicator_type != 2 %}readonly{% endif %}>
                                         <!-- <div class="invalid-feedback">Please enter the Total value</div> -->
                                     </td>
-                                    <td><input type="text" style="width:60px;" name="adult_male_{{sub_category.id}}"  onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_male {% if sub_category.id in mission_jyot_column_total_ids %}vertical_add_male_{{v_calc_dict|get_item:sub_category.id}}_total {% elif sub_category.id == 349  %} vertical_add_male_1_final_total vertical_add_male_2_final_total  {% else %}vertical_add_male_{{v_calc_dict|get_item:sub_category.id}}{% endif %}" size="4" maxlength="4" id="adult_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 or sub_category.id in mission_jyot_column_total_ids or sub_category.id == 349 %}readonly{% endif %}>
+                                    <td><input type="text" style="width:60px;" name="adult_male_{{sub_category.id}}"  onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_male {% if sub_category.id in mission_jyot_column_total_ids %}vertical_add_male_{{v_calc_dict|get_item:sub_category.id}}_total {% elif sub_category.id in read_only_field  %} vertical_add_male_1_final_total vertical_add_male_2_final_total vertical_add_male_3_final_total vertical_add_male_4_final_total  {% else %}vertical_add_male_{{v_calc_dict|get_item:sub_category.id}}{% endif %}" size="4" maxlength="4" id="adult_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 or sub_category.id in mission_jyot_column_total_ids or sub_category.id in read_only_field %}readonly{% endif %}>
                                         <!-- <div class="invalid-feedback">Please enter the Adult Male value</div> -->
                                     </td>
                                     <td>
-                                        <input type="text" style="width:60px;" name="adult_female_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_female {% if sub_category.id in mission_jyot_column_total_ids %}vertical_add_female_{{v_calc_dict|get_item:sub_category.id}}_total final_total_female{% elif sub_category.id == 349  %} vertical_add_female_1_final_total vertical_add_female_2_final_total {% else %}vertical_add_female_{{v_calc_dict|get_item:sub_category.id}}{% endif %}" size="4" maxlength="4" id="adult_female_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 or sub_category.id in mission_jyot_column_total_ids or sub_category.id == 349 %}readonly{% endif %} >
+                                        <input type="text" style="width:60px;" name="adult_female_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_female {% if sub_category.id in mission_jyot_column_total_ids %}vertical_add_female_{{v_calc_dict|get_item:sub_category.id}}_total final_total_female{% elif sub_category.id in read_only_field  %} vertical_add_female_1_final_total vertical_add_female_2_final_total vertical_add_female_3_final_total vertical_add_female_4_final_total {% else %}vertical_add_female_{{v_calc_dict|get_item:sub_category.id}}{% endif %}" size="4" maxlength="4" id="adult_female_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 or sub_category.id in mission_jyot_column_total_ids or sub_category.id in read_only_field %}readonly{% endif %} >
                                         <!-- <div class="invalid-feedback">Please enter the Adult Female value</div> -->
                                     </td>
                                     <td>
-                                        <input type="text" name="adult_transgender_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_transgender {% if sub_category.id in mission_jyot_column_total_ids %}vertical_add_trans_{{v_calc_dict|get_item:sub_category.id}}_total final_total_trans{% elif sub_category.id == 349  %} vertical_add_trans_1_final_total vertical_add_trans_2_final_total {% else %}vertical_add_trans_{{v_calc_dict|get_item:sub_category.id}}{% endif %}"  size="4" maxlength="4" id="adult_transgender_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 or sub_category.id in mission_jyot_column_total_ids or sub_category.id == 349 %}readonly{% endif %} >
+                                        <input type="text" name="adult_transgender_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control adult_transgender {% if sub_category.id in mission_jyot_column_total_ids %}vertical_add_trans_{{v_calc_dict|get_item:sub_category.id}}_total final_total_trans{% elif sub_category.id in read_only_field  %} vertical_add_trans_1_final_total vertical_add_trans_2_final_total vertical_add_trans_3_final_total vertical_add_trans_4_final_total {% else %}vertical_add_trans_{{v_calc_dict|get_item:sub_category.id}}{% endif %}"  size="4" maxlength="4" id="adult_transgender_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 2 or sub_category.id in mission_jyot_column_total_ids or sub_category.id in read_only_field %}readonly{% endif %} >
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                     <td>
                                         <input type="text" style="width:70px;" name="total_adult_{{sub_category.id}}" id="total_adult" class="form-control row_total_adult vertical_add_adult_total_{{sub_category.id}}" readonly >
                                     </td>
                                     <td>
-                                        <input type="text" style="width:60px;" name="child_male_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_male {% if sub_category.id in mission_jyot_column_total_ids %}vertical_add_male_child_{{v_calc_dict|get_item:sub_category.id}}_total final_total_male_child{% elif sub_category.id == 349  %} vertical_add_male_child_1_final_total vertical_add_male_child_2_final_total  {% else %}vertical_add_male_child_{{v_calc_dict|get_item:sub_category.id}}{% endif %}"  size="4" maxlength="4" id="child_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 or sub_category.id in mission_jyot_column_total_ids or sub_category.id == 349 %}readonly{% endif %} >
+                                        <input type="text" style="width:60px;" name="child_male_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_male {% if sub_category.id in mission_jyot_column_total_ids %}vertical_add_male_child_{{v_calc_dict|get_item:sub_category.id}}_total final_total_male_child{% elif sub_category.id in read_only_field  %} vertical_add_male_child_1_final_total vertical_add_male_child_2_final_total vertical_add_male_child_3_final_total vertical_add_male_child_4_final_total {% else %}vertical_add_male_child_{{v_calc_dict|get_item:sub_category.id}}{% endif %}"  size="4" maxlength="4" id="child_male_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 or sub_category.id in mission_jyot_column_total_ids or sub_category.id in read_only_field %}readonly{% endif %} >
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                     <td>
-                                        <input type="text" style="width:60px;" name="child_female_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_female {% if sub_category.id in mission_jyot_column_total_ids %}vertical_add_female_child_{{v_calc_dict|get_item:sub_category.id}}_total final_total_female_child{% elif sub_category.id == 349  %} vertical_add_female_child_1_final_total vertical_add_female_child_2_final_total {% else %}vertical_add_female_child_{{v_calc_dict|get_item:sub_category.id}}{% endif %}"  size="4" maxlength="4" id="child_female_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 or sub_category.id in mission_jyot_column_total_ids or sub_category.id == 349 %}readonly{% endif %} >
+                                        <input type="text" style="width:60px;" name="child_female_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_female {% if sub_category.id in mission_jyot_column_total_ids %}vertical_add_female_child_{{v_calc_dict|get_item:sub_category.id}}_total final_total_female_child{% elif sub_category.id in read_only_field  %} vertical_add_female_child_1_final_total vertical_add_female_child_2_final_total vertical_add_female_child_3_final_total vertical_add_female_child_4_final_total {% else %}vertical_add_female_child_{{v_calc_dict|get_item:sub_category.id}}{% endif %}"  size="4" maxlength="4" id="child_female_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 or sub_category.id in mission_jyot_column_total_ids or sub_category.id in read_only_field %}readonly{% endif %} >
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                     <td>
-                                        <input type="text" name="child_transgender_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_transgender {% if sub_category.id in mission_jyot_column_total_ids %}vertical_add_trans_child_{{v_calc_dict|get_item:sub_category.id}}_total final_total_trans_child{% elif sub_category.id == 349 %}vertical_add_trans_child_1_final_total vertical_add_trans_child_2_final_total{% else %}vertical_add_trans_child_{{v_calc_dict|get_item:sub_category.id}}{% endif %}"  size="4" maxlength="4" id="child_transgender_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 or sub_category.id in mission_jyot_column_total_ids or sub_category.id == 349  %}readonly{% endif %} >
+                                        <input type="text" name="child_transgender_{{sub_category.id}}" onkeypress="return /[0-9]/i.test(event.key)" class="form-control child_transgender {% if sub_category.id in mission_jyot_column_total_ids %}vertical_add_trans_child_{{v_calc_dict|get_item:sub_category.id}}_total final_total_trans_child{% elif sub_category.id in read_only_field %}vertical_add_trans_child_1_final_total vertical_add_trans_child_2_final_total vertical_add_trans_child_3_final_total vertical_add_trans_child_4_final_total{% else %}vertical_add_trans_child_{{v_calc_dict|get_item:sub_category.id}}{% endif %}"  size="4" maxlength="4" id="child_transgender_id" {% if sub_category.indicator_type == 2 or mission_obj.age_group_option == 3 or sub_category.id in mission_jyot_column_total_ids or sub_category.id in read_only_field  %}readonly{% endif %} >
                                         <!-- <div class="invalid-feedback">Please enter the Target value</div> -->
                                     </td>
                                     <td>
@@ -253,7 +253,9 @@
         // tr.find('.row_total').html(total);
         {% if slug == 'mission-jyot' %}
             //vertical calculation vertical_add_total_a
-            columns=['vertical_add_male_1','vertical_add_male_2','vertical_add_female_1','vertical_add_female_2','vertical_add_trans_1','vertical_add_trans_2','vertical_add_male_child_1','vertical_add_male_child_2','vertical_add_female_child_1','vertical_add_female_child_2','vertical_add_trans_child_1','vertical_add_trans_child_2']
+            columns=['vertical_add_male_1','vertical_add_male_2','vertical_add_female_1','vertical_add_female_2','vertical_add_trans_1','vertical_add_trans_2','vertical_add_male_child_1','vertical_add_male_child_2','vertical_add_female_child_1','vertical_add_female_child_2','vertical_add_trans_child_1','vertical_add_trans_child_2',
+            'vertical_add_male_3','vertical_add_male_4','vertical_add_female_3','vertical_add_female_4','vertical_add_trans_3','vertical_add_trans_4','vertical_add_male_child_3','vertical_add_male_child_4','vertical_add_female_child_3','vertical_add_female_child_4','vertical_add_trans_child_3','vertical_add_trans_child_4'
+            ]
             class_name=null
             editing_field = $(this)
             $.each(columns,function(cmn){
@@ -325,11 +327,14 @@
         first_value=$(total_class).val()
         next_class=null
         field_position=total_class.slice(-1)
-        if (field_position == '1'){
-            next_class=total_class.replace(field_position,'2');
-        }else{
-            next_class=total_class.replace(field_position,'1');
+        dict={
+            '1':'2',
+            '2':'1',
+            '3':'4',
+            '4':'3'
         }
+        next_class=total_class.replace(field_position,dict[field_position]);
+        
         second_value=$(next_class+'_total').val()
         return second_value
 

@@ -127,14 +127,25 @@ def missionindicator_add(request, slug,task_id):
             292:2,
             49:2,
             293:2,
+
+            301:3,
+            302:3,
+            303:3,
+            304:4,
+            305:4,
+            306:4,
         }
         total_cal_dict={
             48:[46,47],
             293:[292,49],
             349:[293,48],
-            
+
+            303:[301,302],
+            306:[304,305],
+            307:[303,306],
         }
-        mission_jyot_column_total_ids=[48,293]
+        read_only_field=[349,307]
+        mission_jyot_column_total_ids=[48,293,303,306]
 
     if request.method == 'POST':
         data = request.POST
