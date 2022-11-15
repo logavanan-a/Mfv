@@ -74,7 +74,7 @@
                             </thead>
                                 {% for sub_category in data.sub_category %}
                                 <tbody>
-                                    <td>{{sub_category.name}}{{sub_category.id}}</td> 
+                                    <td>{{sub_category.name}}</td> 
                                     <!-- <td>{{sub_category.get_indicator_type_display}}</td>  -->
                                     
                                     {% disply_indicator_target_values task_obj.id sub_category.id as target_values %}  
