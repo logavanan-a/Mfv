@@ -190,6 +190,37 @@ def missionindicator_edit(request, slug, id,task_id):
     user_role = str(user.groups.last())
 
     dataentry_obj = DataEntryRemark.objects.filter(task__id=task_id).order_by('-id')
+
+    if slug == 'mission-jyot':
+        v_calc_dict={
+            46:1,
+            47:1,
+            48:1,
+            292:2,
+            49:2,
+            293:2,
+
+            301:3,
+            302:3,
+            303:3,
+            304:4,
+            305:4,
+            306:4,
+        }
+        total_cal_dict={
+            48:[46,47],
+            293:[292,49],
+            349:[293,48],
+
+            303:[301,302],
+            306:[304,305],
+            307:[303,306],
+        }
+        read_only_field=[349,307]
+        mission_jyot_column_total_ids=[48,293,303,306]
+    else:
+        v_calc_dict={}
+        total_cal_dict={}
     if request.method == 'POST':
         working_day = request.POST.get('working_day')
         camp_organized = request.POST.get('camp_organized')
