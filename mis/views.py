@@ -579,7 +579,9 @@ def project_list_filter(request):
     if request.method == "POST":
         mission_id =request.POST.get('mission_id')
         if mission_id:
-            project_obj =  Project.objects.filter(active=2).filter(partner_mission_mapping__mission__id = mission_id)
+            project_obj =  Project.objects.filter(active=2).filter(partner_mission_mapping__mission__id = mission_id,id__in=request.session['user_project_list'])
+        else:
+            project_obj =  Project.objects.filter(active=2).filter(id__in=request.session['user_project_list'])
         data=list(project_obj.values('id',"name").order_by("name"))
         return HttpResponse(json.dumps(data), content_type="application/json")   
 
