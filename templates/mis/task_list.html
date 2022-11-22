@@ -146,7 +146,8 @@
                                                         {% endif %}
                                                     </a></b></td>
                                                     {% else %}
-                                                    <td><b><a href="/{{task.project.partner_mission_mapping.mission.slug}}/monthly-report/{{task.id}}/">Add</a></b></td>
+                                                        
+                                                            <td><b><a href="/{{task.project.partner_mission_mapping.mission.slug}}/monthly-report/{{task.id}}/">{% if request.user.groups.all.0.id == 1 %}Add{% else %}View{% endif %}</a></b></td>
                                                     {% endif %}
                                                 </tr>
                                             {% endfor %}  
