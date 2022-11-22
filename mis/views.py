@@ -23,7 +23,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView, View
 from mis.models import MissionIndicatorAchievement, Task, DataEntryRemark
-
+from django.db.models import Q
 
 pg_size = 10
 def get_pagination(request, users):
@@ -268,9 +268,9 @@ def task_list(request):
     month_year = filter_data.get('month_year') if(filter_data.get('month_year') != 'None') else None
 
     if(archive != None or month != None or year != None or project != None or mission != None or task_status != None) and (archive != None):
-        task_obj = Task.objects.filter(active=2, start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year).order_by('-modified')
+        task_obj = Task.objects.filter(~Q(task_status=1),active=2, start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year).order_by('-modified')
     else:
-        task_obj = Task.objects.filter(active=2,  task_status=1, start_date__month = previous_month.month, start_date__year = previous_month.year).order_by('-modified')
+        task_obj = Task.objects.filter(active=2,  task_status=1 ).order_by('-modified')#start_date__month = previous_month.month, start_date__year = previous_month.year
 
     if mission:
         project_objs = project_objs.filter(active=2, partner_mission_mapping__mission__id = mission)
@@ -290,8 +290,10 @@ def task_list(request):
 
     if month_year != 'None' and month_year:
         month_year_list = month_year.split('-')
-        task_obj = task_obj.filter(start_date__year = month_year_list[0]).filter(start_date__month = month_year_list[1])
-
+        task_obj_pending= task_obj.filter(task_status=1 )
+        task_obj_range = task_obj.filter(start_date__year = month_year_list[0]).filter(start_date__month = month_year_list[1])
+        task_obj=task_obj_pending | task_obj_range
+        
     if user.groups.filter(name = 'Partner Admin').exists():
         user_lists = UserPartnerMapping.objects.get(user = request.user)
         for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
