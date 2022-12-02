@@ -178,7 +178,7 @@ class ProjectDonorMapping(BaseContent):
     
 
 class MissionIndicatorCategory(BaseContent):
-    CATEGORY_CHOICES = ((1,'Program Indicator'),(2,'Finance Indicator'))
+    CATEGORY_CHOICES = ((1,'Programme Indicator'),(2,'Finance Indicator'))
     name = models.CharField(max_length = 350)
     mission = models.ForeignKey(Mission, on_delete = models.DO_NOTHING, blank=True, null=True)
     category_type = models.IntegerField(choices = CATEGORY_CHOICES, default=1)
