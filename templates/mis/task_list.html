@@ -124,11 +124,7 @@
                                                     {% if task.get_task %}
                                                     <td><b><a href="/mission_edit/{{task.project.partner_mission_mapping.mission.slug}}/{{task.id}}/{{task.get_task.id}}/">
                                                         {% if request.user.groups.all.0.id == 2 %}
-                                                            {% if task.task_status == 3 %}
-                                                                Edit
-                                                            {% else %}
-                                                                View
-                                                            {% endif %}
+                                                            View
                                                         {% elif request.user.groups.all.0.id == 1 %}
                                                             {% if task.task_status == 1 or task.task_status == 5 %}
                                                                 Edit
@@ -136,11 +132,7 @@
                                                                 View
                                                             {% endif %}
                                                         {% elif request.user.groups.all.0.id ==  4%}
-                                                            {% if task.task_status == 2 %}
-                                                                Edit
-                                                            {% else %}
-                                                                View
-                                                            {% endif %}
+                                                            View
                                                         {% else %}
                                                             View
                                                         {% endif %}

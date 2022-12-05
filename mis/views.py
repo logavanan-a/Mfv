@@ -268,10 +268,10 @@ def task_list(request):
     month_year = filter_data.get('month_year') if(filter_data.get('month_year') != 'None') else None
 
     if(archive != None or month != None or year != None or project != None or mission != None or task_status != None) and (archive != None):
-        task_obj = Task.objects.filter(~Q(task_status=1),active=2, start_date__month__lte = below_last_two_month.month, start_date__year__lte = below_last_two_month.year).order_by('-modified')
+        task_obj = Task.objects.filter(task_status=4,active=2).order_by('-start_date')
     else:
-        task_obj = Task.objects.filter(active=2,  task_status=1 ).order_by('-modified')#start_date__month = previous_month.month, start_date__year = previous_month.year
-
+        task_obj = Task.objects.filter(~Q(task_status=4),active=2).order_by('-start_date')
+    
     if mission:
         project_objs = project_objs.filter(active=2, partner_mission_mapping__mission__id = mission)
         task_obj = task_obj.filter(project__partner_mission_mapping__mission__id = mission)
@@ -288,27 +288,25 @@ def task_list(request):
     if month:
         task_obj = task_obj.filter(start_date__month = month)
 
-    if month_year != 'None' and month_year:
-        month_year_list = month_year.split('-')
-        task_obj_pending= task_obj.filter(task_status=1 )
-        task_obj_range = task_obj.filter(start_date__year = month_year_list[0]).filter(start_date__month = month_year_list[1])
-        task_obj=task_obj_pending | task_obj_range
-        
+    # if month_year != 'None' and month_year:
+    #     month_year_list = month_year.split('-')
+    #     task_obj = task_obj.filter(start_date__year = month_year_list[0]).filter(start_date__month = month_year_list[1])
+
     if user.groups.filter(name = 'Partner Admin').exists():
         user_lists = UserPartnerMapping.objects.get(user = request.user)
         for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
-            task_obj = task_obj.filter(active=2, project__partner_mission_mapping__partner = partner_list.partner).order_by('-modified')
+            task_obj = task_obj.filter(active=2, project__partner_mission_mapping__partner = partner_list.partner).order_by('-start_date')
     
     elif user.groups.filter(name = 'Project In-charge').exists():
-        task_obj = task_obj.filter(active=2, project_in_charge = request.user).order_by('-modified')
+        task_obj = task_obj.filter(active=2, project_in_charge = request.user).order_by('-start_date')
         # pro_lists = UserProjectMapping.objects.get(user = request.user)
         # for project_list in UserProjectMapping.objects.filter(project = pro_lists.project):
-        #     task_obj = Task.objects.filter(project = project_list.project).order_by('-modified')
+        #     task_obj = Task.objects.filter(project = project_list.project).order_by('-start_date')
     
     else:
         user_lists = UserPartnerMapping.objects.get(user = request.user)
         for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
-            task_obj = task_obj.filter(active=2, user = request.user, project__partner_mission_mapping__partner = partner_list.partner).order_by('-modified')
+            task_obj = task_obj.filter(active=2, user = request.user, project__partner_mission_mapping__partner = partner_list.partner).order_by('-start_date')
     
     object_list = get_pagination(request, task_obj)
     page_number_display_count = 5

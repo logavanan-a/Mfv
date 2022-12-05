@@ -16,7 +16,9 @@
                 <div class="col-lg-3 col-md-3 col-sm-3 mt-3 justify-content-center">
                     <p class="text-muted text-right" style="padding-right: .85rem !important;">Data as on {{mat_view_last_updated|date:'d-m-Y g:iA'}}</p>
                 </div>   
-                
+                <div class="col-lg-3 col-md-3 col-sm-3 mt-3 justify-content-center">
+                    <p class="text-muted text-right" style="padding-right: .85rem !important;">Note: The given values are in INR</p>
+                </div> 
                 {% for sub_title in section_title %}
                 {%if forloop.counter0 > 0 %}
                 <div class="row justify-content-left" style="margin-top:25px;">
