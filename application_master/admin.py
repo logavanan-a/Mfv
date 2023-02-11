@@ -37,12 +37,12 @@ class AdminUserProjectMapping(ImportExportActionModelAdmin,admin.ModelAdmin):
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.concrete_fields]
 
-@admin.register(Menus)
-class AdminMenus(ImportExportActionModelAdmin,admin.ModelAdmin):
-    search_fields = ['name']
-    list_filter = ['active']
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.concrete_fields]
+# @admin.register(Menus)
+# class AdminMenus(ImportExportActionModelAdmin,admin.ModelAdmin):
+#     search_fields = ['name']
+#     list_filter = ['active']
+#     def get_list_display(self, request):
+#         return [field.name for field in self.model._meta.concrete_fields]
 
 @admin.register(State)
 class AdminState(ImportExportActionModelAdmin,admin.ModelAdmin):
