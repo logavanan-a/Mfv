@@ -143,7 +143,7 @@
                                     {% for sub_category in fin_data.sub_category %}
                                     <tbody>
                                         <td>{{sub_category.name}}</td> 
-                                        {% disply_indicator_target_values task_obj.id sub_category.id as target_values %}  
+                                        {% disply_indicator_target_values_finance task_obj.id sub_category.id as target_values %}  
                                         {% if fin_data.label_configuration == 2 %}
                                         <td>{{target_values}}</td> 
                                         <td>

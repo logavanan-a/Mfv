@@ -48,6 +48,21 @@ def disply_indicator_target_values(task_id, ind_id):
     else:
         financial_year =  task_obj.start_date.year
     try:
+        mission_indicator_target = MissionIndicatorTarget.objects.get(active = 2, periodicity__range=[financial_year,financial_year], mission_indicator__id = ind_id, project = task_obj.project).target
+    except:
+        mission_indicator_target = ''
+    return mission_indicator_target
+
+@register.simple_tag
+def disply_indicator_target_values_finance(task_id, ind_id):
+    task_obj = Task.objects.get(active = 2, id = task_id)
+    
+    financial_year = ''
+    if task_obj.start_date.month in [1,2,3]:
+        financial_year = task_obj.start_date.year-1  
+    else:
+        financial_year =  task_obj.start_date.year
+    try:
         mission_indicator_target = MissionIndicatorTarget.objects.get(active = 2, periodicity__range=[financial_year,financial_year], mission_indicator__id = ind_id, project = task_obj.project).approved_budget
     except:
         mission_indicator_target = ''
