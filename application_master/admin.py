@@ -106,7 +106,7 @@ class AdminMissionIndicatorTarget(ImportExportActionModelAdmin,admin.ModelAdmin)
         return [field.name for field in self.model._meta.concrete_fields]
 
 @admin.register(UserPartnerMapping)
-class AdminUserPartnerMapping(admin.ModelAdmin):
+class AdminUserPartnerMapping(ImportExportActionModelAdmin,admin.ModelAdmin):
     search_fields = ['partner__name','user__username']
     list_filter = ['active']
     def get_list_display(self, request):
