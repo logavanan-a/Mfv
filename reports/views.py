@@ -30,7 +30,9 @@ logger = logging.getLogger(__name__)
 
 
 def return_sql_results(sql):
-    #logger.error('query:'+ sql)
+    """
+    Executes an SQL query and returns the result rows.
+    """
     cursor = connection.cursor()
     cursor.execute(sql)
     rows = cursor.fetchall()
@@ -48,9 +50,6 @@ def write_to_excel_from_normalized_table(conn_str, sql_query, headers_list, cust
     # create headers rows and write to excel sheet
     header_row_count = 1
     row_data = {}
-    # build a empty row dataframe with only the header information with below structure - dict
-    # {(tuple with headers):{empty data dict}}
-    # {('header level1','header level2'):{}}
     if custom_export_header:
         # custom export header is used to add custom header info - mostly multi level headers like the child classification report
         for i in custom_export_header:
@@ -99,6 +98,9 @@ def write_to_excel_from_normalized_table(conn_str, sql_query, headers_list, cust
 
 @ login_required(login_url='/login/')
 def reports_listing(request):
+    """
+    View function to render the reports listing page.
+    """
     heading='Reports'
     page_reports = ReportMeta.objects.filter(active=2).order_by('display_order')
     return render(request, 'reports/reports.html', locals())
@@ -106,7 +108,6 @@ def reports_listing(request):
 
 @ login_required(login_url='/login/')
 def custom_report(request, page_slug):
-    # TODO:settings reports_row_per_page
     rows_per_page = 10
     if request.method == "POST":
         req_data = request.POST
@@ -114,8 +115,6 @@ def custom_report(request, page_slug):
         req_data = request.GET
     mat_view_last_updated = DashboardSummaryLog.objects.get(
         active=2, log_key='mat_partner_mission_meta_view').last_successful_update
-    # TODO: check the value to check in request
-    # print(req_data.get('export'))
     export_flag = True if req_data.get('export') and req_data.get(
         'export').lower() == 'true' else False
     # order of reports is specified in the ReportMeta default ordering
@@ -136,7 +135,6 @@ def custom_report(request, page_slug):
     user_sort_order = []
     page_info = []
     sorting_field = []
-    # user_filter_values = {}
     user_location_data = None
     filter_values = None
 
@@ -258,6 +256,9 @@ def generate_export_excel(report_title, data_query_list, table_headers, custom_e
 
 
 def get_loc_filter_value(user_filter_value, user_location_data_value):
+    """
+    Returns the location filter value based on the provided user filter value and user location data value. 
+    """
     loc_id = ''
     if user_filter_value != '':
         loc_id = user_filter_value
@@ -267,15 +268,11 @@ def get_loc_filter_value(user_filter_value, user_location_data_value):
 
 
 def update_location_data_with_user_filter(model, loc_data_index, selected_loc_id, user_location_data):
+    """
+    Updates the user location data with the selected location ID and model-specific data.
+    """
     loc_data = user_location_data[loc_data_index]
-    # import ipdb;ipdb.set_trace()
-    # if locaiton_level is not configured data for the user, fetch all sub locations for the selected location id
     if loc_data[2] == False:
-        # if model == State and user_location_data[1][0] != '0':
-        #     loc_list = list(State.objects.filter(
-        #         active=2,id=user_location_data[0][0]).values_list('id', 'name').order_by('name'))
-        #     loc_data[4].update({str(0): loc_list})
-        # elif model == State:
         if model == MissionIndicatorCategory:
             loc_list = list(MissionIndicatorCategory.objects.filter(
                 active=2).values_list('id', 'name').order_by('name'))
@@ -284,10 +281,6 @@ def update_location_data_with_user_filter(model, loc_data_index, selected_loc_id
             loc_list = list(MissionIndicator.objects.filter(
                 category_id=user_location_data[0][0], active=2).values_list('id', 'name').order_by('name'))
             loc_data[4].update({str(user_location_data[0][0]): loc_list})
-        # elif model == ShelterHome and user_location_data[1][0] != '0':
-        #     loc_list = list(ShelterHome.objects.filter(
-        #         district_id=user_location_data[1][0],excluded_shelterhome=False, active=2).values_list('id', 'name').order_by('name'))
-        #     loc_data[4].update({str(user_location_data[1][0]): loc_list})
     user_location_data[loc_data_index] = loc_data
     user_location_data[loc_data_index][0] = int(
         selected_loc_id) if selected_loc_id != '' else 0
@@ -326,8 +319,6 @@ def get_filter_data(request, req_data, f_info,mission_id):
                 selected_year = int(previous_year_month[0:4])
                 selected_year = selected_year - 1 if current_filtered_qtr == 4 else selected_year
                 str_val=previous_month.strftime('%Y%#m')
-                # user_filter_values.update({'fv_fy_start_month_year': str(previous_year)+'04'})
-                # user_filter_values.update({'fv_fy_year': str(previous_year)})
             else:
                 str_val=str_val.replace('-','')
                 current_filtered_qtr = quarter_month_mapper.get(str_val[4:].lstrip('0'))
@@ -339,46 +330,22 @@ def get_filter_data(request, req_data, f_info,mission_id):
             str_val=str(request.session['user_partner_list'])[1:-1]
         elif request.method == 'POST' and key == 'project' and str_val == '' :
             str_val=str(request.session['user_project_list'])[1:-1]
-        # elif request.method == 'POST' and key == 'donor' and str_val == '' :
-        #     str_val=str(request.session['user_donor_list'])[1:-1]
-        # elif key == 'category' and str_val == '' :
-        #     str_val=str(request.session['user_category_list'])[1:-1]
-
-
-        # if (key == 'fv_fy_start_month_year' or key == 'fv_fy_year') and str_val != '':
-        #     # import ipdb;ipdb.set_trace()
-        #     filtered_qtr = quarter_month_mapper.get(str_val[5:])
-        #     filtered_year = int(str_val[0:4])
-        #     filtered_year = filtered_year - 1 if filtered_qtr == 4 else filtered_year
-        #     str_val=str(filtered_year) if key == 'fv_fy_year' else str(filtered_year)+'04'
-        #     print(str_val)
         user_filter_values.update({key: str_val})
-        # if key in ['state', 'district', 'shelter']:
-        #     filter_values.append([])
-    # logger.error('user_filter_values:' + str(user_filter_values))
     user_location_data = request.session['user_location_data'] if 'user_location_data' in request.session else None
     if user_location_data == None:
-        # logger.error('load session-----------------------------')
         load_user_details_to_sessions(request)
         user_location_data = request.session['user_location_data']
     user_location_data = copy.deepcopy(user_location_data)
-    # logger.error("get_filter_data(user_location_data*COPY:"+ str(user_location_data))
     category_id = get_loc_filter_value(user_filter_values.get(
         'category', ''), user_location_data[0][0])
     indicator_id = get_loc_filter_value(user_filter_values.get(
         'indicator', ''), user_location_data[1][0])
-    # shelter_id = get_loc_filter_value(user_filter_values.get(
-    #     'shelter', ''), user_location_data[2][0])
     
     user_location_data = update_location_data_with_user_filter(
         MissionIndicatorCategory, 0, category_id, user_location_data)
     user_location_data = update_location_data_with_user_filter(
         MissionIndicator, 1, indicator_id, user_location_data)
-    # user_location_data = update_location_data_with_user_filter(
-    #     ShelterHome, 2, shelter_id, user_location_data)
-    # prepare filter values for the template
     user_location_dict = request.session['user_location_dict'] if 'user_location_dict' in request.session else None
-    # logger.error("user_location_dict:" + str(user_location_dict))
     loc_data = None
     for i in display_order:
         filter_values.append([])
@@ -388,42 +355,7 @@ def get_filter_data(request, req_data, f_info,mission_id):
         if k in display_order:
             filter_display_order = display_order.index(k)
 
-        # if k == 'state':
-        #     loc_data = user_location_data[0][4]
-        #     data_id = str(user_location_data[0][0])
-        #     data_list = loc_data.get('0', [])
-        #     # logger.error('state-data_id:'+data_id)
-        #     # logger.error('user_location_data[0][2]:'+str(user_location_data[0][2]))
-        #     if (data_id == '0' or len(data_list) == 1) and user_location_data[0][2] == True:
-        #         query_data_id = user_location_dict.get('state', [])
-        #         query_data_id = ','.join([str(i) for i in query_data_id])
-        #         user_filter_values.update({'state': query_data_id})
-        #     filter_type = 'select'
-        # elif k == 'district':
-        #     loc_data = user_location_data[1][4]
-        #     data_id = str(user_location_data[1][0])
-        #     state_id = str(user_location_data[0][0])
-        #     data_list = loc_data.get(state_id, [])
-        #     # logger.error('district-data_id:'+data_id)
-        #     # logger.error('user_location_data[1][2]:'+str(user_location_data[1][2]))
-        #     if (data_id == '0' or len(data_list) == 1) and user_location_data[1][2] == True:
-        #         query_data_id = user_location_dict.get('district', [])
-        #         query_data_id = ','.join([str(i) for i in query_data_id])
-        #         # logger.error('query_data_id:'+str(query_data_id))
-        #         user_filter_values.update({'district': query_data_id})
-        #     filter_type = 'select'
-        # elif k == 'shelter':
-        #     loc_data = user_location_data[2][4]
-        #     data_id = str(user_location_data[2][0])
-        #     district_id = str(user_location_data[1][0])
-        #     data_list = loc_data.get(district_id, [])
-        #     if (data_id == '0' or len(data_list) == 1) and user_location_data[2][2] == True:
-        #         query_data_id = user_location_dict.get('shelter', [])
-        #         query_data_id = ','.join([str(i) for i in query_data_id])
-        #         user_filter_values.update({'shelter': query_data_id})
-        #     filter_type = 'select'
         if k == 'donor':
-            # projects=UserProjectMapping.objects.filter(user=request.user,active=2).values_list('project_id',flat=True)
             donor_list = Donor.objects.filter(id__in=request.session['user_donor_list'],active=2).values_list('id', 'name')
             data_list = [(str(item[0]), item[1])
                          for item in donor_list]
@@ -445,8 +377,6 @@ def get_filter_data(request, req_data, f_info,mission_id):
             loc_data = user_location_data[0][4]
             data_id = str(user_location_data[0][0])
             data_list = loc_data.get('0', [])
-            # logger.error('category-data_id:'+data_id)
-            # logger.error('user_location_data[0][2]:'+str(user_location_data[0][2]))
             if (data_id == '0' or len(data_list) == 1) and user_location_data[0][2] == True:
                 query_data_id = user_location_dict.get('category', [])
                 query_data_id = ','.join([str(i) for i in query_data_id])
@@ -457,12 +387,9 @@ def get_filter_data(request, req_data, f_info,mission_id):
             data_id = str(user_location_data[1][0])
             state_id = str(user_location_data[0][0])
             data_list = loc_data.get(state_id, [])
-            # logger.error('indicator-data_id:'+data_id)
-            # logger.error('user_location_data[1][2]:'+str(user_location_data[1][2]))
             if (data_id == '0' or len(data_list) == 1) and user_location_data[1][2] == True:
                 query_data_id = user_location_dict.get('indicator', [])
                 query_data_id = ','.join([str(i) for i in query_data_id])
-                # logger.error('query_data_id:'+str(query_data_id))
                 user_filter_values.update({'indicator': query_data_id})
             filter_type = 'select'
         elif k == 'start_month':
@@ -490,24 +417,11 @@ def get_filter_data(request, req_data, f_info,mission_id):
                 data_id='-'.join([data_id[:4],data_id[4:6]])
             filter_type = 'month'
         elif k == 'grading':
-            # TODO: Hardcoded grading 
             data_list = [(" A ", " A "), (" B ", " B "), (" C "," C "), (" D ", " D "), (" E ", " E "),(" O ", " O ")]
             data_id = user_filter_values.get('grading', '')
             
             filter_type = 'select'
-            
-        # elif k == 'fv_fy_year':
-        #     data_list = []
-        #     data_id = user_filter_values.get('fv_fy_year')
-        #     if data_id != '':
-        #         data_id='-'.join([data_id[:4],'04'])
-        #     filter_type = 'month'
-        # elif k == 'end_month':
-        #     data_list = []
-        #     data_id = user_filter_values.get('end_month', '')
-            # filter_type = 'month'
         elif k == 'case_worker_qtr_start':
-            # TODO: Hardcoded quarters needs to be change to display current quarter and previous 4 quarters
             data_list = [("202102", "FY'21 Q2"), ("202103", "FY'21 Q3"), ("202104",
                                                                           "FY'21 Q4"), ("202201", "FY'22 Q1"), ("202202", "FY'22 Q2")]
             data_id = user_filter_values.get('case_worker_qtr_start', '')
@@ -519,7 +433,6 @@ def get_filter_data(request, req_data, f_info,mission_id):
                           current_qtr) if qtr_end == '' else qtr_end
             extended_filters_dict = add_extended_filters(data_id, qtr_end)
         elif k == 'case_worker_qtr_end':
-            # TODO: Hardcoded quarters needs to be change to display current quarter and previous 4 quarters
             data_list = [("202102", "FY'21 Q2"), ("202103", "FY'21 Q3"), ("202104",
                                                                           "FY'21 Q4"), ("202201", "FY'22 Q1"), ("202202", "FY'22 Q2")]
             data_id = user_filter_values.get('case_worker_qtr_end', '')
@@ -586,26 +499,13 @@ def add_extended_filters(qtr_start, qtr_end):
                                 and (case_worker_end_date is null 
                                     or case_worker_end_date >= '""" + filter_start_date + """'::date)
                                 )"""})
-    # extended_filters_dict.update({'case_worker_qtr_ext_filter': """ and ((case_worker_start_date >= '""" + filter_start_date + """'::date and case_worker_start_date < '""" + filter_end_date + """'::date)
-    #     or (case_worker_pause_date >= '""" + filter_start_date + """'::date and case_worker_pause_date < '""" + filter_end_date + """'::date)
-    #     or (case_worker_end_date >= '""" + filter_start_date + """'::date and case_worker_end_date < '""" + filter_end_date + """'::date))"""})
     extended_filters_dict.update({'qtr_range_ext_filter': qtr_range_str})
-    #logger.error("EXTENDED FILTER: " + str(extended_filters_dict))
     return extended_filters_dict
 
 
 def update_variable_sort_details(sort_info, default_sort, location_name, location_filter, const_variable_location_name):
     # update sort info
-    # key_list = sort_info.keys()
     updated_sort_info = {}
-    # for key in sort_info:
-    #     value = sort_info.get(key)
-    #     if value == const_variable_location_name and key == const_variable_location_name:
-    #         # sort_info.pop(key)
-    #         updated_sort_info.update(
-    #             {location_filter.capitalize(): location_name})
-    #     else:
-    #         updated_sort_info.update({key: value})
     # update default sort
     if default_sort:
         default_sort_field = default_sort.get('sort_field', '')
@@ -616,28 +516,7 @@ def update_variable_sort_details(sort_info, default_sort, location_name, locatio
 
 def apply_variable_location_info(header, custom_export_header, data_query, count_query, sort_info, default_sort, user_filter_values, user_location_data):
     location_name = ''
-    # state_id = ''
-    # district_id = ''
-    # shelter_home_id = ''
     const_variable_location_name = '@@variable_location_name'
-    # for key in user_filter_values:
-    #     if key == 'state':
-    #         state_id = user_filter_values.get('state','')
-    #     elif key == 'district':
-    #         district_id = user_filter_values.get('district','')
-    #     elif key == 'shelter':
-    #         shelter_home_id = user_filter_values.get('shelter','')
-    # get the location_name based on the filter values
-    # if user_location_data[0][0] == 0:
-    #     location_name = "state_name"
-    #     location_filter = 'State'
-    # # elif state_id != '' and (district_id == '' or (district_id != '' and ('shelter' in user_filter_values or shelter_home_id == ''))):
-    # elif user_location_data[0][0] != 0 and (user_location_data[1][0] == 0 or (user_location_data[1][0] != 0 and ('shelter' in user_filter_values or user_location_data[2][0] == 0))):
-    #     location_name = "district_name"
-    #     location_filter = 'District'
-    # else:
-    #     location_name = "shelter_home_name"
-    #     location_filter = 'Shelterhome'
     location_filter = ''
 
     # update custom export header
@@ -689,12 +568,9 @@ def apply_filters_to_query(data_query, count_query, filter_info, sort_field, sor
     filter_cond = filter_info['filter_cond']
     # IMPORTANT - Please cast all timezone aware timestamp fields to timestamps without timezone in the query
     # or use the to_char function and pass required format
-    # logger.error("user_filter_values:"+str(user_filter_values))
     for key in filter_cond.keys():
         filter_value = user_filter_values.get(key)
         updated_cond = ''
-        # if key == 'fv_fy_start_month_year':
-        #   import ipdb;ipdb.set_trace()
         if filter_value != None and filter_value != '' and filter_value != '0':
             f_cond = filter_cond[key]
             if f_cond.lower().replace(' ','').find("in(@@filter_value)") == -1:
@@ -722,19 +598,10 @@ def apply_filters_to_query(data_query, count_query, filter_info, sort_field, sor
         sort_order = '' if sort_order == None else sort_order
         sortings = ' order by ' + sort_field + ' ' + sort_order + ' '
     data_query = data_query.replace('@@sortings', sortings)
-    # logger.error("Report Query" + report_query)
-    # logger.error("Count Query" + count_query)
     return data_query, count_query
-
-# [
-#   [4, 'Telangana', [[4, 'Telangana']], True, {'4': [[401, 'Hyderabad'], [405, 'Nizamabad']]}],
-#   [0, '', [[401, 'Hyderabad'], [405, 'Nizamabad']], True, {}],
-#   [0, '', [], False, {}]
-# ]
 
 
 def calculate_pagination_info(total_records, current_page, rows_per_page):
-    # TODO: get display page range from settings
     display_page_range = 10
     num_pages = int(total_records/rows_per_page)
     num_pages = num_pages if total_records % rows_per_page == 0 else num_pages + 1
@@ -745,11 +612,8 @@ def calculate_pagination_info(total_records, current_page, rows_per_page):
     first_row = ((current_page-1)*rows_per_page) + 1
     last_row = (current_page*rows_per_page)
     last_row = total_records if last_row > total_records else last_row
-    # logger.error("total:" + str(total_records) + "/ current_page:" + str(current_page) + "/ rows_per_page:"+str(rows_per_page))
     dicta = {"rec_count": total_records, "current_page": current_page, "rows_per_page": rows_per_page, "display_page_range": display_page_range,
              "num_pages": num_pages, "start_page": start_page, "end_page": end_page, "first_row": first_row, "last_row": last_row}
-    # for key in dicta.keys():
-    # print(key+":" + str(dicta.get(key)))
     return {"rec_count": total_records, "current_page": current_page, "rows_per_page": rows_per_page, "display_page_range": display_page_range,
             "num_pages": num_pages, "start_page": start_page, "end_page": end_page, "first_row": first_row, "last_row": last_row}
 
@@ -759,7 +623,6 @@ def custom_report_reload(request, page_slug, report_slug):
     import sys
     import traceback
     html = ''
-    # TODO:settings reports_row_per_page
     rows_per_page = 10
     try:
         if request.method == 'POST' and request.is_ajax():
@@ -789,10 +652,6 @@ def custom_report_reload(request, page_slug, report_slug):
                 else:
                     continue
                 report_slug_list.append(report.report_slug)
-                # filter_keys = filter_info['filter_labels'].keys()
-                # for key in filter_keys:
-                #     str_val = req_data.get(key,'')
-                #     user_filter_values.update({key:str_val})
                 r_query = report.report_query
                 d_query = r_query['sql_query']
                 c_query = r_query['count_query'] if r_query['count_query'] else ''
@@ -801,7 +660,6 @@ def custom_report_reload(request, page_slug, report_slug):
                 s_info = report.sort_info
                 e_header = report.custom_export_header
                 headers = report.report_header  # table_header
-                # nowrap_cols.append(report.report_query['nowrap_cols'])
                 user_location_data, filter_values, user_filter_values, extended_filter_dict = get_filter_data(
                     request, req_data, f_info,mission_id)
                 # update any variable_location_names  - in query, count query, sort and headers
@@ -838,7 +696,6 @@ def custom_report_reload(request, page_slug, report_slug):
         exc_type, exc_value, exc_traceback = sys.exc_info()
         error_stack = repr(traceback.format_exception(
             exc_type, exc_value, exc_traceback))
-        # logger.error(error_stack)
     return HttpResponse(html)
 
 
@@ -855,8 +712,6 @@ def load_user_details_to_sessions(request):
         # # content type id of the user location level - state/district/shelter
         # location_hierarchy_type_id = user_role_location_level_config.location_hierarchy_type.id
         user_based_categories =request.session['user_category_list']
-        # location_hierarchy_type_model = ContentType.objects.get(
-        #     id=location_hierarchy_type_id)
         loc_ids = user_based_categories
         loc_id = ''
         loc_name = ''
@@ -864,34 +719,16 @@ def load_user_details_to_sessions(request):
         shelter_list, district_list, state_list = [], [], []
         shelter_data, district_data, state_data = {}, {}, {}
         shelter_config, district_config, state_config = False, False, False
-        # if location_hierarchy_type_model.model == 'shelterhome':
-        #     loc_list = ShelterHome.objects.filter(id__in=loc_ids).values_list(
-        #         'district__state__id', 'district__state__name', 'district__id', 'district__name', 'id', 'name').order_by('district__state__name', 'district__name', 'name')
-        #     shelter_config, district_config, state_config = True, True, True
-        #     attrib_len = 6
-        # if location_hierarchy_type_model.model == 'district':
-        #     loc_list = District.objects.filter(id__in=loc_ids).values_list(
-        #         'state__id', 'state__name', 'id', 'name').order_by('state__name', 'name')
-        #     district_config, state_config = True, True
-        #     attrib_len = 4
-        # elif location_hierarchy_type_model.model == 'state':
         loc_list = MissionIndicatorCategory.objects.filter(id__in=user_based_categories).values_list(
             'id', 'name',).order_by('name')        
         state_config = True
         attrib_len = 2
-        # else:
-            # loc_list = State.objects.all().values_list('id', 'name').order_by('name')
-            # state_config = True
-            # attrib_len = 2
-        # logger.error('-----loc_list' + str(loc_list))
         for item in loc_list:
             new_state = (item[0], item[1])
             state_list.append(new_state[0])
             s_list = state_data.get('0', [])
             s_list.append(new_state)
-            # s_list = list(set(s_list))
             state_data.update({'0': s_list})
-            # logger.error('----------state_data' + str(state_data))
             if attrib_len > 2:
                 new_district = (item[2], item[3])
                 district_list.append(new_district[0])
@@ -943,20 +780,6 @@ def load_user_details_to_sessions(request):
         configure_error = 'Username not configured . Please contact administration.'
         return configure_error
 
-    # menus = Menu.objects.filter(active=2).values_list(
-    #     'name', 'slug', 'icon', 'feature_link', 'model_permission__id')
-    # permissions_list = [item[4] for item in menus]
-    # permissions_list = list(set(permissions_list))
-
-    # menu_to_display = []
-    # user_grp_permissions = user_group.permissions.filter(
-    #     id__in=permissions_list).values_list('id', flat=True)
-    # for menu in menus:
-    #     if menu[4] in user_grp_permissions:
-    #         menu_to_display.append(menu)
-    # logger.error("user_location_data(SESSION):"+str(user_location_data))
-    # request.session['menus'] = menu_to_display
-    # request.session['location_hierarchy_type_id'] = location_hierarchy_type_id
     request.session['user_location_data'] = user_location_data
     request.session['user_location_dict'] = user_location_dict
 
@@ -967,7 +790,6 @@ def get_indicator(request):
         selected_category = request.GET.get('selected_category', '')
         user_location_data = request.session['user_location_data'] if 'user_location_data' in request.session else None
         if user_location_data == None:
-            # logger.error('load session-----------------------------')
             load_user_details_to_sessions(request)
             user_location_data = request.session['user_location_data']
         loc_data = user_location_data[1]  # index 1 is category data
@@ -981,25 +803,3 @@ def get_indicator(request):
             result_set.append(
                 {'id': district[0], 'name': district[1], })
         return HttpResponse(json.dumps(result_set))
-
-
-# @ login_required(login_url='/login/')
-# def get_shelterhome(request):
-#     if request.method == 'GET' and request.is_ajax():
-#         selected_district = request.GET.get('selected_district', '')
-#         user_location_data = request.session['user_location_data'] if 'user_location_data' in request.session else None
-#         if user_location_data == None:
-#             # logger.error('load session-----------------------------')
-#             load_user_details_to_sessions(request)
-#             user_location_data = request.session['user_location_data']
-#         loc_data = user_location_data[2]  # index 2 is shelterhome data
-#         result_set = []
-#         if loc_data[2] == True:  # user configured shelterhomes
-#             districts = loc_data[4].get(selected_district, [])
-#         else:  # all shelterhomes for district
-#             districts = ShelterHome.objects.filter(district_id=int(
-#                 selected_district),excluded_shelterhome=False, active=2).order_by('name').values_list('id', 'name')
-#         for district in districts:
-#             result_set.append(
-#                 {'id': district[0], 'name': district[1], })
-#         return HttpResponse(json.dumps(result_set))

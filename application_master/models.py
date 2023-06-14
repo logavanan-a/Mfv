@@ -5,6 +5,7 @@ from django.urls import reverse
 from jsonfield import JSONField
 
 
+# BaseContent model represents a base class for content-related models.
 class BaseContent(models.Model):
     ACTIVE_CHOICES  = ((2, 'Active'),(0,"Inactive"))
     active          = models.PositiveIntegerField(choices = ACTIVE_CHOICES, default = 2)
@@ -48,6 +49,9 @@ class Menus(BaseContent):
         return Menus.objects.filter(parent=self).order_by('menu_order')
 
 class State(BaseContent):
+    #-------------------#
+    # State model represents a state with its name and inherits from the BaseContent class.
+    #--------------------#
     name = models.CharField(max_length=350, unique=True)
 
     class Meta: 
@@ -58,6 +62,9 @@ class State(BaseContent):
         return self.name
     
 class District(BaseContent):
+    #-------------------#
+    # district model represents a district with its name and parent as state.
+    #--------------------#
     name = models.CharField(max_length=350, unique=True)
     state =  models.ForeignKey(State, on_delete = models.DO_NOTHING)
 
@@ -69,6 +76,9 @@ class District(BaseContent):
         return self.name
 
 class Partner(BaseContent):
+    #-------------------#
+    # Partner model represents a partner with its name and slug.
+    #--------------------#
     name = models.CharField(max_length=350, unique=True)
     slug = models.SlugField(max_length=100, unique=True)
     partner_logo = models.ImageField(upload_to = 'image_folder/', blank=True, null=True)
@@ -85,9 +95,12 @@ class Partner(BaseContent):
         super(Partner, self).save()
 
 class UserPartnerMapping(BaseContent):
+    #-------------------#
+    # UserPartnerMapping model represents a user and partner relationship.
+    # user is a one to one relationship for Auth User
+    #--------------------#
     partner =  models.ForeignKey(Partner, on_delete = models.DO_NOTHING)
     user = models.OneToOneField(User, on_delete = models.CASCADE, blank=True, null=True)
-    # user = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True)
 
 
     class Meta: 
@@ -98,6 +111,9 @@ class UserPartnerMapping(BaseContent):
         return self.partner.name
 
 class Donor(BaseContent):
+    #-------------------#
+    # Donor model represents a donor with its name and logo image field
+    #--------------------#
     name = models.CharField(max_length=350)
     logo = models.ImageField(upload_to = 'image_folder/', blank=True)
 
@@ -109,6 +125,10 @@ class Donor(BaseContent):
         return self.name
     
 class Mission(BaseContent):
+    #-------------------#
+    # Mission model represents a mission with its name, slug, and additional attributes.
+    #--------------------#
+
     MISSION_CHOICES = ((1,'Indicator'),(2,'Form'))
     name = models.CharField(max_length = 350, unique = True)
     short_description  = models.TextField(blank=True, null=True)
@@ -131,6 +151,9 @@ class Mission(BaseContent):
         return reverse("mis:mission_add", kwargs = {"slug": self.slug})
 
 class PartnerMissionMapping(BaseContent):
+    #-------------------#
+    # PartnerMissionMapping model represents a partner and mission relationship.
+    #--------------------#
     partner = models.ForeignKey(Partner, on_delete = models.DO_NOTHING, blank=True, null=True)
     mission = models.ForeignKey(Mission, on_delete = models.DO_NOTHING, blank=True, null=True)
 
@@ -142,6 +165,9 @@ class PartnerMissionMapping(BaseContent):
         return f"{self.partner.name} - {self.mission.name}"
 
 class Project(BaseContent):
+    #-------------------#
+    # Project model represents a project with its name, slug, and additional attributes.
+    #--------------------#
     name = models.CharField(max_length = 350)
     partner_mission_mapping =  models.ForeignKey(PartnerMissionMapping, on_delete = models.DO_NOTHING, blank=True, null=True)
     district = models.ForeignKey(District, on_delete = models.DO_NOTHING, blank=True, null=True)
@@ -166,6 +192,9 @@ class Project(BaseContent):
         return get_project_donor_mapping_obj
 
 class ProjectDonorMapping(BaseContent):
+    #-------------------#
+    # ProjectDonorMapping model represents a project and donor relationship.
+    #--------------------#
     project = models.OneToOneField(Project, on_delete=models.DO_NOTHING, primary_key=True) 
     donor =  models.ForeignKey(Donor, on_delete = models.DO_NOTHING, blank=True, null=True)
 
@@ -178,6 +207,10 @@ class ProjectDonorMapping(BaseContent):
     
 
 class MissionIndicatorCategory(BaseContent):
+    #-------------------#
+    # MissionIndicatorCategory model represents a mission indicator category.
+    # Mission is a foreign key for Mission
+    #--------------------#
     CATEGORY_CHOICES = ((1,'Programme Indicator'),(2,'Finance Indicator'))
     name = models.CharField(max_length = 350)
     mission = models.ForeignKey(Mission, on_delete = models.DO_NOTHING, blank=True, null=True)
@@ -196,6 +229,10 @@ class MissionIndicatorCategory(BaseContent):
         return MissionIndicator.objects.filter(category = self).order_by('listing_order')
 
 class MissionIndicator(BaseContent):
+    #-------------------#
+    # MissionIndicator model represents a mission indicator.
+    # Category is a foreign key for MissionIndicatorCategory
+    #--------------------#
     IT_CHOICES = ((1,'Gender Base'),(2,'Total'),(3,'Actuals'),(4,'Actuals With Grants Received'))
     name = models.CharField(max_length=350)
     category = models.ForeignKey(MissionIndicatorCategory, on_delete = models.DO_NOTHING)
@@ -203,7 +240,6 @@ class MissionIndicator(BaseContent):
 
     class Meta:
         ordering = ['name']
-        # unique_together = ('name', 'category')
         verbose_name_plural = "       Mission Indicator"
     
     def __str__(self):
@@ -215,8 +251,6 @@ class MissionIndicatorTarget(BaseContent):
     target = models.IntegerField()
     periodicity   = models.PositiveIntegerField()
     approved_budget   = models.PositiveIntegerField(blank = True, null = True)
-    # periodicity_date = models.DateField(blank = True, null = True)  ##TODO positive integer --periodicity
-    ##TODO: approved_budget --postive integer blank = True, null = True
     created_by = models.ForeignKey(User, on_delete = models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
@@ -226,19 +260,25 @@ class MissionIndicatorTarget(BaseContent):
         return f"{self.mission_indicator.name} - {self.created_by.username}"
 
 class UserProjectMapping(BaseContent):
+    #-------------------#
+    # UserProjectMapping model represents a user and project relationship.
+    #--------------------#
     project =  models.ForeignKey(Project, on_delete = models.DO_NOTHING, blank=True, null=True)
     user = models.ForeignKey(User, on_delete = models.CASCADE, blank=True, null=True)
     deactivated_date = models.DateField(blank=True, null=True)
 
     class Meta: 
         verbose_name_plural = " User Project Mapping"
-        # unique_together = ('project', 'user')
 
     def __str__(self):
         return self.project.name
 
 
 class ProjectFiles(BaseContent):
+    #-------------------#
+    # ProjectFiles model represents a project file to upload.
+    # Direct linkage with project model
+    #--------------------#
     name = models.CharField(max_length=350) 
     project = models.ForeignKey(Project, on_delete = models.DO_NOTHING, blank=True, null=True)
     upload_file = models.FileField()

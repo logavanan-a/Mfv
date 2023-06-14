@@ -7,6 +7,9 @@ from import_export.admin import ImportExportActionModelAdmin
 
 @admin.register(ReportMeta)
 class ReportMetaAdmin(ImportExportActionModelAdmin,admin.ModelAdmin):
+    """
+    Customizes the administration interface for the ReportMeta model.
+    """
     list_display = ['report_title', 'page_slug', 'report_slug',
                     'display_order', 'active']
     fields = ['page_slug', 'report_slug',  'report_title', 'report_header',

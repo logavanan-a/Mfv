@@ -8,9 +8,16 @@ from dateutil.relativedelta import relativedelta
 
 # Create your views here.
 def dashboard(request):
+    """
+    View function for the dashboard page.
+
+    This view handles the rendering of the dashboard page and performs necessary operations
+    such as executing a database query, fetching data, and passing it to the template.
+
+    """
     heading = "Dashboard"
-    start_month =  request.POST.get('start_filter','')#request_get start_filter 
-    end_month = request.POST.get('end_filter','')#request_get end_filter
+    start_month =  request.POST.get('start_filter','') 
+    end_month = request.POST.get('end_filter','')
     query = build_query(request)
     # execute query 
     # parse the 1 row returned from the query and assign values to the dashboard placeholders in blade
@@ -19,13 +26,6 @@ def dashboard(request):
     cursor.execute(query)
     data = cursor.fetchall()
 
-    # if UserPartnerMapping.objects.filter(user_id=request.user.id).exists():
-    #     partner_list=UserPartnerMapping.objects.filter(user_id=request.user.id).values_list('partner__id',flat=True)
-    #     user_mission_list=list(PartnerMissionMapping.objects.filter(partner__id__in=partner_list).values_list('mission_id',flat=True))
-    # elif UserProjectMapping.objects.filter(user_id=request.user.id).exists():
-    #     partner_mission_ids=UserProjectMapping.objects.filter(user_id=request.user.id).values_list('project__partner_mission_mapping_id',flat=True)
-    #     user_mission_list=list(PartnerMissionMapping.objects.filter(id__in=partner_mission_ids).values_list('mission_id',flat=True))
-
     dash_summary = DashboardSummaryLog.objects.filter(log_key="mat_partner_mission_meta_view").first()
     last_updated_on = ''
     if dash_summary and dash_summary.last_successful_update:
@@ -33,13 +33,18 @@ def dashboard(request):
     return render(request, 'dashboard/dashboard.html', locals())
 
 def build_query(request):
-    start_month =  request.POST.get('start_filter','')#request_get start_filter 
-    end_month = request.POST.get('end_filter','')#request_get end_filter
+    """
+    Build and return the SQL query based on the request parameters.
+
+    This function constructs a SQL query using the request parameters, such as start month,
+    end month, and user filters. It replaces placeholders in the base query string with
+    the corresponding values.
+    """
+    start_month =  request.POST.get('start_filter','')
+    end_month = request.POST.get('end_filter','')
     start_date,end_date,start_month_condition,end_month_condition='','','',''
     if start_month:
         start_date = start_month + "-01"
-        # start_date = datetime.strptime(start_date,'%Y%m%d')
-        # start_date = datetime.strrtime(start_date,'%Y-%m-%d')
         start_month_condition='and ach.task_month >= ' + start_month.replace('-', '')
     if end_month:
         end_date = end_month + "-01"
@@ -50,38 +55,6 @@ def build_query(request):
 
     logged_in_user_id = request.user.id#request_get user_id
 
-    # query = """select coalesce(jyot_vcs.vcs_count,0) as jyot_vcs_count, a.* from (select sum(case when key in ('total_33','total_296') then value else 0 end)::integer as jyot_eye_screening,
-    #     sum(case when key in ('total_40','total_346') then value else 0 end)::integer as jyot_spectacles_dispensed,
-    #     sum(case when key in ('total_301','total_46','total_292','total_304') then value else 0 end)::integer as jyot_surgeries,
-    #     0 as jyot_average_opd_vc,
-    #     sum(case when key in ('total_40') then value else 0 end)::integer as jyot_spectacles_conversion_vc_numerator,
-    #     sum(case when key in ('total_39') then value else 0 end)::integer as jyot_spectacles_conversion_vc_denominator,
-    #     0 as jyot_avg_spec_transaction_value_vc_numerator,
-    #     0 as jyot_avg_spec_transaction_value_vc_denominator,
-    #     sum(case when key in ('total_121','total_221','total_122','total_222','total_223') then value else 0 end)::integer as nayan_neonates_screened_rop,
-    #     sum(case when key in ('total_224','total_225') then value else 0 end)::integer as nayan_children_rop_positive,
-    #     sum(case when key in ('total_229','total_230','total_232','total_231') then value else 0 end)::integer as nayan_num_treatments_done,
-    #     0 as jeevan_child_enrolled,
-    #     sum(case when key in ('total_16') then value else 0 end)::integer as roshni_children_screened,
-    #     sum(case when key in ('total_132') then value else 0 end)::integer as roshni_spectacles_dispensed,
-    #     sum(case when key in ('total_1') then value else 0 end)::integer as disha_screening,
-    #     sum(case when key in ('total_2') then value else 0 end)::integer as disha_spectacles_dispensed,
-    #     0 as saksham_aop_completed_training,
-    #     sum(case when key in ('total_284') then value else 0 end)::integer as saksham_aop_in_training, 
-    #     0 as netra_cataract_surgeries,
-    #     sum(case when key in ('total_112','total_273','total_264') then value else 0 end)::integer as base_screening,
-    #     sum(case when key in ('total_274','total_265','total_113') then value else 0 end)::integer as base_cataract_surgeries,
-    #     sum(case when key in ('total_281','total_272','total_263') then value else 0 end)::integer as base_other_surgeries
-    #     from mat_dashboard_achievement_view as ach 
-    #     where 1=1 @@fvalue_start_month @@fvalue_end_month @@user_project_filter 
-    #     @@user_partner_filter
-    # ) as a 
-    # left outer join (select mission_id, count(distinct project_id) as vcs_count
-    #     from mat_partner_mission_meta_view 
-    #     where mission_id = 5 @@fvalue_start_date @@fvalue_end_date
-    #     @@user_project_filter @@user_partner_filter
-    #     group by mission_id 
-    # ) as jyot_vcs on true"""
     query="""select coalesce(jyot_vcs.vcs_count,0) as jyot_vcs_count, a.* from (select sum(case when key in ('total_33','total_296') then value else 0 end) as jyot_eye_screening,
             sum(case when key in ('total_40','total_346') then value else 0 end) as jyot_spectacles_dispensed,
             sum(case when key in ('total_301','total_46','total_292','total_304') then value else 0 end) as jyot_surgeries,

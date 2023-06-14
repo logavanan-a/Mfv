@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 
-import requests
+# import requests
 from application_master.models import (District, Donor, Menus, Mission,
                                        MissionIndicator,
                                        MissionIndicatorCategory,
@@ -27,6 +27,12 @@ from django.db.models import Q
 
 pg_size = 10
 def get_pagination(request, users):
+    """
+    Paginates a list of users based on the request parameters.
+    It uses the Django Paginator class to divide the users into multiple pages.
+    The current page number is extracted from the request.GET parameters.
+    The paginated users are then returned as the result.
+    """
     paginator = Paginator(users, pg_size) # Show no of object per page
     page = request.GET.get('page',1)
     try:
@@ -38,6 +44,10 @@ def get_pagination(request, users):
     return users
 
 def login_view(request):
+    """
+    The login function retrieves the username and password from the request and proceeds to authenticate the user. 
+    If the user is valid, the function stores the user details in the session.
+    """
     heading = "Login"
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -90,11 +100,6 @@ def login_view(request):
             except:
                 user_partner = ''              
             return redirect('/task-list/')
-            # configure_error = load_user_details_to_sessions(request)
-            # if not configure_error:
-            # return redirect('/task-list/')
-            # else:
-            #     logout(request)
         else:
             error_message = "Invalid Username and Password"
     return render(request, 'login.html', locals())
@@ -112,6 +117,12 @@ class LogoutView(RedirectView):
 
 @login_required(login_url='/')
 def missionindicator_add(request, slug,task_id):
+    """
+    View function to add a mission indicator achievement.
+    Requires the user to be logged in.
+    Retrieves the mission, program and finance categories,
+    and the task associated with the provided slug and task_id.
+    """
     mission_obj = Mission.objects.get(slug = slug)
     heading = mission_obj.name
     programe_category = MissionIndicatorCategory.objects.filter(mission__slug = slug,category_type = '1', active=2).order_by('listing_order')
@@ -175,12 +186,18 @@ def missionindicator_add(request, slug,task_id):
         mission_add.save()
 
         return redirect('mis:mission_edit', slug = slug, task_id = task_id, id = mission_add.id,)
-        # return redirect('/task-list/')
 
     return render(request, 'mis/indicator_list.html', locals())
 
 @login_required(login_url='/')
 def missionindicator_edit(request, slug, id,task_id):
+    """
+    View function to edit a mission indicator achievement.
+    Requires the user to be logged in.
+    Retrieves the mission, program and finance categories,
+    the mission indicator achievement with the provided id,
+    and the task associated with the provided slug and task_id.
+    """
     mission_obj = Mission.objects.get(slug = slug)
     heading = mission_obj.name
     mission_respose_obj = MissionIndicatorAchievement.objects.get(id = id)
@@ -249,6 +266,12 @@ def missionindicator_edit(request, slug, id,task_id):
 
 @login_required(login_url='/')
 def task_list(request):
+    """
+    View function to display a list of tasks.
+    Requires the user to be logged in.
+    Retrieves the tasks based on various filters provided in the request.
+    Renders the task_list.html template with the task objects.
+    """
     heading= 'Task List'
     user = get_user(request)
 
@@ -288,10 +311,6 @@ def task_list(request):
     if month:
         task_obj = task_obj.filter(start_date__month = month)
 
-    # if month_year != 'None' and month_year:
-    #     month_year_list = month_year.split('-')
-    #     task_obj = task_obj.filter(start_date__year = month_year_list[0]).filter(start_date__month = month_year_list[1])
-
     if user.groups.filter(name = 'Partner Admin').exists():
         user_lists = UserPartnerMapping.objects.get(user = request.user)
         for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
@@ -299,10 +318,6 @@ def task_list(request):
     
     elif user.groups.filter(name = 'Project In-charge').exists():
         task_obj = task_obj.filter(active=2, project_in_charge = request.user).order_by('-start_date')
-        # pro_lists = UserProjectMapping.objects.get(user = request.user)
-        # for project_list in UserProjectMapping.objects.filter(project = pro_lists.project):
-        #     task_obj = Task.objects.filter(project = project_list.project).order_by('-start_date')
-    
     else:
         user_lists = UserPartnerMapping.objects.get(user = request.user)
         for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
@@ -319,6 +334,12 @@ def task_list(request):
 
 @csrf_exempt 
 def task_status_changes(request, task_id):
+    """
+    View function to change the status of a task.
+    Retrieves the task object with the provided task_id.
+    If the request method is POST, updates the task status and saves the changes.
+    Returns a JSON response indicating the success of the operation.
+    """
     if request.method == "POST":
         status_val = request.POST.get('status_val')
         remark =request.POST.get('remark')
@@ -332,6 +353,13 @@ def task_status_changes(request, task_id):
 
 @login_required(login_url='/')
 def project_list(request):
+    """
+    View function to display a list of projects.
+    Retrieves the partner associated with the logged-in user.
+    Retrieves the IDs of partner mission mappings for the partner.
+    Retrieves the projects associated with the partner mission mappings and specific missions.
+    Paginates the project list.
+    """
     heading= 'Project List'
     partner = UserPartnerMapping.objects.get(user = request.user).partner
     partner_mission_mapping_ids = PartnerMissionMapping.objects.filter(partner = partner).values_list('id', flat=True)
@@ -347,6 +375,11 @@ def project_list(request):
     return render(request, 'project/project_list.html', locals())
 
 def get_district(request, state_id):
+    """
+    Ajax view function to retrieve the districts based on the selected state.
+    Retrieves the districts associated with the specified state.
+    Returns the districts as a JSON response.
+    """
     if request.method == 'GET' and request.is_ajax():
         result_set = []
         fossilahsessions = District.objects.filter(state__id=state_id)
@@ -360,6 +393,10 @@ class ProjectAdd(View):
 
     @method_decorator(login_required(login_url='/'))
     def get(self, request):
+        """
+        Handles the GET request to display the project add form.
+        Retrieves the necessary data for rendering the form.
+        """
         heading= 'Project Add'
         states = State.objects.all()
         # districts = District.objects.all()
@@ -368,6 +405,10 @@ class ProjectAdd(View):
 
     @method_decorator(login_required(login_url='/'))
     def post(self, request):
+        """
+        Handles the POST request to add a new project.
+        Creates a new project based on the submitted form data.
+        """
         data = request.POST
         name = data.get('name')
         district = data.get('district')
@@ -380,7 +421,6 @@ class ProjectAdd(View):
             partner_mission_mapping_obj = PartnerMissionMapping.objects.get(partner = partner, id = partner_mission_mapping_id)
         project_add = Project.objects.create(name = name, start_date = start_date, partner_mission_mapping = partner_mission_mapping_obj, district = district_obj, location=location )
         return redirect('/project-list/')
-        # return render(request,'project/project_list.html', locals())
 
 
 class ProjectUpdate(View):
@@ -388,6 +428,10 @@ class ProjectUpdate(View):
     
     @method_decorator(login_required(login_url='/'))
     def get(self, request, id):
+        """
+        Handles the GET request to display the project update form.
+        Retrieves the necessary data for rendering the form.
+        """
         heading= 'Project Edit'
         states = State.objects.all()
         mission_obj = PartnerMissionMapping.objects.filter(id__in = request.session['partner_mission_mapping_id'])
@@ -397,18 +441,16 @@ class ProjectUpdate(View):
 
     @method_decorator(login_required(login_url='/'))
     def post(self, request, id):
+        """
+        Handles the POST request to update a project.
+        Updates the project based on the submitted form data.
+        """
         data = request.POST
         name = data.get('name')
         district = data.get('district')
         location = data.get('location')
         start_date = data.get('start_date')
         district_obj = District.objects.get(id = district)
-        
-        # partner_mission_mapping_id = data.get('partner_mission_mapping')
-        # if partner_mission_mapping_id:
-            # partner = UserPartnerMapping.objects.get(user = request.user).partner
-            # partner_mission_mapping_obj = PartnerMissionMapping.objects.get(partner = partner, id = partner_mission_mapping_id)
-        
         project_update = Project.objects.get(id = id)
         project_update.name = name
         project_update.start_date = start_date
@@ -417,30 +459,26 @@ class ProjectUpdate(View):
         project_update.save()
                 
         return redirect('/project-list/')
-        # return render(request, self.template_name, locals())
 
 @ login_required(login_url='/')
-# @ user_passes_test(lambda u: u.is_superuser)
 def user_listing(request):
+    """
+    Renders the user listing page.
+    Displays a list of user roles and locations.
+    """
     heading = "User Management"
-    # all_fields = User._meta.fields[4:-1]
     user_role_location_config = UserPartnerMapping.objects.filter(
         active=2)
     groups = Group.objects.all().exclude(id=11)
 
     object_list = get_pagination(request, user_role_location_config)
-    # page_number_display_count = PAGE_NUMBER_DISPLAY_COUNT
-    # current_page = request.GET.get('page', 1)
-    # page_number_start = int(current_page) - 2 if int(current_page) > 2 else 1
-    # page_number_end = page_number_start + page_number_display_count if page_number_start + \
-    #     page_number_display_count < data.paginator.num_pages else data.paginator.num_pages+1
-    # display_page_range = range(page_number_start, page_number_end)
-
     return render(request, 'user/user_listing.html', locals())
 
 @ login_required(login_url='/')
-# @ user_passes_test(lambda u: u.is_superuser)
 def add_user(request, user_location=None):
+    """
+    Renders the add user page and handles the creation of a new user.
+    """
     heading = "Add User"
     groups = Group.objects.all()
     partners = Partner.objects.all()
@@ -470,14 +508,6 @@ def add_user(request, user_location=None):
                 )
 
                 return redirect('mis:user_listing')
-
-                # user.groups.add(user_location)
-                # user_role_config = UserRoleLocationLevelConfig.objects.create(
-                #     user=user, group_id=user_location, location_hierarchy_type=user_content_type)
-                # for location_id in selected_user_location:
-                #     user_role_location = UserLocationRelation.objects.create(
-                #         UserRoleLocationLevelConfig=user_role_config, object_id=location_id, content_type=user_content_type)
-            
             except ObjectDoesNotExist:
                 return redirect('mis:add_user')
             return redirect('mis:user_listing')
@@ -495,30 +525,28 @@ def add_user(request, user_location=None):
 
             if User.objects.filter(username__iexact=username).exists():
                 user_location = None
-                # selected_group = None
                 user_exist_error = 'Username already exist'
             else:
-                # selected_group = groups.get(id=user_role)
                 selected_role_model = user_group_dict.get(
                     user_role)._meta.model_name
-                # dropdown_value = user_group_dict.get(
-                #     selected_group.name).objects.filter(active=2)
                 states = State.objects.filter(active=2)
                 heading = username  # + ' - '+selected_group.name
             return render(request, 'user/add_user.html', locals())
         return render(request, 'user/add_user.html', locals())
 
 @ login_required(login_url='/')
-# @ user_passes_test(lambda u: u.is_superuser)
 def user_profile(request, id):
+    """
+    Renders the user profile page.
+    """
     user = User.objects.get(id=id)
-    # user_location_relation = UserPartnerMapping.objects.filter(
-    #     UserRoleLocationLevelConfig__user=user, active=2).order_by('object_id')
     return render(request, 'user/user_profile.html', locals())
 
 @ login_required(login_url='/')
-# @ user_passes_test(lambda u: u.is_superuser)
 def edit_user(request, id):
+    """
+    Edits the user details.
+    """
     groups = Group.objects.all()
     partners = Partner.objects.all()
 
@@ -552,8 +580,10 @@ def edit_user(request, id):
 
 
 @ login_required(login_url='/')
-# @ user_passes_test(lambda u: u.is_superuser)
 def deactivate_user(request, user_id):
+    """
+    Deactivates or activates a user.
+    """
     user = User.objects.get(id=user_id)
     if user.is_active:
         user.is_active = False
@@ -563,8 +593,10 @@ def deactivate_user(request, user_id):
     return redirect('mis:user_profile', user_id=user_id)
 
 @ login_required(login_url='/')
-# @ user_passes_test(lambda u: u.is_superuser)
 def user_change_password(request, id):
+    """
+    Handles the change password functionality for a user.
+    """
     user = User.objects.get(id = id)
     if request.method == 'POST':
         data = request.POST
@@ -576,6 +608,9 @@ def user_change_password(request, id):
 
 @csrf_exempt 
 def project_list_filter(request):
+    """
+    Filters the project list based on the selected mission.
+    """
     if request.method == "POST":
         mission_id =request.POST.get('mission_id')
         if mission_id:
@@ -584,17 +619,4 @@ def project_list_filter(request):
             project_obj =  Project.objects.filter(active=2).filter(id__in=request.session['user_project_list'])
         data=list(project_obj.values('id',"name").order_by("name"))
         return HttpResponse(json.dumps(data), content_type="application/json")   
-
-# from mis.models import Task
-# from application_master.models import Project
-# from mis.views import *
-# from django.contrib.auth.models import User
-
-# def task_create():
-#      for user_obj in User.objects.filter(is_superuser = False):
-#          if user_obj:
-#             for project_obj in Project.objects.filter(active=2):
-#                 print(project_obj.name)
-#                 added = Task(project = project_obj,user=user_obj, name = project_obj.name, start_date="2022-08-01",end_date= "2022-08-30")
-#                 added.save()
 

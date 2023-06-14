@@ -4,6 +4,9 @@ from application_master.models import *
 
 # Create your models here.
 class DashboardSummaryLog(BaseContent):
+    #-------------------#
+    # Store the history of the dashboard query execution.
+    #--------------------#
     log_key = models.CharField(max_length=500, unique=True)
     last_successful_update = models.DateTimeField(blank=True, null=True)
     most_recent_update = models.DateTimeField(blank=True, null=True)
