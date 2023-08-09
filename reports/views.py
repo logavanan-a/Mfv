@@ -62,9 +62,11 @@ def write_to_excel_from_normalized_table(conn_str, sql_query, headers_list, cust
         for i in headers_list[0]:
             # remove any <br/> added in the header as formatting on the html pages
             header_text = i.get('label', '').replace('<br/>', '')
+            headers_text = header_text.replace("%",'%%')
             col_list.append(header_text)
         header_df = pd.DataFrame([], columns=col_list)
         header_row_count = 1
+        sql_query = sql_query.replace("%",'%%')
     normalized_df_list = pd.read_sql_query(
         sql_query, con=conn_str, chunksize=rows_in_chunk)
     start_row = header_row_count
