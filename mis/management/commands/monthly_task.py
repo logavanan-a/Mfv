@@ -39,40 +39,43 @@ class Command(BaseCommand):
         multiple_projects_users, multiple_partner_users, created_tasks = [], [], []
         for project in projects:
             for partner_mapping in UserPartnerMapping.objects.filter(partner=project.partner_mission_mapping.partner, active=2).order_by('-modified'):
-                # getting the user and project mapped records
-                project_incharge = UserProjectMapping.objects.filter(
-                    project=project, active=2)
+                try:
+                    # getting the user and project mapped records
+                    project_incharge = UserProjectMapping.objects.filter(
+                        project=project, active=2)
 
-                # user_partner_mapping = UserPartnerMapping.objects.filter(
-                #     partner=project.partner_mission_mapping.partner, active=2).order_by('-modified')
+                    # user_partner_mapping = UserPartnerMapping.objects.filter(
+                    #     partner=project.partner_mission_mapping.partner, active=2).order_by('-modified')
 
-                if project_incharge.count() != 1:
-                    multiple_projects_users.append(project.name)
+                    # if project_incharge.count() != 1:
+                    #     multiple_projects_users.append(project.name)
+                    #     continue
+                    # if user_partner_mapping.count() != 1:
+                    #     multiple_partner_users.append(
+                    #         project.partner_mission_mapping.partner)
+                    #     continue
+                    task_data = {
+                        'user': partner_mapping.user,
+                        'end_date': end_date,
+                        'task_status': 1,
+                        'task_month': from_date.month,
+                        'task_approval': partner_mapping.user,
+                        'project_in_charge': project_incharge.first().user if project_incharge else None,
+                    }
+                    new_task, created = Task.objects.update_or_create(
+                        name=project.name,
+                        project=project,
+                        start_date=from_date,
+                        defaults=task_data,
+                    )
+                    created_tasks.append(new_task.name)
+                except:
                     continue
-                # if user_partner_mapping.count() != 1:
-                #     multiple_partner_users.append(
-                #         project.partner_mission_mapping.partner)
-                #     continue
-                task_data = {
-                    'user': partner_mapping.user,
-                    'end_date': end_date,
-                    'task_status': 1,
-                    'task_month': from_date.month,
-                    'task_approval': partner_mapping.user,
-                    'project_in_charge': project_incharge.first().user if project_incharge else None,
-                }
-                new_task, created = Task.objects.update_or_create(
-                    name=project.name,
-                    project=project,
-                    start_date=from_date,
-                    defaults=task_data,
-                )
-                created_tasks.append(new_task.name)
 
-        print("Please check these projects have multiple user mapping or doesn't have mapping ")
-        print("----------------------------------------------------------------------------------")
-        print(set(multiple_projects_users))
-        print("----------------------------------------------------------------------------------\n")
+        # print("Please check these projects have multiple user mapping or doesn't have mapping ")
+        # print("----------------------------------------------------------------------------------")
+        # print(set(multiple_projects_users))
+        # print("----------------------------------------------------------------------------------\n")
 
         # print(
         #     "Please check these partner have multiple user mapping or doesn't have mapping ")
