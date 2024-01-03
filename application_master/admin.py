@@ -188,15 +188,19 @@ class AdminUserPartnerMapping(ImportExportActionModelAdmin, admin.ModelAdmin):
     Custom admin configuration for the 'UserPartnerMapping' model.
     """
     search_fields = ['partner__name', 'user__username']
-    list_filter = ['active']
+    list_filter = ['active','user__groups']
+    list_display = ('user', 'get_group_name')  # Add 'get_group_name' to display in admin
 
-    def get_list_display(self, request):
-        """
-        Customize the list display for the admin page.
-        """
-        return [field.name for field in self.model._meta.concrete_fields]
+    # def get_list_display(self, request):
+    #     """
+    #     Customize the list display for the admin page.
+    #     """
+    #     return [field.name for field in self.model._meta.concrete_fields]
 
+    def get_group_name(self, obj):
+        return obj.user.groups.first().name if obj.user.groups.exists() else '-'  # Fetch the group name
 
+    get_group_name.short_description = 'Group'  # Display name in admin
 @admin.register(ProjectDonorMapping)
 class AdminProjectDonorMapping(ImportExportActionModelAdmin, admin.ModelAdmin):
     """
