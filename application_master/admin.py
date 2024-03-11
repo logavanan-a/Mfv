@@ -42,6 +42,7 @@ class AdminUserProjectMapping(ImportExportActionModelAdmin, admin.ModelAdmin):
     Custom admin configuration for the 'UserProjectMapping' model.
     """
     search_fields = ['project__name']
+    list_filter = ['active','user__groups','project']
 
     def get_list_display(self, request):
         """
@@ -85,7 +86,7 @@ class AdminProject(ImportExportActionModelAdmin, admin.ModelAdmin):
     Custom admin configuration for the 'Project' model.
     """
     search_fields = ['name', 'partner_mission_mapping__partner__name']
-    list_filter = ['active']
+    list_filter = ['active','partner_mission_mapping__partner']
 
     def get_list_display(self, request):
         """
@@ -188,7 +189,7 @@ class AdminUserPartnerMapping(ImportExportActionModelAdmin, admin.ModelAdmin):
     Custom admin configuration for the 'UserPartnerMapping' model.
     """
     search_fields = ['partner__name', 'user__username']
-    list_filter = ['active','user__groups']
+    list_filter = ['active','user__groups','partner']
     list_display = ('user', 'get_group_name')  # Add 'get_group_name' to display in admin
 
     # def get_list_display(self, request):
