@@ -61,22 +61,26 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            if user.groups.filter(name__in = ['Partner Data Entry Operator','Partner Admin']).exists():
-                user_partner_id=UserPartnerMapping.objects.filter(user=request.user,active=2).values_list('partner__id',flat=True)
-                partner_mission_mapping=PartnerMissionMapping.objects.filter(partner__id__in=user_partner_id,active=2)
-                partner_mission_mapping_ids=partner_mission_mapping.values_list('id',flat=True)
-                user_mission_id=partner_mission_mapping.values_list('mission_id',flat=True)
-                user_project_ids=Project.objects.filter(partner_mission_mapping_id__in=partner_mission_mapping_ids,active=2).values_list('id',flat=True)
+            if user.groups.filter(name__in = ['Partner Data Entry Operator','Partner Admin','Project In-charge']).exists():# project incharge
+                user_project=UserProjectMapping.objects.filter(user=request.user,active=2)
+                user_project_ids = user_project.values_list('project__id',flat=True)
+                user_partner_id = user_project.values_list('project__partner_mission_mapping__partner_id',flat=True)
+                user_mission_id = user_project.values_list('project__partner_mission_mapping__mission_id',flat=True)
+                # partner_mission_mapping=PartnerMissionMapping.objects.filter(partner__id__in=user_partner_id,active=2)
+                # usr -> project -> partner --> mission
+                # partner_mission_mapping_ids=partner_mission_mapping.values_list('id',flat=True)
+                # user_mission_id=partner_mission_mapping.values_list('mission_id',flat=True)
+                # user_project_ids=Project.objects.filter(partner_mission_mapping_id__in=partner_mission_mapping_ids,active=2).values_list('id',flat=True)
                 user_donor_id=ProjectDonorMapping.objects.filter(project__id__in=user_project_ids,active=2).values_list('donor__id',flat=True).distinct()
                 user_category_list=MissionIndicatorCategory.objects.filter(mission__id__in=user_mission_id,active=2).values_list('id',flat=True)
 
-            elif user.groups.filter(name__in = ['Project In-charge','M & E']).exists():
-                user_project_ids=UserProjectMapping.objects.filter(user=request.user,active=2).values_list('project_id',flat=True)
-                user_partner_id=UserPartnerMapping.objects.filter(user=request.user,active=2).values_list('partner__id',flat=True)
-                partner_mission_ids=Project.objects.filter(id__in=user_project_ids,active=2).values_list('partner_mission_mapping_id',flat=True)
-                user_mission_id=PartnerMissionMapping.objects.filter(id__in=partner_mission_ids,active=2).values_list('mission_id',flat=True)
-                user_donor_id=ProjectDonorMapping.objects.filter(project__id__in=user_project_ids,active=2).values_list('donor__id',flat=True).distinct()
-                user_category_list=MissionIndicatorCategory.objects.filter(mission__id__in=user_mission_id,active=2).values_list('id',flat=True)
+            # elif user.groups.filter(name__in = ['M & E']).exists():
+            #     user_project_ids=UserProjectMapping.objects.filter(user=request.user,active=2).values_list('project_id',flat=True)
+            #     user_partner_id=UserPartnerMapping.objects.filter(user=request.user,active=2).values_list('partner__id',flat=True)
+            #     partner_mission_ids=Project.objects.filter(id__in=user_project_ids,active=2).values_list('partner_mission_mapping_id',flat=True)
+            #     user_mission_id=PartnerMissionMapping.objects.filter(id__in=partner_mission_ids,active=2).values_list('mission_id',flat=True)
+            #     user_donor_id=ProjectDonorMapping.objects.filter(project__id__in=user_project_ids,active=2).values_list('donor__id',flat=True).distinct()
+            #     user_category_list=MissionIndicatorCategory.objects.filter(mission__id__in=user_mission_id,active=2).values_list('id',flat=True)
 
             elif user.is_superuser:
                 user_mission_id=Mission.objects.filter(active=2).values_list('id',flat=True)
@@ -92,6 +96,7 @@ def login_view(request):
             request.session['user_category_list']=list(user_category_list)
 
             try:
+                #need to check if used or not and remove 
                 user_partner = UserPartnerMapping.objects.get(user = user)
                 partner_mission_mapping_id = PartnerMissionMapping.objects.filter(mission__id__in= [1,2],partner=user_partner.partner).values_list('id', flat = True)
                 request.session['user_partner'] = user_partner.partner.name
@@ -311,17 +316,20 @@ def task_list(request):
     if month:
         task_obj = task_obj.filter(start_date__month = month)
 
-    if user.groups.filter(name = 'Partner Admin').exists():
-        user_lists = UserPartnerMapping.objects.get(user = request.user)
-        for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
-            task_obj = task_obj.filter(active=2, project__partner_mission_mapping__partner = partner_list.partner).order_by('-start_date')
+    #TODO: need to use the user project mapping 
+    # if user.groups.filter(name = 'Partner Admin').exists():
+    #     user_lists = UserPartnerMapping.objects.get(user = request.user)
+    #     for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
+    #         task_obj = task_obj.filter(active=2, project__partner_mission_mapping__partner = partner_list.partner).order_by('-start_date')
     
-    elif user.groups.filter(name = 'Project In-charge').exists():
-        task_obj = task_obj.filter(active=2, project_in_charge = request.user).order_by('-start_date')
-    else:
-        user_lists = UserPartnerMapping.objects.get(user = request.user)
-        for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
-            task_obj = task_obj.filter(active=2, user = request.user, project__partner_mission_mapping__partner = partner_list.partner).order_by('-start_date')
+    # elif user.groups.filter(name = 'Project In-charge').exists():
+        # task_obj = task_obj.filter(active=2, project_in_charge = request.user).order_by('-start_date')
+    if not user.is_superuser:
+        task_obj = task_obj.filter(active=2, project_id__in = request.session.get('user_project_list',[])).order_by('-start_date')
+    # else:
+    #     user_lists = UserPartnerMapping.objects.get(user = request.user)
+    #     for partner_list in UserPartnerMapping.objects.filter(partner = user_lists.partner):
+            # task_obj = task_obj.filter(active=2, user = request.user, project__partner_mission_mapping__partner = partner_list.partner).order_by('-start_date')
     
     object_list = get_pagination(request, task_obj)
     page_number_display_count = 5
