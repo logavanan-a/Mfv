@@ -11,9 +11,9 @@
                             <div class="card">                              
                             <form class="dt_adv_search" method="GET" action="/task-list/" autocomplete="off">
                                 <div class="row">
-
                                     <input type="hidden" value="{{archive}}" name="archive">
                                     <input type="hidden" value="{{month_year}}" name="month_year">
+                                    {% if request.user.groups.all.0.id != 1 %}
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                         <label for="mission">Mission:</label>
@@ -37,11 +37,11 @@
                                                 </select>
                                         </div>
                                     </div>
-
+                                    {% endif %}
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                         <label for="task_status">Status:</label>
-                                        <select class="form-control" id="task_status", name="task_status">
+                                        <select class="form-control" id="task_status" name="task_status" >
                                             <option value="" selected>Select</option>
                                             <option value="1">Pending</option>
                                             <option value="2">Submitted for Partner Admin</option>
@@ -50,42 +50,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- <div class="collapse {{archive}}" id="collapseExample"> -->
-                                        {% comment %} <div class="col-sm-4 collapse {{archive}}">
-                                            <div class="form-group">
-                                            <label for="project">Month:</label>
-                                            <select class="form-control" id="month", name="month">
-                                                <option value="" selected>Select</option>
-                                                <option value="1">January</option>
-                                                <option value="2">February</option>
-                                                <option value="3">March</option>
-                                                <option value="4">April</option>
-                                                <option value="5">May</option>
-                                                <option value="6">June</option>
-                                                <option value="7">July</option>
-                                                <option value="8">August</option>
-                                                <option value="9">September</option>
-                                                <option value="10">October</option>
-                                                <option value="11">November</option>
-                                                <option value="12">December</option>
-                                            </select>
-                                            </div>
-                                        </div>
-                                
-                                        <div class="col-sm-4 collapse {{archive}}">
-                                            <div class="form-group">
-                                                <label  for="year">Year:</label>
-                                                    <select class="form-control" id="year", name="year">
-                                                        <option value="" selected>Select</option>
-                                                        <option value="2022">2022</option>
-                                                        <!-- <option value="2023">2023</option>
-                                                        <option value="2024">2024</option>
-                                                        <option value="2025">2025</option>
-                                                        <option value="2026">2026</option> -->
-                                                    </select>
-                                            </div>
-                                        </div> {% endcomment %}
-                                    <!-- </div> -->
+                                    
                                     <div class="col-sm-4 collapse {{archive}}">
                                         <label>Month-Year :</label>
                                         <div class="position-relative" id="datepickerFrom">
@@ -109,6 +74,7 @@
                                             <th style="width: 28%;">Mission</th>
                                             <th>Project</th>
                                             <th>Task Month</th>
+                                            <th>Task Year</th>
                                             <th>Status</th>
                                             <th>Actions</th>
                                         </tr>
@@ -121,6 +87,7 @@
                                                     <td>{{task.project.partner_mission_mapping.mission.name}}</td>
                                                     <td>{{task.project.name}}</td>
                                                     <td>{{task.start_date|date:"F"}}</td>
+                                                    <td>{{task.start_date|date:"Y"}}</td>
                                                     <td {% if task.task_status  == 1 %}class="badge-soft-danger"
                                                         {% elif task.task_status == 2 %}class="badge-soft-warning"
                                                         {% elif task.task_status == 3 %}class="badge-soft-success"
@@ -194,7 +161,7 @@
         </div>
     </div>
 <!-- end row -->
-
+<script src="{% static 'libs/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'%}"></script>
 <script>     
 var months = '{{month}}'
 if(months != 'None'){
@@ -222,16 +189,6 @@ if(projects != 'None'){
 }
 </script>
 </script>
-<!-- <script>
-    $(document).ready(function() {
-    var d = new Date();
-    var month = d.getMonth() + 1;
-    var year = d.getFullYear();
-
-    $("#month").val(month); 
-    $("#year").val(year);    
-});
-</script> -->
 
 <style>
     .select2-container .select2-selection {
@@ -262,7 +219,6 @@ if(projects != 'None'){
         });
     });
 </script>
-<script src="{% static 'libs/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'%}"></script>
 <script>
     $(document).ready(function() {
         $('#month_years').datepicker({

@@ -43,12 +43,14 @@
             {% endif %}
             {% endif %}
             {% endfor %}
+          {% if request.user.groups.all.0.id != 1 %}
           <li>
             <a href="/dashboard/" class="waves-effect">
               <i class="bx bxs-dashboard"></i>
               <span key="t-file-manager">Dashboards</span>
             </a>
           </li>
+          {% endif %}
           <li>
             <a href="/reports/" class="waves-effect">
               <i class="bx bx-tone"></i>
