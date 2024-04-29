@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block contents %}
+<link href="{% static 'libs/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'%}" rel="stylesheet" type="text/css">
     <div class="row align-items-center">
         <div class="col-xl-12 mx-auto">
             <div class="card">
@@ -8,7 +9,7 @@
                     <div class="row">
                         <div class="col-xl-12">
                             <div class="card">                              
-                            <form class="dt_adv_search" method="GET" action="/task-list/">
+                            <form class="dt_adv_search" method="GET" action="/task-list/" autocomplete="off">
                                 <div class="row">
 
                                     <input type="hidden" value="{{archive}}" name="archive">
@@ -50,7 +51,7 @@
                                     </div>
 
                                     <!-- <div class="collapse {{archive}}" id="collapseExample"> -->
-                                        <div class="col-sm-4 collapse {{archive}}">
+                                        {% comment %} <div class="col-sm-4 collapse {{archive}}">
                                             <div class="form-group">
                                             <label for="project">Month:</label>
                                             <select class="form-control" id="month", name="month">
@@ -83,8 +84,15 @@
                                                         <option value="2026">2026</option> -->
                                                     </select>
                                             </div>
-                                        </div>
+                                        </div> {% endcomment %}
                                     <!-- </div> -->
+                                    <div class="col-sm-4 collapse {{archive}}">
+                                        <label>Month-Year :</label>
+                                        <div class="position-relative" id="datepickerFrom">
+                                            <input type="text" class="form-control" value="{% if month_year %}{{month_year}}{% else %}{{current_month_year}}{% endif %}" name="month_year" id="month_years" data-date-container="#datepickerFrom" data-provide="datepicker"
+                                                data-date-format="MM yyyy" data-date-min-view-mode="1" data-date-autoclose="true" data-date-end-date="0d" placeholder="Month & Year">
+                                        </div>
+                                    </div>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="submit" class="btn btn-primary mr-1 waves-effect waves-float waves-light" tabindex="5">Search</button>
@@ -251,6 +259,14 @@ if(projects != 'None'){
             });
             $('#project').html(stateOptions);
             }
+        });
+    });
+</script>
+<script src="{% static 'libs/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'%}"></script>
+<script>
+    $(document).ready(function() {
+        $('#month_years').datepicker({
+            endDate: '0d'
         });
     });
 </script>

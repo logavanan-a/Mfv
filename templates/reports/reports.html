@@ -120,13 +120,13 @@
                                 </thead>
                                 <tbody>
                                     {% if 5 in request.session.user_mission_list %}
-                                    <tr>
+                                    {% comment %} <tr>
                                         <td>Finance Summary Report - Mission Jyot</td>
                                         <td>
                                             <button type="button" onclick="location.href='/report/finance-summary-mission-jyot/';" class="btn btn-light btn-sm">View</button>
                                             <button type="button" onclick="location.href='/report/finance-summary-mission-jyot/?export=True';" class="btn btn-light btn-sm">Download</button>
                                         </td>
-                                    </tr>
+                                    </tr> {% endcomment %}
                                     <tr>
                                         <td>Finance Report - Mission Jyot</td>
                                         <td>

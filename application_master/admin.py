@@ -41,7 +41,7 @@ class AdminUserProjectMapping(ImportExportActionModelAdmin, admin.ModelAdmin):
     """
     Custom admin configuration for the 'UserProjectMapping' model.
     """
-    search_fields = ['project__name']
+    search_fields = ['project__name','user__username']
     list_filter = ['active','user__groups','project']
 
     def get_list_display(self, request):

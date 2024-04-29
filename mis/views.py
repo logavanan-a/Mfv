@@ -295,7 +295,7 @@ def task_list(request):
     year = filter_data.get('year') if(filter_data.get('year') != 'None') else None
     month_year = filter_data.get('month_year') if(filter_data.get('month_year') != 'None') else None
 
-    if(archive != None or month != None or year != None or project != None or mission != None or task_status != None) and (archive != None):
+    if(archive != None or month_year != None or project != None or mission != None or task_status != None) and (archive != None):
         task_obj = Task.objects.filter(task_status=4,active=2).order_by('-start_date')
     else:
         task_obj = Task.objects.filter(~Q(task_status=4),active=2).order_by('-start_date')
@@ -309,6 +309,11 @@ def task_list(request):
     
     if task_status:
         task_obj = task_obj.filter(task_status = task_status)
+
+    if month_year:
+        if archive:
+            month_year_date = datetime.strptime(month_year, '%B %Y')
+            task_obj = task_obj.filter(start_date__year=month_year_date.year, start_date__month=month_year_date.month)
 
     if year:
         task_obj = task_obj.filter(start_date__year = year)
