@@ -190,7 +190,7 @@ class AdminUserPartnerMapping(ImportExportActionModelAdmin, admin.ModelAdmin):
     """
     search_fields = ['partner__name', 'user__username']
     list_filter = ['active','user__groups','partner']
-    list_display = ('user', 'get_group_name')  # Add 'get_group_name' to display in admin
+    list_display = ('user', 'get_group_name','partner')  # Add 'get_group_name' to display in admin
 
     # def get_list_display(self, request):
     #     """
@@ -216,3 +216,19 @@ class AdminProjectDonorMapping(ImportExportActionModelAdmin, admin.ModelAdmin):
         """
         return [field.name for field in self.model._meta.concrete_fields]
 
+
+@admin.register(Menus)
+class AdminMenus(ImportExportActionModelAdmin, admin.ModelAdmin):
+    """
+    Custom admin configuration for the 'Menus' model.
+    """
+    search_fields = ['name', 'group']
+    list_filter = ['active','group','parent']
+
+    def get_list_display(self, request):
+        """
+        Customize the list display for the admin page.
+        """
+        return [field.name for field in self.model._meta.concrete_fields]
+
+    
