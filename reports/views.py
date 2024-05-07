@@ -78,7 +78,7 @@ def write_to_excel_from_normalized_table(conn_str, sql_query, headers_list, cust
             chunk_df.index += (df_count * rows_in_chunk)+1
             df_count = df_count + 1
             chunk_df.to_excel(excelWriter, sheet_name=sheetname,
-                              startrow=start_row, header=header_info, encoding='utf-8')
+                              startrow=start_row, header=header_info)
             # add the dataframe size (rows read from table/ chunk size) and header rows count (1 for first iteration and 0 for further iterations)
             start_row = start_row + chunk_df.shape[0] #+ header_row_count
             # set flags to indicate first dataframe is written to excel
@@ -89,7 +89,7 @@ def write_to_excel_from_normalized_table(conn_str, sql_query, headers_list, cust
 
         # add the header row rowas at row 0 - insert it as a new data frame with empty data and the header rows
         header_df.to_excel(excelWriter, sheet_name=sheetname,
-                           startrow=0, encoding='utf-8')
+                           startrow=0)
     except Exception as e:
         df_count = 0
         exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -245,7 +245,7 @@ def generate_export_excel(report_title, data_query_list, table_headers, custom_e
 
     finally:
         if excelWriter:
-            excelWriter.save()
+            excelWriter.close()
 
     if os.path.exists(MEDIA_ROOT+folder_file_name):
         excel = open(MEDIA_ROOT+folder_file_name, "rb")
