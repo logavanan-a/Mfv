@@ -45,54 +45,58 @@ def return_sql_results(sql):
 
 
 def write_to_excel_from_normalized_table(conn_str, sql_query, headers_list, custom_export_header, rows_in_chunk, sheetname, excelWriter):
+    # read from sql table into the pandas dataframe in chucks, this returns a list of dataframes - one for each chunk
 
-    # Initialize variables
+    # create headers rows and write to excel sheet
     header_row_count = 1
     row_data = {}
+    if custom_export_header:
+        # custom export header is used to add custom header info - mostly multi level headers like the child classification report
+        for i in custom_export_header:
+            row_data.update({tuple(i): {}})
+        header_row_count = len(custom_export_header[0])
+        header_df = pd.DataFrame.from_dict(row_data)
+    else:
+        # when custom export header is None, then add the report headers as the export excel headers
+        col_list = []
+        for i in headers_list[0]:
+            # remove any <br/> added in the header as formatting on the html pages
+            header_text = i.get('label', '').replace('<br/>', '')
+            headers_text = header_text.replace("%",'%%')
+            col_list.append(header_text)
+        header_df = pd.DataFrame([], columns=col_list)
+        header_row_count = 1
+        sql_query = sql_query.replace("%",'%%')
+    normalized_df_list = pd.read_sql_query(
+        sql_query, con=conn_str, chunksize=rows_in_chunk)
     start_row = header_row_count
+    # set header to False indicating not to add the header data/row
+    header_info = False
     df_count = 0
-
     try:
-        # Create header DataFrame (handle custom and non-custom cases)
-        if custom_export_header:
-            for i in custom_export_header:
-                row_data.update({tuple(i): {}})
-            header_row_count = len(custom_export_header[0])
-            header_df = pd.DataFrame.from_dict(row_data)
-        else:
-            col_list = []
-            for i in headers_list[0]:
-                header_text = i.get('label', '').replace('<br/>', '')
-                headers_text = header_text.replace("%", "%%")
-                col_list.append(header_text)
-            header_df = pd.DataFrame([], columns=col_list)
-
-        # Process data chunks
-        normalized_df_list = pd.read_sql_query(sql_query.replace("%", "%%"), con=conn_str, chunksize=rows_in_chunk)
         for chunk_df in normalized_df_list:
-            # Index adjustment for proper row numbering
-            chunk_df.index += (df_count * rows_in_chunk) + 1
-            df_count += 1
+            chunk_df.index += (df_count * rows_in_chunk)+1
+            df_count = df_count + 1
+            chunk_df.to_excel(excelWriter, sheet_name=sheetname,
+                              startrow=start_row, header=header_info)
+            # add the dataframe size (rows read from table/ chunk size) and header rows count (1 for first iteration and 0 for further iterations)
+            start_row = start_row + chunk_df.shape[0] #+ header_row_count
+            # set flags to indicate first dataframe is written to excel
+            # set header row count used in the calcuation of start row to 0 as no further header rows will be added
+            header_row_count = 0
+            # unset flag for header info to false as no further header details will be written to sheet
+            header_info = False
 
-            # Write header only on the first iteration
-            if start_row == header_row_count:
-                header_df.to_excel(excelWriter, sheet_name=sheetname, startrow=0)
-                start_row += header_df.shape[0]
-
-            # Write data chunk
-            chunk_df.to_excel(excelWriter, sheet_name=sheetname, startrow=start_row, header=False)
-            start_row += chunk_df.shape[0]
-
+        # add the header row rowas at row 0 - insert it as a new data frame with empty data and the header rows
+        header_df.to_excel(excelWriter, sheet_name=sheetname,
+                           startrow=0)
     except Exception as e:
-        # Handle and log exception
+        df_count = 0
         exc_type, exc_value, exc_traceback = sys.exc_info()
-        error_stack = repr(traceback.format_exception(exc_type, exc_value, exc_traceback))
+        error_stack = repr(traceback.format_exception(
+            exc_type, exc_value, exc_traceback))
         logger.error(error_stack)
         raise
-
-    # No need for a separate header write after the loop (already done in the loop)
-
-    return None  # Or return a success message/indicator if needed
 
 @ login_required(login_url='/login/')
 def reports_listing(request):
