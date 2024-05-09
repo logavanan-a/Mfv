@@ -61,6 +61,7 @@ class DataEntryRemark(BaseContent):
     task = models.ForeignKey(Task, on_delete = models.DO_NOTHING, blank=True, null=True)
     user_name = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True)
     remark = models.TextField(blank=True, null=True)
+    reject_reason = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "Data Entry Remark"

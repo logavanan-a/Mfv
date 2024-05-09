@@ -211,8 +211,8 @@ def missionindicator_edit(request, slug, id,task_id):
     user = get_user(request)
     user_role = str(user.groups.last())
 
-    dataentry_obj = DataEntryRemark.objects.filter(task__id=task_id).order_by('-id')
-
+    dataentry_obj = DataEntryRemark.objects.filter(task__id=task_id, remark__isnull=False).order_by('-id')
+    reject_obj = DataEntryRemark.objects.filter(task_id=task_id,reject_reason__isnull=False).first()
     if slug == 'mission-jyot':
         v_calc_dict={
             46:1,
@@ -356,11 +356,14 @@ def task_status_changes(request, task_id):
     if request.method == "POST":
         status_val = request.POST.get('status_val')
         remark =request.POST.get('remark')
+        reject_reason =request.POST.get('reject_reason')
         task_obj = Task.objects.get(id = task_id)
         task_obj.task_status = status_val
         task_obj.save()
         if remark:
-            DataEntryRemark.objects.create(task = task_obj, remark = remark, user_name = request.user)         
+            DataEntryRemark.objects.create(task = task_obj, remark = remark, user_name = request.user)
+        if reject_reason:
+            DataEntryRemark.objects.create(task = task_obj, reject_reason = reject_reason, user_name = request.user)
         return HttpResponse({"message":'true'} , content_type="application/json")
     return HttpResponse({"message":'false'}, content_type="application/json")  
 
