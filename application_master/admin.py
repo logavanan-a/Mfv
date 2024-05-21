@@ -222,7 +222,7 @@ class AdminMenus(ImportExportActionModelAdmin, admin.ModelAdmin):
     """
     Custom admin configuration for the 'Menus' model.
     """
-    search_fields = ['name', 'group']
+    search_fields = ['name', 'group__name']
     list_filter = ['active','group','parent']
 
     def get_list_display(self, request):

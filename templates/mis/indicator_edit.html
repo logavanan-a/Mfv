@@ -198,9 +198,12 @@
                     {% if reject_obj %}
                     <div>
                         <h4><b><u>Reject info:- </u></b></h4>
-                        <P><b>Rejected by :</b> {{reject_obj.user_name}} </P>
-                        <P><b>Rejected on :</b>  {{reject_obj.created}} </P>
-                        <P><b>Reason for reject :</b> {{reject_obj.reject_reason}}. </P>
+                        {% for i in reject_obj %}
+                        <P><b>Rejected by :</b> {{i.user_name}} </P>
+                        <P><b>Rejected on :</b>  {{i.created}} </P>
+                        <P><b>Reason for reject :</b> {{i.reject_reason}}. </P>
+                        {% endfor %}
+
                     {% endif %}
                     </div>
                     <div class="relative">
@@ -226,7 +229,7 @@
                             {% elif 'Admin' == user_role %}
                                 {% if mission_respose_obj.task.task_status == 4 %}
                                     <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="ConfirmReject('{{mission_respose_obj.task.id}}',5,'Reject')">Reject</button>
-                                    <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="ConfirmNeed('{{mission_respose_obj.task.id}}',2,'Need Revision')">Need Revision</button>
+                                    <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="ConfirmNeed('{{mission_respose_obj.task.id}}',3,'Need Revision')">Need Revision</button>
                                 {% endif %}
                             {% endif %}
                         <button type="reset" style='margin-right:5px' onclick="location.href='/task-list/'" class="btn float-end btn-secondary waves-effect">Cancel</button>

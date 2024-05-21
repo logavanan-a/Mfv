@@ -212,7 +212,7 @@ def missionindicator_edit(request, slug, id,task_id):
     user_role = str(user.groups.last())
 
     dataentry_obj = DataEntryRemark.objects.filter(task__id=task_id, remark__isnull=False).order_by('-id')
-    reject_obj = DataEntryRemark.objects.filter(task_id=task_id,reject_reason__isnull=False).first()
+    reject_obj = DataEntryRemark.objects.filter(task_id=task_id,reject_reason__isnull=False).order_by('-id')
     if slug == 'mission-jyot':
         v_calc_dict={
             46:1,
