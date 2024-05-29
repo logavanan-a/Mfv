@@ -51,8 +51,19 @@
                                         </select>
                                         </div>
                                     </div>
-
-                                    
+                                    {% if request.user.groups.all.0.id != 1 %}
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="partner">Partner:</label>
+                                            <select class="form-control" id="partner" name="partner">
+                                                <option value="" selected>Select</option> 
+                                                {% for partner in partner_objs %}
+                                                    <option value="{{partner.id}}" {% if partner.id == partners %}selected{% endif %} >{{partner.name}}</option> 
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {% endif %}
                                     <div class="col-sm-4 collapse {{archive}}">
                                         <label>Month-Year :</label>
                                         <div class="position-relative" id="datepickerFrom">
@@ -74,6 +85,7 @@
                                         <tr>
                                             <th>SL No</th>
                                             <th style="width: 28%;">Mission</th>
+                                            <th>Partner</th>
                                             <th>Project</th>
                                             <th>Task Month</th>
                                             <th>Task Year</th>
@@ -87,6 +99,7 @@
                                                 <tr>
                                                     <td>{{forloop.counter0|add:object_list.start_index}}</td>
                                                     <td>{{task.project.partner_mission_mapping.mission.name}}</td>
+                                                    <td>{{task.project.partner_mission_mapping.partner.name}}
                                                     <td>{{task.project.name}}</td>
                                                     <td>{{task.start_date|date:"F"}}</td>
                                                     <td>{{task.start_date|date:"Y"}}</td>
@@ -121,7 +134,7 @@
                                                 </tr>
                                             {% endfor %}  
                                         {% else %}
-                                            <td colspan="7" class="text-primary">No records found</td>
+                                            <td colspan="8" class="text-primary"><center>No records found</center></td>
                                         {% endif %} 
                                         </tbody>
                                 </table><br>
@@ -130,7 +143,7 @@
                                     {% if object_list.has_other_pages %}
                                     <ul class="pagination justify-content-end ">
                                         {% if object_list.has_previous %}
-                                        <li class="paginate_button page-item"><a class="page-link" href="?page={{ 1 }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}&task_status={{task_status}}">First</a></li>
+                                        <li class="paginate_button page-item"><a class="page-link" href="?page={{ 1 }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}&task_status={{task_status}}&partner={{partner}}">First</a></li>
                                         {% comment %} <li class="paginate_button page-item"><a class="page-link" href="?page={{ object_list.previous_page_number }}">Previous</a></li> {% endcomment %}
                                         {% else %}
                                         <li class="paginate_button page-item disabled"><span class="page-link">First</span></li>
@@ -140,12 +153,12 @@
                                             {% if object_list.number == i %}
                                             <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
                                             {% else %}
-                                            <li class="paginate_button paginate_button page-item"><a class="page-link" href="?page={{ i }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}&task_status={{task_status}}">{{ i }}</a></li>
+                                            <li class="paginate_button paginate_button page-item"><a class="page-link" href="?page={{ i }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}&task_status={{task_status}}&partner={{partner}}">{{ i }}</a></li>
                                             {% endif %}
                                         {% endfor %}
                                         {% if object_list.has_next %}
                                             {% comment %} <li class="paginate_button page-item"><a class="page-link" href="?page={{ object_list.next_page_number }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}&task_status={{task_status}}">Next</a></li> {% endcomment %}
-                                            <li class="paginate_button page-item"><a class="page-link" href="?page={{ object_list.paginator.num_pages }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}&task_status={{task_status}}">Last</a></li>
+                                            <li class="paginate_button page-item"><a class="page-link" href="?page={{ object_list.paginator.num_pages }}&archive={{archive}}&month_year={{month_year}}&year={{year}}&month={{month}}&project={{project}}&mission={{mission}}&task_status={{task_status}}&partner={{partner}}">Last</a></li>
                                         {% else %}
                                             {% comment %} <li class="paginate_button page-item disabled"><span class="page-link">Next</span></li> {% endcomment %}
                                             <li class="paginate_button page-item disabled"><span class="page-link">Last</span></li>

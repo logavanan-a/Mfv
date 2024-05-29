@@ -20,10 +20,20 @@
             <div class="card-body">
                 <div class="row">
                     <div class="card-body">
-                        <form action="/user-listing/" method="GET">
+                        <form action="" class="needs-validation form-horizontal" method="GET">
                             <div class="mb-2" style="display: flex;justify-content: flex-end;">
-                            <button class="btn btn-primary" onclick="location.href='/user-add/'" type="button">Add User</button>
-                            </div> 
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input type="text" id="search" name="search" class="form-control" value="{{search}}" placeholder="User Name..." style="margin-right: 15px;"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="button-group"> 
+                                    <button type="submit" class="btn btn-success" >Search</button>
+                                    <button class="btn btn-primary" onclick="location.href='/user-add/'" type="button">Add User</button>
+                                </div>
+                            </div>
                         </form> 
                     <div class="row">
                         <table id="datatable-buttons" class="table table-bordered dt-responsive w-100">
@@ -60,9 +70,30 @@
                                 {% endif %} 
                             </tbody>
                         </table>
-                        {% if object_list %}
-                            {% include 'partials/pagination.html' %}
-                        {% endif %}
+                        
+                        <nav aria-label="...">
+                            {% if object_list.has_other_pages %}
+                            <ul class="pagination justify-content-end ">
+                                {% if object_list.has_previous %}
+                                <li class="paginate_button page-item"><a class="page-link" href="?page=1&search={{search}}">First</a></li>
+                                {% else %}
+                                <li class="paginate_button page-item disabled"><span class="page-link">First</span></li>
+                                {% endif %}
+                                {% for i in display_page_range %}
+                                    {% if object_list.number == i %}
+                                    <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
+                                    {% else %}
+                                    <li class="paginate_button paginate_button page-item"><a class="page-link" href="?page={{ i }}&search={{search}}">{{ i }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if object_list.has_next %}
+                                    <li class="paginate_button page-item"><a class="page-link" href="?page={{ object_list.paginator.num_pages }}&search={{search}}">Last</a></li>
+                                {% else %}
+                                    <li class="paginate_button page-item disabled"><span class="page-link">Last</span></li>
+                                {% endif %}
+                                </ul>
+                            {% endif %}
+                        </nav> 
                     </div>
                     </div>
                     </div>

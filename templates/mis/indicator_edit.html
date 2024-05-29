@@ -228,7 +228,7 @@
                                 {% endif %}
                             {% elif 'Admin' == user_role %}
                                 {% if mission_respose_obj.task.task_status == 4 %}
-                                    <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="ConfirmReject('{{mission_respose_obj.task.id}}',5,'Reject')">Reject</button>
+                                    {% comment %} <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="ConfirmReject('{{mission_respose_obj.task.id}}',5,'Reject')">Reject</button> {% endcomment %}
                                     <button type="button" style='margin-right:5px' value="{{task_id}}" class="confirm_btn btn btn-info ml-2 float-end" onclick="ConfirmNeed('{{mission_respose_obj.task.id}}',3,'Need Revision')">Need Revision</button>
                                 {% endif %}
                             {% endif %}

@@ -5,7 +5,7 @@ from application_master.models import UserPartnerMapping,UserProjectMapping,Part
 from django.shortcuts import render
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-
+from mis.models import *
 # Create your views here.
 def dashboard(request):
     """
@@ -25,7 +25,10 @@ def dashboard(request):
     cursor = connection.cursor()
     cursor.execute(query)
     data = cursor.fetchall()
+    partner = request.POST.get('partner') if(request.POST.get('partner') != 'None') else None
+    partners = int(partner) if partner not in [None, 'None', ''] else None
 
+    partner_objs = Partner.objects.filter(active=2,id__in=request.session['user_partner_list']).order_by('name')
     dash_summary = DashboardSummaryLog.objects.filter(log_key="mat_partner_mission_meta_view").first()
     last_updated_on = ''
     if dash_summary and dash_summary.last_successful_update:
@@ -42,6 +45,8 @@ def build_query(request):
     """
     start_month =  request.POST.get('start_filter','')
     end_month = request.POST.get('end_filter','')
+    partner = request.POST.get('partner') if(request.POST.get('partner') != 'None') else None
+   
     start_date,end_date,start_month_condition,end_month_condition='','','',''
     if start_month:
         start_date = start_month + "-01"
@@ -84,12 +89,12 @@ def build_query(request):
             (case when coalesce(sum(case when key in ('total_112','total_273','total_264') then value else 0 end),0) = 0 then 0::numeric else round(sum(case when key in ('total_274','total_265','total_113') then value else 0 end) * 100/sum(case when key in ('total_112','total_273','total_264') then value else 0 end)::numeric,0) end)::integer as base_cataract_surgeries_percentage,
             (case when coalesce(sum(case when key in ('total_112','total_273','total_264') then value else 0 end),0) = 0 then 0::numeric else round(sum(case when key in ('total_281','total_272','total_263') then value else 0 end) * 100/sum(case when key in ('total_112','total_273','total_264') then value else 0 end)::numeric,0) end)::integer as base_other_surgeries_percentage
             from mat_dashboard_achievement_view as ach
-            where 1=1 @@fvalue_start_month @@fvalue_end_month @@user_project_filter @@user_partner_filter
+            where 1=1 @@fvalue_start_month @@fvalue_end_month @@user_project_filter @@user_partner_filter @@partnerfilter
             ) as a
             left outer join (select mission_id, count(distinct project_id) as vcs_count
             from mat_partner_mission_meta_view
             where mission_id = 5 @@fvalue_start_date @@fvalue_end_date
-            @@user_project_filter @@user_partner_filter
+            @@user_project_filter @@user_partner_filter @@partnerfilter
             group by mission_id
             ) as jyot_vcs on true"""
 
@@ -119,6 +124,12 @@ def build_query(request):
     if end_date != '':
         start_date_condition="and project_start_date < '" + end_date +"'" 
 
+    partner_cond = ''
+    if partner :
+        partner_cond = """ and project_id in (select distinct project_id 
+                                                    from mat_partner_mission_meta_view 
+                                                    where partner_id = """ + partner +"""
+                                                    ) """
 
     query = query.replace("@@user_partner_filter",user_partner_filter_cond) 
     query = query.replace("@@user_project_filter",user_project_filter_cond)
@@ -126,4 +137,5 @@ def build_query(request):
     query = query.replace("@@fvalue_end_date",end_date_condition) #should be of format 2022-01-25
     query = query.replace("@@fvalue_start_month",start_month_condition) #should be of format 202201
     query = query.replace("@@fvalue_end_month",end_month_condition) #should be of format 202201
+    query = query.replace("@@partnerfilter",partner_cond)
     return query

@@ -11,13 +11,23 @@
                 <form action="{{form_url}}" class="form-horizontal" method="POST" id="filters">
                     {%csrf_token%}
                     <div class="row">
-                        <div class="col-auto mt-2">
-                            Filter by:
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="partner">Partner:</label>
+                                <select class="form-control" id="partner" name="partner">
+                                    <option value="" selected>Select</option> 
+                                    {% for partner in partner_objs %}
+                                        <option value="{{partner.id}}" {% if partner.id == partners %}selected{% endif %} >{{partner.name}}</option> 
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
                         <div class="col-3">
+                            <label for="partner">Start month:</label>
                             <input type="month" class="form-control" name='start_filter' value="{{start_month}}" id="start_filter" >
                         </div>
                         <div class="col-3">
+                            <label for="partner">End month:</label>
                             <input type="month" class="form-control" name='end_filter' value="{{end_month}}" id="end_filter" >
                         </div>
                         <div class="col-5 mt-2">
@@ -336,6 +346,7 @@
     $("#reset").click(function() {
         $('#start_filter').val('');
         $('#end_filter').val('');
+        $('#partner').val('');
         this.form.submit();
     });
 </script>

@@ -285,24 +285,31 @@ def task_list(request):
 
     mission_objs = Mission.objects.filter(active=2,id__in=request.session['user_mission_list'])
     project_objs = Project.objects.filter(active=2,id__in=request.session['user_project_list']).order_by('name')
-
+    partner_objs = Partner.objects.filter(active=2,id__in=request.session['user_partner_list']).order_by('name')
     filter_data = request.GET
     archive = filter_data.get('archive') if(filter_data.get('archive') != 'None') else None
     mission = filter_data.get('mission') if(filter_data.get('mission') != 'None') else None
     project = filter_data.get('project') if(filter_data.get('project') != 'None') else None
+    partner = filter_data.get('partner') if(filter_data.get('partner') != 'None') else None
+    partners = int(partner) if partner not in [None, 'None', ''] else None
+
     task_status = filter_data.get('task_status') if(filter_data.get('task_status') != 'None') else None
     month = filter_data.get('month') if(filter_data.get('month') != 'None') else None
     year = filter_data.get('year') if(filter_data.get('year') != 'None') else None
     month_year = filter_data.get('month_year') if(filter_data.get('month_year') != 'None') else None
 
     if(archive != None or month_year != None or project != None or mission != None or task_status != None) and (archive != None):
-        task_obj = Task.objects.filter(task_status=4,active=2).order_by('-start_date')
+        task_obj = Task.objects.filter(task_status=4,active=2).order_by('project__partner_mission_mapping__partner__name')
     else:
-        task_obj = Task.objects.filter(~Q(task_status=4),active=2).order_by('-start_date')
+        task_obj = Task.objects.filter(~Q(task_status=4),active=2).order_by('project__partner_mission_mapping__partner__name')
     
     if mission:
         project_objs = project_objs.filter(active=2, partner_mission_mapping__mission__id = mission)
         task_obj = task_obj.filter(project__partner_mission_mapping__mission__id = mission)
+
+    if partner:
+        project_objs = project_objs.filter(active=2, partner_mission_mapping__partner__id = partner)
+        task_obj = task_obj.filter(project__partner_mission_mapping__partner__id = partner)
 
     if project:
         task_obj = task_obj.filter(project__id = project)
@@ -483,11 +490,21 @@ def user_listing(request):
     Displays a list of user roles and locations.
     """
     heading = "User Management"
+    search = request.GET.get('search', '')
     user_role_location_config = UserPartnerMapping.objects.filter(
-        active=2)
+        active=2).order_by('user__username')
     groups = Group.objects.all().exclude(id=11)
-
+    if search:
+        user_role_location_config = user_role_location_config.filter(user__username__icontains = search, active=2)
+    
     object_list = get_pagination(request, user_role_location_config)
+    
+    current_page = request.GET.get('page', 1)
+    page_number_start = int(current_page) - 2 if int(current_page) > 2 else 1
+    page_number_end = page_number_start + 5 if page_number_start + \
+        5 < object_list.paginator.num_pages else object_list.paginator.num_pages+1
+    display_page_range = range(page_number_start, page_number_end)
+
     return render(request, 'user/user_listing.html', locals())
 
 @ login_required(login_url='/')
