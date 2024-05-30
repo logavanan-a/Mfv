@@ -32,12 +32,22 @@ class Task(BaseContent):
         return self.name
 
     # function to initialize the model, task list edit mission indicator
+    # def get_task(self):
+    #     try:
+    #         obj =  MissionIndicatorAchievement.objects.get(task = self)
+    #     except:
+    #         obj = None
+    #     return obj
+
     def get_task(self):
         try:
-            obj =  MissionIndicatorAchievement.objects.get(task = self)
-        except:
+            t = Task.objects.get(id=self.id)
+            obj = MissionIndicatorAchievement.objects.filter(task_id=t.id).last()
+            
+        except Task.DoesNotExist:
             obj = None
         return obj
+
 
 # declare a new model with a name "MissionIndicatorAchievement"
 class MissionIndicatorAchievement(BaseContent):
