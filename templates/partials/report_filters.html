@@ -133,5 +133,47 @@
             });
         }); {% endcomment %}
     </script>
-
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('select#partner').change(function () {
+                var optionSelected = $(this).find("option:selected");
+                var valueSelected = optionSelected.val();
+                console.log("Selected Partner ID:", valueSelected); 
+    
+                if (valueSelected == '') {
+                    $("#project option").remove();
+                    var a = '<option selected disabled value="">Select Project</option>';
+                    $("#project").append(a);
+                } else {
+                    var data = {
+                        'selected_partner': valueSelected
+                    };
+                    $.ajax({
+                        type: "GET",
+                        url: '/ajax/report_project/',
+                        data: data,
+                        success: function (result) {
+                            console.log("AJAX Success:", result); 
+                            $("#project option").remove();
+                            if (result.length == 0) {
+                                var a = '<option selected disabled value="">No projects available</option>';
+                                $("#project").append(a);
+                            } else {
+                                var a = '<option selected value="0">Select Project</option>';
+                                $("#project").append(a);
+                                $.each(result, function (key, value) {
+                                    a = '<option value=' + value['id'] + '>' + value['name'] + '</option>';
+                                    $("#project").append(a);
+                                });
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.log("AJAX Error:", error); 
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+     
 {% endblock  %}

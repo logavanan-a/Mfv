@@ -19,7 +19,7 @@ import json
 import re
 import csv
 import logging
-from application_master.models import Mission,Project,Donor,Partner,MissionIndicator,MissionIndicatorCategory,UserPartnerMapping,UserProjectMapping,ProjectDonorMapping
+from application_master.models import Mission,Project,Donor,Partner,MissionIndicator,MissionIndicatorCategory,UserPartnerMapping,UserProjectMapping,ProjectDonorMapping,PartnerMissionMapping
 from django.contrib.auth.models import User
 from datetime import datetime as dt
 
@@ -186,7 +186,6 @@ def custom_report(request, page_slug):
         
         if request.method == "POST" and request.POST.get("filter"):
             data.append(return_sql_results(data_query))
-        print(data_query)
 
         total_header_cols.append(header_col_count)
         report_slug_list.append(r_slug)
@@ -805,3 +804,32 @@ def get_indicator(request):
             result_set.append(
                 {'id': district[0], 'name': district[1], })
         return HttpResponse(json.dumps(result_set))
+
+
+import json
+from django.http import JsonResponse, HttpResponse
+
+def get_project(request):
+    if request.method == 'GET' and request.is_ajax():
+        selected_partner = request.GET.get('selected_partner', '')
+        if not selected_partner:
+            return JsonResponse([], safe=False)
+        try:
+            selected_partner_id = int(selected_partner)
+        except ValueError:
+            return JsonResponse([], safe=False)
+        user_location_data = request.session.get('user_location_data')
+        if not user_location_data:
+            load_user_details_to_sessions(request)
+            user_location_data = request.session['user_location_data']
+        loc_data = user_location_data[1] 
+        result_set = []
+        if loc_data[2]:  
+            districts = loc_data[4].get(selected_partner_id, [])
+        else:  
+            pmm_ids = PartnerMissionMapping.objects.filter(partner_id=selected_partner_id).values_list('id', flat=True)
+            projects = Project.objects.filter(partner_mission_mapping_id__in=pmm_ids, active=2)
+            for project in projects:
+                result_set.append({'id': project.id, 'name': project.name})
+        return JsonResponse(result_set, safe=False)
+    return HttpResponse(status=400)
