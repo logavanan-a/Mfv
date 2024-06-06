@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link href="{% static 'libs/sweetalert2/dist/sweetalert2.min.css' %}" rel="stylesheet" type="text/css" />
+
+<!-- DataTables -->
+<link href="{% static 'libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}" rel="stylesheet"
+    type="text/css" />
+<link href="{% static 'libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css' %}" rel="stylesheet"
+    type="text/css" />
+
+<!-- Responsive datatable examples -->
+<link href="{% static 'libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css' %}" rel="stylesheet"
+    type="text/css" />
+
+<!-- Edit icon  -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+{% endblock %}
+
+{% block contents %}
+
+<style>
+    .btn{
+        padding: 5px 10px;
+        margin-right: 10px;
+    }
+</style>
+<div class="row align-items-center">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body pb-0">
+                <form action="" class="needs-validation form-horizontal mb-2" enctype="multipart/form-data" novalidate  method="GET" id="filters">
+                    <div class="row justify-content-end " style="margin-right:0px ;">
+                         
+                        {% if heading == 'district' %}
+                        <div class="col-md-4">  
+                            <select  class="form-select select2"  aria-label="Floating label select example" 
+                            placeholder="Choose State" id="state" name='state_name' >      
+                                <option selected value="" disabled>Choose state</option>
+                                {% for states in state %}
+                                    <option value="{{states.id}}" {% if states.id == state_names %}selected{% endif %}>{{states.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endif %}
+                        {% if heading == 'vision center' %}
+                        <div class="col-md-4">  
+                            <select  class="form-select select2"  aria-label="Floating label select example" 
+                            placeholder="Choose Partner" id="partner" name='partner_name' >      
+                                <option selected value="" disabled>Choose Partner</option>
+                                {% for part in partner %}
+                                    <option value="{{part.id}}" {% if part.id == partner_names %}selected{% endif %}>{{part.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endif %}
+
+                        <div class="col-md-4">  
+                            <input type="text" id= "search" name="search" class='form-control' value='{{search}}' placeholder='Enter Name...'>
+                        </div>
+                        <div class="col-auto p-0">
+                            <button type="submit" class="btn btn-primary mr-1 waves-effect waves-float waves-light">Submit</button>
+                        </div>
+                        <div class="col-auto p-0">
+                            <button type="reset" id="filter_reset"  class="btn btn-secondary waves-effect btn-xs float-right" >Reset</button>
+                        </div>
+                        <div class="col-auto p-0" style="float: right; ">
+                            <button type="button" class="btn btn-success waves-effect btn-xs float-right" onclick="location.href='/application_master/add/{{model}}/'">Add</button>
+                        </div> 
+                    </div>
+                </form> 
+                <div class="table-responsive mt-4" data-pattern="priority-columns">
+                    <table id="datatable-buttons " class="table table-striped dt-responsive w-100">
+                        <thead class="table-light  ">
+                            <tr>
+                                {% if model == 'state' %}
+                                <th>SI No</th>
+                                <th>Name</th>
+                                {% elif model == 'district' %}
+                                <th>SI No</th>
+                                <th>Name</th>
+                                <th>State</th>
+                                {% elif model == 'partner' %}
+                                <th>SI No</th>
+                                <th>Name</th>
+                                <th>Slug</th>
+                                {% elif model == 'mission' %}
+                                <th>SI No</th>
+                                <th>Name</th>
+                                <th>Short Description</th>
+                                <th>Mission Template</th>
+                                <th>Slug</th>
+                                <th>Age Group</th>
+                                {% elif model == 'project' %}
+                                <th>SI No</th>
+                                <th>Name</th>
+                                <th>Partner Mission Mapping</th>
+                                <th>District</th>
+                                <th>Location</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                {% elif model == 'donor' %}
+                                <th>SI No</th>
+                                <th>Name</th>
+                                {% elif model == 'missionindicatorcategory' %}
+                                <th>SI No</th>
+                                <th>Name</th>
+                                <th>Mission</th>
+                                <th>Category Type</th>
+                                <th>Label Configuration</th>
+                                {% elif model == 'missionindicator' %}
+                                <th>SI No</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Indicator Type</th>
+                                {% endif %}
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>    
+                        </thead>
+                        <tbody>
+                            {% for l in data %}
+                            <tr>
+                                
+                                {% if model == 'state' %}
+                                <td>{{ forloop.counter0|add:data.start_index }}</td>
+                                <td>{{l.name}}</td>
+                                {% elif model == 'district' %}
+                                <td>{{ forloop.counter0|add:data.start_index }}</td>
+                                <td>{{l.name}}</td>
+                                <td>{{l.state }}</td>
+                                {% elif model == 'partner' %}
+                                <td>{{ forloop.counter0|add:data.start_index }}</td>
+                                <th><a href="/application_master/details/{{model}}/{{l.id}}/">{{ l.name }}</a></th>
+                                <td>{{l.slug }}</td>
+                                {% elif model == 'mission' %}
+                                <td>{{ forloop.counter0|add:data.start_index }}</td>
+                                <td>{{l.name}}</td>
+                                <td>{{l.short_description|default_if_none:'-' }}</td>
+                                <td>{{l.get_mission_template_display }}</td>
+                                <td>{{l.slug }}</td>
+                                <td>{{l.age_group_option }}</td>
+                                {% elif model == 'project' %}
+                                <td>{{ forloop.counter0|add:data.start_index }}</td>
+                                <th><a href="/application_master/details/{{model}}/{{l.id}}/">{{ l.name }}</a></th>
+                                <td>{{l.partner_mission_mapping }}</td>
+                                <td>{{l.district }}</td>
+                                <td>{{l.location }}</td>
+                                <td>{{l.start_date|default_if_none:'-' }}</td>
+                                <td>{{l.end_date|default_if_none:'-' }}</td>
+                                {% elif model == 'donor' %}
+                                <td>{{ forloop.counter0|add:data.start_index }}</td>
+                                <td>{{l.name}}</td>
+                                {% elif model == 'missionindicatorcategory' %}
+                                <td>{{ forloop.counter0|add:data.start_index }}</td>
+                                <td>{{l.name}}</td>
+                                <td>{{l.mission|default_if_none:'-' }}</td>
+                                <td>{{l.get_category_type_display }}</td>
+                                <td>{{l.label_configuration }}</td>
+                                {% elif model == 'missionindicator' %}
+                                <td>{{ forloop.counter0|add:data.start_index }}</td>
+                                <td>{{l.name}}</td>
+                                <td>{{l.category|default_if_none:'-' }}</td>
+                                <td>{{l.get_indicator_type_display }}</td>
+                                {% endif %}
+                                <td>{% if l.active == 2 %}Active {% else %}Inactive{% endif %}</td>
+                                <td>  
+                                    <a href="/application_master/edit/{{model}}/{{l.id}}/?page={{page}}" class="btn btn-outline-secondary  edit" title="Edit"><i class="fas fa-pencil-alt"></i></a>
+                                    {% if l.active == 2 %}<button class='btn btn-outline-danger' onclick="Confirm('{{l.id}}', '{{model}}', 'Deactivate')"><i class="mdi mdi-close-circle"  title="Deactivate"></i></button>{% else %}<button class='btn btn-outline-success' onclick="Confirm('{{l.id}}', '{{model}}', 'Activate')"><i class="mdi mdi-checkbox-marked-circle" title="Activate"></i></button>{% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <nav aria-label="...">
+                        {% if data.has_other_pages %}
+                        <ul class="pagination justify-content-end ">
+                            {% if data.has_previous %}
+                            <li class="paginate_button page-item"><a class="page-link" href="?page=1&role_name={{role_names}}&state_name={{state_names}}&partner_name={{partner_names}}&search={{search}}">First</a></li>
+                            {% else %}
+                            <li class="paginate_button page-item disabled"><span class="page-link">First</span></li>
+                            {% endif %}
+                            {% for i in display_page_range %}
+                                {% if data.number == i %}
+                                <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
+                                {% else %}
+                                <li class="paginate_button paginate_button page-item"><a class="page-link" href="?page={{ i }}&role_name={{role_names}}&state_name={{state_names}}&partner_name={{partner_names}}&search={{search}}">{{ i }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if data.has_next %}
+                                <li class="paginate_button page-item"><a class="page-link" href="?page={{ data.paginator.num_pages }}&role_name={{role_names}}&state_name={{state_names}}&partner_name={{partner_names}}&search={{search}}">Last</a></li>
+                            {% else %}
+                                <li class="paginate_button page-item disabled"><span class="page-link">Last</span></li>
+                            {% endif %}
+                        </ul>
+                        {% endif %}
+                    </nav>
+                </div> 
+            </div>     
+            
+        </div>
+    </div> <!-- end col -->
+</div> <!-- end row -->
+
+{% endblock %}
+
+
+{% block extra_javascript %}
+<script src="{% static 'libs/sweetalert2/dist/sweetalert2.min.js' %}"></script>
+
+<!-- Required datatable js -->
+<script src="{% static 'libs/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<!-- <script src="{% static 'libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script> -->
+<!-- Buttons examples -->
+<script src="{% static 'libs/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons/js/buttons.colVis.min.js' %}"></script>
+
+<!-- Responsive examples -->
+<script src="{% static 'libs/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
+
+<!-- Datatable init js -->
+<script src="{% static 'js/pages/datatables.init.js' %}"></script>
+<script type="text/javascript" >
+    function Confirm(id, model,title) {
+        Swal.fire({
+            title: "Are you sure!",
+            text:"You want to "+ title +"?",
+            showCancelButton: !0,
+            confirmButtonColor: "#34c38f",
+            cancelButtonColor: "#f46a6a",
+            confirmButtonText: "Yes, "+ title +" it!",
+        }).then((result) => {
+            if (result.isConfirmed){
+                window.location.href = '/application_master/'+model+'/'+id+'/delete/?page={{page}}&role_name={{role_name}}';
+            };
+                
+        })
+    };
+
+</script>
+<script type="text/javascript">
+    $('#filter_reset').click(function() {
+        $('#state').val('');
+        $('#district').prop('selectedIndex', 0).change();
+        $('#search').val('');
+        $('#partner').val('');
+        $('#role').val('');
+        
+        this.form.submit();
+  });
+
+$(document).ready(function() {
+  $('#district').prop('readonly', true);
+
+  $("#filter_reset").click(function() {
+    $('#state').prop('selectedIndex', 0).change();
+    this.form.submit();
+  });
+
+  $('#state').change(function() {
+    var optionSelected = $(this).find("option:selected");
+    var valueSelected = optionSelected.val();
+
+    $('#district').prop('readonly', false);
+
+    if (valueSelected === "") {
+      $('#district').prop('readonly', true);
+      $("#district option").remove();
+    } else {
+      $.ajax({
+        type: "GET",
+        url: '/ajax/district/' + valueSelected + '/',
+        success: function(result) {
+          $("#district option").remove();
+          a = '<option selected value="">Choose district Name</option>';
+          $("#district").append(a);
+
+          if (JSON.parse(result) == 0) {
+            $("#district option").remove();
+            a = '<option selected value="">No district is mapped to this state </option>';
+            console.log(a)
+            $("#district").append(a);
+          } else {
+            $.each(JSON.parse(result), function(key, value) {
+              a = '<option value=' + value['id'] + '>' + value['name'] + '</option>';
+              $("#district").append(a);
+            });
+          }
+        }
+      });
+    }
+  });
+
+});
+
+    
+</script>
+{% endblock %}
+

@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+<div class="row align-items-center">
+  <div class="col-xl-12 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive mb-3" data-pattern="priority-columns">
+          <button type="button" class="btn btn-outline-primary waves-effect btn-xs float-end mb-2 mx-0" onclick="location.href='/application_master/partner_mission_mapping/{{partner_id}}/'"><i class="bx bx-plus-medical" title="Add New"></i></button>
+        </div>
+        {% for user in user_obj %}
+        <form method='POST' class="needs-validation" autocomplete="off" oninput='password2.setCustomValidity(password2.value != password.value ? "Passwords do not match." : "")' novalidate>
+          {% csrf_token %}
+          <div class='text-danger'>
+              {{error}}
+          </div>
+          <div class="row mb-4">
+            <label for="" class="col-md-2 col-form-label">User Name<span class="required-field"></span></label>
+            <div class="col-md-4">
+              <input type="text" id="username" class="form-control"  value="{% if user.username %}{{ user.username|default_if_none:'' }}{% else %}{{ username|default_if_none:'' }}{% endif %}" name="username" placeholder="Enter Username" required >
+              <div class="invalid-feedback" id="username_vlu">
+               
+              </div>
+            </div>
+            <label for="" class="col-md-2 col-form-label"> Name<span class="required-field"></span></label>
+            <div class="col-md-4">
+              <input type="text" id="first_name" class="form-control"  value="{% if user.first_name %}{{user.first_name|default_if_none:''}}{% else %}{{ first_name|default_if_none:'' }}{% endif %}" name="first_name" placeholder="Enter Name" required>
+              <div class="invalid-feedback">
+                Please enter name.
+              </div>
+            </div>
+          </div>
+                                
+                            
+
+          <div class="row">
+            <label for="email" class="col-md-2 col-form-label mb-4">Email<span class="required-field"></span></label>
+            <div class="col-md-4 mb-4">
+              <input type="email" id="email" class="form-control"  value="{% if user.email %}{{ user.email }}{% else %}{{ email|default_if_none:'' }}{% endif %}" name="email" placeholder="Enter Email id" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" required>
+              <div class="invalid-feedback" id="email_vlu">
+              </div>
+            </div>
+            <label for="group" class="col-md-2 col-form-label mb-4">Group:<span class="required-field"></span></label>
+            <div class="col-md-4 mb-4">
+            <select  class=" form-control"  
+                                data-placeholder="Choose User Role" id="user_role" name='user_role' required>      
+                                {% for group in groups_obj %}
+                                <option value="{{group.id}}" 
+                                    {% if group.id in user_group_ids %}
+                                        selected
+                                    {% endif %}
+                                >{{ group.name }}</option>
+                            {% endfor %}
+            </select>
+            </div>
+            {% if not user_obj %}
+            <label for="" class="col-md-2 col-form-label mb-4">Password<span class="required-field"></span></label>
+            <div class="col-md-4 mb-4">
+              <input type="password" class="form-control" id="" name='password' value="{{password|default_if_none:''}}" placeholder="Enter Password" required >
+              <div class="invalid-feedback">
+                Please enter password.
+              </div>
+            </div>
+            <label for="" class="col-md-2 col-form-label mb-4">Confirm Password<span class="required-field"></span></label>
+            <div class="col-md-4 mb-4">
+              <input type="password" class="form-control" id="" name='password2' value="{{password|default_if_none:''}}" placeholder="Confirm Password" required >
+              <div class="invalid-feedback" id="val_password">
+                
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          <b><hr></b>
+        </form>
+        {% endfor %}
+        <div class="gap-2">
+          <button type="reset" onclick="location.href='javascript:history.back()'" class="btn btn-secondary waves-effect">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div> 
+</div>
+
+
+{% endblock %}
+
+

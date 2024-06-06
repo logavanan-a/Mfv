@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block contents %}
+
+<style>
+    .btn{
+        padding: 5px 10px;
+        margin-right: 10px;
+    }
+</style>
+<div class="row align-items-center">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-end mb-3">
+                    {% if model == 'project' or model == 'partner' %}
+                <button type="button" id="usermapping" class="btn btn-primary w-md" onclick="window.location.href='/application_master/vendor_partner_user_mapping/{{id}}/{{model}}/'" style="margin-right: 2px;">{% if user_prop %} View Userprofile{% else %}Create Userprofile{% endif %}</button>
+                {% endif %}
+                {% if model == 'partner' %}
+                <button type="button" id="partnermission" class="btn btn-primary w-md"  onclick="window.location.href='/application_master/partner_mission_mapping_list/{{id}}/'">Link mission</button>
+                {% elif model == 'project' %}
+                <button type="button" id="donorproject" class="btn btn-primary w-md"  onclick="window.location.href='/application_master/project_donor_mapping_list/{{id}}/'">Link Donor</button>
+                {% endif %}
+                </div>
+                <table  class="table  dt-responsive ">
+                    <thead class="table-light">
+                        <tr>
+                            <th colspan="6" class="text-capitalize">{{model}} - Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>Name</th>
+                            <td>{{obj.name}}</td>
+                            {% if model == 'partner' %}
+                            <th>Slug</th>
+                            <td>{{obj.slug|default_if_none:'-'}}</td>
+                            {% elif model == 'project' %}
+                            <th>partner_mission_mapping</th>
+                            <td>{{obj.partner_mission_mapping}}
+                            {% endif %}                            
+                        </tr>
+                        <tr> 
+                            {% if model == 'partner' %}
+                            <th>Partner Logo</th>
+                            <td>{{obj.partner_logo|default_if_none:'-'}}</td>
+                            <th>Status</th>
+                            <td>{{obj.get_active_display|default_if_none:'-'}}</td>                           
+                            
+                            {% elif model == 'project' %}
+                            <th>district</th>
+                            <td>{{obj.district|default_if_none:'-'}}</td>
+                            <th>location</th>
+                            <td>{{obj.location|default_if_none:'-'}}</td>
+                            {% endif %} 
+                        </tr>
+                        {% if model == 'project' %}
+                        <tr> 
+                            <th>additional_info</th>
+                            <td>{{obj.additional_info|default_if_none:'-'}}</td>
+                            <th>start_date</th>
+                            <td>{{obj.start_date|default_if_none:'-'}}</td>
+                        </tr>
+                        <tr> 
+                            <th>end_date</th>
+                            <td>{{obj.end_date|default_if_none:'-'}}</td>
+                            <th>Status</th>
+                            <td>{{obj.get_active_display|default_if_none:'-'}}</td>   
+                        </tr>
+                        {% endif %} 
+
+                    </tbody>
+                </table>
+                
+            </div>
+            <div class="container-fluid p-0">
+                    <div class="row">
+                        <div class="col-md-12 d-flex justify-content-between">
+                            <div>
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" data-bs-toggle="tab" href="#home" role="tab"
+                                            aria-selected="true">
+                                            <span class="d-none d-sm-block">User Details</span>
+                                            <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#profile" role="tab"
+                                            aria-selected="false" tabindex="-1">
+                                            <span class="d-none d-sm-block">Mission Details </span>
+                                            <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <br>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                        <div class="table-responsive">
+                            <table class="table  dt-responsive ">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th colspan="4">User {{model}} details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th>User Name{{user_obj}}</th>
+                                        <td>{{user_obj.email}}</td>
+                                        <th>Name</th>
+                                        <td>{{user_obj.first_name|default_if_none:'-'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Email</th>
+                                        <td>{{ user_obj.email }}</td>
+                                        <th>Group</th>
+                                        <td>
+                                            {% if groups_obj.exists %}
+                                                {% for group in groups_obj %}
+                                                    {{ group.name }}{% if not forloop.last %}, {% endif %}
+                                                {% endfor %}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                        <div class="tab-content" id="myTabContent">
+                            
+                            <table class="table  dt-responsive ">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th colspan="5">Medical Examination</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th colspan="2">Blood pressure</th>
+                                        <th>Blood sugar</th>
+                                        <th>Weight</th>
+                                        <th>Height</th>
+                                    </tr>
+                                    
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>                    
+                </div>
+            </div>
+        </div>
+    </div> 
+</div> 
+{% endblock %}
