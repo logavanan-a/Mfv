@@ -315,8 +315,12 @@ def edit_user_partner_project(request, id, model):
     partners = Partner.objects.all()
 
     user = User.objects.get(id=id)
-    vendor_id = UserPartnerMapping.objects.filter(user_id=user).values_list('partner_id', flat=True)
-    vendor_partner_id = Partner.objects.filter(id__in = vendor_id).first()
+    if model == 'partner':
+        vendor_id = UserPartnerMapping.objects.filter(user_id=user).values_list('partner_id', flat=True)
+        vendor_partner_id = Partner.objects.filter(id__in = vendor_id).first()
+    elif model == 'project':
+        vendor_id = UserProjectMapping.objects.filter(user_id=user).values_list('project_id', flat=True)
+        vendor_partner_id = Project.objects.filter(id__in = vendor_id).first()
 
     user_partner_config = UserPartnerMapping.objects.get(
         user=user)

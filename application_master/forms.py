@@ -47,6 +47,10 @@ class MissionForm(forms.ModelForm):
     mission_template = forms.ChoiceField(choices=MISSION_CHOICES, required=True, widget=forms.Select(attrs={'class': 'form-select'}), initial=1)
     age_group_option = forms.IntegerField(required=True,  initial=1)
 
+    def __init__(self, *args, **kwargs):
+        super(MissionForm, self).__init__(*args, **kwargs)            
+        self.fields['short_description'].widget.attrs['class'] = 'form-control'
+
     class Meta:
         model = Mission
         fields = ['name', 'mission_template','slug','age_group_option' , 'short_description']
@@ -70,7 +74,15 @@ class ProjectForm(forms.ModelForm):
     additional_info = forms.CharField(widget=forms.Textarea(attrs={'placeholder':'Enter description','rows':3}),required = False)
 
     def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance')  
         super(ProjectForm, self).__init__(*args, **kwargs)
+        if instance:  
+            try:
+                donor_mapping = ProjectDonorMapping.objects.get(project=instance)
+                self.initial['donor'] = donor_mapping.donor.id  
+            except ProjectDonorMapping.DoesNotExist:
+                pass
+
         self.fields['partner_mission_mapping'].widget.attrs['class'] = 'form-select select2'
         self.fields['district'].widget.attrs['class'] = 'form-select select2'
         self.fields['donor'].widget.attrs['class'] = 'form-select select2'
