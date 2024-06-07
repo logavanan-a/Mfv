@@ -64,13 +64,21 @@ class ProjectForm(forms.ModelForm):
     partner_mission_mapping = forms.ModelChoiceField(queryset=PartnerMissionMapping.objects.filter(active=2),required = True,empty_label="Select Partnermissionmapping")
     district = forms.ModelChoiceField(queryset=District.objects.filter(active=2).order_by("name"),required = True,empty_label="Select DIstrict")
     location = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'Enter location'}), max_length=150)
-    start_date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'})) 
-    end_date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'})) 
-    additional_info = forms.CharField(widget=forms.Textarea(attrs={'placeholder':'Enter short description','rows':4}),required = False)
+    start_date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    end_date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    donor = forms.ModelChoiceField(queryset=Donor.objects.all(), required=True, empty_label="Select Donor")
+    additional_info = forms.CharField(widget=forms.Textarea(attrs={'placeholder':'Enter description','rows':3}),required = False)
+
+    def __init__(self, *args, **kwargs):
+        super(ProjectForm, self).__init__(*args, **kwargs)
+        self.fields['partner_mission_mapping'].widget.attrs['class'] = 'form-select select2'
+        self.fields['district'].widget.attrs['class'] = 'form-select select2'
+        self.fields['donor'].widget.attrs['class'] = 'form-select select2'
+        self.fields['additional_info'].widget.attrs['class'] = 'form-control'
 
     class Meta:
         model = Project
-        fields = ['name', 'partner_mission_mapping', 'district','location','start_date','end_date','additional_info']
+        fields = ['name', 'partner_mission_mapping', 'district','location','start_date','end_date', 'donor', 'additional_info']
 
 
 class DonorForm(forms.ModelForm):

@@ -3,18 +3,26 @@
 
 
 {% block contents %}
+<link href="{% static 'libs/sweetalert2/dist/sweetalert2.min.css' %}" rel="stylesheet" type="text/css" />
 
 <style>
     .btn{
         padding: 5px 10px;
         margin-right: 10px;
     }
+    ul{
+    margin-left: 20px;
+    }
+    #home, #profile{
+    margin-right: 20px;
+    margin-left: 20px;
+    }
 </style>
 <div class="row align-items-center">
     <div class="col-xl-12 mx-auto">
         <div class="card">
             <div class="card-body">
-                <div class="d-flex justify-content-end mb-3">
+                <!-- <div class="d-flex justify-content-end mb-3">
                     {% if model == 'project' or model == 'partner' %}
                 <button type="button" id="usermapping" class="btn btn-primary w-md" onclick="window.location.href='/application_master/vendor_partner_user_mapping/{{id}}/{{model}}/'" style="margin-right: 2px;">{% if user_prop %} View Userprofile{% else %}Create Userprofile{% endif %}</button>
                 {% endif %}
@@ -23,7 +31,7 @@
                 {% elif model == 'project' %}
                 <button type="button" id="donorproject" class="btn btn-primary w-md"  onclick="window.location.href='/application_master/project_donor_mapping_list/{{id}}/'">Link Donor</button>
                 {% endif %}
-                </div>
+                </div> -->
                 <table  class="table  dt-responsive ">
                     <thead class="table-light">
                         <tr>
@@ -38,7 +46,7 @@
                             <th>Slug</th>
                             <td>{{obj.slug|default_if_none:'-'}}</td>
                             {% elif model == 'project' %}
-                            <th>partner_mission_mapping</th>
+                            <th>Partner mission</th>
                             <td>{{obj.partner_mission_mapping}}
                             {% endif %}                            
                         </tr>
@@ -50,24 +58,34 @@
                             <td>{{obj.get_active_display|default_if_none:'-'}}</td>                           
                             
                             {% elif model == 'project' %}
-                            <th>district</th>
+                            <th>District</th>
                             <td>{{obj.district|default_if_none:'-'}}</td>
-                            <th>location</th>
+                            <th>Location</th>
                             <td>{{obj.location|default_if_none:'-'}}</td>
                             {% endif %} 
                         </tr>
                         {% if model == 'project' %}
                         <tr> 
-                            <th>additional_info</th>
+                            <th>Additional info</th>
                             <td>{{obj.additional_info|default_if_none:'-'}}</td>
-                            <th>start_date</th>
+                            <th>Start date</th>
                             <td>{{obj.start_date|default_if_none:'-'}}</td>
                         </tr>
                         <tr> 
-                            <th>end_date</th>
+                            <th>End date</th>
                             <td>{{obj.end_date|default_if_none:'-'}}</td>
                             <th>Status</th>
                             <td>{{obj.get_active_display|default_if_none:'-'}}</td>   
+                        </tr>
+                        <tr>
+                            <th>Donor</th>
+                            <td>{% if project_obj.exists %}
+                                {% for donor in project_obj %}
+                                    {{ donor.name }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                -
+                            {% endif %}</td>
                         </tr>
                         {% endif %} 
 
@@ -76,91 +94,148 @@
                 
             </div>
             <div class="container-fluid p-0">
-                    <div class="row">
-                        <div class="col-md-12 d-flex justify-content-between">
-                            <div>
-                                <ul class="nav nav-tabs" role="tablist">
-                                    <li class="nav-item">
-                                        <a class="nav-link active" data-bs-toggle="tab" href="#home" role="tab"
-                                            aria-selected="true">
-                                            <span class="d-none d-sm-block">User Details</span>
-                                            <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#profile" role="tab"
-                                            aria-selected="false" tabindex="-1">
-                                            <span class="d-none d-sm-block">Mission Details </span>
-                                            <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
+                <div class="row">
+                    <div class="col-md-12 d-flex justify-content-between">
+                        <div>
+                            <ul class="nav nav-tabs custom-tabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-bs-toggle="tab" href="#home" role="tab"
+                                        aria-selected="true">
+                                        <span class="d-none d-sm-block">User Details</span>
+                                        <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#profile" role="tab"
+                                        aria-selected="false" tabindex="-1">
+                                        <span class="d-none d-sm-block">{% if model == 'partner' %} Mission Details {% endif %}</span>
+                                        <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <br>
-                <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                        <div class="table-responsive">
-                            <table class="table  dt-responsive ">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th colspan="4">User {{model}} details</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th>User Name{{user_obj}}</th>
-                                        <td>{{user_obj.email}}</td>
-                                        <th>Name</th>
-                                        <td>{{user_obj.first_name|default_if_none:'-'}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Email</th>
-                                        <td>{{ user_obj.email }}</td>
-                                        <th>Group</th>
-                                        <td>
-                                            {% if groups_obj.exists %}
-                                                {% for group in groups_obj %}
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    <div class="table-responsive" data-pattern="priority-columns">
+                        <button type="button" class="btn btn-outline-primary waves-effect btn-xs float-end mb-2 mx-0" onclick="location.href='/application_master/vendor_partner_user_mapping/{{id}}/{{model}}/'"><i class="bx bx-plus-medical" title="Add New"></i></button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table dt-responsive">
+                            <thead class="table-light">
+                                <tr>
+                                    <th colspan="6">User {{ model }} details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>Sl No</th>
+                                    <th>User Name</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Group</th> 
+                                    <th>Status</th> 
+                                </tr>
+                                {% for user in user_obj %}
+                                <tr>
+                                    <td>{{ user.id }}</td>
+                                    <td>{{ user.username }}</td>
+                                    <td>{{ user.first_name|default_if_none:'-' }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        {% with user.groups.all as user_groups %}
+                                            {% if user_groups.exists %}
+                                                {% for group in user_groups %}
                                                     {{ group.name }}{% if not forloop.last %}, {% endif %}
                                                 {% endfor %}
                                             {% else %}
                                                 -
                                             {% endif %}
-                                        </td>
-                                    </tr>
-                                    
-                                </tbody>
-                            </table>
-                        </div>
+                                        {% endwith %}
+                                    </td>
+                                    <td> <a href="/application_master/edit_user_partner_project/{{user.id}}/{{model}}/" class="btn btn-outline-secondary  edit" title="Edit"><i class="fas fa-pencil-alt"></i></a></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                        <div class="tab-content" id="myTabContent">
-                            
-                            <table class="table  dt-responsive ">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th colspan="5">Medical Examination</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th colspan="2">Blood pressure</th>
-                                        <th>Blood sugar</th>
-                                        <th>Weight</th>
-                                        <th>Height</th>
-                                    </tr>
-                                    
-
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>                    
                 </div>
+                {% if model == 'partner' %}
+                
+                <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                    <div class="table-responsive" data-pattern="priority-columns">
+                        <button type="button" class="btn btn-outline-primary waves-effect btn-xs float-end mb-2 mx-0" onclick="location.href='/application_master/partner_mission_mapping/{{id}}/'"><i class="bx bx-plus-medical" title="Add New"></i></button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table dt-responsive">
+                            <thead class="table-light">
+                                <tr>
+                                    <th colspan="5">Mission mapping details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Partner</th>
+                                    <th>Mission</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                                {% for l in parner_mission_obj %}
+                            <tr>
+                                <td>{{ l.id }}</td>
+                                <td>{{ l.partner }}</td>
+                                <td>{{ l.mission|default_if_none:'-' }}</td>
+                                <td>{% if l.active == 2 %}Active {% else %}Inactive{% endif %}</td>
+                                <td>                                  
+                                    {% if l.active == 2 %}<button class='btn btn-outline-danger' onclick="Confirm('{{l.id}}', 'Deactivate')"><i class="mdi mdi-close-circle"  title="Deactivate"></i></button>{% else %}<button class='btn btn-outline-success' onclick="Confirm('{{l.id}}', 'Activate')"><i class="mdi mdi-checkbox-marked-circle" title="Activate"></i></button>{% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div> 
 </div> 
+
+<script src="{% static 'libs/sweetalert2/dist/sweetalert2.min.js' %}"></script>
+
+<script src="{% static 'libs/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<!-- <script src="{% static 'libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script> -->
+<!-- Buttons examples -->
+<script src="{% static 'libs/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons/js/buttons.colVis.min.js' %}"></script>
+
+<!-- Responsive examples -->
+<script src="{% static 'libs/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
+
+<!-- Datatable init js -->
+<script src="{% static 'js/pages/datatables.init.js' %}"></script>
+<script type="text/javascript" >
+    function Confirm(id, title) {
+        Swal.fire({
+            title: "Are you sure!",
+            text:"You want to "+ title +"?",
+            showCancelButton: !0,
+            confirmButtonColor: "#34c38f",
+            cancelButtonColor: "#f46a6a",
+            confirmButtonText: "Yes",
+        }).then((result) => {
+            if (result.isConfirmed){
+                window.location.href = '/application_master/partner_mission_status_update/'+id+'/';
+            };
+                
+        })
+    };
+
+</script>
 {% endblock %}

@@ -17,36 +17,25 @@
                         {{error_message}}
                     </div>
                     <div data-repeater-list="group-a">
-                        <div data-repeater-item class="row row2">
-                            <div  class="mb-3 col-md-5">
-                                <div class="row">
-                                    <label for="district" class="col-md-4 col-form-label"><b>Partner :</b><span class="required-field"></span></label>
-                                    <div class="col-md-8">
-                                        <select name="district" id="id_district" class="form-select select2 district"  required>
-                                            <option value="" >Select partner</option>
-                                                <option value="{{ptr.id}}" selected>{{ ptr }}</option>
-                                        </select>
-                                    </div> 
-                                </div>
-                            </div>
-                            <div  class="mb-3 col-md-5">
-                                <div class="row">
-                                    <label for="donor" class="col-md-4 col-form-label"><b>Mission :</b><span class="required-field"></span></label>
-                                    <div class="col-md-8">
-                                        <select  name='mission' id="mission" class="form-select select2 district donor"  required>
-                                            <option value="" selected>Select Mission</option>
-                                            {% for donor in user_obj %}
-                                                <option value="{{donor.id}}" >{{donor.name}}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div> 
+                        <div class="mb-3 col-md-12">
+                            <div class="row">
+                                <label for="missions" class="col-md-2 col-form-label"><b>Missions :</b><span class="required-field"></span></label>
+                                <div class="col-md-10">
+                                    {% for mission in missions %}
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="missions" id="mission_{{ mission.id }}" value="{{ mission.id }}">
+                                            <label class="form-check-label" for="mission_{{ mission.id }}">
+                                                {{ mission.name }}
+                                            </label>
+                                        </div>
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="gap-2">
-                        <button type="reset" onclick="location.href='/application_master/list/partner/'" class="btn btn-secondary waves-effect">
+                        <button type="reset" onclick="location.href='javascript:history.back()'" class="btn btn-secondary waves-effect">
                             Back
                         </button>
                         <button type="submit" id="submitting" style="margin-left: 5px;" class="btn btn-primary w-md">Submit</button>
@@ -56,6 +45,7 @@
         </div>
     </div>
 </div>
+
 
 {% endblock %}
 

@@ -86,6 +86,13 @@ def master_add_form(request, model):
             instance = fields.save()
             instance.code = instance.name
             instance.save()
+            if model == 'project':
+                donor = request.POST.get('donor')
+                ProjectDonorMapping.objects.update_or_create(
+                    project_id=instance.id,
+                    defaults={'donor_id': donor}
+                )
+            
             return redirect('/application_master/list/'+str(model))
         else:
             message = [str(fields.errors[error][0]) for error in fields.errors.as_data()]
@@ -103,6 +110,9 @@ def master_edit_form(request,model,id):
     if model == 'project':
         part = Project.objects.filter(id=id).values_list('id', flat=True)
         user_prop = UserProjectMapping.objects.filter(project_id__in = part)
+        project_donor_obj = ProjectDonorMapping.objects.filter(project_id=id).values_list('donor_id', flat=True)
+        donor = Donor.objects.filter(id__in=project_donor_obj).first()
+
     if model != 'userprofile':
         listing_model = apps.get_model(app_label= 'application_master', model_name=model)
     else:
@@ -110,9 +120,16 @@ def master_edit_form(request,model,id):
     obj=listing_model.objects.get(id=id)
     user_form = eval(model.title()+'Form') 
     forms=user_form(request.POST or None,instance=obj)
+
     if request.method == 'POST' and forms.is_valid():
         page = request.GET.get('page')
         forms.save()
+        if model == 'project':
+            donor = request.POST.get('donor')
+            proj_donor = ProjectDonorMapping.objects.update_or_create(
+                project_id=id,
+                defaults={'donor_id': donor}
+            )
         return redirect('/application_master/list/'+str(model)+'/?page='+str(page))
     else:
         message = [str(forms.errors[error][0]) for error in forms.errors.as_data()]
@@ -135,33 +152,36 @@ def delete_record(request,model,id):
     obj.save()
     return redirect('/application_master/list/'+str(model)+'/?page='+str(page))
 
+def partner_mission_status_update(request, dpl_id):
+    dpl_data=PartnerMissionMapping.objects.get(id=dpl_id)
+    if dpl_data.active == 2:
+        dpl_data.active = 1
+    else:
+        dpl_data.active = 2
+    dpl_data.save()
+    return redirect('/application_master/details/partner/'+str(dpl_data.partner.id)+'/')      
+
 
 def master_details_form(request,model,id):
     heading=model
     if model == 'partner':
         heading="Partner"
-        # donor_val = UserPartnerMapping.objects.filter(partner__id=id)
-        # model_name=Partner.objects.get(id=id).id
-        # groups = Group.objects.all()
         user_mapping = UserPartnerMapping.objects.filter(partner_id=id).values_list('user_id', flat=True)
         user_obj = User.objects.filter(id__in=user_mapping)
         groups_obj = Group.objects.filter(user__in=user_obj).distinct()
-        print(user_mapping,'----------user_mapping')
-        print(User.objects.all(),'-user_obj---------')
-        print(groups_obj,'-groups_obj---------')
+        part=Partner.objects.filter(id=id)
+        parner_mission_obj = PartnerMissionMapping.objects.filter(partner_id__in=part).order_by('-id')
     elif model == 'project':
         heading="Project"
-        donor_val = UserProjectMapping.objects.filter(project__id=id)
-        model_name=Project.objects.get(id=id).id
-        groups = Group.objects.all()
         user_mapping = UserProjectMapping.objects.filter(project_id=id).values_list('user_id', flat=True)
         user_obj = User.objects.filter(id__in=user_mapping)
         groups_obj = Group.objects.filter(user__in=user_obj).distinct()
+        project_donor_obj = ProjectDonorMapping.objects.filter(project_id=id).values_list('donor_id', flat=True)
+        project_obj = Donor.objects.filter(id__in=project_donor_obj)
         try:
             user_mapping = UserPartnerMapping.objects.get(partner_id=model_name).user.id
         except:
             user_mapping = ''
-    
     listing_model = apps.get_model(app_label= 'application_master', model_name=model)
     obj=listing_model.objects.get(id=id)
     return render(request, 'user/details_list.html', locals())
@@ -170,11 +190,11 @@ def master_details_form(request,model,id):
 def vendor_partner_user_mapping(request,vendor_partner_id,model):
     # heading = 'user profile'
     if model == 'partner':
-        partner_name=Partner.objects.get(id=vendor_partner_id).name
+        partner_name=Partner.objects.filter(id=vendor_partner_id)
         heading = 'User Partner Mapping'
         try:
             user_mapping = UserPartnerMapping.objects.filter(partner_id=vendor_partner_id).values_list('user_id', flat=True)
-            user_obj = User.objects.filter(id__in=user_mapping)
+            user_obj = User.objects.filter(id=vendor_partner_id)
             groups_obj = Group.objects.filter(user__in=user_obj).distinct()
         except:
             user_mapping = None
@@ -182,9 +202,8 @@ def vendor_partner_user_mapping(request,vendor_partner_id,model):
             groups_obj = None
         
     if model == 'project':
-        vendor_name=Project.objects.get(id=vendor_partner_id).name
+        vendor_name=Project.objects.filter(id=vendor_partner_id)
         heading = 'User Project Mapping'
-        
         try:
             user_mapping = UserProjectMapping.objects.filter(project_id=vendor_partner_id).values_list('user_id', flat=True)
             user_obj = User.objects.filter(id__in=user_mapping)
@@ -195,47 +214,30 @@ def vendor_partner_user_mapping(request,vendor_partner_id,model):
             user_obj = None
             groups_obj = None
         
+    groups = Group.objects.all()
+    partners = Partner.objects.all()
+
     if request.method == 'POST':
         try:
-            with transaction.atomic():
-                username = request.POST.get('username')
-                email = request.POST.get('email')
-                password = request.POST.get('password')
-                first_name = request.POST.get('first_name')
-                if User.objects.filter(email=email).exclude(id=user_mapping).exists():
-                    email_exist = "Email already exists"
-                    return render(request, 'user/add_user_link_to_role.html', locals())
-                if User.objects.filter(username=username).exclude(id=user_mapping).exists():
-                    user_exist = "Username already exists"
-                    return render(request, 'user/add_user_link_to_role.html', locals())
-                if user_mapping:
-                    user_obj.email = email
-                    user_obj.username = username.lower()
-                    user_obj.first_name=first_name
+            data = request.POST
+            username = data.get('username')
+            password = data.get('password1')
+            user_role = data.get('user_role')
+            first_name = data.get('first_name')
+            last_name = data.get('last_name')
+            email = data.get('email')
 
-                    user_obj.save()
-                    user_profile.user.set_password(password)
-                    user_profile.save()
-                else:
-                    if User.objects.filter(email=email).exclude(id=user_mapping).exists():   
-                        email_exist = "email already exists"
-                        return render(request, 'user/add_user_link_to_role.html', locals())
-                    user=User.objects.create_user(username=username.lower(),password=password, first_name=first_name, email=email)
-                    user.save()
-                    if model == 'partner':
-                        partner_obj=UserPartnerMapping.objects.create(
-                            partner_id = vendor_partner_id,
-                            user_id = user.id
-                        )
-                        partner_obj.save()
-                    if model == 'project':
-                        vendor_obj=UserProjectMapping.objects.create(
-                            project_id = vendor_partner_id,
-                            user_id = user.id
-                        )
-                        vendor_obj.save()
-                    
-            return redirect('/user_listing/')
+            user = User.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name)
+            user.groups.add(Group.objects.get(id=user_role))
+            user.save()
+            if model == 'partner':
+                user_role_config = UserPartnerMapping.objects.create(user=user, partner_id=vendor_partner_id)
+                user_role_config.save()
+            elif model == 'project':
+                user_role_config = UserProjectMapping.objects.create(user=user, project_id=vendor_partner_id)
+                user_role_config.save()
+
+            return redirect('/application_master/details/'+ str(model) + '/'+ str(vendor_partner_id) + '/')
         except Exception as e:
             error = f"User is not created. Please try again. Error: {str(e)}"
     return render(request, 'user/add_user_link_to_role.html', locals())
@@ -256,20 +258,20 @@ def partner_mission_mapping_list(request, partner_id):
 def partner_mission_mapping(request, partner_id):
     heading = 'Partner Mission mapping'
     ptr = Partner.objects.get(id=partner_id)
-    donor_parner_obj = UserPartnerMapping.objects.filter(partner__id=partner_id).values_list('user_id', flat=True)
-    user_obj = Mission.objects.filter(active=2).order_by('name')
-
-    donor_parner_obj = UserPartnerMapping.objects.filter(partner__id=partner_id)
+    pmm_obj = PartnerMissionMapping.objects.filter(partner_id=partner_id).values_list('mission_id',flat=True)
+    missions = Mission.objects.filter(active=2).exclude(id__in=pmm_obj).order_by('name')
+    
     if request.method == "POST":
-        data = request.POST
-        mission = request.POST.get('mission')
-        obj = PartnerMissionMapping.objects.create(
+        selected_missions = request.POST.getlist('missions')  
+        for mission_id in selected_missions:
+            part_mission=PartnerMissionMapping.objects.create(
                 partner_id=partner_id,
-                mission_id=mission,
+                mission_id=mission_id,
             )
-        obj.save()
-        return redirect('/application_master/partner_mission_mapping_list/'+str(partner_id)+'/')      
-    return render(request, 'user/user_partner_mapping.html', locals())
+            part_mission.save()
+        return redirect('/application_master/details/partner/' + str(partner_id) + '/')
+    
+    return render(request, 'user/user_partner_mapping.html',locals())
 
 
 
@@ -277,7 +279,6 @@ def project_donor_mapping_list(request, project_id):
     heading = 'Project Donor Mapping'
     project_obj=Project.objects.filter(id=project_id)
     donor_project_obj = ProjectDonorMapping.objects.filter(project__id__in=project_obj)
-    print(donor_project_obj,'-------------------donor_project_obj')
     data = get_pagination(request, donor_project_obj)
     current_page = request.GET.get('page', 1)
     page_number_start = int(current_page) - 2 if int(current_page) > 2 else 1
@@ -306,43 +307,41 @@ def project_donor_mapping(request, project_id):
     return render(request, 'user/donor_project_mapping.html', locals())
 
 
+def edit_user_partner_project(request, id, model):
+    """
+    Edits the user details.
+    """
+    groups = Group.objects.all()
+    partners = Partner.objects.all()
+
+    user = User.objects.get(id=id)
+    vendor_id = UserPartnerMapping.objects.filter(user_id=user).values_list('partner_id', flat=True)
+    vendor_partner_id = Partner.objects.filter(id__in = vendor_id).first()
+
+    user_partner_config = UserPartnerMapping.objects.get(
+        user=user)
+    if request.method == 'POST':
+        data = request.POST
+        username = data.get('username')
+        first_name = data.get('first_name')
+        last_name = data.get('last_name')
+        email = data.get('email')
+        user_role = data.get('user_role')
+        partner = data.get('partner')
+        user.username = username
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        if user_role:
+            user.groups.clear()
+            user.groups.add( Group.objects.get(id = user_role))
+        user.save()
+       
+        return redirect('/application_master/details/'+ str(model) + '/'+ str(vendor_partner_id.id) + '/')
+    return render(request, 'user/edit_user_link_to_role.html', locals())
 
 
-# def add_user(request, user_location=None):
-#     """
-#     Renders the add user page and handles the creation of a new user.
-#     """
-#     heading = "Add User"
-#     groups = Group.objects.all()
-#     partners = Partner.objects.all()
 
-#     if True:
-#         if request.method == 'POST':
-#             try:
-#                 data = request.POST
-#                 username = data.get('username')
-#                 password = data.get('password1')
-#                 partner = data.get('partner')
-#                 user_role = data.get('user_role')
-#                 first_name = data.get('first_name')
-#                 last_name = data.get('last_name')
-#                 email = data.get('email')
 
-#                 user = User.objects.create_user(username, password)
 
-#                 user.email =  email
-#                 user.first_name = first_name
-#                 user.last_name = last_name
-#                 user.groups.add(Group.objects.get(id = user_role ))
-#                 user.save()
 
-#                 user_role_config = UserPartnerMapping.objects.create(
-#                     user=user, partner = Partner.objects.get(id = partner)
-#                 )
-
-#                 return redirect('mis:user_listing')
-#             except ObjectDoesNotExist:
-#                 return redirect('mis:add_user')
-#             return redirect('mis:user_listing')
-#         return render(request, 'user/add_user.html', locals())
-    
