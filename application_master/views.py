@@ -119,8 +119,7 @@ def master_edit_form(request,model,id):
         listing_model = apps.get_model(app_label= 'application_master', model_name=model)
     obj=listing_model.objects.get(id=id)
     user_form = eval(model.title()+'Form') 
-    forms=user_form(request.POST or None,instance=obj)
-
+    forms=user_form(request.POST or None, request.FILES or None,instance=obj)
     if request.method == 'POST' and forms.is_valid():
         page = request.GET.get('page')
         forms.save()
