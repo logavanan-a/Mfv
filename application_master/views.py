@@ -346,10 +346,10 @@ def edit_user_partner_project(request, id, model):
 
 
 def get_district(request, state_id):
-    print(state_id, 'state_id---------------------------')  
+    print(state_id, 'state_id---------------------------')  # Debug statement
     if request.method == 'GET':
         result_set = []
-        district_obj = District.objects.filter(state_id=state_id).order_by('name')
+        district_obj = District.objects.filter(state_id=state_id, active=2).order_by('name')
         for district in district_obj:
             result_set.append({'id': district.id, 'name': district.name})
         return JsonResponse(result_set, safe=False)

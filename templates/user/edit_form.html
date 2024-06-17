@@ -78,37 +78,37 @@
 <script src="{% static 'js/pages/form-validation.init.js' %}"></script> 
 
 <script>
-  $(document).ready(function() {
-      $('select').addClass('form-control');
-      $('input').addClass('form-control');
-
-      $('#id_state').change(function() {
-          var stateId = $(this).val();
-          console.log('State ID selected:', stateId); // Debug statement
-          
-          if (stateId === "") {
-              $('#id_district').prop('readonly', true);
-              $("#id_district option").remove();
-          } else {
-              $.ajax({
-                  type: "GET",
-                  url: '/ajax/district/' + stateId + '/',
-                  success: function(result) {
-                      console.log('Result received:', result); // Debug statement
-                      var districtSelect = $('#id_district');
-                      districtSelect.empty();
-                      districtSelect.append('<option value="">Select District</option>');
-                      result.forEach(function(district) {
-                          districtSelect.append('<option value="' + district.id + '">' + district.name + '</option>');
-                      });
-                  },
-                  error: function(xhr, status, error) {
-                      console.error('Error occurred:', status, error); // Debug statement
-                  }
-              });
-          }
-      });
-  });
-</script>
+    $(document).ready(function() {
+        $('select').addClass('form-control');
+        $('input').addClass('form-control');
+  
+        $('#id_state').change(function() {
+            var stateId = $(this).val();
+            console.log('State ID selected:', stateId); // Debug statement
+  
+            if (stateId === "") {
+                $('#id_district').prop('readonly', true);
+                $("#id_district option").remove();
+            } else {
+                $.ajax({
+                    type: "GET",
+                    url: '/application_master/ajax/district/' + stateId + '/',
+                    success: function(result) {
+                        console.log('Result received:', result); // Debug statement
+                        var districtSelect = $('#id_district');
+                        districtSelect.empty();
+                        districtSelect.append('<option value="">Select District</option>');
+                        result.forEach(function(district) {
+                            districtSelect.append('<option value="' + district.id + '">' + district.name + '</option>');
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error occurred:', status, error); // Debug statement
+                    }
+                });
+            }
+        });
+    });
+  </script>
 
 {% endblock %}
