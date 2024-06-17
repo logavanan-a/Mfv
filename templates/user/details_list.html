@@ -58,16 +58,16 @@
                             <td>{{obj.get_active_display|default_if_none:'-'}}</td>                           
                             
                             {% elif model == 'project' %}
+                            <th>State</th>
+                            <td>{{obj.district.state|default_if_none:'-'}}</td>
                             <th>District</th>
                             <td>{{obj.district|default_if_none:'-'}}</td>
-                            <th>Location</th>
-                            <td>{{obj.location|default_if_none:'-'}}</td>
                             {% endif %} 
                         </tr>
                         {% if model == 'project' %}
                         <tr> 
-                            <th>Additional info</th>
-                            <td>{{obj.additional_info|default_if_none:'-'}}</td>
+                            <th>Location</th>
+                            <td>{{obj.location|default_if_none:'-'}}</td>
                             <th>Start date</th>
                             <td>{{obj.start_date|default_if_none:'-'}}</td>
                         </tr>
@@ -86,6 +86,8 @@
                             {% else %}
                                 -
                             {% endif %}</td>
+                            <th>Additional info</th>
+                            <td>{{obj.additional_info|default_if_none:'-'}}</td>
                         </tr>
                         {% endif %} 
 
@@ -101,14 +103,14 @@
                                 <li class="nav-item">
                                     <a class="nav-link active" data-bs-toggle="tab" href="#home" role="tab"
                                         aria-selected="true">
-                                        <span class="d-none d-sm-block">User Details</span>
+                                        <span class="d-none d-sm-block" style="color:blue">User Details</span>
                                         <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" data-bs-toggle="tab" href="#profile" role="tab"
                                         aria-selected="false" tabindex="-1">
-                                        <span class="d-none d-sm-block">{% if model == 'partner' %} Mission Details {% endif %}</span>
+                                        <span class="d-none d-sm-block" style="color:blue">{% if model == 'partner' %} Mission Details {% endif %}</span>
                                         <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
                                     </a>
                                 </li>
@@ -156,7 +158,9 @@
                                             {% endif %}
                                         {% endwith %}
                                     </td>
-                                    <td> <a href="/application_master/edit_user_partner_project/{{user.id}}/{{model}}/" class="btn btn-outline-secondary  edit" title="Edit"><i class="fas fa-pencil-alt"></i></a></td>
+                                    <td> 
+                                        <a href="/application_master/edit_user_partner_project/{{user.id}}/{{model}}/" class="btn btn-outline-secondary  edit" title="Edit"><i class="fas fa-pencil-alt"></i></a>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -200,6 +204,11 @@
                     </div>
                 </div>
                 {% endif %}
+            </div>
+            <div class="mt-2 ms-3">
+                <button type="reset" onclick="window.location.href='/application_master/list/{{model}}/'" class="btn btn-secondary waves-effect">
+                    Back
+                </button>
             </div>
         </div>
     </div> 
