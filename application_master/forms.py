@@ -91,8 +91,6 @@ class ProjectForm(forms.ModelForm):
         self.fields['additional_info'].widget.attrs['class'] = 'form-control'
 
         if self.instance.pk:
-            if self.instance.district.state.zone:
-                self.fields['state'].queryset = self.fields['state'].queryset.filter(zone_id=self.instance.district.state.zone.id)
             if self.instance.district.state:
                 self.fields['district'].queryset = self.fields['district'].queryset.filter(state_id=self.instance.district.state.id)
             self.fields['state'].initial = self.instance.district.state
