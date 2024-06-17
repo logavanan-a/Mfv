@@ -24,7 +24,7 @@
         <div class="card">
             <div class="card-body">
               
-                <form method='POST' class="needs-validation" autocomplete="off" novalidate>
+                <form method='POST' enctype="multipart/form-data" class="needs-validation" autocomplete="off" novalidate>
                   {% csrf_token %}
                   {% if error %}
                   <div class="error">
@@ -77,133 +77,38 @@
 <script src="{% static 'libs/jquery/dist/jquery.min.js' %}"></script>
 <script src="{% static 'js/pages/form-validation.init.js' %}"></script> 
 
-<script type="text/javascript">
-    $(document).ready(function(){
-        $('select').addClass('form-control')
-        $('input').addClass('form-control')
+<script>
+  $(document).ready(function() {
+      $('select').addClass('form-control');
+      $('input').addClass('form-control');
 
-    });
-    
-    $("#filter_reset").click(function() {
-        $('#id_state').prop('selectedIndex', 0).change();
-        this.form.submit();
-    });
-    $(document).ready(function() {
-  $('#id_district').prop('readonly', true);
-
-  $("#filter_reset").click(function() {
-    $('#id_state').prop('selectedIndex', 0).change();
-    this.form.submit();
-  });
-  $('#id_zone').change(function() {
-    var optionSelected = $(this).find("option:selected");
-    var valueSelected = optionSelected.val();
-
-    $('#id_state').prop('readonly', false);
-
-    if (valueSelected === "") {
-    $('#id_state').prop('readonly', true);
-    $("#id_state option").remove();
-    } else {
-    $.ajax({
-        type: "GET",
-        url: '/ajax/state/' + valueSelected + '/',
-        success: function(result) {
-        $("#id_state option").remove();
-        a = '<option selected disabled value="">Choose State Name</option>';
-        $("#id_state").append(a);
-
-        if (JSON.parse(result) == 0) {
-            $("#id_state option").remove();
-            a = '<option selected value="">No state is mapped to this zone </option>';
-            console.log(a)
-            $("#id_state").append(a);
-        } else {
-            $.each(JSON.parse(result), function(key, value) {
-            a = '<option value=' + value['id'] + '>' + value['name'] + '</option>';
-            $("#id_state").append(a);
-            });
-        }
-        }
-    });
-    }
-});
-
-$('#id_partner').change(function() {
-    var optionSelected = $(this).find("option:selected");
-    var valueSelected = optionSelected.val();
-
-    $('#id_donor').prop('readonly', false);
-
-    if (valueSelected === "") {
-    $('#id_donor').prop('readonly', true);
-    $("#id_donor option").remove();
-    } else {
-    $.ajax({
-        type: "GET",
-        url: '/ajax/donor/' + valueSelected + '/',
-        success: function(result) {
-        $("#id_donor option").remove();
-        a = '<option selected disabled value="">Choose Donor Name</option>';
-        $("#id_donor").append(a);
-
-        if (JSON.parse(result) == 0) {
-            $("#id_donor option").remove();
-            a = '<option selected value="">No Donor is mapped to this Partner </option>';
-            console.log(a)
-            $("#id_donor").append(a);
-        } else {
-            $.each(JSON.parse(result), function(key, value) {
-            a = '<option value=' + value['id'] + '>' + value['name'] + '</option>';
-            $("#id_donor").append(a);
-            });
-        }
-        }
-    });
-    }
-});
-
-
-
-  $('#id_state').change(function() {
-    var optionSelected = $(this).find("option:selected");
-    var valueSelected = optionSelected.val();
-
-    $('#id_district').prop('readonly', false);
-
-    if (valueSelected === "") {
-      $('#id_district').prop('readonly', true);
-      $("#id_district option").remove();
-    } else {
-      $.ajax({
-        type: "GET",
-        url: '/ajax/district/' + valueSelected + '/',
-        success: function(result) {
-          $("#id_district option").remove();
-          a = '<option selected value="">Choose district Name</option>';
-          $("#id_district").append(a);
-
-          if (JSON.parse(result) == 0) {
-            $("#id_district option").remove();
-            a = '<option selected value="">No district is mapped to this state </option>';
-            console.log(a)
-            $("#id_district").append(a);
+      $('#id_state').change(function() {
+          var stateId = $(this).val();
+          console.log('State ID selected:', stateId); // Debug statement
+          
+          if (stateId === "") {
+              $('#id_district').prop('readonly', true);
+              $("#id_district option").remove();
           } else {
-            $.each(JSON.parse(result), function(key, value) {
-              a = '<option value=' + value['id'] + '>' + value['name'] + '</option>';
-              $("#id_district").append(a);
-            });
+              $.ajax({
+                  type: "GET",
+                  url: '/ajax/district/' + stateId + '/',
+                  success: function(result) {
+                      console.log('Result received:', result); // Debug statement
+                      var districtSelect = $('#id_district');
+                      districtSelect.empty();
+                      districtSelect.append('<option value="">Select District</option>');
+                      result.forEach(function(district) {
+                          districtSelect.append('<option value="' + district.id + '">' + district.name + '</option>');
+                      });
+                  },
+                  error: function(xhr, status, error) {
+                      console.error('Error occurred:', status, error); // Debug statement
+                  }
+              });
           }
-        }
       });
-    }
   });
-  // $('#id_state').trigger('change');
-
-});
-
-
- 
 </script>
-    
+
 {% endblock %}

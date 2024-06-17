@@ -1,5 +1,6 @@
 from django.urls import path
 from . views import *
+from .views import get_district
 
 app_name = "application_master"
 
@@ -16,5 +17,6 @@ urlpatterns = [
     path('project_donor_mapping/<project_id>/', project_donor_mapping, name="project_donor_mapping"),
     path('partner_mission_status_update/<dpl_id>/', partner_mission_status_update, name="partner_mission_status_update"),
     path("edit_user_partner_project/<id>/<model>/", edit_user_partner_project, name="edit_user_partner_project"),
+    path('ajax/district/<int:state_id>/', get_district, name='get_district'),
 
 	]

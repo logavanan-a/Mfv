@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from mis . views import *
 # Create your views here.
 from django.db import transaction
+from django.http import JsonResponse
 
 
 def master_list_form(request,model):
@@ -344,7 +345,11 @@ def edit_user_partner_project(request, id, model):
     return render(request, 'user/edit_user_link_to_role.html', locals())
 
 
-
-
-
-
+def get_district(request, state_id):
+    print(state_id, 'state_id---------------------------')  
+    if request.method == 'GET':
+        result_set = []
+        district_obj = District.objects.filter(state_id=state_id).order_by('name')
+        for district in district_obj:
+            result_set.append({'id': district.id, 'name': district.name})
+        return JsonResponse(result_set, safe=False)

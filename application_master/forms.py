@@ -66,7 +66,8 @@ class MissionForm(forms.ModelForm):
 class ProjectForm(forms.ModelForm):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'Enter Name'}), max_length=150, strip=True)
     partner_mission_mapping = forms.ModelChoiceField(queryset=PartnerMissionMapping.objects.filter(active=2),required = True,empty_label="Select Partnermissionmapping")
-    district = forms.ModelChoiceField(queryset=District.objects.filter(active=2).order_by("name"),required = True,empty_label="Select DIstrict")
+    state = forms.ModelChoiceField(queryset=State.objects.filter(active=2).order_by("name"),required = True,empty_label="Select State")
+    district = forms.ModelChoiceField(queryset=District.objects.filter(active=2).order_by("name"),required = True,empty_label="Select District")
     location = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'Enter location'}), max_length=150)
     start_date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
     end_date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
@@ -84,13 +85,21 @@ class ProjectForm(forms.ModelForm):
                 pass
 
         self.fields['partner_mission_mapping'].widget.attrs['class'] = 'form-select select2'
+        self.fields['state'].widget.attrs['class'] = 'form-select select2'
         self.fields['district'].widget.attrs['class'] = 'form-select select2'
         self.fields['donor'].widget.attrs['class'] = 'form-select select2'
         self.fields['additional_info'].widget.attrs['class'] = 'form-control'
 
+        if self.instance.pk:
+            if self.instance.district.state.zone:
+                self.fields['state'].queryset = self.fields['state'].queryset.filter(zone_id=self.instance.district.state.zone.id)
+            if self.instance.district.state:
+                self.fields['district'].queryset = self.fields['district'].queryset.filter(state_id=self.instance.district.state.id)
+            self.fields['state'].initial = self.instance.district.state
+            
     class Meta:
         model = Project
-        fields = ['name', 'partner_mission_mapping', 'district','location','start_date','end_date', 'donor', 'additional_info']
+        fields = ['name', 'partner_mission_mapping', 'state', 'district','location','start_date','end_date', 'donor', 'additional_info']
 
 
 class DonorForm(forms.ModelForm):
