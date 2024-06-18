@@ -250,7 +250,7 @@ class MissionIndicator(BaseContent):
         return f"{self.name} - {self.category.name}"
 
 class MissionIndicatorTarget(BaseContent):
-    mission_indicator = models.ForeignKey(MissionIndicator, on_delete=models.DO_NOTHING)
+    mission_indicator = models.ForeignKey(MissionIndicator, on_delete=models.DO_NOTHING,blank=True, null=True)
     project = models.ForeignKey(Project, on_delete=models.DO_NOTHING,null=True, blank=True)
     approved_budget   = models.PositiveIntegerField(blank = True, null = True)
     created_by = models.ForeignKey(User, on_delete = models.DO_NOTHING, blank=True, null=True)
