@@ -67,16 +67,16 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='missionindicatortarget',
             name='mission_indicator',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='application_master.missionindicator'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='application_master.missionindicator',blank=True, null=True),
         ),
         migrations.AlterField(
             model_name='missionindicatortarget',
             name='periodicity',
-            field=models.PositiveIntegerField(),
+            field=models.PositiveIntegerField(blank=True, null=True),
         ),
         migrations.AlterField(
             model_name='missionindicatortarget',
             name='project',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='application_master.project'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='application_master.project',blank=True, null=True),
         ),
     ]

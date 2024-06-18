@@ -1,6 +1,6 @@
 from ast import literal_eval
 from datetime import datetime, timedelta
-from masterdata.models import *
+from application_master.models import *
 # from common_methods import *
 # from userroles.models import UserRoles
 from django.db import models
@@ -1333,7 +1333,7 @@ class JsonAnswer(BaseContent):
     interface = models.CharField(choices=INTERFACE_TYPES,default=1,max_length=2)
     language = models.ForeignKey('survey.Language', blank=True, null=True,on_delete=models.DO_NOTHING)
     # beneficiary_type = models.ForeignKey('beneficiary.BeneficiaryType', blank=True, null=True,on_delete=models.DO_NOTHING)
-    training_type = models.ForeignKey('masterdata.MasterLookUp', blank=True, null=True,on_delete=models.DO_NOTHING)
+    training_type = models.ForeignKey('application_master.MasterLookUp', blank=True, null=True,on_delete=models.DO_NOTHING)
     json_order = models.PositiveIntegerField(blank=True,null=True)
     training_survey = models.ForeignKey(Survey, blank=True, null=True,related_name='training_survey',on_delete=models.DO_NOTHING)
     inner_response_creation_key = models.CharField(max_length=50, blank=True,null=True)
