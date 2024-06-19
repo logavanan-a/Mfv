@@ -7,7 +7,9 @@ from django.http import HttpResponseRedirect, HttpResponse
 from mis . views import *
 # Create your views here.
 from django.db import transaction
-
+from rest_framework.views import APIView
+from application_master.serializers import LoginAndroidSerializer
+from rest_framework.response import Response
 
 def master_list_form(request,model):
     heading = 'user profile'    
@@ -346,6 +348,69 @@ def edit_user_partner_project(request, id, model):
 
 
 
+class LoginAndroidView(APIView):
+    serializer_class = LoginAndroidSerializer
+    def post(self, request, *args, **kwargs):
+        """
+        User Login.
+        ---
+        parameters:
+        - name: username
+          description: Username Login
+          required: true
+          type: string
+          paramType: form
+        - name: password
+          description: Password for Login
+          paramType: form
+          required: true
+          type: string
+        """
+        response = {}
+        serializer = LoginAndroidSerializer(data=request.data)
+        if serializer.is_valid():
+            user = authenticate(username=request.data[
+                                'username'], password=request.data['password'])
+            print(user, '-----------1------------')
+            if user is not None:
+                if user.is_superuser:
+                    login(request, user)
+                    response.update({
+                            'status': 1, 'admin': 1,
+                            'user_id': int(user.id),
+                            'first_name': user.first_name
+                            })
+                else:
+                    login(request, user)
+                    response.update({'status': 1, 'admin': 0, 'user_id': int(user.id),
+                                     'first_name': user.first_name
+                                     })
+            else:
+                try:
+                    user = User.objects.get(username = request.data.get('username'))
+                    if user.is_active == False:
+                        response.update({'status': 0, 'msg': "User is inactive"})
+                    else:
+                        response.update({'status': 0, 
+                        'msg': "Username/Password mismatch "})
+                except: 
+                    response.update(
+                        {'status': 0, 'msg': "Username/Password mismatch"})
+        else:
+            errors = serializer.errors
+            errors = stripmessage(errors)
+            error_dict = {}
+            error_dict.update({'message':'error','status':0,'errors':errors})
+            return Response(error_dict)
+        return Response(response)
 
 
-
+def stripmessage(errors):
+    for i, j in errors.items():
+        errors[i] = j[0]
+        expr = re.search(r'\w+:', errors[i])
+        if expr:
+            ik = expr.group().replace(':', '')
+            errors[ik] = errors.pop(i)
+            errors[ik] = re.sub(r'\w+:', '', errors[ik])
+    return errors
