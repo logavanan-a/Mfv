@@ -5,7 +5,6 @@ from datetime import datetime
 import os
 import pytz
 
-
 def pagination(request, plist):
     paginator = Paginator(plist, 1)
     page = request.GET.get('page', '')

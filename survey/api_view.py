@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from survey.models import *
-# from survey.custom_decorators import *
+from survey.custom_decorators import *
 # from survey.monkey_patching import *
 # from masterdata.models import *
 # from beneficiary.models import *
@@ -24,6 +24,97 @@ import  logging
 from django.conf import settings
 from collections import defaultdict
 
+
+def get_time_difference(tabtime):
+    # Returns the time difference the tab time and the current server time
+    message, response_type = '', 2
+    if tabtime:
+        tabtime_obj = datetime.strptime(tabtime, "%Y-%m-%d %H:%M:%S")
+        current_time = datetime.now()
+        diff = current_time - tabtime_obj
+        diff_time = divmod(diff.days * 86400 + diff.seconds, 60)
+        message = "The server time and tab time is more than " + \
+            str(diff_time[0])+" minutes "+str(diff_time[1])+" seconds"
+        if diff_time[0] < 10:
+            response_type = 1
+    else:
+        message = "Tab time not sent"
+    return {'message': message, 'response_type': response_type}
+
+@csrf_exempt
+@validate_user
+def applogin(request, **kwargs):
+    # User model method get_latest_survey_versions is a method which return
+    # survey version with piriodicity (common method)
+    response, message, error_msg = {}, '', ''
+    if request.method == 'POST' and kwargs.get('status', False):
+        tabtime = request.POST.get('tabtime')
+        user = kwargs.get('user')
+        
+        time_data = get_time_difference(tabtime)
+        message = time_data.get('message', '')
+        response_type = time_data.get('response_type')
+        appdetails_obj = AppLoginDetails(user=request.user,
+                                         surveyversion=request.POST.get(
+                                             'surveyversion'),
+                                         lang_code=request.POST.get(
+                                             'lang_code'),
+                                         tabtime=request.POST.get('tabtime')
+                                         if request.POST.get('tabtime') else None,
+                                         sdc=request.POST.get('sdc')
+                                         if request.POST.get('sdc') else 0,
+                                         itype=request.POST.get('ltype'),
+                                         version_number=request.POST.get('version_number'))
+        appdetails_obj.save()
+        # userrole_obj = UserRoles.objects.get(user=user)
+        # role_typ = userrole_obj.role_type.all()[0].id
+        # role_nme = userrole_obj.role_type.all()[0].name
+#        role_names = [i.name.lower() for i in userrole_obj.role_type.all()]
+#        app_roles = ['community organizer','data entry operator','ceo','vertical specialist', 'field staff', 'master trainer', 'field level officer','development officer','case worker','team lead','director','issac']
+
+        # version_update = VersionUpdate.objects.filter().latest('id')
+        # updated_link = user_setup().get('updated_link', "")
+        updateapk = {"forceUpdate": "False",
+                     "appVersion": 0,
+                     "updateMessage": "New update available, download from playstore",
+                     "link": ""}
+        # if userrole_obj.role_type.filter(app_login=True).exists():
+
+        response = {
+            'message': "Logged in successfully",
+            'uId': user.id,
+            'first_name': '{} {}'.format(user.first_name, user.last_name),
+            'role_type': 0,
+            'role_name': "",
+            'partner_id': 0,
+        }
+        # elif [i.name.lower() for i in userrole_obj.role_type.all()] in ['data center cordinator', 'admin']:
+        #     message = "District Coordinator or admin Logged in"
+        # response = {
+        #     'message': message,
+        #     'uId': user.id,
+        #     'role_type': 0,
+        #     'role_name': "",
+        #     'partner_id': 0,
+        # }
+        # else:
+        # response = {
+        #     'message': 'Please contact administrator.',
+        #     'status': 0,
+        #     'uId': 0,
+        #     'role_type': 0,
+        #     'role_name': "",
+        #     'partner_id': 0,
+        #     'response_type': 0,
+        # }
+        response.update(
+            {'updateAPK': updateapk, 'activeStatus': 2, 'forceLogout': 0, })
+    else:
+        response_type = 0
+        error_msg = kwargs.get('error_msg', '')
+        response.update({'message': error_msg, 'status': 0,'activeStatus':kwargs.get('activeStatus'),'uId':0})
+    response.update({'responseType': response_type, 'updates': 60})
+    return JsonResponse(response)
 
 
 @csrf_exempt
