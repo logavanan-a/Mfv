@@ -416,10 +416,10 @@ class MasterLookUp(BaseContent):
         child_objlist = MasterLookUp.objects.filter(active=2, parent__id=self.id).order_by("-id")
         return child_objlist
 
-    def get_masterdata_locations(self):
-        locations = MasterDataLocation.objects.filter(masterdata=self,active=2).values_list('location',flat=True)
-        if not locations :
-            locations=""
-        else:
-            locations= ','.join(str(i) for i in locations)
-        return locations
+    # def get_masterdata_locations(self):
+    #     locations = MasterDataLocation.objects.filter(masterdata=self,active=2).values_list('location',flat=True)
+    #     if not locations :
+    #         locations=""
+    #     else:
+    #         locations= ','.join(str(i) for i in locations)
+    #     return locations

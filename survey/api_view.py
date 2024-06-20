@@ -913,7 +913,7 @@ class MasterlookupDetails(g.CreateAPIView):
                         'parent_id': i.parent.id if i.parent else 0,
                         'active': i.active,
                         'modified': datetime.strftime(i.modified, '%Y-%m-%d %H:%M:%S.%f'),
-                        'locations':i.get_masterdata_locations(),
+                        'locations':'',
                         } 
                         for i in masterlookup ]
                 response = {'status':1, 'message':"masterlookup success", 'data':data}
