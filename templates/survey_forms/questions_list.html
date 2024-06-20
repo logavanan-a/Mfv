@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% load common_tags %}
+{% block contents %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- <h1>data collection form > setting </h1> -->
+            <div class="col-md-12">
+                <div class="card">
+                <div class="card-body">
+                    <div class="card-header card-header-icon d-flex justify-content-between" data-background-color="rose">
+                        <div class="d-flex align-items-center">
+                            <i class="p-1 bx bx-paste" style="font-size: 18px;"></i>
+                            <h4 class="p-1 card-title" style="position: relative; top: 5px;">Activity questions</h4>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="p">
+                                <form autocomplete="off" method="GET" action="." id="search" class="search app-search d-none d-lg-block" style="padding: 0;">
+                                                       
+                                    <!-- new search bar -->
+                                    <div class="position-relative">
+                                        <input {% if txt %} value={{txt}} {%else%} value=""  {%endif%}  type="text" class="form-control" placeholder="Search by name..." style="width:100%" type="text" name = 'text' {% if txt %}value="{{txt}}" {% endif %}>
+                                        <span class="bx bx-search-alt"></span>
+                                    </div>
+                                </form>
+
+                            </div>
+                            <div  class="p">
+                                <a  href="{{request.path}}">
+                                    <input type="button" class="btn  btn-fill btn-rose btn-sm btn-filter " value=""  ><i class="bx bx-x" style="position: relative; top: 2px; font-size: 18px;" ></i> 
+                                </a>
+                            </div>
+                        </div>
+                        <div class="d-flex" style="gap:5px">
+                            <a href="/survey/">
+                                <button class="btn btn-primary btn-just-icon btn-round btn-dangerr btn-sm" rel="tooltip" title="Back" style="float:right">
+                                <em class="bx bx-left-arrow-circle" style="font-size: 18px;"></em>
+                                </button>
+                            </a>
+                            <a href="/question/add/{{pk}}/  ">
+                                <button class="btn btn-primary btn-just-icon btn-round btn-dribbble btn-sm" rel="tooltip" title="Add" style="float:right">
+                                <em class="bx bx-plus" style="font-size: 18px;"></em>
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-content card_section">
+                                    <div class="toolbar">
+                                        <!--        Here you can write extra buttons/actions for the toolbar              -->
+                                    </div>
+                                    <div class="material-datatables new_datatablefilter">
+
+                                            <div class="user_back datatable_search d-none">
+                                                <form autocomplete="off" method="GET" action="." id="search" class="search app-search d-none d-lg-block">
+                                                    <!-- <div class="form-group label-floating">
+                                                        <label class="control-label">Search</label>
+                                                        <input class="form-control" formcontrolname="text"  style="width:100%" type="text" name = 'text' {% if txt %}value="{{txt}}" {% endif %}>
+                                                    </div>
+                                                    <a href="/manage/questions/{{pk}}/">
+                                                        <button type="submit" class="search_field btn btn-white btn-round btn-just-icon">
+                                                                <i class="material-icons">search</i>
+                                                                <div class="ripple-container"></div>
+                                                            </button>
+                                                    </a> -->
+                                                    <!-- new search bar -->
+                                                    <div class="position-relative">
+                                                        <input type="text" class="form-control" placeholder="Search by name..." style="width:30%" type="text" name = 'text' {% if txt %}value="{{txt}}" {% endif %}>
+                                                        <span class="bx bx-search-alt"></span>
+                                                    </div>
+                                                </form>
+                                                
+                                            </div>
+                        <div class="add_back">
+                        </div>
+                        <div class="table-responsive width_section">
+                            <table class="table">
+                                <thead class="text-primary">
+                                    <th>Name</th>
+                                    <th>Code</th>
+                                    <th>Type</th>
+                                    <th>Parent Question</th>
+                                    <th>Status</th>
+                                    <th class="text-right d-flex justify-content-end">Actions</th>
+                                </thead>
+                                <tbody>
+                                    {% for question in object_list %}
+                                    <tr>
+                                        <td>{{ question.name }}</td>
+                                        <td>{{ question.code }}</td>
+                                        <td>{{ question.get_qtype_display }}</td>
+                                        <td>{{ question.parent.name }}</td>
+                                        <td>{{ question.get_active_display}}</td>
+                                        <td>
+                                            <div class="d-flex justify-content-end" style="gap:5px">
+                                                <a href="/question/edit/{{question.id}}/" class="ng-star-inserted">
+                                                    <button class="btn btn-just-icon btn-info btn-sm" rel="tooltip" title="Edit" style="float:right">
+                                                        <em class="bx bx-pencil" style="font-size:16px;"></em>
+                                                    </button>
+                                                </a>
+                                                
+                                                {% if language == True %}
+                                                <a href="/manage/languages/question/{{question.id}}/" title="Manage languages" class="ng-star-inserted">
+                                                    <button class="btn btn-primary btn-just-icon btn-rose btn-sm" rel="tooltip" title="Manage languages" style="float:right">
+                                                        <em class="bx bx-user-voice" style="font-size:16px;"></em>
+                                                    </button>
+                                                </a>
+                                                {% endif %}
+                                                {% if question.qtype in "In, GD" and question.qtype != 'D' %}
+                                                <a href="/manage/question/add/{{pk}}/{{question.id}}/" class="ng-star-inserted">
+                                                    <button class="btn btn-primary btn-just-icon btn-warning btn-sm" rel="tooltip" title="Add sub question"  style="float:right">
+    <!--                                                Add sub question-->
+                                                        <em class="bx bx-user-voice" style="font-size:16px;"></em>
+                                                    </button>
+                                                </a>
+                                                {% endif %}
+                                                {% if question.qtype in "S, R, C, T" %}
+                                                <a href="/choices/{{question.id}}/" class="ng-star-inserted">
+                                                    <button class="btn btn-light btn-just-icon btn-rose btn-sm" rel="tooltip" title="Manage Options" style="float:right">
+    <!--                                                Manage options-->
+                                                        <em class="bx bx-cog" style="font-size:16px;"></em>
+                                                    </button>
+                                                </a>
+                                                {% endif %}
+                                                {% if question.qtype in "S, R, C" %}
+                                                <a href="/skip-questions/{{question.id}}/"  class="ng-star-inserted">
+                                                    <button class="btn btn-just-icon btn-success btn-sm" rel="tooltip" title="Set rules" style="float:right"> 
+    <!--                                                Set rules-->
+                                                    <em class="bx bx-list-ul" style="font-size:16px;"></em>
+                                                    </button>
+                                                </a>
+                                                {% endif %}
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% if object_list %}
+                            {% include 'survey_forms/pagination.html' %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    
+<script>
+var txt = "{{txt}}"
+    if (txt != "None"){
+        $("#search").val(txt);
+    }
+</script>
+{% endblock %}

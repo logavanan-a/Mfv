@@ -20,6 +20,8 @@ import pytz
 from django.contrib.auth.models import User
 # from survey.serializers import *
 # from rest_framework.views import APIView
+from rest_framework.response import Response
+
 from ast import literal_eval
 from django.db.models import Q,F
 import sys, traceback
@@ -728,6 +730,97 @@ def languageassessmentlist(request):
                    "message": "No questions of different language has been tagged to this user", }
         return JsonResponse(res)
 
+def get_res_dict(k,modified_date,user_id,usm,query,res_dict):
+    if k == "MetricsQuestionConfiguration":
+        result = Question.objects.filter(
+            block__survey__id__in=usm, modified__gt=modified_date, is_grid=False)
+    elif k == "MetricsQuestionTranslation":
+        result = QuestionLanguageTranslation.objects.filter(
+            question__block__survey__id__in=usm, modified__gt=modified_date, question__is_grid=True)
+    elif k == "BlockLanguageTranslation":
+        result = Block.objects.filter(survey__id__in=usm, modified__gt=modified_date)
+    elif k == "ChoiceLanguageTranslation":
+        result = Choice.objects.filter(question__block__survey__id__in=usm, modified__gt=modified_date)
+    elif k == "QuestionLanguageTranslation":
+        result = Question.objects.filter(
+            block__survey__id__in=usm, modified__gt=modified_date)
+    else:
+        q = {query.get(k): usm, 'modified__gt': modified_date}
+        result = apps.get_model('survey', k).objects.filter(**q)
+    if result.count() > 0:
+        res_dict[k] = True
+    else:
+        res_dict[k] = False
+    return res_dict
+
+
+@csrf_exempt
+def updatedtables(request):
+    if request.method == 'POST':
+        user_id = request.POST.get("uId")
+#        usm = list(set(DetailedUserSurveyMap.objects.filter(
+#            user__user__id=int(user_id)).values_list('survey__id', flat=True)))
+        usm = Survey.objects.filter(active=2).values_list('id', flat=True)
+        query = {
+            "Block": "survey__id__in",
+            "BlockLanguageTranslation": "block__survey__id__in",
+            "Question": "block__survey__id__in",
+            "QuestionLanguageTranslation": "question__block__survey__id__in",
+            "Choice": "question__block__survey__id__in",
+            "SkipMandatory": "question__block__survey__id__in",
+            "ChoiceLanguageTranslation": "choice__question__block__survey__id__in",
+        }
+        res_dict = {}
+        updated_dict = request.POST.get('UpdatedDateTime')
+        updated_dict = literal_eval(updated_dict)
+
+        updated_dict["BlockLanguageTranslation"] = updated_dict.pop(
+            "LanguageBlock")
+        print(updated_dict)        
+        updated_dict["QuestionLanguageTranslation"] = updated_dict.pop(
+            "LanguageQuestion")
+        updated_dict["MetricsQuestionConfiguration"] = updated_dict.pop(
+            "Assessment")
+        updated_dict["MetricsQuestionTranslation"] = updated_dict.pop(
+            "LanguageAssessment")
+        updated_dict["Choice"] = updated_dict.pop("Options")
+        updated_dict["ChoiceLanguageTranslation"] = updated_dict.pop(
+            "LanguageOptions")
+        updated_dict.pop("SkipRules")
+        updated_dict.pop("LanguageLabels")
+#        updated_dict.pop("MetricsQuestionConfiguration")
+        updated_dict.pop("MetricsQuestionTranslation")
+        for k, v in updated_dict.items():
+            if v != "":
+                modified_date = convert_string_to_date(str(v))
+                get_res_dict(k,modified_date,user_id,usm,query,res_dict)
+            else:
+                res_dict[k] = True
+            res_dict["SkipRules"] = False
+            res_dict["LanguageLabels"] = False
+            res_dict["MetricsQuestionTranslation"] = True
+        res_dict["LanguageBlock"] = res_dict.pop("BlockLanguageTranslation")
+        res_dict["LanguageQuestion"] = res_dict.pop(
+            "QuestionLanguageTranslation")
+        res_dict["Assessment"] = res_dict.pop("MetricsQuestionConfiguration")
+        res_dict["LanguageAssessment"] = res_dict.pop(
+            "MetricsQuestionTranslation")
+        res_dict["Options"] = True if res_dict.get("Choice") else False
+        res_dict["LanguageOptions"] = res_dict.pop("ChoiceLanguageTranslation")
+        # userprofile_obj = UserRoles.objects.get(user__id=user_id)
+        # version_update = VersionUpdate.objects.filter().latest('id')
+        # updated_link = user_setup().get('updated_link',"") 
+        updateapk = {"forceUpdate": "",
+                     "appVersion": 0,
+                     "updateMessage": "New update available, download from playstore",
+                     "link":""}
+        res = {'status': 2,
+               'message': 'updated successfully',
+               'updatedTables': res_dict}
+        res.update({'updateAPK': updateapk,
+                    'activeStatus': 2, 'forceLogout': 0, })
+        res.update({'state_id':''})
+    return JsonResponse(res, safe=False)
 
 
 
@@ -762,6 +855,44 @@ def languagelist(request):
                     "message":"No languages has been tagged to this user",}
         return JsonResponse(res)        
 
+@csrf_exempt
+def program_responses_list(request):
+    if request.method == 'POST':
+        user_id = request.POST.get("userid")
+        user = User.objects.get(id=user_id)
+        updatedtime = request.POST.get("serverdatetime")
+        partner_obj = UserRoles.objects.get(user_id=int(user_id)).partner
+        survey_list=Survey.objects.filter(active=2,survey_module=1)
+        # survey_module = 1 for programs responses in swayam instance
+        user_roles,locations = get_user_based_roles_locations(user)
+        if not 'TEAM LEAD' in user_roles:
+            responses = groups_roles_locations_based_responses(survey_list,user)
+            responses_ids = list(set(responses))
+            user_list = UserRoles.objects.filter(partner=partner_obj).values_list('user',flat=True)
+            flag = ""
+            ben_uuid = ""
+            fac_uuid = ""
+            responses = JsonAnswer.objects.filter(active=2, id__in=responses_ids)
+            if updatedtime:
+                updated = convert_string_to_date(updatedtime)
+                responses = responses.filter(modified__gt=updated)
+                flag = False
+            responses = responses.filter().order_by('modified')[:100]
+            res_list = get_common_responses_details(responses,partner_obj,user_id)
+        else:
+            res_list = []
+        if res_list:
+            res = {'status': 2,
+                   'message': "Success",
+                   "ResponsesData": res_list, }
+        elif flag == False:
+            res = {"status": 2,
+                   "message": "Data already sent", }
+        else:
+            res = {"status": 0,
+                   "message": "No responses for this user", }
+        return JsonResponse(res)
+    
 class MasterlookupDetails(g.CreateAPIView):
     
     def post(self, request):
@@ -782,7 +913,7 @@ class MasterlookupDetails(g.CreateAPIView):
                         'parent_id': i.parent.id if i.parent else 0,
                         'active': i.active,
                         'modified': datetime.strftime(i.modified, '%Y-%m-%d %H:%M:%S.%f'),
-                        'locations':i.get_masterdata_locations(),
+                        'locations':'',
                         } 
                         for i in masterlookup ]
                 response = {'status':1, 'message':"masterlookup success", 'data':data}
@@ -791,6 +922,243 @@ class MasterlookupDetails(g.CreateAPIView):
         except Exception as e:
             response = {'message': e.args[0], 'status': 0, 'data':data}
         return Response(response)
+
+
+def file_respone_details(res):
+    import mimetypes
+    file_data = ResponseFiles.objects.filter(active=2,content_type = ContentType.objects.get_for_model(res),object_id = res.id)
+    file_data_list = []
+    approved_status=''
+    try:
+        for fl_obj in file_data:
+            '''
+                * Below if condition is to send approve status of each and every file of response
+                * Technically using for Content from cluster for KHPT/Sphoorthi
+            '''
+            inline_index = ''
+            if res.survey.extra_config.get('cluster_activity') == 2:
+                approved_status = 1 if fl_obj.approve else 0
+            if fl_obj.response_image:
+                # import ipdb;ipdb.set_trace()
+                file_type_ext = mimetypes.MimeTypes().guess_type(fl_obj.response_image.file.name)[0].split('/')
+                if 'image' in file_type_ext[0] or 'video' in file_type_ext[0]:
+                    file_type = file_type_ext[0]
+                else:
+                    file_type = file_type_ext[1]
+                if fl_obj.question.parent and fl_obj.question.parent.qtype == 'In':
+                    inline_index = fl_obj.index if fl_obj.index else ''
+                file_data_list.append({"unique_id":fl_obj.creation_key,
+                                        "capture_time":fl_obj.created.strftime("%Y-%m-%d %H:%M:%S.%f"), 
+                                        "path":fl_obj.response_image.name,
+                                        "filetype":file_type,"qid":fl_obj.question.id,
+                                        "approved_status":approved_status,
+                                        "inline_index" : inline_index
+
+                                        })
+    except:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        error_stack = repr(traceback.format_exception(exc_type, exc_value, exc_traceback))
+        logging.error(error_stack)
+    return file_data_list
+
+def get_common_responses_details(responses,partner_obj,user_id , user_roles=None):
+    res_list = []
+    flag = ""
+    ben_uuid = ""
+    fac_uuid = ""
+    for res in responses:
+        address_dict = {}
+        if res.response.get('address') and res.survey.questions().filter(qtype='AW').exists():
+            qid = res.survey.questions().filter(qtype='AW')[0].id
+            address_dict = res.response.get('address').get('1').get(str(qid))
+        if (res.survey.survey_type == 0 and res.get_beneficiary_object() and res.get_beneficiary_object().partner == partner_obj) or (res.user and str(res.user.id) == str(user_id)) or user_setup().get('share-approve-based-response') == 2:
+            if not type(res.cluster) == list:
+                cluster_beneficiary = res.cluster.get('BeneficiaryResponse', '') if res.cluster else ''
+            else:
+                cluster_beneficiary = ''
+            grid_inline_questions = map(int,res.survey.questions().filter(qtype__in=['GD', 'In']).values_list('id',flat=True))
+            if res.survey.survey_type == 0:
+                cluster_id = res.get_beneficiary_object().get_beneficiary_address()
+                cluster_name = Boundary.objects.get_or_none(id=cluster_id)
+            else:
+                try:
+                    cluster_id = res.get_response_location()
+                    cluster_name = Boundary.objects.get_or_none(id=cluster_id) if cluster_id else ''
+                except:
+                    cluster_name =''
+            if res.cluster.get('Training'):
+                ben_obj = BeneficiaryResponse.objects.get_or_none(creation_key=res.cluster.get('Training'))
+                training_uuid = JsonAnswer.objects.get_or_none(id=ben_obj.json_answer_id).creation_key if ben_obj else ''
+            else:
+                training_uuid =''
+#            if res.survey.survey_module == 2:
+#                # this is to specify if the user logged in is tagged with the survivor activits groups or not 
+#                # to know who is the leading the groups
+#                active = 2 if res.lead_user and str(res.lead_user.id) == str(user_id) else 0
+#            else: 
+            try:
+                active = res.cluster['active']
+            except:
+                if user_roles and 'lead-caseworker' in RoleTypes.objects.filter(id__in=user_roles).values_list('slug',flat=True):
+                    active = res.active if res.lead_user_id ==int (user_id) or not res.lead_user_id else 0
+                else:
+                    active = res.active
+            files_data = file_respone_details(res)
+            '''
+            #1 did only in KHPT for sending approved/pending status of peer girls response
+            approved_status = ''
+            if res.survey.extra_config.get('beneficiary_as_user'):
+                approved_status = 0
+                role_obj = UserRoles.objects.get_or_none(uuid=res.creation_key)
+                if role_obj and role_obj.user.is_active:
+                    approved_status = 1
+            #1
+            
+            #2 KHPT special programs ('shared survey')
+            sr_st = 0
+            if res.survey.extra_config.get('shared_activity'):
+                sp_prog = SharedResponseUserRelation.objects.get_or_none(response_id=res.id)
+                if sp_prog:
+                    if sp_prog.status == 3:
+                        approved_status = 0
+                    else:
+                        approved_status = sp_prog.status
+                    sr_st = sp_prog.share_status
+                else:
+                    sr_st,approved_status = 0,''
+            '''
+            # 2
+            if res.survey.extra_config.get('share_response') == 2:
+                approved_status = 0
+                if ResponseFiles.objects.filter(content_type=ContentType.objects.get_for_model(res),object_id=res.id).exists():
+                    try:
+                        rf = ResponseFiles.objects.get_or_none(content_type=ContentType.objects.get_for_model(res),object_id=res.id)
+                    except:
+                        rf = None
+                    if rf:
+                        approved_status = 1 if rf.approve == True else 0
+            res_list.append({"response_id": res.id,
+                            "app_answer_on": datetime.strftime(
+                                 res.app_answer_on, '%Y-%m-%d %H:%M:%S') if res.app_answer_on else '',
+                             "bene_uuid": res.creation_key,
+                             "l_id": str(res.language.id) if res.language else '1',
+                             "survey_id": int(res.survey.id),
+                             "cluster_id": int(cluster_id) if cluster_id != None and cluster_id != '' and cluster_id != 'None' else 0,
+                             "cluster_name": cluster_name.name if cluster_name else '',
+                             "ben_parent_uuid":res.get_beneficiary_object().creation_key if res.get_beneficiary_object() else '',
+                             "response_dump":get_actual_response(res.response),
+                             "collected_date": datetime.strftime(
+                                 res.submission_date, '%Y-%m-%d'),
+                             "active": active,
+                             "server_date_time": datetime.strftime(
+                                 res.modified, '%Y-%m-%d %H:%M:%S.%f'),
+                             'location': address_dict,
+                             'cluster_beneficiary': cluster_beneficiary,
+                             'training_survey':res.training_survey.id if res.training_survey else 0,
+                             'training_survey_id': str(res.beneficiary_type.get_survey().id) if res.beneficiary_type else "",
+                             'training_uuid': training_uuid,
+                             'grid_inline_questions': grid_inline_questions,
+                             'facility_uuid':res.cluster.get('Facility',''),
+                             'batch_uuid':res.cluster.get('Batch',''),
+                             'task_uuid':res.cluster.get('Task',''),
+                             'image_info': res.get_image_info(),
+                             'user_id':res.user.id if res.user else '',
+                             'child_reference_id':res.cluster.get('child_reference_id',''),
+                             'files_info':files_data,
+                             # 'approved_status':approved_status,
+                             # 'sr_st':sr_st,
+                             'project_id':res.cluster.get('project_id' , 0),
+                             })
+    return res_list
+
+import itertools       
+def user_based_group_responses():
+
+#    """if 'lead-caseworker' in RoleTypes.objects.filter(id__in=user_roles).values_list('slug',flat=True):
+#        #responses = list(itertools.chain(JsonAnswer.objects.filter(survey__id=survey_list.values_list('id',flat=True),lead_user=user).values_list('id',flat=True)))
+#        responses = list(itertools.chain(JsonAnswer.objects.filter(survey__id=survey_list.values_list('id',flat=True)).values_list('id',flat=True)))
+#    else:"""
+    responses = list(itertools.chain(JsonAnswer.objects.filter().values_list('id',flat=True)))
+    return responses
+def get_survivors_linkages_responses():
+    # if 'lead-caseworker' in RoleTypes.objects.filter(id__in=user_roles).values_list('slug',flat=True):
+    try:
+        # ben_ids = BeneficiaryResponse.objects.filter(json_answer_id__in=responses)
+        # linkages = BeneficiaryLink.objects.filter(object_id__in=ben_ids,content_type=ContentType.objects.get_for_model(BeneficiaryResponse.objects.get_or_none(id=ben_ids[0].id))).values_list('object_id1',flat=True)
+        linkage_responses = list(itertools.chain(JsonAnswer.objects.filter().values_list('id',flat=True)))
+    except:
+        linkage_responses=[]
+    # else:
+    #     linkage_responses=[]
+    return linkage_responses
+
+def lead_activites_responses(user,user_roles):
+    activity_list=[]
+    act_responses=[]
+    # if not 'lead-caseworker' in RoleTypes.objects.filter(id__in=user_roles).values_list('slug',flat=True):
+    surveys = Survey.objects.filter(survey_module)
+    surveys = Survey.objects.filter(survey_module=2)
+    for i in surveys:
+        activities = list(itertools.chain(Survey.objects.filter(config__0__content_type_1='BeneficiaryType',config__0__object_id_1=str(i.object_id)).values_list('id',flat=True)))
+        activity_list.extend(activities)
+    act_responses = list(itertools.chain(JsonAnswer.objects.filter(survey__id__in=activity_list).values_list('id',flat=True)))
+    return act_responses
+
+@csrf_exempt
+def avtivist_group_responses(request):
+    if request.method == 'POST':
+        user_id = request.POST.get("userid")
+        user = User.objects.get(id=user_id)
+#        """#updatedtime = request.POST.get("serverdatetime")"""
+        partner_obj = UserPartnerMapping.objects.get(user_id=int(user_id)).partner
+        survey_list=Survey.objects.filter(active=2,survey_module=2)
+#        """# survey_module = 2 for survivor activits group in swayam instance"""
+        # user_roles,locations = get_user_based_roles_locations(user)
+        responses = user_based_group_responses()
+        linkage_responses = get_survivors_linkages_responses()
+        if linkage_responses:
+            responses.extend(linkage_responses)
+        # activity_responses = lead_activites_responses(user,user_roles)
+        # responses.extend(activity_responses)
+        user_list = UserRoles.objects.filter(partner=partner_obj).values_list('user',flat=True)
+        flag = ""
+        ben_uuid = ""
+        fac_uuid = ""
+        responses = JsonAnswer.objects.filter(active=2, id__in=responses)
+#        if updatedtime:
+#            updated = convert_string_to_date(updatedtime)
+#            responses = responses.filter(modified__gt=updated)
+#            flag = False
+#        responses = responses.filter().order_by('modified')[:100]
+        res_list = get_common_responses_details(responses,partner_obj,user_id, user_roles)
+        if res_list:
+            res = {'status': 2,
+                   'message': "Success",
+                   "ResponsesData": res_list, }
+        elif flag == False:
+            res = {"status": 2,
+                   "message": "Data already sent", }
+        else:
+            res = {"status": 0,
+                   "message": "No responses for this user", }
+        return JsonResponse(res)
+    
+# class ProgramRetreiveLinkages(CreateAPIView):
+#     serializer_class = LinkageListingSerializer
+#     def post(cls, request, format=None):
+#         response = {'status': "success", "message": "successfully done"}
+#         serializer = LinkageListingSerializer(data=request.data)
+#         if serializer.is_valid():
+#             data_dict = {'content_type':ContentType.objects.get_for_model(BeneficiaryResponse),
+#                 'content_type1':ContentType.objects.get_for_model(BeneficiaryResponse),
+#                 'relation':None,
+#                 'survey_relation':1
+#                 }
+#             linkage_list,flag = get_common_linkage_details(request,data_dict)
+#             response.update({'linkages': linkage_list})
+#         else:
+#             return get_serializer_errors(serializer)
+#         return Response(response)    
     
 
 @csrf_exempt

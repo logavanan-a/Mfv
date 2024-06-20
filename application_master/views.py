@@ -5,11 +5,15 @@ from django.apps import apps
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
 from mis . views import *
-# Create your views here.
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from rest_framework.response import Response
+from rest_framework import generics as g
+from django.contrib.auth.models import User
+from rest_framework import permissions
 from django.db import transaction
 from rest_framework.views import APIView
 from application_master.serializers import LoginAndroidSerializer
-from rest_framework.response import Response
 
 def master_list_form(request,model):
     heading = 'user profile'    
@@ -404,6 +408,72 @@ class LoginAndroidView(APIView):
             return Response(error_dict)
         return Response(response)
 
+@method_decorator(csrf_exempt, name='dispatch')
+class UserlistAndroid(g.CreateAPIView):
+
+    # authentication_class = (ExpiringTokenAuthentication,)
+    # permission_classes = (permissions.IsAuthenticated,)
+
+    def post(cls, request, format=None):
+        """
+        API of users for android
+        ---
+        parameters:
+        - name: user_id
+          description: Pass user id
+          required: true
+          type: integer
+          paramType: form
+        """
+        data = request.data
+        if not data.get('user_id'):
+            return Response({'status':0,'message':'user id required'})
+        try:
+            userlist = User.objects.filter().order_by("-id")
+            response=[]
+            for i in userlist:
+                user_info = {'id': i.id,
+                         'name': i.get_full_name(),
+                         'username':i.username,
+                         'email': i.email,
+                         'mobile_number': "",
+                         }
+                # role_obj = UserRoles.objects.get_or_none(user = i)
+                # if role_obj:
+                #     role_id = all()[0].user_role_ids()
+                # else:
+                role_id = i.groups.all()[0].id
+                user_info.update(role_id = role_id)
+                response.append(user_info)
+            return Response({'message':'success','status':2,'users':response})
+        except Exception as e:
+            response = [{'message': e.args[0], 'status': 0}]
+        return Response(response)
+    
+class RoleTypesListAndroid(g.CreateAPIView):
+
+    def post(self, request, format=None):
+        """
+        API to list of roles for android
+        parameters:
+        - name: user_id
+          description: Pass user id
+          required: true
+          type: integer
+          paramType: form
+        """
+        if not request.data.get('user_id'):
+            return Response({'status':0,'message':'user_id required'})
+        try:
+            objs = Group.objects.filter(active=2).order_by('-id')
+            data=[{'id': i.id, 
+            			'name':i.name,
+            			} for i in objs]
+            			
+            response = {'message':"Successfully Retrieved",'status':2,'roles':data}
+        except Exception as e:
+             response = {'message': e.args[0], 'status': 0}
+        return Response(response)
 
 def stripmessage(errors):
     for i, j in errors.items():

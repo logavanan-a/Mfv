@@ -1,0 +1,417 @@
+{% extends "base.html" %}
+{% block contents %}
+
+
+<!-- TOGGLE POPUP FOR THE WARNING  -->
+<div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-body">
+            <div class="modal-header">
+                <h4 class="modal-title">Are You Sure You want to Deactivate.
+                    You won't be able to activate it again please confirm !
+                </h4>
+            </div>
+            <form method="POST" action="/manage/deactivate-activity/{{survey_obj.id}}/" class="form-horizontal">{% csrf_token %}
+
+                <div class="card-content">
+                    <h4 class="card-title"></h4>
+                    <div class="col-md-12 validate_height" id="div_name">
+                        <label class="col-sm-12 label-on-right">Reason For Deactivating <span class="required">*</span></label>
+                        <div class="col-sm-12" >
+                            <div class="form-group label-floating is-empty" >
+                                
+                                <select class="form-control" data-width="100%" data-style="select-with-transition" name="reason" id="theme_id" required >
+                                    <option value="">---------------</option>
+                                    {% for reason in survey_deactivate_reasons %}
+                                    <option value="{{ reason.0}}">{{ reason.1 }}</option>
+                                    {% endfor %}
+                                </select>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 text-right choose_right d-flex justify-content-end mt-3" style="gap: 10px;">
+                    <input type="button" class="btn btn-primary  btn-fill btn-sm" data-bs-dismiss="modal" value="Close">
+                    <input type="submit" class="btn btn-fill btn-danger btn-sm" value="Deactivate">
+                </div>
+
+            </form>
+            <!-- <div class="modal-body"> -->
+            <!-- <h3>Reason For Deactivating</h3> -->
+            <!-- </div> -->
+            <!-- <div class="modal-footer"> -->
+
+            <!-- </div> -->
+        </div>
+        </div>
+    </div>
+</div>
+<!-- Deactivate Form Wraning HTML Closes-->
+
+<div class="content">
+    <!-- <h1> data collectin add form</h1> -->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                <div class="card-body">
+                    <form method="POST" action="." class="form-horizontal" id="survey">{% csrf_token %}
+                        <div class="card-header card-header-icon mb-3" data-background-color="rose">
+                            <div class="d-flex align-items-center">
+                                <i class="p-1 bx bx-paste" style="font-size: 18px;"></i>
+                                <h4 class="p-1 card-title" style="position: relative; top: 5px;">{% if add %}Create{% else %}Update{% endif %} Activity</h4>
+                            </div>
+
+                        </div>
+                        {% if error %} <div class="col-md-12"><div class="error_alert"><h3>{{error}}</h3></div></div>{% endif %}
+                        
+                        <div class="row card-content">
+                            <div class="col-md-6 validate_height mb-3" id="div_name">
+                                <label class="col-sm-12 label-on-left">Activity Name <span class="required">*</span></label>
+                                <div class="col-sm-12">
+                                    <div class="form-group label-floating is-empty">
+                                        <!-- <label class="control-label"></label> -->
+                                        <input type="text" class="form-control" value="{% if name %}{{name}}{% endif %}" name="name">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 validate_height mb-3" id="div_survey_type">
+                                <label class="col-sm-12 label-on-left">Activity type <span class="required">*</span></label>
+                                <div class="col-sm-12">
+                                    <div class="form-group label-floating">
+                                        <!-- <label class="control-label"></label> -->
+                                        <select class="col-sm-12 form-control  " data-style="select-with-transition" name="survey_type" id="survey_type_id">
+                                            <option value="">---------------</option>
+                                            {% for survey_type in survey_type_choices %}
+                                            <option value="{{ survey_type.0}}">{{ survey_type.1 }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 validate_height mb-3" id="div_section">
+                                <label class="col-sm-12 label-on-left">Activity section <span class="required">*</span></label>
+                                <div class="col-sm-12">
+                                    <div class="form-group label-floating is-empty padding_top">
+                                        <!-- <label class="control-label"></label> -->
+                                        <input type="radio" id="2" name="survey_section" value="2">
+                                        <label for="2">Beneficiary</label>
+                                        <input type="radio" id="1" name="survey_section" value="1">
+                                        <label for="1">Location</label>
+										<!-- <input type="radio" id="4" name="survey_section" value="4">
+                                        <label for="4">Role</label> -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 validate_height mb-3" id="div_beneficiary_type">
+                                <label class="col-sm-12 label-on-left">Select participant type <span class="required">*</span></label>
+                                <div class="col-sm-12">
+                                    <div class="form-group label-floating">
+                                        <!-- <label class="control-label"></label> -->
+                                        <select class="col-sm-12 form-control" data-style="select-with-transition" name="beneficiary_type_id" id="beneficiary_type_id">
+                                            <option value="">---------------</option>
+                                            {% for beneficiary_type in beneficiary_types %}
+                                            <option value="{{ beneficiary_type.id }}">{{ beneficiary_type.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 validate_height mb-3" id="div_level">
+                                <label class="col-sm-12 label-on-left">Select level <span class="required">*</span></label>
+                                <div class="col-sm-12">
+                                    <div class="form-group label-floating">
+                                        <!-- <label class="control-label"></label> -->
+                                        <select class="col-sm-12 form-control " data-style="select-with-transition" name="level_id" id="level_id">
+                                            <option value="">---------------</option>
+                                            {% for level in levels %}
+                                            <option value="{{ level.id }}">{{ level.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+							<div class="col-md-6 validate_height mb-3" id="div_role">
+                                <label class="col-sm-12 label-on-left">Select role <span class="required">*</span></label>
+                                <div class="col-sm-12">
+                                    <div class="form-group label-floating">
+                                        <!-- <label class="control-label"></label> -->
+                                        <select class="col-sm-12 form-control" data-style="select-with-transition" name="role_id" id="role_id">
+                                            <option value="">---------------</option>
+                                            {% for role in roles %}
+                                            <option value="{{ role.id }}">{{ role.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 validate_height mb-3" id="div_periodicity">
+                                <label class="col-sm-12 label-on-left">Activity Periodicity <span class="required">*</span></label>
+                                <div class="col-sm-12">
+                                    <div class="form-group label-floating">
+                                        <!-- <label class="control-label"></label> -->
+                                        <select class="col-sm-12 form-control" data-style="select-with-transition" name="periodicity" id="periodicity_id" required>
+                                            <option value="">---------------</option>
+                                            {% for periodicity in periodicity_choices %}
+                                            <option value="{{ periodicity.0}}">{{ periodicity.1 }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 validate_height mb-3" id="div_cp_level">
+                                <label class="col-sm-12 label-on-left">Capture Level <span class="required">*</span></label>
+                                <div class="col-sm-12">
+                                    <div class="form-group label-floating">
+                                        <!-- <label class="control-label"></label> -->
+                                        <select class="col-sm-12 form-control" data-style="select-with-transition" name="cp_level" id="cp_level_id">
+                                            <option value="">---------------</option>
+                                            {% for cp_level in capture_level_choices %}
+                                            <option value="{{ cp_level.0}}">{{ cp_level.1 }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 validate_height mb-3" id="div_order">
+                                    <label class="col-sm-12 label-on-left"> Order<span class="required">*</span></label>
+                                    <div class="col-sm-12">
+                                        <div class="form-group label-floating is -empty">
+                                            <!-- <label class="control-label"></label> -->
+                                            <input type="text" class="form-control" value="{% if survey_order %}{{survey_order}}{% endif %}" name="survey_order">
+                                        </div>
+                                    </div>
+                            </div>
+                           
+                               <!-- <div class="row" id="div_theme">
+                                    <label class="col-sm-2 label-on-left">Activity Theme</label>
+                                    <div class="col-sm-6">
+                                        <div class="form-group label-floating">
+                                            <label class="control-label"></label>
+                                            <select class="selectpicker" data-style="select-with-transition" name="theme_id" id="theme_id">
+                                                <option value="">---------------</option>
+                                                {% for theme in themes %}
+                                                <option value="{{ theme.id}}">{{ theme.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div-->
+
+                                {% if add %}
+                                    <div class="col-md-12 text-right choose_right mt-3 d-flex justify-content-end" style="gap:10px" >
+                                        <a href="/survey/">
+                                            <span class="btn btn-danger btn-fill btn-sm">Cancel</span>
+                                        </a>
+                                    <input type="submit"  class="btn btn-primary btn-fill btn-sm" value="Save">
+                                {% else %}
+                                    {% if survey_obj.active == 2 %}
+
+                                      
+                                            <div class="col-md-12 mt-3 d-flex justify-content-between" style="gap:10px">
+                                                <!--##########################################-->
+                                                <div class="p text-left choose_left">
+                                                    <a href="#" class="btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#basicModal"> <span class="btn-danger btn-sm">Deactivate</span></a>
+                                                    <input type="hidden">
+                                                </div>
+                                                <div class="p text-right choose_right">
+                                                    <a href="/survey/">
+                                                        <span class="btn btn-danger btn-fill btn-sm">Cancel</span>
+                                                    </a>
+                                                    <input type="submit" class="btn btn-primary btn-fill btn-rose btn-sm" value="Save">
+                                                </div>
+                                            <!-- <button class="btn-danger">Deactivate</button>    -->
+                                    {% else %}
+                                    <div class="row mt-3">
+                                        
+                                        <div class="col-md-12 validate_height  " id="div_DeactivateDetails" style="gap:10px">
+                                            <label class="label-on-left"><h5>Deactivation Details</h5></label><br>
+                                            <!-- <label class="col-md-3 label-on-left"><b>Deactivation Details</b></label><br><hr> -->
+                                            <label class="label-on-left"><b>Deactivation Reason :</b></label>{% if survey_obj.deactivated_reason %} {{survey_obj.deactivated_reason}} {% else %}  Not Available {% endif %} <br>
+                                            <label class="label-on-left"><b> Deactivated Date  :</b></label>{% if survey_obj.deactivated_date %}    {{survey_obj.deactivated_date }} {% else %}  Not Available {% endif %}<br>
+                                            <label class="label-on-left"><b>Deactivated By  :</b></label>   {% if survey_obj.deactivated_user %}    {{survey_obj.deactivated_user.username }} {% else %} Not Available {% endif %}
+        
+                                        </div>
+                                        <div class="col-md-12 text-right choose_right">
+                                            <a href="/manage/activities/">
+                                                <span class="btn btn-primary btn-fill btn-sm">Back</span>
+                                            </a>
+                                    {% endif%}
+                                {% endif %}
+                            <!-- <div class="ripple-container"></div> -->
+                            </div>
+                                    </div>
+                        </div>
+                    </div></form>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_javascript %}
+{% if edit %}
+<script>
+    $(document).ready(function() {
+        $.ajax({
+            type:"GET",
+            url:"/survey/get_survey_details/{{pk}}/",
+            dataType: "json",
+            data: {'id':'{{pk}}'},
+            success: function(d) {
+                if (d.status == 2){
+                    $( "input[name='name']" ).val(d.survey_details.name);
+                    $( "select[name='survey_type']" ).val(d.survey_details.survey_type);
+                    $( "select[name='periodicity']" ).val(d.survey_details.periodicity);
+                    $( "select[name='cp_level']" ).val(d.survey_details.cp_level);
+                    //$( "select[name='order']").val(d.survey_details.order)
+                    //$( "select[name='theme_id']" ).val(d.survey_details.theme_id);
+                    display_fields_type_based(parseInt(d.survey_details.survey_type))
+                    $( "select[name='level_id']" ).val(d.survey_details.location_id);
+                    if (parseInt(d.survey_details.type) == 2){
+                        $( "select[name='beneficiary_type_id']" ).val(d.survey_details.beneficiary_type_id);
+                    }
+					if (parseInt(d.survey_details.type) == 4){
+                        $( "select[name='role_id']" ).val(d.survey_details.role_id);
+                    }
+                    $('#'+d.survey_details.type).prop('checked', true);
+                    display_fields_section_based(parseInt(d.survey_details.type))
+                    $('.selectpicker').selectpicker('refresh')
+                    
+                }
+            }
+        });
+    });
+</script>
+{% endif %}
+
+<script src="/static/js/jquery.validate.js"></script>
+
+<script>
+    function display_fields_section_based(id){
+        if (id == 2 && id != ''){
+            $("#level_id").val('');
+            $("#div_level").hide();
+			$("#role_id").val('');
+            $("#div_role").hide();
+            $("#div_beneficiary_type").show();
+        }
+        else if (id == 1){
+            $("#beneficiary_type_id").val('');
+            $("#div_beneficiary_type").hide();
+			$("#role_id").val('');
+            $("#div_role").hide();
+            //if ('{{add}}' != 'True'){
+                $("#div_level").show();
+                $('#1').prop('checked', true);
+            //}
+        }
+        else if(id == 3){
+            $("#level_id").val('');
+            $("#div_level").hide();
+            $("#beneficiary_type_id").val('');
+            $("#div_beneficiary_type").hide();
+  			$("#role_id").val('');
+            $("#div_role").hide();
+			$("#role_id").val('');
+            $("#div_role").hide();
+        }
+		else if(id == 4){
+            $("#level_id").val('');
+            $("#div_level").hide();
+            $("#beneficiary_type_id").val('');
+            $("#div_beneficiary_type").hide();
+            $("#div_role").show();
+        }
+        $('.selectpicker').selectpicker('refresh')
+    }
+    function display_fields_type_based(id){
+        if (id == 0 && id != ""){
+                $("#div_section").show();
+                $("#1").hide();
+                $('label[for="1"]').hide();
+                $("#3").hide();
+                $('label[for="3"]').hide();
+                $("#div_level").hide();
+                $("#div_section").show();
+                $("#div_beneficiary_type").show();
+                $('#2').prop('checked', true);
+				$("#4").hide();
+				$('label[for="4"]').hide();
+           }
+           else if (id == 1){
+                $("#div_section").show();
+                $("#1").show();
+                $('label[for="1"]').show();
+                $("#3").show();
+                $('label[for="3"]').show();
+                $("#div_beneficiary_type").show();
+                $('#2').prop('checked', false);
+				$("#4").show();
+				$('label[for="4"]').show();
+                display_fields_section_based(id)
+           }
+           else{
+               $("#div_section").hide();
+               $("#div_beneficiary_type").hide();
+               $("#div_level").hide();
+           }
+    }
+    $(document).ready(function() {
+        if ('{{edit}}' == 'True'){
+            var active = '{{survey_obj.active}}'
+            if(active == 0){
+                $('#survey').find(':input').attr('disabled', 'disabled');
+            } 
+        }
+
+        if ('{{add}}' == 'True'){
+            $("#div_section").hide();
+            $("#div_beneficiary_type").hide();
+            $("#div_level").hide();
+			$("#div_role").hide();
+            if ('{{survey_type}}'){
+                $( "select[name='survey_type']" ).val('{{survey_type}}');
+                display_fields_type_based('{{survey_type}}')
+                $( "select[name='beneficiary_type_id']" ).val('{{beneficiary_type_id}}');
+                $( "select[name='level_id']" ).val('{{location_id}}');
+                $( "select[name='periodicity']" ).val('{{periodicity}}');
+               
+               
+            }
+            $('.selectpicker').selectpicker('refresh')
+        }
+        $("#survey").validate({
+            rules :
+            {
+                name: {required: true},
+                survey_type: {required: true},
+                beneficiary_type_id: {required: true},
+                level_id: {required: true},
+                periodicity: {required: true},
+                survey_section: {required: true},
+                survey_order:{required:true},
+                cp_level:{required:true},
+            },
+        });
+    $('input[name="survey_section"]').on('change', function(){
+        var id=$(this).val();
+        display_fields_section_based(id)
+    });
+    $('#survey_type_id').change(function(){
+           var id=$(this).val();
+           display_fields_type_based(id)
+        });
+    });
+</script>
+
+
+
+{% endblock %}

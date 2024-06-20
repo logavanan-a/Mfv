@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block contents %}
+{% load configuration_tags %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                <div class="card-body">
+                    <form method="POST" action="." class="form-horizontal" id="survey">{% csrf_token %}
+                        <div class="card-header card-header-icon mb-3" data-background-color="rose">
+                            <div class="d-flex align-items-center" >
+                                <i class="p-1 bx bx-detail" style="font-size: 18px;"></i>
+                                <h4 class="p-1 card-title" style="position: relative; top: 5px;" >Select questions to display</h4>
+                                
+                        
+
+                            </div>
+                            
+                        </div>
+                        {% if error %}<div class="col-md-12"><div class="error_alert"><h3>{{error}}</h3></div></div>{% endif %}
+                        <div class="card-content mb-3">
+                            <h4 class="card-title">Skip questions({{question_object.text}})</h4>
+                            {% for choice in question_object.get_choices %}
+                            <div class="col-md-6" id="div_{{choice.text}}">
+                                <label class="col-sm-4 label-on-left">{{choice.text}}</label>
+                                <div class="col-sm-8">
+                                    <div class="form-group  label-floating">
+                                        <!-- <label class="control-label"></label> -->
+                                        <select class="col-sm-12 selectpicker select2" data-style="select-with-transition" name="choice_{{choice.id}}" multiple id="id_{{choice.id}}">
+                                            <option value="">---------------</option>
+                                            {% for question in next_questions %}
+                                                {% get_skip_question choice question as skip_question %}
+                                                <option value="{{ question.id}}" {% if skip_question %}selected{% endif %}>{{question.code}}--{{ question.text }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <span class="control-label" style="color: gray; font-size: 12px;">Use Ctrl + Mouse left key for multiple select</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-12 text-right  choose_right d-flex justify-content-end" style="gap:10px">
+                        <a href="/questions/{{cancel_id}}/">
+                            <span class="btn btn-danger btn-fill btn-sm">Cancel</span>
+                        </a>
+                        <input type="submit" class="btn btn-primary btn-fill btn-rose btn-sm" value="Save"><div class="ripple-container"></div>
+                        </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
