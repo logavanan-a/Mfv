@@ -458,6 +458,31 @@ class UserlistAndroid(g.CreateAPIView):
         except Exception as e:
             response = [{'message': e.args[0], 'status': 0}]
         return Response(response)
+    
+class RoleTypesListAndroid(g.CreateAPIView):
+
+    def post(self, request, format=None):
+        """
+        API to list of roles for android
+        parameters:
+        - name: user_id
+          description: Pass user id
+          required: true
+          type: integer
+          paramType: form
+        """
+        if not request.data.get('user_id'):
+            return Response({'status':0,'message':'user_id required'})
+        try:
+            objs = Group.objects.filter(active=2).order_by('-id')
+            data=[{'id': i.id, 
+            			'name':i.name,
+            			} for i in objs]
+            			
+            response = {'message':"Successfully Retrieved",'status':2,'roles':data}
+        except Exception as e:
+             response = {'message': e.args[0], 'status': 0}
+        return Response(response)
 
 def stripmessage(errors):
     for i, j in errors.items():

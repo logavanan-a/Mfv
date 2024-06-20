@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load common_tags %}
+{% block contents %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                <div class="card-body">
+                    <div class="card-header card-header-icon d-flex justify-content-between" data-background-color="rose">
+                        <div class="d-flex align-items-center">
+                            <i class="p-1 bx bx-detail" style="font-size: 18px;"></i>
+                            <h4 class="p-1 card-title" style="position: relative; top:5px">Question choices</h4>
+                        </div>
+                        <div class="d-flex" style="gap:5px"> 
+                            <a href="/questions/{{cancel_id}}/">
+                                <button class="btn btn-danger btn-just-icon btn-round btn-sm" style="float:right">
+                                    <em class="bx bx-left-arrow-circle" style="font-size: 18px;"></em>
+                                </button>
+                            </a>
+                            <a href="/choice/add/{{pk}}/">
+                                <button class="btn btn-primary btn-just-icon btn-round btn-dribbble btn-sm" style="float:right">
+                                    <em class="bx bx-plus" style="font-size: 18px;" ></em>
+                                </button>
+                            </a>
+                         </div>
+
+                    </div>
+                    <div class="card-content card_section">
+                        <div class="table-responsive width_section">
+                            <table class="table">
+                                <thead class="text-primary">
+                                    <th>Name</th>
+                                    <th>Order</th>
+                                    <th>Status</th>
+                                    <th class="text-right d-flex justify-content-end ">Actions</th>
+                                </thead>
+                                <tbody>
+                                    {% for choice in choices_list %}
+                                    <tr>
+                                        <td>{{ choice.text }}</td>
+                                        <td>{{ choice.code }}</td>
+                                        <td>{{ choice.get_active_display }}</td>
+                                        <td class="d-flex justify-content-end" style="gap:5px">
+                                            <a href="/choice/edit/{{choice.id}}/" class="ng-star-inserted">
+                                                <button class="btn btn-just-icon btn-info" style="float:right">
+                                                    <em class="bx bx-pencil"></em>
+                                                </button>
+                                            </a>
+                                            
+                                            {% if language == True %}
+                                            <a href="/manage/languages/choice/{{choice.id}}/" title="Manage languages" class="ng-star-inserted">
+                                                <button class="btn btn-just-icon btn-rose" style="float:right">
+                                                    <em class="bx bx-user-voice"> </em>
+                                                </button>
+                                            </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

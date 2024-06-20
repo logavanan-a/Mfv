@@ -4,5 +4,6 @@ from . views import *
 app_name = "application_master"
 
 urlpatterns = [
-     path('android/list/',UserlistAndroid.as_view()),
+    path('userroles/android/role-types/list/', RoleTypesListAndroid.as_view()),
+    path('user/android/list/',UserlistAndroid.as_view()),
 	]

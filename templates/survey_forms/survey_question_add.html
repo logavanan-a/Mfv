@@ -1,0 +1,639 @@
+{% extends "base.html" %}
+{% block contents %}
+<!-- TOGGLE POPUP FOR THE WARNING  -->
+<div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-body">
+            <div class="modal-header">
+                <h4 class="modal-title">Are You Sure You want to Deactivate.
+                    You won't be able to activate it again please confirm !
+                </h4>
+            </div>
+            <form method="POST" action="/manage/deactivate-question/{{question_object.id}}/" class="form-horizontal">{% csrf_token %}
+
+                <div class="card-content">
+                    <h4 class="card-title"></h4>
+                    <div class="col-md-12 validate_height" id="div_name">
+                        <label class="col-sm-12 label-on-right">Reason For Deactivating <span class="required">*</span></label>
+                        <div class="col-sm-12">
+                            <div class="form-group label-floating is-empty">
+                                
+                                <select class="form-control" data-width="100%" data-style="select-with-transition" name="reason" id="theme_id" required>
+                                    <option value="">---------------</option>
+                                    {% for reason in question_deactivate_reasons %}
+                                    <option value="{{ reason.0}}">{{ reason.1 }}</option>
+                                    {% endfor %}
+                                </select>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 text-right choose_right d-flex justify-content-end mt-3" style="gap:10px">
+                    <input type="button" class="btn btn-primary btn-fill btn-sm" data-bs-dismiss="modal" value="Close">
+                    <input type="submit" class="btn btn-fill btn-danger btn-sm" value="Deactivate">
+                </div>
+
+            </form>
+            <!-- <div class="modal-body"> -->
+            <!-- <h3>Reason For Deactivating</h3> -->
+            <!-- </div> -->
+            <!-- <div class="modal-footer"> -->
+
+            <!-- </div> -->
+        </div>
+        </div>
+    </div>
+</div>
+<!-- Deactivate Question Warning HTML Closes-->
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- <h1> Question add page</h1> -->
+            <div class="col-md-12">
+                <div class="card">
+                <div class="card-body">
+                    {% if error %}<div class="col-md-12"><div class="error_alert"><h3>{{error}}</h3></div></div>{% endif %}
+                    {% if parent_question %}<div class="col-md-12"><div class="error_text"><h4>Adding question for {{parent_question.text}} of type {{parent_question.get_qtype_display}}</h4></div></div>{% endif %}
+                    <form method="POST" action="." class="form-horizontal" id="survey">{% csrf_token %}
+                        <div class="card-header card-header-icon mb-3" data-background-color="rose">
+                            
+                            <div class="d-flex align-items-center">
+                                <i class="p-1 bx bx-detail" style="font-size: 18px;"></i>
+                                <h4 class="p-1 card-title" style="position: relative; top: 5px;">{% if add %}Create{% else %}Update{% endif %} Question</h4>
+
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="row card-content">
+                        {% for field in form %}
+                        <div class="col-md-6 mb-2" id="div_{{field.name}}">
+                            <label class="col-sm-12 label-on-left">{{field.label}}{% if field.field.required or field.name == 'master_question' or field.name == 'api_qtype' or field.name == 'api_json' %}<span class="required"> *</span>{% endif %}</label>
+                            <div class="col-sm-12 ">
+                                <div class="col-sm-12 form-group label-floating is-empty">
+                                    <!-- <label class="control-label"></label> -->
+                                    {{field}}
+                                    {% if field.errors %}{{ field.errors|striptags }}{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <div class="col-md-6 mb-2" id="div_api_type">
+                            <label class="col-sm-12 label-on-left">Api type <span class="required"> *</span></label>
+                            <div class="col-sm-12">
+                                <div class="form-group label-floating is-empty">
+                                    <!-- <label class="control-label"></label> -->
+                                    <input type="radio" name="api_type" {% if question_object and question_object.master_question %}checked{% endif %} value="MasterLookUp"/>MasterLookUp
+                                    <input type="radio" name="api_type" {% if question_object and not question_object.master_question %}checked{% endif %} value="Api"/>Api
+                                </div>
+                            </div>
+                        </div>
+                        {% if parent_question.qtype == 'GD' or question_object.parent.qtype == 'GD' %}
+                        <div class="col-md-6 mb-2" id="div_is_grid">
+                            <label class="col-sm-12 label-on-left">Is grid</label>
+                            <div class="col-sm-12">
+                                <div class="form-group label-floating is-empty">
+                                    <!-- <label class="control-label"></label> -->
+                                    <input type="checkbox" name="is_grid" id="id_is_grid" {% if question_object.is_grid %}checked{% endif %}>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div id="text_fields">
+                            <div class="row">
+                                <div class="col-md-6 mb-2" id="div_validation_type">
+                                    <label class="col-sm-12 label-on-left">Validation type</label>
+                                    <div class="col-sm-12">
+                                        <div class="form-group label-floating ">
+                                            <!-- <label class="control-label"></label> -->
+                                            <select class=" col-sm-12 form-select select2" data-style="select-with-transition"  name="validation_type" id="validation_type_id">
+                                                <option class="" value="">---------------</option>
+                                                {% for validation in validations %}
+                                                <option class="" value="{{ validation.id }}" {% if question_validation.validationtype.validation_type == validation.validation_type %} selected {% endif %}>{{ validation.validation_type }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-2" id="div_min_value">
+                                    <label class="col-sm-12 label-on-left">Min value</label>
+                                    <div class="col-sm-12">
+                                        <div class="form-group label-floating is-empty">
+                                            <!-- <label class="control-label"></label> -->
+                                            <input type="number" name="min_value" value="{{min_value}}"  id="id_min_value" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-2" id="div_max_value">
+                                    <label class="col-sm-12 label-on-left">Max value</label>
+                                    <div class="col-sm-12">
+                                        <div class="form-group label-floating is-empty">
+                                            <!-- <label class="control-label"></label> -->
+                                            <input type="number" name="max_value" id="id_max_value" value="{{max_value}}" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-2" id="div_message">
+                                    <label class="col-sm-12 label-on-left">Validation message</label>
+                                    <div class="col-sm-12">
+                                        <div class="form-group label-floating is-empty">
+                                            <!-- <label class="control-label"></label> -->
+                                            <input type="text" name="message" id="id_message" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div id="date_fields">
+                            <div class="row">
+                                <div class="col-md-6 mb-2" id="div_validation_type">
+                                    <label class="col-sm-12 label-on-left">date Validation type</label>
+                                    <div class="col-sm-12">
+                                        <div class="form-group label-floating">
+                                            <!-- <label class="control-label"></label> -->
+                                            <select class="col-sm-12 form-control date_validation" data-style="select-with-transition" name="validation_type" id="validation_type_id">
+                                                <option value="">---------------</option>
+                                                {% for validation in date_validation %}
+                                                <option value="{{ validation.id }}" {% if question_object.api_json.date_val|add:"0" == validation.id|add:"0" %}selected{% endif %}>{{ validation.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <div id="custom_date_validation">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-2" id="">
+                                            <label class="col-sm-12 label-on-left"> From Date <span class="required"> *</span></label>
+                                            <div class="col-sm-12">
+                                                <div class="form-group label-floating">
+                                                    <!-- <label class="control-label"></label> -->
+                                    
+                                                    <!-- <input type="date" name="from_date"   value="{{from_date|date:'Y-m-d'}}" class="form-control " required="" id="from_date"> -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-2" id="">
+                                            <label class="col-sm-12 label-on-left"> To Date <span class="required"> *</span></label>
+                                            <div class="col-sm-12">
+                                                <div class="form-group label-floating">
+                                                    <!-- <input type="date" name="to_date" value="{{to_date|date:'Y-m-d'}}" class="form-control " required="" id="to_date"> -->
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                        {% if add %}
+                            <div class="col-md-12 text-right choose_right btn_select d-flex justify-content-end" style="gap: 5px;">
+                                
+                                <a href="/questions/{{cancel_id}}/">
+                                    <span class="btn btn-danger btn-fill btn-sm ">Cancel</span>
+                                </a>
+                                <input type="submit" class="btn btn-primary btn-fill btn-rose btn-sm" value="Save">
+                                
+                                </div>
+                        {% else %}
+                            {% if question_object.active == 2 %}
+                                <div class="col-md-12 d-flex justify-content-between mt-3">
+                                    <div class="p text-left choose_left">
+                                        <a href="#" class="btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#basicModal"><span class="btn-danger btn-sm">Deactivate</span></a>
+                                        <input type="hidden">
+                                    </div>
+                                    <div class="p text-right choose_right">
+                                        <a href="/questions/{{cancel_id}}/">
+                                            <span class="btn btn-danger btn-fill btn-sm ">Cancel</span>
+                                        </a>
+                                        <input type="submit"  class="btn btn-primary btn-fill btn-rose btn-sm" value="Save">
+                                    </div>
+                                
+                                </div>
+                            {% else %}
+                                <div class="col-md-12 validate_height" id="div_DeactivateDetails">
+                                    <label class="label-on-left"><h5>Deactivation Details</h5></label><br>
+                                    <!-- <label class="col-md-3 label-on-left"><b>Deactivation Details</b></label><br><hr> -->
+                                    <label class="label-on-left"><b>Deactivation Reason :</b></label>{% if question_object.deactivated_reason %} {{question_object.deactivated_reason}} {% else %}  Not Available {% endif %} <br>
+                                    <label class="label-on-left"><b> Deactivated Date  :</b></label>{% if question_object.deactivated_date %}    {{question_object.deactivated_date }} {% else %}  Not Available {% endif %}<br>
+                                    <label class="label-on-left"><b>Deactivated By  :</b></label>   {% if question_object.deactivated_user %}    {{question_object.deactivated_user.username }} {% else %} Not Available {% endif %}
+
+                                </div>
+                                <div class="col-md-12 text-right choose_right d-flex justify-content-end">
+                                    <a href="/manage/questions/{{cancel_id}}/">
+                                        <span class="btn btn-primary btn-fill btn-sm">Back</span>
+                                    </a>
+                                <div>
+                            {% endif%}
+                        {% endif %}
+                        </div>
+                    </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_javascript %}
+<script>
+function display_api_questions(id, sometext=''){
+        if (id == 'Api'){
+            $("#id_master_question").val('');
+            if (sometext != 'sometext'){
+                $("#id_api_qtype").val('');
+            }
+            $("#div_master_question").hide();
+            $("#div_api_qtype").show();
+            $("#div_api_json").show();
+        }
+        else if(id == 'MasterLookUp'){
+            if (sometext != 'sometext'){
+                $("#id_api_qtype").val('');
+            }
+            $("#id_api_json").val('{}');
+            $("#div_master_question").show();
+            $("#div_api_qtype").show();
+            $("#div_api_json").hide();
+        }
+        else{
+            $("#id_master_question").val('');
+            $("#id_api_qtype").val('');
+            $("#div_master_question").hide();
+            $("#div_api_qtype").hide();
+            $("#id_api_json").val('{}');
+            $("#div_api_json").hide();
+        }
+        $('.selectpicker').selectpicker('refresh')
+    }
+</script>
+{% if edit %}
+<script>
+    if ('{{edit}}' == 'True' && '{{question_object.qtype}}' == 'T'){
+        $("#validation_type_id").val('{{question_validation.validationtype.id}}');
+        $("#from_date").val('{{request.POST.from_date}}');
+        $("#to_date").val('{{request.POST.to_date}}');
+        $("#id_message").val('{{question_validation.message}}');
+        $("#id_min_value").val('{{question_validation.min_value}}');
+        $("#id_max_value").val('{{question_validation.max_value}}');
+        $("#text_fields").show();
+        $("#id_api_type").val('');
+        $("#id_master_question").val('');
+        $("#id_api_qtype").val('');
+        $("#id_api_json").val('{}');
+        $("#div_api_type").hide();
+        $("#div_master_question").hide();
+        $("#div_api_qtype").hide();
+        $("#div_api_json").hide();
+        $("#date_fields").hide();
+        }
+    else if ('{{question_object.qtype}}' == 'AI' && '{{edit}}' == 'True'){
+            $("#validation_type_id").val('');
+            $("#from_date").val('');
+            $("#to_date").val('');
+            $("#message").val('')
+            $("#id_min_value").val('');
+            $("#id_max_value").val('');
+            $("#text_fields").hide();
+            $("#div_api_type").show();
+            $("#div_master_question").show();
+            $("#div_api_qtype").show();
+            $("#div_api_json").show();
+            $("#date_fields").hide();
+            $("#id_api_type").val('{% if question_object.master_question %}MasterLookUp{% else %}Api{% endif %}');
+            display_api_questions('{% if question_object.master_question %}MasterLookUp{% else %}Api{% endif %}', 'sometext')
+        }
+    else if ('{{question_object.qtype}}' == 'AF' && '{{edit}}' == 'True'){
+            $("#validation_type_id").val('');
+            $("#from_date").val('');
+            $("#to_date").val('');
+            $("#message").val('')
+            $("#id_min_value").val('');
+            $("#id_max_value").val('');
+            $("#text_fields").hide();
+            $("#div_api_type").show();
+            $("#div_master_question").show();
+            $("#div_api_qtype").show();
+            $("#div_api_json").show();
+            $("#date_fields").hide();
+            $("#id_api_type").val('{% if question_object.master_question %}MasterLookUp{% else %}Api{% endif %}');
+            display_api_questions('{% if question_object.master_question %}MasterLookUp{% else %}Api{% endif %}', 'sometext')
+        }
+    else if ('{{question_object.qtype}}' == 'D' && '{{edit}}' == 'True'){
+        $("#validation_type_id").val('');
+        //$("#from_date").val('');
+        //$("#to_date").val('');
+        $("#message").val('')
+        $("#id_min_value").val('');
+        $("#id_max_value").val('');
+        $("#text_fields").hide();
+        $("#id_api_type").val('');
+        $("#id_master_question").val('');
+        $("#id_api_qtype").val('');
+        $("#id_api_json").val('{}');
+        $("#div_api_type").hide();
+        $("#div_master_question").hide();
+        $("#div_api_qtype").hide();
+        $("#div_api_json").hide();
+        $("#date_fields").show();
+        if ('{{question_object.api_json.date_val}}' == '499' ){
+            $("#custom_date_validation").show();
+        }
+
+    }
+    else{
+        $("#validation_type_id").val('');
+        $("#from_date").val('');
+        $("#to_date").val('');
+        $("#message").val('')
+        $("#id_min_value").val('');
+        $("#id_max_value").val('');
+        $("#text_fields").hide();
+        $("#id_api_type").val('');
+        $("#id_master_question").val('');
+        $("#id_api_qtype").val('');
+        $("#id_api_json").val('{}');
+        $("#div_api_type").hide();
+        $("#div_master_question").hide();
+        $("#div_api_qtype").hide();
+        $("#div_api_json").hide();
+        $("#date_fields").hide();
+    }
+</script>
+
+{% endif %}
+<script src="/static/js/jquery.validate.js"></script>
+<script>
+    function display_fields_type_based(id){
+    	if (id == 'H' && id != ""){
+        	$("#div_api_json").show();
+        	
+        	}
+        else if(id == 'D' && id != ""){
+            $("#validation_type_id").val('');
+            $("#from_date").val('');
+            $("#to_date").val('');
+            $("#message").val('')
+            $("#id_min_value").val('');
+            $("#id_max_value").val('');
+            $("#text_fields").hide();
+            $("input:radio[name=api_type]").each(function(i) {
+                   this.checked = false;
+            });
+            $("#id_master_question").val('');
+            $("#id_api_qtype").val('');
+            $("#id_api_json").val('{}');
+            $("#div_api_type").hide();
+            $("#div_master_question").hide();
+            $("#div_api_qtype").hide();
+            $("#div_api_json").hide();
+            $("#date_fields").show();
+        }
+    
+        else if (id == 'T' && id != ""){
+            $("#text_fields").show();
+            $("input:radio[name=api_type]").each(function(i) {
+                   this.checked = false;
+            });
+            $("#id_master_question").val('');
+            $("#id_api_qtype").val('');
+            $("#id_api_json").val('{}');
+            $("#div_api_type").hide();
+            $("#div_master_question").hide();
+            $("#div_api_qtype").hide();
+            $("#div_api_json").hide();
+            $("#date_fields").hide();
+           }
+       else if (id == 'AI' && id != ""){
+            $("#validation_type_id").val('');
+            $("#from_date").val('');
+            $("#to_date").val('');
+            $("#message").val('')
+            $("#id_min_value").val('');
+            $("#id_max_value").val('');
+            $("#text_fields").hide();
+            $("#div_api_type").show();
+            $("#date_fields").hide();
+        }
+        else if (id == 'AF' && id != ""){
+            $("#validation_type_id").val('');
+            $("#from_date").val('');
+            $("#to_date").val('');
+            $("#message").val('')
+            $("#id_min_value").val('');
+            $("#id_max_value").val('');
+            $("#text_fields").hide();
+            $("#div_api_type").show();
+            $("#date_fields").hide();
+       }
+       else{
+            $("#validation_type_id").val('');
+            $("#from_date").val('');
+            $("#to_date").val('');
+            $("#message").val('')
+            $("#id_min_value").val('');
+            $("#id_max_value").val('');
+            $("#text_fields").hide();
+            $("input:radio[name=api_type]").each(function(i) {
+                   this.checked = false;
+            });
+            $("#id_master_question").val('');
+            $("#id_api_qtype").val('');
+            $("#id_api_json").val('{}');
+            $("#div_api_type").hide();
+            $("#div_master_question").hide();
+            $("#div_api_qtype").hide();
+            $("#div_api_json").hide();
+            $("#date_fields").hide();
+       }
+       $('.selectpicker').selectpicker('refresh')
+    }
+    function display_fields_type_based_post(id){
+        if (id == 'T' && id != ""){
+            $("#validation_type_id").val('{{request.POST.validation_type}}');
+            $("#from_date").val('{{request.POST.from_date}}');
+            $("#to_date").val('{{request.POST.to_date}}');
+            $("#id_message").val('{{request.POST.message}}');
+            $("#id_min_value").val('{{request.POST.min_value}}');
+            $("#id_max_value").val('{{request.POST.max_value}}');
+            $("#text_fields").show();
+            $("input:radio[name=api_type]").each(function(i) {
+                   this.checked = false;
+            });
+            $("#id_master_question").val('');
+            $("#id_api_qtype").val('');
+            $("#id_api_json").val('{}');
+            $("#div_api_type").hide();
+            $("#div_master_question").hide();
+            $("#div_api_qtype").hide();
+            $("#div_api_json").hide();
+            $("#date_fields").hide();
+           }
+
+        else if(id == 'D' && id != ""){
+            $("#validation_type_id").val('');
+                $("#message").val('')
+                $("#from_date").val('');
+                $("#to_date").val('');    
+                $("#id_min_value").val('');
+                $("#id_max_value").val('');
+                $("#text_fields").hide();
+                $("input:radio[name=api_type]").each(function(i) {
+                   this.checked = false;
+                });
+                $("#id_master_question").val('');
+                $("#id_api_qtype").val('');
+                $("#id_api_json").val('{}');
+                $("#div_api_type").hide();
+                $("#div_master_question").hide();
+                $("#div_api_qtype").hide();
+                $("#div_api_json").hide();
+                $("#date_fields").show();
+        }
+
+        else if (id == 'AI' && id != ""){
+            display_api_questions('{{request.POST.api_type}}')
+            $("input:radio[name=api_type]").each(function(i) {
+                if (this.value == '{{request.POST.api_type}}'){
+                    this.checked = true;
+                }
+                else{
+                    this.checked = false;
+                }
+            });
+            $("#id_api_type").val('{{request.POST.api_type}}');
+            $("#id_master_question").val('{{request.POST.master_question}}');
+            $("#id_api_qtype").val('{{request.POST.api_qtype}}');
+            $("#id_api_json").val('{{request.POST.api_json|safe}}');
+            $("#div_api_type").show();
+            $("#validation_type_id").val('');
+            $("#from_date").val('');
+            $("#to_date").val('')
+            $("#message").val('')
+            $("#id_min_value").val('');
+            $("#id_max_value").val('');
+            $("#text_fields").hide();
+            $("#date_fields").hide();
+        }else if (id == 'AF' && id != ""){
+            display_api_questions('{{request.POST.api_type}}')
+            $("input:radio[name=api_type]").each(function(i) {
+                if (this.value == '{{request.POST.api_type}}'){
+                    this.checked = true;
+                }
+                else{
+                    this.checked = false;
+                }
+            });
+            $("#id_api_type").val('{{request.POST.api_type}}');
+            $("#id_master_question").val('{{request.POST.master_question}}');
+            $("#id_api_qtype").val('{{request.POST.api_qtype}}');
+            $("#id_api_json").val('{{request.POST.api_json|safe}}');
+            $("#div_api_type").show();
+            $("#validation_type_id").val('');
+            $("#from_date").val('');
+            $("#to_date").val('');
+            $("#message").val('')
+            $("#id_min_value").val('');
+            $("#id_max_value").val('');
+            $("#text_fields").hide();
+            $("#date_fields").hide();
+        }
+           else{
+                $("#validation_type_id").val('');
+                $("#from_date").val('');
+                $("#to_date").val('');
+                $("#message").val('')
+                $("#id_min_value").val('');
+                $("#id_max_value").val('');
+                $("#text_fields").hide();
+                $("input:radio[name=api_type]").each(function(i) {
+                   this.checked = false;
+                });
+                $("#id_master_question").val('');
+                $("#id_api_qtype").val('');
+                $("#id_api_json").val('{}');
+                $("#div_api_type").hide();
+                $("#div_master_question").hide();
+                $("#div_api_qtype").hide();
+                $("#div_api_json").hide();
+                $("#date_fields").hide();
+           }
+           $('.selectpicker').selectpicker('refresh')
+    }
+    $(document).ready(function() {
+        //if question is deacitvataded make the forms as readonly
+        if('{{edit}}'){
+            var active = '{{question_object.active}}'
+            if(active == 0){
+            $('#survey').find(':input').attr('disabled', 'disabled');
+            }
+        }
+
+        if('{{edit}}' && '{{question_object.api_json.date_val}}' != '499'){
+            $("#custom_date_validation").hide();
+        }
+
+ 
+        $("#div_api_type").insertBefore("#div_master_question");
+        $('#div_is_grid').find("label:first").text('Row (Check if row) ');
+        $('input[type=text]').addClass('form-control');
+        $('input[type=number]').addClass('form-control');
+        if ('{{add}}' == 'True'){
+            $("#text_fields").hide();
+            $("#div_api_type").hide();
+            $("#div_master_question").hide();
+            $("#div_api_qtype").hide();
+            $("#div_api_json").hide();
+            $("#date_fields").hide();
+        }
+        $("#survey").validate({
+            rules :
+            {
+                qtype: {required: true},
+                text: {required: true},
+                question_order: {required: true},
+                code: {required: true, min: 0},
+                api_json: {required: true},
+                master_question: {required: true},
+                api_qtype: {required: true},
+                api_type: {required: true},
+            },
+        });
+    if ('{{request.method}}' == 'POST'){
+        var id=$('#id_qtype').val();
+        display_fields_type_based_post(id)
+    }
+    $('#id_qtype').change(function(){
+           var id=$(this).val();
+           display_fields_type_based(id)
+        });
+    $('input[type=radio][name=api_type]').change(function() {
+        var id=$(this).val();
+        display_api_questions(id)
+    });
+});
+
+    $('.date_validation').change(function(){
+        console.log($(this).val())
+        if($(this).val() == 499){
+            $("#custom_date_validation").show();
+        }else{
+            $("#custom_date_validation").hide();
+        }
+});
+
+</script>
+
+{% endblock %}
