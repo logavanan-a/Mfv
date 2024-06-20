@@ -7,7 +7,6 @@ from django.http import HttpResponseRedirect, HttpResponse
 from mis . views import *
 # Create your views here.
 from django.db import transaction
-from django.http import JsonResponse
 
 
 def master_list_form(request,model):
