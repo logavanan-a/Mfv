@@ -119,3 +119,9 @@ class ResponseFilesAdmin(ImportExportModelAdmin, ImportExportFormat):
 @admin.register(LanguageTranslationText)    
 class LanguageTranslationTextAdmin(ImportExportModelAdmin, ImportExportFormat):
     pass
+
+
+
+@admin.register(LabelLanguageTranslation)    
+class LabelLanguageTranslationAdmin(ImportExportModelAdmin, ImportExportFormat):
+    pass

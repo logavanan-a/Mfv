@@ -8,4 +8,6 @@ urlpatterns = [
     path('choice-list/',choicelist, name="choicelist"),
     path('survey-list/',surveylist, name="surveylist"),
     path('block-list/', blocklist,name="blocklist"),
+    path('get-language-labels/', get_language_app_label,
+                    name="get_language_app_label"),
 ]

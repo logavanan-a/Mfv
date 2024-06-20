@@ -11,6 +11,7 @@ import os
 from datetime import datetime, timedelta
 from django.db.models import Q
 from django.apps import apps
+from survey.serializers import LabelLanguageTranslationSerializer
 from survey.capture_sur_levels import convert_string_to_date
 import pytz
 # from configuration_settings.user_location_views import user_responses
@@ -290,6 +291,182 @@ def blocklist(request):
                    "message": "No Blocks tagged for this user", }
         return JsonResponse(res)
 
+def get_latest_survey_versions(user_id):
+    # Retrieves latest survey version based on used
+    # User based survey and latest version of the user surveys
+    version_updates = []
+    user = User.objects.get(id=user_id)
+    user_level = get_user_level(user)
+    userrole = UserRoles.objects.filter(user__id=int(user_id))
+    # usersurvey_list = DetailedUserSurveyMap.objects.filter(
+    #     active=2, user__in=userrole)
+    # survey_ids = list(
+    #     set(usersurvey_list.values_list('survey__id', flat=True)))
+    # ,id__in=survey_ids excluded for testing
+    survey_list = Survey.objects.filter(active=2).order_by('survey_order')
+    # active_survey_ids = list(set(survey_list.values_list('id', flat=True)))
+    version_updates = []
+    all_survey_location = get_all_survey_location(survey_list)
+    #updated filter questions 
+    filter_questions = list(SurveyDisplayQuestions.objects.filter(active=2).values_list('survey_id', 'display_type','questions'))
+    all_order_levels, all_labels = user_survey_level_labels_v3(survey_list, user_level)
+
+    all_order_levels, all_labels, all_beneficiary_ids, all_beneficiary_type = get_beneficiary_location_details_v3(user_level, survey_list)
+    for i in survey_list:
+        generalized = True
+        description = ''
+        display_name = ''
+        display_in_app = 2
+        plimit = {1: 45, 2: 60, 3: 365, 4: 365, 5: 365}.get(int(1), 0)
+        display_in_training = 0
+        if i.survey_type == 0:
+            ben_obj = i.get_beneficiary_type()
+            if ben_obj.is_admin_type:
+                display_in_app = 0
+            if ben_obj.is_training_type:
+                display_in_training = 2
+            if ben_obj.is_training_module:
+                category_name = "Trainings"
+                category_id = "99"
+                category_order = 0
+                display_in_app = 0
+            else:
+                if not ben_obj.category and ben_obj.parent:
+                    generalized, category_name = True, ben_obj.parent.name
+                    category_id = str(ben_obj.parent.id)
+                    category_order = ben_obj.parent.order
+                else:
+                    generalized, category_name = False, ben_obj.category.name
+                    category_id = str(ben_obj.category.id)
+                    category_order = ben_obj.category.order
+        elif i.categories :
+            category_name = i.categories.name
+            category_id = i.categories.id
+            category_order = i.categories.order
+        else:
+            category_name = "Activity"
+            category_id = 0
+            category_order = 0
+        status = 1
+
+        # Commented because not used in bajaj
+        # if int(i.survey_module) == 1:
+        #     if userrole.filter(role_type__name__iexact="TEAM LEAD").exists():
+        #         status = 1
+        #     else:
+        #         status = 0
+        # if i.survey_module == 2:
+        #     status = 0
+
+        # order_levels, labels, beneficiary_ids, beneficiary_type = '','',0,''#i.get_beneficiary_location_details('beneficiary', user)
+        # order_levels, labels, beneficiary_ids, beneficiary_type = get_beneficiary_location_details_v3('beneficiary', user)
+        order_levels, labels, beneficiary_ids, beneficiary_type = all_order_levels.get(i.id), all_labels.get(i.id), all_beneficiary_ids.get(i.id), all_beneficiary_type.get(i.id)
+
+        # Commented because not used in bajaj
+        facility_ids, facility_type = "",""
+        # facility_ids, facility_type = i.get_beneficiary_location_details('facility', user)
+        
+        if i.survey_type == 1:
+            labels = all_labels.get(i.id)
+            order_levels = all_order_levels.get(i.id)
+            # order_levels, labels = user_survey_level_labels(i, user)
+        # try:
+        summary_qid = ','.join(','.join(map(str, item[2])) for item in filter_questions if item[1] == '1' and item[0] == i.id)
+        search_filter = ','.join(','.join(map(str, item[2])) for item in filter_questions if item[1] == '3' and item[0] == i.id)
+        # summary_qid = ','.join(str(j) for j in  SurveyDisplayQuestions.objects.get(survey=i, display_type='1').questions)
+        if not summary_qid:
+            survey_questions = load_data_to_cache_survey_based_questions()
+            questions = survey_questions.get(str(i.id),{})
+            summary_qids  = [x['id'] for x in questions if x['qtype'] in ['T', 'R', 'S', 'C']]
+            summary_qid = ','.join(map(str, summary_qids[:3]))
+            # summary_qid = ','.join([str(quest.id) for quest in Question.objects.filter(block__survey=i, parent=None, qtype__in=['T', 'R', 'S', 'C'])[:3]])
+        if int(i.periodicity) != 0:
+            piriodicity = i.get_periodicity_display()
+        else:
+            piriodicity = ""
+        get_survey_location = all_survey_location.get(i.id)#i.get_survey_location()
+        if (get_survey_location and get_survey_location.code >= user_level) or (i.survey_type == 0) or (i.data_entry_level_id == 4 and (userrole.filter(role_type__id__in=i.extra_config.get('role_type',[])))):
+            unique_questions = ""
+            # try:
+            #     unique_questions = ','.join(map(str, i.get_unique_validations().questions)) if i.get_unique_validations() else ""
+            # except:
+            #     pass
+
+            # Commented because not used in bajaj
+            # try:
+            #     description = i.get_survey_rule_engine().rule_engine.get("description")
+            # except:
+            #     pass
+            # try:
+            #     display_name = i.get_survey_rule_engine().rule_engine.get("display_name")
+            # except:
+            #     pass
+
+            #survey_json
+            #commented the ruleengine call because not used in bajaj
+            survey_json = []#i.get_survey_linkage_questions()
+            survey_json.append({"b_type":i.location_beneficiary_id})
+
+            child_survey = None
+            # child_survey = Survey.objects.filter(
+            #     surveyparent__id=i.id).values_list('id', flat=True)
+            version_updates.append({'vn': "1.0",
+                                    'id': i.id,
+                                    'summary_qid': summary_qid,
+                                    'order_levels': order_levels,
+                                    #                                    'order_levels':'' if i.survey_type == 0 else i.get_location_details(1),
+                                    'beneficiary_ids': beneficiary_ids,
+                                    'labels': labels,
+                                    'parent_id': '',
+                                    'beneficiary_type': beneficiary_type,
+                                    'piriodicity': '1',\
+                                    'piriodicity_flag': piriodicity,\
+                                    'pLimit': plimit,\
+                                    'pFeature': 3,
+                                    'rule_engine': [],
+                                    'reasonDisagree': 3,
+                                    'survey_id': i.id,
+                                    'survey_name': i.name,
+                                    "survey_type": i.survey_type,
+                                    "category_name": category_name,
+                                    "category_id": category_id,
+                                    "category_order": category_id,
+                                    "modified_on": i.modified.strftime('%Y-%m-%d '
+                                                                       '%H:%M:%S.%f'),
+                                    "created_on": i.created.strftime('%Y-%m-%d '
+                                                                     '%H:%M:%S.%f'),
+                                    "active": i.active, "order": i.survey_order,
+                                    "additional_days": '',
+                                    "parents": "",
+                                    'location_level': '',
+                                    'display_name': display_name,
+                                    'parent_link': [] ,#disabled the parent key for temporarly#i.get_parent_links(),
+                                    'linkages': i.get_beneficiary_linkages(),
+                                    "constraints": unique_questions,
+                                    "activity_description": description,
+                                    "rule_engine": [],#i.get_survey_rule_engine_for_surveylist(0) if generalized else i.get_survey_rule_beneficiary(),
+                                    "rule_engine_or": [],#i.get_survey_rule_engine_for_surveylist(1) if generalized else [],
+                                    "activity_rule_set": [],#i.get_survey_rule_set(),
+                                    "category_rule_set": [],#i.get_survey_category_rule_set(),
+                                    "display_in_app": display_in_app,
+                                    "display_in_training": display_in_training,
+                                    "is_training_survey": 0,#2 if JsonAnswer.objects.filter(training_survey=i) else 0,
+                                    "facility_ids": facility_ids,
+                                    "facility_type": facility_type,
+                                    "child_datacollection_ids": ','.join(map(str, child_survey)) if child_survey else '',
+                                    "survey_categories": [{'id': i.categories.id, 'name': i.categories.name}] if i.categories else [],
+                                    "search_filter":search_filter,#i.get_search_filter_ids(),
+                                    "survey_json":survey_json ,
+                                    "add": status,
+                                    # survey_module = 2 for activitis groups in swauyam instance ,survey_module = 1 for program module in swayam instances
+                                    "is_activist_group": 1 if i.survey_module == 2 else 0,
+                                    "activity_expenses":i.extra_config.get('activity_expenses',True) if i.extra_config else True,
+                                    "expenses_questions": i.extra_config.get('expenses_questions',[]) if i.extra_config else [],
+                                    "form_type": 1 if i.data_entry_level_id == 4 else 0,
+                                    "role_type": i.extra_config.get('role_type', []),
+                                    })
+    return version_updates
+
 
 @csrf_exempt
 def surveylist(request):
@@ -309,7 +486,28 @@ def surveylist(request):
                 "states":state,
                }
         return JsonResponse(res)
-    
+
+
+@csrf_exempt
+def get_language_app_label(request):
+    status,message,res,responses = 0,"Data sent successfully",{},{}
+    if request.method == 'POST':
+        labeltrans_modified = request.POST.get('modified') # last modified date for label language translation
+        # app label translation
+        if labeltrans_modified: 
+            labeltrans_queryset = LabelLanguageTranslation.objects.filter(modified__gt=labeltrans_modified).order_by('modified', 'id')
+        else:
+            labeltrans_queryset = LabelLanguageTranslation.objects.filter().order_by('modified','id')
+        labeltrans_queryset = labeltrans_queryset[:100]
+        responses = LabelLanguageTranslationSerializer(labeltrans_queryset, many=True).data
+        status = 2
+        if not labeltrans_queryset:
+            message = "Data already sent"
+    res = {'status':status,'message': message, 'translation': responses}
+    return JsonResponse(res)
+
+
+
 @csrf_exempt
 def new_responses_list_v3(request):
     # get user and based on userid get surveys mapped to user

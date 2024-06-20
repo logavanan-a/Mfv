@@ -1809,3 +1809,10 @@ class LanguageTranslationText(BaseContent):
     class Meta:
         unique_together = (('content_type', 'object_id', 'language'),)
 
+
+class LabelLanguageTranslation(BaseContent):
+    applabel = models.ForeignKey(AppLabel,on_delete=models.DO_NOTHING)
+    text = models.CharField(max_length=255)
+    language = models.ForeignKey(Language,on_delete=models.DO_NOTHING)
+    other_text = models.CharField(max_length=255, blank=True, null=True)
+    integer_field = models.IntegerField(default=0)
