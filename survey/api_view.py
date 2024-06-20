@@ -3,7 +3,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from survey.models import *
+from rest_framework import generics as g
 from survey.custom_decorators import *
+
 # from survey.monkey_patching import *
 # from masterdata.models import *
 # from beneficiary.models import *
@@ -492,7 +494,7 @@ def surveylist(request):
 def get_language_app_label(request):
     status,message,res,responses = 0,"Data sent successfully",{},{}
     if request.method == 'POST':
-        labeltrans_modified = request.POST.get('modified') # last modified date for label language translation
+        labeltrans_modified = request.POST.get('serverdatetime') # last modified date for label language translation
         # app label translation
         if labeltrans_modified: 
             labeltrans_queryset = LabelLanguageTranslation.objects.filter(modified__gt=labeltrans_modified).order_by('modified', 'id')
@@ -506,8 +508,230 @@ def get_language_app_label(request):
     res = {'status':status,'message': message, 'translation': responses}
     return JsonResponse(res)
 
+@csrf_exempt
+def languagequestionlist(request):
+    if request.method == 'POST':
+        user_id = request.POST.get("uId")
+        count = request.POST.get("count")
+        flag = ""
+        lang_questions = []
+        updatedtime = request.POST.get("updatedtime")
+        lang_quest = LanguageTranslationText.objects.filter(content_type=ContentType.objects.get_for_model(Question))
+        if updatedtime:
+            updated = convert_string_to_date(updatedtime)
+            lang_quest = lang_quest.filter(modified__gt=updated)
+            flag = False
+        lang_quest = lang_quest.filter().order_by('modified')[:100]
+        for lq in lang_quest:
+            if (lq.content_object and not lq.content_object.parent and lq.content_object.is_grid == False) or (lq.content_object and lq.content_object.parent and lq.content_object.is_grid == True):
+                lang_questions.append({'id': int(lq.id),
+                   'question_pid': int(lq.content_object.id),
+                   'question_text': lq.text,
+                   'language_id': int(lq.language.code),
+                   'updated_time': datetime.strftime(lq.modified, '%Y-%m-%d %H:%M:%S.%f'),
+                   'extra_column1': "",
+                   'instruction': "",
+                   'help_text': "",
+                   'extra_column2': 0, })
+        if lang_questions:
+            res = {'status': 2,
+                   'message': "Data sent successfully",
+                   "LanguageQuestion": lang_questions, }
+        elif flag == False:
+            res = {"status": 2,
+                   "message": "Data already sent", }
+        else:
+            res = {"status": 0,
+                   "message": "No questions of different language has been tagged to this user", }
+        return JsonResponse(res)
 
 
+@csrf_exempt
+def languagechoice(request):
+    if request.method == 'POST':
+        user_id = request.POST.get("uId")
+        count = request.POST.get("count")
+
+        flag = ""
+        l_ch = []
+        updatedtime = request.POST.get("updatedtime")
+        lang_ch = LanguageTranslationText.objects.filter(content_type=ContentType.objects.get_for_model(Choice))
+        if updatedtime:
+            updated = convert_string_to_date(updatedtime)
+            lang_ch = lang_ch.filter(modified__gt=updated)
+            flag = False
+        lang_ch = lang_ch.filter().order_by('modified')[:100]
+        for ch in lang_ch:
+            if ch.content_object:
+                l_ch.append({"id": ch.id,
+                             "option_pid": ch.content_object.id,
+                             "question_pid": ch.content_object.question.id,
+                             "language_id": int(ch.language.code),
+                             "option_text": ch.text,
+                             "validation": "",
+                             "updated_time": datetime.strftime(ch.modified, '%Y-%m-%d %H:%M:%S.%f'),
+                             "extra_column1": "",
+                             'extra_column2': 0, })
+        if l_ch:
+            res = {'status': 2,
+                   'message': "Data sent successfully",
+                   "LanguageOptions": l_ch, }
+        elif flag == False:
+            res = {"status": 2,
+                   "message": "Data already sent", }
+        else:
+            res = {"status": 0,
+                   "message": "No choices of different language has been tagged to this user", }
+        return JsonResponse(res)
+
+@csrf_exempt
+def assessmentlist(request):
+    if request.method == 'POST':
+        user_id = request.POST.get("uId")
+        count = request.POST.get("count")
+
+        questions = []
+        flag = ""
+        metrics_quest = []
+        updatedtime = request.POST.get("updatedtime")
+        metrics = Question.objects.filter(is_grid=False)
+        if updatedtime:
+            updated = convert_string_to_date(updatedtime)
+            metrics = metrics.filter(modified__gt=updated)
+            flag = False
+        metrics = metrics.filter().exclude(parent=None).order_by('modified')[:100]
+        for met in metrics:
+#            if met.parent != None:
+            metrics_quest.append({'id': int(met.id),
+                                  'assessment': met.text,
+                                  'question_pid': met.parent.id if met.parent else 0,
+                                  'active': met.active,
+                                  'mandatory': int(met.mandatory),
+                                #   'group_validation': met.get_question_validation() if met.get_question_validation() else "",
+                                  'survey_id': int(met.block.survey.id),
+                                  'language_id': 1,
+                                  'updated_time': datetime.strftime(met.modified, '%Y-%m-%d %H:%M:%S.%f'),
+                                  'extra_column1': "",
+                                  'extra_column2': 0,
+                                  'qtype': met.qtype if met.qtype else "",
+                                  'question_json': met.api_json,
+                                  'code_display': str(met.code_display) if met.code_display  else '0', 
+                                  'question_code': int(met.code),})
+        if metrics_quest:
+            res = {'status': 2,
+                   'message': "Data sent successfully",
+                   "Assessment": metrics_quest, }
+        elif flag == False:
+            res = {"status": 2,
+                   "message": "Data already sent", }
+        else:
+            res = {"status": 0,
+                   "message": "No grid questions tagged for this user", }
+        return JsonResponse(res)    
+
+
+
+@csrf_exempt
+def languageassessmentlist(request):
+    if request.method == 'POST':
+        user_id = request.POST.get("uId")
+        count = request.POST.get("count")
+        flag = ""
+        lang_questions = []
+        updatedtime = request.POST.get("updatedtime")
+        lang_quest = LanguageTranslationText.objects.filter(content_type=ContentType.objects.get_for_model(Question))
+        if updatedtime:
+            updated = convert_string_to_date(updatedtime)
+            lang_quest = lang_quest.filter(modified__gt=updated)
+            flag = False
+        lang_quest = lang_quest.filter().order_by('modified')[:100]
+        for lq in lang_quest:
+            if lq.content_object and lq.content_object.parent and lq.content_object.is_grid == False:
+                lang_questions.append({'id': int(lq.id),
+                   'assessment_pid': int(lq.content_object.id),
+                   'assessment': lq.text,
+                   'language_id': int(lq.language.code),
+                   'updated_time': datetime.strftime(lq.modified, '%Y-%m-%d %H:%M:%S.%f'),
+                   'extra_column1': "",
+                   'instruction': "",
+                   'help_text': "",
+                   'extra_column2': 0, })
+        if lang_questions:
+            res = {'status': 2,
+                   'message': "Data sent successfully",
+                   "LanguageAssessment": lang_questions, }
+        elif flag == False:
+            res = {"status": 2,
+                   "message": "Data already sent", }
+        else:
+            res = {"status": 0,
+                   "message": "No questions of different language has been tagged to this user", }
+        return JsonResponse(res)
+
+
+
+
+@csrf_exempt
+def languagelist(request):
+    if request.method == 'POST':
+        user_id = request.POST.get("uid")
+        updatedtime = request.POST.get("updatedtime")
+        usl = []
+        flag=""
+        #user_state = UserRoles.objects.get(user_id=int(user_id)).partner.state
+        user_lang = Language.objects.filter(active=2)
+        if updatedtime:
+            updated = convert_string_to_date(updatedtime)
+            user_lang = user_lang.filter(modified__gt=updated)
+            flag = False
+        for ul in user_lang:
+            usl.append({"id": int(ul.id),
+                        "language_code": int(ul.code),
+                        "language_name": ul.name,
+                        "active": ul.active,
+                        "updated_date": datetime.strftime(ul.modified, '%Y-%m-%d %H:%M:%S.%f')})
+        if usl:
+            res = { 'status':2,\
+                    'message':"Success",\
+                    "regional_language": usl,}
+        elif flag == False:
+            res = { "status":2, \
+                    "message":"Data already sent",}
+        else:
+            res= { "status":0, \
+                    "message":"No languages has been tagged to this user",}
+        return JsonResponse(res)        
+
+class MasterlookupDetails(g.CreateAPIView):
+    
+    def post(self, request):
+        """API to list all MasterLookUp."""
+        data=[] 
+        try:
+            if request.data.get('uId') and User.objects.filter(id = int(request.data.get('uId'))).exists():
+                modified_date = request.data.get('serverdatetime')
+                masterlookup = MasterLookUp.objects.all()
+                if modified_date:
+                    modified_date = convert_string_to_date(modified_date)
+                    masterlookup = masterlookup.filter(modified__gt=modified_date)
+                masterlookup = masterlookup.order_by('modified')[:100]
+                data = [{'id': i.id,
+                        'name': i.name,
+                        'code': str(i.code),
+                        'order':float(i.order),
+                        'parent_id': i.parent.id if i.parent else 0,
+                        'active': i.active,
+                        'modified': datetime.strftime(i.modified, '%Y-%m-%d %H:%M:%S.%f'),
+                        'locations':i.get_masterdata_locations(),
+                        } 
+                        for i in masterlookup ]
+                response = {'status':1, 'message':"masterlookup success", 'data':data}
+            else:
+                response = {'message': "user does not exist", 'status': 0, 'data':data}
+        except Exception as e:
+            response = {'message': e.args[0], 'status': 0, 'data':data}
+        return Response(response)
+        
 @csrf_exempt
 def new_responses_list_v3(request):
     # get user and based on userid get surveys mapped to user
