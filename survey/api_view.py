@@ -9,7 +9,7 @@ from survey.custom_decorators import *
 # from survey.monkey_patching import *
 # from masterdata.models import *
 # from beneficiary.models import *
-import os
+import os,re
 from datetime import datetime, timedelta
 from django.db.models import Q
 from django.apps import apps
@@ -855,6 +855,12 @@ def languagelist(request):
                     "message":"No languages has been tagged to this user",}
         return JsonResponse(res)        
 
+def get_user_based_roles_locations(user):
+    userrole = UserRoles.objects.get(user=user)
+    locations = map(str,list(itertools.chain(OrganizationLocation.objects.filter(user=userrole).exclude(location=None).values_list('location__id',flat=True))))
+    boundaries = Boundary.objects.filter(id__in=locations)
+    user_roles = list(chain(userrole.role_type.all().values_list('id',flat=True)))
+    return user_roles,locations
 
 def groups_roles_locations_based_responses(survey_list,user):
     responses=[]
@@ -917,29 +923,30 @@ def groups_roles_locations_based_responses(survey_list,user):
 @csrf_exempt
 def program_responses_list(request):
     if request.method == 'POST':
-        user_id = request.POST.get("userid")
-        user = User.objects.get(id=user_id)
-        updatedtime = request.POST.get("serverdatetime")
-        partner_obj = UserPartnerMapping.objects.get(user_id=int(user_id)).partner
-        survey_list=Survey.objects.filter(active=2,survey_module=1)
-        # survey_module = 1 for programs responses in swayam instance
-        # user_roles,locations = get_user_based_roles_locations(user)
-        # if not 'TEAM LEAD' in user_roles:
-        responses = groups_roles_locations_based_responses(survey_list,user)
-        responses_ids = list(set(responses))
-        user_list = UserPartnerMapping.objects.filter(partner=partner_obj).values_list('user',flat=True)
-        flag = ""
-        ben_uuid = ""
-        fac_uuid = ""
-        responses = JsonAnswer.objects.filter(active=2, id__in=responses_ids)
-        if updatedtime:
-            updated = convert_string_to_date(updatedtime)
-            responses = responses.filter(modified__gt=updated)
-            flag = False
-        responses = responses.filter().order_by('modified')[:100]
-        res_list = get_common_responses_details(responses,partner_obj,user_id)
+        # user_id = request.POST.get("userid")
+        # user = User.objects.get(id=user_id)
+        # updatedtime = request.POST.get("serverdatetime")
+        # partner_obj = UserPartnerMapping.objects.get(user_id=int(user_id)).partner
+        # survey_list=Survey.objects.filter(active=2,survey_module=1)
+        # # survey_module = 1 for programs responses in swayam instance
+        # # user_roles,locations = get_user_based_roles_locations(user)
+        # # if not 'TEAM LEAD' in user_roles:
+        # responses = groups_roles_locations_based_responses(survey_list,user)
+        # responses_ids = list(set(responses))
+        # user_list = UserPartnerMapping.objects.filter(partner=partner_obj).values_list('user',flat=True)
+        # flag = ""
+        # ben_uuid = ""
+        # fac_uuid = ""
+        # responses = JsonAnswer.objects.filter(active=2, id__in=responses_ids)
+        # if updatedtime:
+        #     updated = convert_string_to_date(updatedtime)
+        #     responses = responses.filter(modified__gt=updated)
+        #     flag = False
+        # responses = responses.filter().order_by('modified')[:100]
+        # res_list = get_common_responses_details(responses,partner_obj,user_id)
         # else:
         #     res_list = []
+        res_list,flag = [],True
         if res_list:
             res = {'status': 2,
                    'message': "Success",
@@ -1166,30 +1173,31 @@ def lead_activites_responses(user,user_roles):
 @csrf_exempt
 def avtivist_group_responses(request):
     if request.method == 'POST':
-        user_id = request.POST.get("userid")
-        user = User.objects.get(id=user_id)
-#        """#updatedtime = request.POST.get("serverdatetime")"""
-        partner_obj = UserPartnerMapping.objects.get(user_id=int(user_id)).partner
-        survey_list=Survey.objects.filter(active=2,survey_module=2)
-#        """# survey_module = 2 for survivor activits group in swayam instance"""
-        # user_roles,locations = get_user_based_roles_locations(user)
-        responses = user_based_group_responses()
-        linkage_responses = get_survivors_linkages_responses()
-        if linkage_responses:
-            responses.extend(linkage_responses)
-        # activity_responses = lead_activites_responses(user,user_roles)
-        # responses.extend(activity_responses)
-        user_list = UserRoles.objects.filter(partner=partner_obj).values_list('user',flat=True)
-        flag = ""
-        ben_uuid = ""
-        fac_uuid = ""
-        responses = JsonAnswer.objects.filter(active=2, id__in=responses)
-#        if updatedtime:
-#            updated = convert_string_to_date(updatedtime)
-#            responses = responses.filter(modified__gt=updated)
-#            flag = False
-#        responses = responses.filter().order_by('modified')[:100]
-        res_list = get_common_responses_details(responses,partner_obj,user_id, user_roles)
+#         user_id = request.POST.get("userid")
+#         user = User.objects.get(id=user_id)
+# #        """#updatedtime = request.POST.get("serverdatetime")"""
+#         partner_obj = UserPartnerMapping.objects.get(user_id=int(user_id)).partner
+#         survey_list=Survey.objects.filter(active=2,survey_module=2)
+# #        """# survey_module = 2 for survivor activits group in swayam instance"""
+#         # user_roles,locations = get_user_based_roles_locations(user)
+#         responses = user_based_group_responses()
+#         linkage_responses = get_survivors_linkages_responses()
+#         if linkage_responses:
+#             responses.extend(linkage_responses)
+#         # activity_responses = lead_activites_responses(user,user_roles)
+#         # responses.extend(activity_responses)
+#         user_list = UserRoles.objects.filter(partner=partner_obj).values_list('user',flat=True)
+#         flag = ""
+#         ben_uuid = ""
+#         fac_uuid = ""
+#         responses = JsonAnswer.objects.filter(active=2, id__in=responses)
+# #        if updatedtime:
+# #            updated = convert_string_to_date(updatedtime)
+# #            responses = responses.filter(modified__gt=updated)
+# #            flag = False
+# #        responses = responses.filter().order_by('modified')[:100]
+#         res_list = get_common_responses_details(responses,partner_obj,user_id, user_roles)
+        res_list,flag = [],True
         if res_list:
             res = {'status': 2,
                    'message': "Success",
@@ -1224,14 +1232,16 @@ def avtivist_group_responses(request):
 def get_levels(request, level):
     try:
         n = 100
-        url_level = level
+        # url_level = level
 
     #    userrole = UserRoles.objects.get(user__id=request.POST.get('uid'))
     #    orguser = OrganizationLocation.objects.filter(user__id=userrole.id)
         user = User.objects.get(id=request.POST.get('uid'))
-        level_obj = BoundaryLevel.objects.get(code=int(url_level))
-        user_locations = user_projects_locations(user, level_obj)
-        tagged_locations = Boundary.objects.filter(id__in=user_locations)
+        boundary_level = {1:State,2:District}
+        tagged_locations = UserProjectMapping.objects.filter(user=user,active=2).select_related('project','project__district','project__district__state')
+        # level_obj = BoundaryLevel.objects.get(code=int(url_level))
+        # user_locations = user_projects_locations(user, level_obj)
+        # tagged_locations = Boundary.objects.filter(id__in=user_locations)
         tagged_locations_all = tagged_locations
         modified_obj = request.POST.get("modified_date")
         if modified_obj:
@@ -1242,13 +1252,13 @@ def get_levels(request, level):
         tagged_locations = tagged_locations.order_by('modified')[:int(n)]
 
         for tl in tagged_locations:
-            location = tl
+            location = tl.project.district
             one_location_level = {}
-            parent_locations_list = location.get_parent_locations([]) 
-            for loc in parent_locations_list:
-                one_location_level.update(loc)
+            # parent_locations_list = location.get_parent_locations([]) 
+            # for loc in parent_locations_list:
+            #     one_location_level.update(loc)
             
-            one_location_level['level'+str(url_level)+'_id']=int(location.id)
+            one_location_level['level'+str(level)+'_id']=int(location.id)
             one_location_level['name']=re.sub(r'[^\x00-\x7F]+','',location.name).strip()
             one_location_level['active']=str(location.active)
             one_location_level['modified_date']=datetime.strftime(location.modified, '%Y-%m-%d %H:%M:%S.%f')
@@ -1263,7 +1273,7 @@ def get_levels(request, level):
         else:
             flag = 1
         if parent_locations:
-            return JsonResponse({'status':2,'Level '+str(url_level):parent_locations,'flag':flag,'location_ids':list(tagged_locations_all.values_list('id',flat=True))
+            return JsonResponse({'status':2,'Level '+str(level):parent_locations,'flag':flag,'location_ids':list(tagged_locations_all.values_list('id',flat=True))
                         })
         else:
             return JsonResponse({"status":2, "message":"Data already sent",})

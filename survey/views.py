@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 import pandas as pd
 from django.shortcuts import render,HttpResponse,HttpResponseRedirect
 import bleach
+from rest_framework.response import Response
 
 pg_size = settings.REST_FRAMEWORK.get('PAGE_SIZE')
 
@@ -641,17 +642,21 @@ class ImportMQuestions(View):
 class ProgramRetreiveLinkages(CreateAPIView):
     serializer_class = LinkageListingSerializer
     def post(cls, request, format=None):
-        response = {'status': "success", "message": "successfully done"}
-        serializer = LinkageListingSerializer(data=request.data)
-        if serializer.is_valid():
-            data_dict = {'content_type':ContentType.objects.get_for_model(BeneficiaryResponse),
-                'content_type1':ContentType.objects.get_for_model(BeneficiaryResponse),
-                'relation':None,
-                'survey_relation':1
-                }
-            linkage_list,flag = get_common_linkage_details(request,data_dict)
-            response.update({'linkages': linkage_list})
-        else:
-            return get_serializer_errors(serializer)
-        return Response(response)    
+        # response = {'status': "success", "message": "successfully done"}
+        # serializer = LinkageListingSerializer(data=request.data)
+        # if serializer.is_valid():
+        #     data_dict = {'content_type':ContentType.objects.get_for_model(BeneficiaryResponse),
+        #         'content_type1':ContentType.objects.get_for_model(BeneficiaryResponse),
+        #         'relation':None,
+        #         'survey_relation':1
+        #         }
+        #     linkage_list,flag = get_common_linkage_details(request,data_dict)
+        #     response.update({'linkages': linkage_list})
+        # else:
+        #     return get_serializer_errors(serializer)
+        return Response({
+                    "status": "success",
+                    "message": "successfully done",
+                    "linkages": []
+                })    
 
