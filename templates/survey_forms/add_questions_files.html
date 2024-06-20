@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block contents %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                <div class="card-body">
+                    <form method="POST" action="." class="form-horizontal" id="survey" enctype="multipart/form-data">{% csrf_token %}
+                        <div class="card-header card-header-icon mb-3" data-background-color="rose">
+                            <div class="d-flex align-items-center" >
+                                <i class="p-1 bx bx-envelope" style="font-size: 22px;"></i>
+                                <h4 class="p-1 card-title" style="position: relative; top:5px;">{% if key %}Upload regional language's question and choice excel {% else %}Upload question excel {% endif %}</h4>
+                            </div>
+
+                        </div>
+                        {% if error %}<div class="col-md-12"><div class="error_alert"><h3>{{error}}</h3></div></div>{% endif %}
+                        <div class="card-content"> <!-- "key" for import regional choice question -->
+                            <div class="col-md-6 validate_height" id="div_name">
+                                <label class="col-sm-12 label-on-left">File <span class="required">*</span></label>
+                                <div class="col-sm-12">
+                                    <div class="form-group label-floating is-empty">
+                                        <!-- <label class="control-label"></label> -->
+                                        <input class="form-control-file" type="file" value="" name="file">
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+                            <div class="col-md-12 text-right choose_right d-flex justify-content-end" style="gap:10px" >
+                                <a href="/survey/">
+                                    <span class="btn btn-danger btn-fill btn-sm">Cancel</span>
+                                </a>
+
+                                <input type="submit" class="btn btn-primary btn-fill btn-rose btn-sm" value="Save">
+
+                            <div class="ripple-container"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_javascript %}
+
+<script src="/static/js/jquery.validate.js"></script>
+<script>
+    $(document).ready(function() {
+        $("#survey").validate({
+            rules :
+            {
+                file: {required: true},
+            },
+        });
+    });
+</script>
+
+{% endblock %}

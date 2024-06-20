@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% load urs_tags %}
+{% get_request as request %}
+{% with "data-collection-forms"|make_string:"view" as keystring %}
+            {% if request.user.is_superuser or request|has_permission_for_action:keystring %}
+{% block contents %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                <div class="card-body">
+                    <div class="card-header card-header-icon d-flex justify-content-between" data-background-color="rose">
+                        <div class="d-flex align-items-center">
+                            <i class="p-1 bx bx-paste" style="font-size: 18px;" ></i>
+                            <h4 class="p-1 card-title" style="position: relative; top: 5px;" >Data collection forms</h4>
+                        </div>
+
+                        <div class="user_back datatable_search d-flex align-items-center">
+                            <div class="p">
+                                <form action="{{request.path}}" class="app-search d-none d-sm-block" style="padding: 0;!important">
+                                    <div class="position-relative">
+                                        <input formcontrolname="text" {% if search_txt%}  value={{search_txt}} {%else%} {%endif%} name = 's' type="text" class="form-control" placeholder="Search with name...">
+                                        <span class="bx bx-search-alt"></span>
+                                    </div>
+                                </form>
+                            </div>
+                            <div  class="p">
+                                <a  href="{{request.path}}">
+                                    <input type="button" class="btn  btn-fill btn-rose btn-sm btn-filter " value=""  ><i class="bx bx-x" style="position: relative; top: 2px; font-size: 18px;" ></i> 
+                                </a>
+                            </div>
+
+                        </div>
+
+
+                        <div class="d-flex" style="gap:10px">
+                            {% with "data-collection-forms"|make_string:"add" as keystring %}
+                            {% if request.user.is_superuser or request|has_permission_for_action:keystring %}
+                            <a href="/manage/import-regional-choice-question/" class="ng-star-inserted">
+                                                    <button class="btn btn-just-icon btn-success btn-sm d-none"  rel="tooltip" title="Import Regional Ques and choices">
+    <!-- import regional question and choices-->
+                                                    <i class="bx bx-cloud-upload icon-size-lg" id="backup"  ></i>
+                                                    </button>
+                            </a>
+                            <a href="/survey/add/">
+                                <button class="btn btn-primary btn-just-icon btn-round btn-dribbble btn-sm"  title="add information">
+                                    <i class="bx bx-plus icon-size-lg" ></i>
+                                </button>
+                            </a>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+
+
+                    </div>
+                    <div class="card-content card_section">
+                        
+                        <div class="user_back datatable_search d-none">
+                        
+		                    <!-- <form autocomplete="off" method="GET" action="{{request.path}}" id="search" class="search">
+				            <div class="form-group label-floating">
+				                <label class="control-label">Search with name</label>
+				                 <input class="form-control" formcontrolname="text"  style="width:100%" type="text" name = 's'>
+				            </div>
+				            <a href="/manage/users/">
+				                <button type="submit" class="search_field btn btn-white btn-round btn-just-icon">
+				                        <i class="material-icons">search</i>
+				                        <div class="ripple-container"></div>
+                                        
+				                </button>
+				              </a>
+				              </form> -->
+                              
+                        <!-- new search bar -->
+                            <form action="{{request.path}}" class="app-search d-none d-sm-block">
+                                <div class="position-relative">
+                                    <input formcontrolname="text" name = 's' type="text" class="form-control" placeholder="Search with name...">
+                                    <span class="bx bx-search-alt"></span>
+                                </div>
+                            </form>
+                        
+                    	</div>
+                              
+                              
+                                        
+                        
+                        <div class="table-responsive width_section" >
+                            <table class="table">
+                                <thead class="text-primary" style="vertical-align: middle;!important ">
+                                    <th>Name</th>
+                                    {% if anonymous_user_entry == 1 or anonymous_user_entry == 2 %}
+                                    <th>Hash Code</th>
+                                    {% endif %}
+                                    <th>Type</th>
+                                    <th>Participant(Location)</th>
+                                    <th>Order</th>
+                                    <th>Status</th>
+                                    {% with "data-collection-forms"|make_string:"edit" as keystring %}
+            {% if request.user.is_superuser or request|has_permission_for_action:keystring %}
+                                    <th class="text-right d-flex justify-content-end">Actions</th>
+                                    {% endif %}
+                                        {% endwith %}
+                                </thead>
+                                <tbody style="vertical-align: middle;!important ">
+                                    {% for survey in object_list %}
+                                    <tr>
+                                        <td>{{ survey.name }}</td>
+                                        {% if anonymous_user_entry == 1 or anonymous_user_entry == 2 %}
+                                        <td>{{survey.get_hash_code}}</td>
+                                        {% endif %}
+                                        <td>{{ survey.get_survey_type_display }}</td>
+                                        <td>{% if survey.get_beneficiary_type %}{{ survey.get_beneficiary_type }}{% endif %}{% if survey.get_survey_location %}({{ survey.get_survey_location }}){% endif %}</td>
+                                        <td>{{ survey.survey_order }}</td>
+                                        <td> {% if survey.active == 2 %} Active {% else %} InActive {% endif %}  </td>
+                                        
+                                        {% with "data-collection-forms"|make_string:"edit" as keystring %}
+            {% if request.user.is_superuser or request|has_permission_for_action:keystring %}
+                                        <td class="action_btn d-flex justify-content-end" style="gap: 5px;">
+                                            <a href="/survey/edit/{{survey.id}}/" class="ng-star-inserted">
+                                                <button class="btn btn-just-icon btn-info btn-sm" style="float:right" title=edit>
+                                                    <i class="bx bx-pencil" style="font-size: 16px;"></i>
+                                                </button>
+                                            </a>
+                                            <a href="/questions/{{survey.id}}/" class="ng-star-inserted">
+                                                <button class="btn btn-light btn-just-icon btn-rose btn-sm" style="float:right">
+<!--                                                Manage Questions-->
+                                                <i class="bx bx-cog" style="font-size: 16px;"></i>
+                                                </button>
+                                            </a>
+                                            {% if request.user.is_superuser %}
+
+                                            <a href="/import-questions/{{survey.id}}/" class="ng-star-inserted ">
+                                                <button class="btn btn-just-icon btn-success btn-sm" style="float:right" rel="tooltip" title="Import Ques and choices">
+                                                <em class="bx bx-cloud-upload" style="font-size: 16px;"></em>
+                                                </button>
+                                            </a>
+                                            
+                                            <a href="/import-modified-questions/{{survey.id}}/" class="ng-star-inserted ">
+                                                <button class="btn btn-just-icon btn-success btn-sm" style="float:right" rel="tooltip" title="Modified Import Ques and choices">
+<!--                                                Manage Questions-->
+                                                <i class="bx bx-cloud-upload" style="font-size: 16px;"></i>
+                                                </button>
+                                            </a>
+                                            
+                                            <a href="/activity/questions/export/?id={{survey.id}}" class="ng-star-inserted ">
+                                                <button class="btn btn-just-icon btn-success btn-sm" style="float:right"rel="tooltip" title="Export Questions">
+<!--                                                Manage Questions-->
+                                                <i class="bx bx-cloud-download" style="font-size: 16px;"></i>
+                                                </button>
+                                            </a>
+                                            {% endif %}
+                                            {% if request.user.is_superuser %}
+                                            <a href="/activity/choices/export/?id={{survey.id}}" class="ng-star-inserted ">
+                                                <button class="btn btn-just-icon btn-success btn-sm" style="float:right" rel="tooltip" title="Export Choices">
+<!--                                                Manage Questions-->
+                                                <i class="bx bx-cloud-download" style="font-size: 16px;"></i>
+                                                </button>
+                                            </a>
+                                            {% endif %}
+                                        </td>
+                                        {% endif %}
+                                        {% endwith %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% if object_list %}
+                            {% include 'survey_forms/pagination.html' %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% endif %}
+{% endwith %}

@@ -112,3 +112,9 @@ def query_transform(request, **kwargs):
 
     return updated.urlencode()
 
+@register.simple_tag
+def get_skip_question(choice, question):
+    is_skip_question = False
+    if question in choice.skip_question.all():
+        is_skip_question = True
+    return is_skip_question

@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block contents %}
+<!-- TOGGLE POPUP FOR THE WARNING  -->
+<div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-body">
+            <div class="modal-header">
+                <h4 class="modal-title">Are You Sure You want to Deactivate. <br>
+                    You won't be able to activate it again please confirm !
+                </h4>
+            </div>
+            <form method="POST" action="/manage/deactivate-choice/{{choice_object.id}}/" class="form-horizontal">{% csrf_token %}
+
+                <div class="card-content">
+                    <h4 class="card-title"></h4>
+                    <div class="col-md-12 validate_height" id="div_name">
+                        <label class="col-sm-12 label-on-right">Reason For Deactivating <span class="required">*</span></label>
+                        <div class="col-sm-8">
+                            <div class="form-group label-floating is-empty">
+                                
+                                <select class="form-control" data-width="100%" data-style="select-with-transition" name="reason" id="theme_id" required>
+                                    <option value="">---------------</option>
+                                    {% for reason in choice_deactivate_reasons %}
+                                    <option value="{{ reason.0}}">{{ reason.1 }}</option>
+                                    {% endfor %}
+                                </select>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 text-right choose_right d-flex justify-content-end" style="gap:10px">
+                    <input type="button" class="btn btn-primary btn-fill btn-sm" data-bs-dismiss="modal" value="Close">
+                    
+                    <!-- input type="submit" class="btn btn-fill btn-danger btn-sm" value="Deactivate"> -->
+                    <input type="submit" class="btn btn-fill btn-danger btn-sm" value="Deactivate">
+
+                </div>
+
+            </form>
+            <!-- <div class="modal-body"> -->
+            <!-- <h3>Reason For Deactivating</h3> -->
+            <!-- </div> -->
+            <!-- <div class="modal-footer"> -->
+
+            <!-- </div> -->
+        </div>
+        </div>
+    </div>
+</div>
+<!-- Deactivate Choice Warning HTML Closes-->
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                <div class="card-body">
+                    <form method="POST" action="." class="form-horizontal" id="survey">{% csrf_token %}
+                        <div class="card-header card-header-icon mb-3" data-background-color="rose">
+                            <div class="d-flex align-items-center">
+                                <i class="p-1 bx bx-detail" style="font-size: 18px;"></i>
+                                <h4 class="p-1 card-title" style="position: relative; top: 5px;">{% if add %}Create{% else %}Update{% endif %} Choice</h4>
+                            </div>
+
+                        </div>
+                        {% if error %}<div class="col-md-12"><div class="error_alert"><h3>{{error}}</h3></div></div>{% endif %}
+                        <div class="row card-content">
+                            {% for field in form %}
+                            <div class="col-md-6 mb-3" id="div_{{field.name}}">
+                                <label class="col-sm-4 label-on-left">{{field.label}}{% if field.field.required %}<span class="required"> *</span>{% endif %}</label>
+                                <div class="col-sm-8">
+                                    <div class="form-group label-floating is-empty">
+                                        <!-- <label class="control-label"></label> -->
+                                        {{field}}
+                                        {% if field.errors %}{{ field.errors|striptags }}{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% if add %}
+                                <div class="col-md-12 text-right choose_right d-flex justify-content-end mt-3 " style="gap:10px">
+                                    <a href="/choices/{{cancel_id}}/">
+                                        <span class="btn btn-danger btn-fill btn-sm">Cancel</span>
+                                    </a>
+                                    <input type="submit" class="btn btn-primary btn-fill btn-rose btn-sm" value="Save">
+                                </div>
+                            {% else %}
+                                {% if choice_object.active == 2 %}
+                                    <div class="col-md-12 d-flex justify-content-between mt-3">
+                                        <div class=" text-left choose_left d-flex">
+                                            <a href="#" class="btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#basicModal"><span class="btn-danger btn-sm">Deactivate</span></a>
+                                            <input type="hidden">
+                                        </div>
+                                        
+                                        <div class=" text-right choose_right d-flex justify-content-end" style="gap:10px">
+                                            <a href="/choices/{{cancel_id}}/">
+                                                <span class="btn btn-danger btn-fill btn-sm">Cancel</span>
+                                            </a>
+                                            <input type="submit" class="btn btn-primary btn-fill btn-rose btn-sm" value="Save">
+
+                                        </div>
+
+                                    </div>
+                                {% else %}
+                                    <div class="col-md-12 validate_height " id="div_DeactivateDetails">
+                                        <label class="label-on-left"><h5>Deactivation Details</h5></label><br>
+                                        <!-- <label class="col-md-3 label-on-left"><b>Deactivation Details</b></label><br><hr> -->
+                                        <label class="label-on-left"><b>Deactivation Reason :</b></label>{% if choice_object.deactivated_reason %} {{choice_object.deactivated_reason}} {% else %}  Not Available {% endif %} <br>
+                                        <label class="label-on-left"><b> Deactivated Date  :</b></label>{% if choice_object.deactivated_date %}    {{choice_object.deactivated_date }} {% else %}  Not Available {% endif %}<br>
+                                        <label class="label-on-left"><b>Deactivated By  :</b></label>   {% if choice_object.deactivated_user %}    {{choice_object.deactivated_user.username }} {% else %} Not Available {% endif %}
+        
+                                    </div>
+                                    <div class="col-md-12 text-right choose_right">
+                                        <a href="/manage/choices/{{cancel_id}}/">
+                                            <span class="btn btn-danger btn-fill btn-sm">Back</span>
+                                        </a>
+                                    <div>
+                                {% endif%}
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_javascript %}
+{% if edit %}
+<script>
+    if ('{{edit}}' == 'True' && '{{question_object.qtype}}' == 'T'){
+        $("#validation_type_id").val('{{question_validation.validationtype.id}}');
+        $("#id_message").val('{{question_validation.message}}');
+        $("#id_min_value").val('{{question_validation.min_value}}');
+        $("#id_max_value").val('{{question_validation.max_value}}');
+        $("#text_fields").show();
+        }
+    else{
+        $("#validation_type_id").val('');
+        $("#message").val('')
+        $("#id_min_value").val('');
+        $("#id_max_value").val('');
+        $("#text_fields").hide();
+    }
+</script>
+
+{% endif %}
+<script src="/static/js/jquery.validate.js"></script>
+<script>
+    $(document).ready(function() {
+        if('{{edit}}'){
+            var active = '{{choice_object.active}}'
+        if(active == 0){
+            $('#survey').find(':input').attr('disabled', 'disabled');
+        } 
+        }
+
+
+        $('input[type=text]').addClass('form-control');
+        $('input[type=number]').addClass('form-control');
+        $("#survey").validate({
+            rules :
+            {
+                text: {required: true},
+                choice_order: {required: true},
+                code: {required: true, min: 0},
+            },
+        });
+    });
+</script>
+
+{% endblock %}
