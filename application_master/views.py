@@ -14,6 +14,7 @@ from rest_framework import permissions
 from django.db import transaction
 from rest_framework.views import APIView
 from application_master.serializers import LoginAndroidSerializer
+from django.http import JsonResponse
 
 def master_list_form(request,model):
     heading = 'user profile'    
@@ -349,6 +350,15 @@ def edit_user_partner_project(request, id, model):
         return redirect('/application_master/details/'+ str(model) + '/'+ str(vendor_partner_id.id) + '/')
     return render(request, 'user/edit_user_link_to_role.html', locals())
 
+
+def get_district(request, state_id):
+    print(state_id, 'state_id---------------------------')  # Debug statement
+    if request.method == 'GET':
+        result_set = []
+        district_obj = District.objects.filter(state_id=state_id, active=2).order_by('name')
+        for district in district_obj:
+            result_set.append({'id': district.id, 'name': district.name})
+        return JsonResponse(result_set, safe=False)
 
 
 class LoginAndroidView(APIView):
