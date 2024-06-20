@@ -855,32 +855,91 @@ def languagelist(request):
                     "message":"No languages has been tagged to this user",}
         return JsonResponse(res)        
 
+
+def groups_roles_locations_based_responses(survey_list,user):
+    responses=[]
+    input_parameters_1={}
+    user_roles,locations = get_user_based_roles_locations(user)
+    level = get_user_level(user)
+    user_groups = get_user_location_group(locations)
+    for survey in survey_list:
+#        level = user_setup().get('least_location_level_config')
+        if survey.is_beneficiary_based_child() == False:
+            address_question = survey.questions().filter(api_json__is_address=2)
+        else:
+            address_question = survey.get_parent_beneficiary_address()
+        role_question = survey.questions().get(api_json__is_role=2)
+#        input_parameters = {'response__address__K1__' + str(address_question.id) + '__' + str(level)+'__icontains': locations,'response__K'+str(role_question.id)+'__icontains':user_roles}
+        filters = Q()
+        for i in user_roles:
+            input_parameters_1 = {'response__K'+str(role_question.id)+'__icontains': i}
+            filters |= Q(**{input_parameters_1.keys()[0]:input_parameters_1[input_parameters_1.keys()[0]]})
+        json_response = JsonAnswer.objects.filter(filters,survey=survey)
+        filters = Q()
+        input_parameters_1 = {}
+        if address_question:
+            for address in address_question:
+                for j in locations:
+                    input_parameters_1 = ({'response__K'+str(address.id)+'__icontains': j})
+                    #input_parameters_1=({'response__address__K1__K' + str(address.id) + '__K' + str(level)+'__icontains': j})
+                    filters |= Q(**{input_parameters_1.keys()[0]:input_parameters_1[input_parameters_1.keys()[0]]})
+        json_response = json_response.filter(filters)
+        group_questions = survey.questions().filter(api_json__is_group=2)
+        flag1 =False
+        filters = Q()
+        input_parameters_1 = {}
+        if group_questions:
+            flag1=True
+            for grp_ques in group_questions:
+                for i in user_groups:
+                    input_parameters_1 = ({'response__K'+str(grp_ques.id)+'__icontains': i})
+                    filters |= Q(**{input_parameters_1.keys()[0]:input_parameters_1[input_parameters_1.keys()[0]]})
+        json_response = json_response.filter(filters)
+        question_response=survey.questions().filter(api_json__is_response=2)
+        flag2 = False
+        input_parameters_1 = {}
+        filters = Q()
+        if question_response:
+            flag2=True
+            for res_ques in question_response:
+                res_survey_id=res_ques.api_json.get('is_form')
+                input_parameters_1 = {'response__K'+str(res_ques.id)+'=':res_survey_id}
+                filters |= Q(**{input_parameters_1.keys()[0]:input_parameters_1[input_parameters_1.keys()[0]]})
+        json_response = json_response.filter(filters)
+        role_que = None
+#        for item in input_parameters:
+#            if item == 'response__K'+str(role_question.id)+'__icontains':
+#                filters = Q(**{item:input_parameters[item]})
+#        j = JsonAnswer.objects.filter(filters,survey=survey)
+        responses.extend(json_response.values_list('id', flat=True))
+    return responses
+
 @csrf_exempt
 def program_responses_list(request):
     if request.method == 'POST':
         user_id = request.POST.get("userid")
         user = User.objects.get(id=user_id)
         updatedtime = request.POST.get("serverdatetime")
-        partner_obj = UserRoles.objects.get(user_id=int(user_id)).partner
+        partner_obj = UserPartnerMapping.objects.get(user_id=int(user_id)).partner
         survey_list=Survey.objects.filter(active=2,survey_module=1)
         # survey_module = 1 for programs responses in swayam instance
-        user_roles,locations = get_user_based_roles_locations(user)
-        if not 'TEAM LEAD' in user_roles:
-            responses = groups_roles_locations_based_responses(survey_list,user)
-            responses_ids = list(set(responses))
-            user_list = UserRoles.objects.filter(partner=partner_obj).values_list('user',flat=True)
-            flag = ""
-            ben_uuid = ""
-            fac_uuid = ""
-            responses = JsonAnswer.objects.filter(active=2, id__in=responses_ids)
-            if updatedtime:
-                updated = convert_string_to_date(updatedtime)
-                responses = responses.filter(modified__gt=updated)
-                flag = False
-            responses = responses.filter().order_by('modified')[:100]
-            res_list = get_common_responses_details(responses,partner_obj,user_id)
-        else:
-            res_list = []
+        # user_roles,locations = get_user_based_roles_locations(user)
+        # if not 'TEAM LEAD' in user_roles:
+        responses = groups_roles_locations_based_responses(survey_list,user)
+        responses_ids = list(set(responses))
+        user_list = UserPartnerMapping.objects.filter(partner=partner_obj).values_list('user',flat=True)
+        flag = ""
+        ben_uuid = ""
+        fac_uuid = ""
+        responses = JsonAnswer.objects.filter(active=2, id__in=responses_ids)
+        if updatedtime:
+            updated = convert_string_to_date(updatedtime)
+            responses = responses.filter(modified__gt=updated)
+            flag = False
+        responses = responses.filter().order_by('modified')[:100]
+        res_list = get_common_responses_details(responses,partner_obj,user_id)
+        # else:
+        #     res_list = []
         if res_list:
             res = {'status': 2,
                    'message': "Success",

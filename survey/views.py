@@ -4,6 +4,8 @@ from survey.models import *
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.conf import settings
 from .forms import *
+from rest_framework.generics import (CreateAPIView)
+from survey.serializers import LinkageListingSerializer
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 import pandas as pd
@@ -635,3 +637,21 @@ class ImportMQuestions(View):
         file_path = str(response_file_object.response_image.path)
         import_modified_questions(file_path)
         return HttpResponseRedirect('/manage/questions/' + str(pk) + '/')
+
+class ProgramRetreiveLinkages(CreateAPIView):
+    serializer_class = LinkageListingSerializer
+    def post(cls, request, format=None):
+        response = {'status': "success", "message": "successfully done"}
+        serializer = LinkageListingSerializer(data=request.data)
+        if serializer.is_valid():
+            data_dict = {'content_type':ContentType.objects.get_for_model(BeneficiaryResponse),
+                'content_type1':ContentType.objects.get_for_model(BeneficiaryResponse),
+                'relation':None,
+                'survey_relation':1
+                }
+            linkage_list,flag = get_common_linkage_details(request,data_dict)
+            response.update({'linkages': linkage_list})
+        else:
+            return get_serializer_errors(serializer)
+        return Response(response)    
+
