@@ -1816,3 +1816,152 @@ class LabelLanguageTranslation(BaseContent):
     language = models.ForeignKey(Language,on_delete=models.DO_NOTHING)
     other_text = models.CharField(max_length=255, blank=True, null=True)
     integer_field = models.IntegerField(default=0)
+
+######################## Beneficiary Models ################
+class BeneficiaryType(BaseContent):
+    name = models.CharField('Name', max_length=100)
+    parent = models.ForeignKey('self',on_delete=models.DO_NOTHING, blank=True, null=True)
+    is_main = models.BooleanField(default=False)
+    btype_order = models.IntegerField(null=True, blank=True)
+    allow_multiple_address = models.BooleanField(default=False)
+    color = models.CharField('Color', max_length=50, blank=True, null=True)
+    is_training_type = models.BooleanField(default=False)
+    is_admin_type = models.BooleanField(default=False)
+    is_training_module = models.BooleanField(default=False)
+    category = models.ForeignKey(MasterLookUp, on_delete=models.DO_NOTHING, \
+                blank=True, null=True)
+    is_activist_group = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
+
+    def get_childs(self):
+        return BeneficiaryType.objects.filter(parent=self, active=2).order_by('btype_order')
+
+    def get_survey(self):
+        """ Survey object of Beneficiary Type """
+        survey = Survey.objects.get_or_none(survey_type=0, content_type=\
+                        ContentType.objects.get_for_model(self), object_id=self.id)
+        return survey
+
+    def get_answers_count(self):
+        """ Returns the count of answers for this beneficiary type"""
+        if self.get_survey() and self.get_survey().survey_type == 0:
+            answers = BeneficiaryResponse.objects.filter(survey=self.get_survey())
+        else:
+            answers = JsonAnswer.objects.filter(survey=self.get_survey())
+        return answers.count()
+
+    def get_answers(self):
+        """ Returns the answers for this beneficiary type"""
+        if self.get_survey() and self.get_survey().survey_type == 0:
+            answers = BeneficiaryResponse.objects.filter(
+                survey=self.get_survey())
+        else:
+            answers = JsonAnswer.objects.filter(survey=self.get_survey())
+        return answers
+
+
+class BeneficiaryResponse(BaseContent):
+    survey = models.ForeignKey('survey.Survey', on_delete=models.DO_NOTHING, \
+                blank=True, null=True)
+    beneficiary_type = models.ForeignKey(
+        BeneficiaryType, blank=True, null=True,on_delete=models.DO_NOTHING)
+    partner = models.ForeignKey(
+        'partner.Partner', blank=True, null=True, related_name='beneficiary_partner',on_delete=models.DO_NOTHING)
+    creation_key = models.CharField('UUID', max_length=100, unique=True)
+    list_view = models.JSONField(default=dict)
+    profile_view = models.JSONField(default=dict)
+    json_answer_id = models.IntegerField(default=0)
+    code = models.CharField(max_length=50, blank=True, null=True)
+    parent_beneficiary = models.IntegerField(blank=True, null=True)
+    address_1 = models.IntegerField(default=0)
+    address_2 = models.IntegerField(default=0)
+    address_3 = models.IntegerField(default=0)
+    address_4 = models.IntegerField(default=0)
+    address_5 = models.IntegerField(default=0, db_index=True)
+    address_6 = models.IntegerField(default=0)
+    address_7 = models.IntegerField(default=0)
+    address_8 = models.IntegerField(default=0)
+    duplicate_status = models.IntegerField(null=True,blank=True,choices=((1,'Approved'),(2,'Duplicate'),(3,'Rejected')))
+    duplicate_marked_date = models.DateTimeField(blank=True,null=True)
+    duplicate_marked_by = models.ForeignKey(User,on_delete=models.DO_NOTHING,blank=True,null=True)
+    
+    # Beneficciary workflow 
+    approval_status = models.IntegerField(default=1,null=True,blank=True,choices=((0,'Submitted for approval'),(1,'Draft'),(2,'Approved'),(3,'Rejected')))
+    approved_by = models.ForeignKey(User, related_name="approved_by_users",on_delete=models.DO_NOTHING,blank=True,null=True)
+    approved_on = models.DateTimeField(blank=True,null=True)
+
+    def __str__(self):
+        # Unicode for answer
+        return str(self.survey) + '-' + str(self.get_response_name())
+
+    def response(self):
+        return JsonAnswer.objects.get(id=self.json_answer_id).response
+
+    def get_cluster(self):
+        return JsonAnswer.objects.get(id=self.json_answer_id).cluster
+
+    def get_answer(self):
+        try:
+            answer = JsonAnswer.objects.get(id=self.json_answer_id)
+        except:
+            answer = None
+        return answer
+
+    def get_response_name(self):
+        disp_name = ''
+        code_concate = user_setup().get('user_display_code',0)
+        try:
+            question = self.survey.questions().filter(display_has_name=True)[0]
+        except:
+            try:
+                question = self.survey.questions().filter(qtype__in=['T', 'S'])[0]
+            except:
+                question = self.survey.get_form_questions().filter(qtype__in=['T','S'])[0] if self.survey.get_form_questions() else None
+        if question:
+            disp_name = self.response().get(str(question.id))
+            if self.survey.questions().filter(training_config__has_key="with_code_question") and code_concate:
+                que =self.survey.questions().filter(training_config__has_key="with_code_question")[0]
+                code_value=self.response().get(str(que.training_config["with_code_question"]["q_id"]))
+                disp_name ="{} - {}".format(disp_name,code_value)
+        return disp_name
+
+    def get_beneficiary_address(self):
+        try:
+            answer = JsonAnswer.objects.get(id=self.json_answer_id)
+            if answer.survey.is_beneficiary_based_child() == False:
+                qid = answer.survey.questions().filter(qtype='AW')[0].id
+            else:
+                qid = answer.survey.get_parent_beneficiary_address().id
+            from configuration_settings.form_views import get_survey_based_location
+            least_level = get_survey_based_location(answer.survey)
+            if answer.survey.extra_config.get('least_location_level_config'):
+                least_level = answer.survey.extra_config.get('least_location_level_config')
+            location = answer.response.get('address').get('1').get(str(qid)).get(str(least_level))
+        except:
+            location = None
+        return location
+
+    def get_location_name(self):
+        location_name = ''
+        try:
+            if self.get_beneficiary_address():
+                location_name = Boundary.objects.get(id=self.get_beneficiary_address()).name
+        except:
+            pass
+        return location_name
+
+    def get_location_object(self):
+        location_name = ''
+        if self.get_beneficiary_address():
+            location_name = Boundary.objects.get(id=self.get_beneficiary_address())
+        return location_name
+        
+    def get_benefited_address(self):
+        try:
+            answer = JsonAnswer.objects.get(id=self.json_answer_id)
+            location = answer.response.get('address')
+        except:
+            location = []
+        return location

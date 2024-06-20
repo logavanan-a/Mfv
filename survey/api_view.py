@@ -24,6 +24,7 @@ import sys, traceback
 import  logging
 from django.conf import settings
 from collections import defaultdict
+from application_master.models import BoundaryLevel
 
 
 def get_time_difference(tabtime):
@@ -292,21 +293,13 @@ def blocklist(request):
         return JsonResponse(res)
 
 def get_latest_survey_versions(user_id):
-    # Retrieves latest survey version based on used
-    # User based survey and latest version of the user surveys
     version_updates = []
     user = User.objects.get(id=user_id)
-    user_level = get_user_level(user)
-    userrole = UserRoles.objects.filter(user__id=int(user_id))
-    # usersurvey_list = DetailedUserSurveyMap.objects.filter(
-    #     active=2, user__in=userrole)
-    # survey_ids = list(
-    #     set(usersurvey_list.values_list('survey__id', flat=True)))
-    # ,id__in=survey_ids excluded for testing
+    user_level = 2#get_user_level(user)
+    # userrole = UserRoles.objects.filter(user__id=int(user_id))
     survey_list = Survey.objects.filter(active=2).order_by('survey_order')
-    # active_survey_ids = list(set(survey_list.values_list('id', flat=True)))
     version_updates = []
-    all_survey_location = get_all_survey_location(survey_list)
+    # all_survey_location = get_all_survey_location(survey_list)
     #updated filter questions 
     filter_questions = list(SurveyDisplayQuestions.objects.filter(active=2).values_list('survey_id', 'display_type','questions'))
     all_order_levels, all_labels = user_survey_level_labels_v3(survey_list, user_level)
@@ -349,72 +342,37 @@ def get_latest_survey_versions(user_id):
             category_order = 0
         status = 1
 
-        # Commented because not used in bajaj
-        # if int(i.survey_module) == 1:
-        #     if userrole.filter(role_type__name__iexact="TEAM LEAD").exists():
-        #         status = 1
-        #     else:
-        #         status = 0
-        # if i.survey_module == 2:
-        #     status = 0
-
-        # order_levels, labels, beneficiary_ids, beneficiary_type = '','',0,''#i.get_beneficiary_location_details('beneficiary', user)
-        # order_levels, labels, beneficiary_ids, beneficiary_type = get_beneficiary_location_details_v3('beneficiary', user)
         order_levels, labels, beneficiary_ids, beneficiary_type = all_order_levels.get(i.id), all_labels.get(i.id), all_beneficiary_ids.get(i.id), all_beneficiary_type.get(i.id)
 
-        # Commented because not used in bajaj
         facility_ids, facility_type = "",""
-        # facility_ids, facility_type = i.get_beneficiary_location_details('facility', user)
         
         if i.survey_type == 1:
             labels = all_labels.get(i.id)
             order_levels = all_order_levels.get(i.id)
-            # order_levels, labels = user_survey_level_labels(i, user)
-        # try:
+
         summary_qid = ','.join(','.join(map(str, item[2])) for item in filter_questions if item[1] == '1' and item[0] == i.id)
         search_filter = ','.join(','.join(map(str, item[2])) for item in filter_questions if item[1] == '3' and item[0] == i.id)
-        # summary_qid = ','.join(str(j) for j in  SurveyDisplayQuestions.objects.get(survey=i, display_type='1').questions)
         if not summary_qid:
             survey_questions = load_data_to_cache_survey_based_questions()
             questions = survey_questions.get(str(i.id),{})
             summary_qids  = [x['id'] for x in questions if x['qtype'] in ['T', 'R', 'S', 'C']]
             summary_qid = ','.join(map(str, summary_qids[:3]))
-            # summary_qid = ','.join([str(quest.id) for quest in Question.objects.filter(block__survey=i, parent=None, qtype__in=['T', 'R', 'S', 'C'])[:3]])
         if int(i.periodicity) != 0:
             piriodicity = i.get_periodicity_display()
         else:
             piriodicity = ""
-        get_survey_location = all_survey_location.get(i.id)#i.get_survey_location()
-        if (get_survey_location and get_survey_location.code >= user_level) or (i.survey_type == 0) or (i.data_entry_level_id == 4 and (userrole.filter(role_type__id__in=i.extra_config.get('role_type',[])))):
+        get_survey_location = 2#all_survey_location.get(i.id)
+        if (get_survey_location and get_survey_location.code >= user_level) or (i.survey_type == 0) :
             unique_questions = ""
-            # try:
-            #     unique_questions = ','.join(map(str, i.get_unique_validations().questions)) if i.get_unique_validations() else ""
-            # except:
-            #     pass
-
-            # Commented because not used in bajaj
-            # try:
-            #     description = i.get_survey_rule_engine().rule_engine.get("description")
-            # except:
-            #     pass
-            # try:
-            #     display_name = i.get_survey_rule_engine().rule_engine.get("display_name")
-            # except:
-            #     pass
-
-            #survey_json
-            #commented the ruleengine call because not used in bajaj
-            survey_json = []#i.get_survey_linkage_questions()
+            
+            survey_json = []
             survey_json.append({"b_type":i.location_beneficiary_id})
 
             child_survey = None
-            # child_survey = Survey.objects.filter(
-            #     surveyparent__id=i.id).values_list('id', flat=True)
             version_updates.append({'vn': "1.0",
                                     'id': i.id,
                                     'summary_qid': summary_qid,
                                     'order_levels': order_levels,
-                                    #                                    'order_levels':'' if i.survey_type == 0 else i.get_location_details(1),
                                     'beneficiary_ids': beneficiary_ids,
                                     'labels': labels,
                                     'parent_id': '',
@@ -440,25 +398,24 @@ def get_latest_survey_versions(user_id):
                                     "parents": "",
                                     'location_level': '',
                                     'display_name': display_name,
-                                    'parent_link': [] ,#disabled the parent key for temporarly#i.get_parent_links(),
+                                    'parent_link': [] ,
                                     'linkages': i.get_beneficiary_linkages(),
                                     "constraints": unique_questions,
                                     "activity_description": description,
-                                    "rule_engine": [],#i.get_survey_rule_engine_for_surveylist(0) if generalized else i.get_survey_rule_beneficiary(),
-                                    "rule_engine_or": [],#i.get_survey_rule_engine_for_surveylist(1) if generalized else [],
-                                    "activity_rule_set": [],#i.get_survey_rule_set(),
-                                    "category_rule_set": [],#i.get_survey_category_rule_set(),
+                                    "rule_engine": [],
+                                    "rule_engine_or": [],
+                                    "activity_rule_set": [],
+                                    "category_rule_set": [],
                                     "display_in_app": display_in_app,
                                     "display_in_training": display_in_training,
-                                    "is_training_survey": 0,#2 if JsonAnswer.objects.filter(training_survey=i) else 0,
+                                    "is_training_survey": 0,
                                     "facility_ids": facility_ids,
                                     "facility_type": facility_type,
                                     "child_datacollection_ids": ','.join(map(str, child_survey)) if child_survey else '',
                                     "survey_categories": [{'id': i.categories.id, 'name': i.categories.name}] if i.categories else [],
-                                    "search_filter":search_filter,#i.get_search_filter_ids(),
+                                    "search_filter":search_filter,
                                     "survey_json":survey_json ,
                                     "add": status,
-                                    # survey_module = 2 for activitis groups in swauyam instance ,survey_module = 1 for program module in swayam instances
                                     "is_activist_group": 1 if i.survey_module == 2 else 0,
                                     "activity_expenses":i.extra_config.get('activity_expenses',True) if i.extra_config else True,
                                     "expenses_questions": i.extra_config.get('expenses_questions',[]) if i.extra_config else [],
@@ -473,7 +430,7 @@ def surveylist(request):
     if request.method == 'POST':
         user_id = request.POST.get("uId")
         status, message = 2, 'Survey list sent successfully'
-        state = StateSerializer(State.objects.filter(active=2),many=True).data
+        # state = StateSerializer(State.objects.filter(active=2),many=True).data
         proj_levellist = list(ProjectLevels.objects.filter(
             active=2).values_list('name', flat=True).order_by('name'))
         proj_levels = ",".join(proj_levellist)
@@ -482,10 +439,113 @@ def surveylist(request):
                "application_levels": str(proj_levels),
                'surveyDetails': get_latest_survey_versions(user_id),
                'survey_active_key': '',
-               "display_as_code": user_setup().get("is_code_display") if user_setup().get("is_code_display") else 0,
-                "states":state,
+               "display_as_code": 0,
+                # "states":state,
                }
         return JsonResponse(res)
+
+def get_all_survey_location(survey_list):
+    all_location_level,location_level = {},None
+    boundary_level_dict = {str(obj.id):obj for obj in BoundaryLevel}
+    for sur in survey_list:
+        for i in sur.config:
+            for key in i.keys():
+                indexvalue = key.split('_')[-1]
+                if i[key] == "BoundaryLevel":
+                    location_level  = boundary_level_dict.get(i.get('object_id_'+indexvalue))
+                    if not location_level:
+                        location_level = next((obj for obj_id, obj in boundary_level_dict.items() if str(obj.code) == i.get('object_id_'+indexvalue)), None)
+        all_location_level[sur.id] = location_level   
+
+    return all_location_level
+
+def user_survey_level_labels_v3(survey_list, user_level):
+    all_order_levels, all_labels = {}, {}
+    boundary_level_dict = dict(BoundaryLevel.objects.filter(active=2).values_list('id','code'))
+    boundary_level_name_dict = dict(BoundaryLevel.objects.filter(active=2).values_list('code','name'))
+    order_levels, labels ="level1,level2","State,District" # get_orders_levels(user_level)
+
+
+    for survey in survey_list:
+        for i in survey.config:
+            for key in i.keys():
+                indexvalue = key.split('_')[-1]
+                if i[key] == "BeneficiaryType":
+                    # beneficiaryobj = BeneficiaryType.objects.get_or_none(id=int(i.get('object_id_' + indexvalue)))
+                    # beneficiary_type = str(beneficiary_types.get(int(i.get('object_id_' + indexvalue)),''))
+                    # beneficiary_type = str(beneficiaryobj.name)
+                    # beneficiary_ids = int(beneficiaryobj.get_survey().id)
+                    order_levels, labels = get_orders_levels(user_level)
+                elif i[key] == 'BoundaryLevel':
+                    # boundaryobj = BoundaryLevel.objects.get_or_none(
+                        # id=int(i.get('object_id_'+indexvalue)))
+                    boundaryobj = boundary_level_dict.get(int(i.get('object_id_'+indexvalue)))
+                    if boundaryobj and boundaryobj < user_level:
+                        order_levels = ','.join(['level'+str(code) for k,code in boundary_level_dict.items() if code <= user_level])
+                        labels = ','.join([name for code,name in boundary_level_name_dict.items() if code <= user_level])
+                    elif boundaryobj:
+                        # boundary_level_gte = BoundaryLevel.objects.filter(active=2, code__lte=boundaryobj, code__gte=user_level).order_by('code')
+                        order_levels = ['level'+str(code) for k,code in boundary_level_dict.items() if code <= boundaryobj and code >= user_level]
+                        # order_levels = ','.join(['level'+str(level.code) for level in boundary_level_gte])
+                        labels = ','.join([name for code,name in boundary_level_name_dict.items() if code <= boundaryobj and code >= user_level])
+        all_order_levels[survey.id] = order_levels
+        all_labels[survey.id] = labels
+    return all_order_levels, all_labels
+
+
+
+def get_beneficiary_location_details_v3(user_level,survey_list):
+    all_order_levels, all_labels,all_beneficiary_type,all_beneficiary_ids = {},{},{},{}
+    boundary_level_dict = {str(obj.id):obj for obj in BoundaryLevel.objects.filter(active=2)}
+    boundary_type_dict = {obj.id:obj for obj in BeneficiaryType.objects.filter(active=2)}
+    beneficiary_based_survey_dict = dict(Survey.objects.filter(active=2,survey_type=0, content_type_id=26).values_list('object_id','id'))
+    for survey in survey_list:
+        order_levels, labels,beneficiary_type,beneficiary_ids = '','','',''
+        benf_type_list,benf_id_list =[],[]
+        if survey.survey_type == 0:
+            # beneficiaryobj = BeneficiaryType.objects.get_or_none(id = survey.object_id)
+            beneficiaryobj = boundary_type_dict.get(survey.object_id)
+            # beneficiary_ids = beneficiaryobj.get_survey().id
+            beneficiary_ids = beneficiary_based_survey_dict.get(beneficiaryobj.id,"")
+            beneficiary_type = beneficiaryobj.name
+            if survey.extra_config.get('user_level'):
+                boundary_level = cache.get(settings.INSTANCE_CACHE_PREFIX + 'get_boundary_level')
+                if not boundary_level:
+                    boundary_level = list(BoundaryLevel.objects.filter(active=2).order_by('code').values_list('id','code','name'))
+                    cache_set_with_namespace('RESPONSE_SURVEY_V3', 'get_boundary_level', boundary_level,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
+                # boundary_level = BoundaryLevel.objects.filter(active=2,code__in=survey.extra_config.get('user_level')).order_by('code')
+                order_levels = ','.join(['level'+str(level[1]) for level in boundary_level if level[1] in survey.extra_config.get('user_level')])
+                labels = ','.join([level[2] for level in boundary_level if level[1] in survey.extra_config.get('user_level')])
+            else:
+                order_levels , labels = get_orders_levels(user_level)
+        else:
+            for i in survey.config:
+                for key in i.keys():
+                    indexvalue = key.split('_')[-1]
+                    if i[key] == "BeneficiaryType":
+                        beneficiaryobj = boundary_type_dict.get(int(i.get('object_id_' + indexvalue)))
+                        # beneficiaryobj = BeneficiaryType.objects.get_or_none(id=int(i.get('object_id_' + indexvalue)))
+                        beneficiary_type = str(beneficiaryobj.name)
+                        # beneficiary_ids = int(beneficiaryobj.get_survey().id)
+                        beneficiary_ids = beneficiary_based_survey_dict.get(beneficiaryobj.id,"")
+                        benf_id_list.append(beneficiary_ids)
+                        benf_type_list.append(beneficiary_type)
+                        order_levels , labels = get_orders_levels(user_level)
+                        
+                    elif i[key] == 'BoundaryLevel':
+                        boundaryobj  = boundary_level_dict.get(i.get('object_id_'+indexvalue))
+                        #BoundaryLevel.objects.get_or_none(id = int(i.get('object_id_'+indexvalue)))
+                        if boundaryobj:
+                            order_levels ,labels = get_boundary_levels_orders(boundaryobj,user_level)
+            
+        
+        beneficiary_ids =  benf_id_list[0] if benf_id_list else beneficiary_ids
+        beneficiary_type = benf_type_list[0] if benf_type_list else beneficiary_type
+        all_order_levels[survey.id] = order_levels
+        all_labels[survey.id] = labels
+        all_beneficiary_type[survey.id] = beneficiary_type
+        all_beneficiary_ids[survey.id] = beneficiary_ids
+    return all_order_levels,all_labels,all_beneficiary_ids,all_beneficiary_type
 
 
 @csrf_exempt
