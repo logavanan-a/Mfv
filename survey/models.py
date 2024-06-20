@@ -1270,7 +1270,7 @@ class Choice(BaseContent):
     config = models.JSONField('Configurations', default=dict, **OPTIONAL)
     code_display = models.IntegerField(default=0,null=True, blank=True)
     score = models.FloatField(default=0,null=True, blank=True)
-    boundary=models.ManyToManyField(Boundary)
+    # boundary=models.ManyToManyField(Boundary)
     uuid = models.CharField('UUID', max_length=100,blank=True,null=True)
     deactivated_reason = models.CharField(max_length=500,blank=True,null=True,choices=CHOICE_DEACTIVATE_REASON)
     deactivated_date   = models.DateTimeField(blank=True, null=True)
@@ -1557,7 +1557,7 @@ class Language(BaseContent):
     char_field2 = models.CharField(max_length=500, blank=True, null=True)
     integer_field1 = models.IntegerField(default=0)
     integer_field2 = models.IntegerField(default=0)
-    states = models.ManyToManyField(Boundary)
+    # states = models.ManyToManyField(Boundary)
 
     def __str__(self):
         return self.name
