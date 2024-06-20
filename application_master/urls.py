@@ -17,4 +17,5 @@ urlpatterns = [
     path('partner_mission_status_update/<dpl_id>/', partner_mission_status_update, name="partner_mission_status_update"),
     path("edit_user_partner_project/<id>/<model>/", edit_user_partner_project, name="edit_user_partner_project"),
     path('android_login/',LoginAndroidView.as_view()),
+    path('user/android/list/',UserlistAndroid.as_view()),
 	]

@@ -16,8 +16,15 @@ urlpatterns = [
     path('language-choice/',
          languagechoice, name="languagechoice"),
     path('assessment-list/',
-         assessmentlist, name="assessmentlist"), 
+         assessmentlist, name="assessmentlist"),
+    path('updated-tables/',updatedtables), 
     path('language-assessment-list/',
-         languageassessmentlist, name="languageassessmentlist"),         
+         languageassessmentlist, name="languageassessmentlist"), 
+    path('program-responses/', program_responses_list,
+         name="programresponse_list"),
+    path('activists-responses/', avtivist_group_responses,
+         name='activistsresponse_list'),       
+    path('masterlookup-details/', MasterlookupDetails.as_view()),
+          
 
 ]
