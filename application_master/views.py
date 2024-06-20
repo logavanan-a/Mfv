@@ -5,9 +5,15 @@ from django.apps import apps
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
 from mis . views import *
-# Create your views here.
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from rest_framework.response import Response
+from rest_framework import generics as g
+from django.contrib.auth.models import User
+from rest_framework import permissions
 from django.db import transaction
-
+from rest_framework.views import APIView
+from application_master.serializers import LoginAndroidSerializer
 
 def master_list_form(request,model):
     heading = 'user profile'    
@@ -344,3 +350,111 @@ def edit_user_partner_project(request, id, model):
     return render(request, 'user/edit_user_link_to_role.html', locals())
 
 
+
+class LoginAndroidView(APIView):
+    serializer_class = LoginAndroidSerializer
+    def post(self, request, *args, **kwargs):
+        """
+        User Login.
+        ---
+        parameters:
+        - name: username
+          description: Username Login
+          required: true
+          type: string
+          paramType: form
+        - name: password
+          description: Password for Login
+          paramType: form
+          required: true
+          type: string
+        """
+        response = {}
+        serializer = LoginAndroidSerializer(data=request.data)
+        if serializer.is_valid():
+            user = authenticate(username=request.data[
+                                'username'], password=request.data['password'])
+            print(user, '-----------1------------')
+            if user is not None:
+                if user.is_superuser:
+                    login(request, user)
+                    response.update({
+                            'status': 1, 'admin': 1,
+                            'user_id': int(user.id),
+                            'first_name': user.first_name
+                            })
+                else:
+                    login(request, user)
+                    response.update({'status': 1, 'admin': 0, 'user_id': int(user.id),
+                                     'first_name': user.first_name
+                                     })
+            else:
+                try:
+                    user = User.objects.get(username = request.data.get('username'))
+                    if user.is_active == False:
+                        response.update({'status': 0, 'msg': "User is inactive"})
+                    else:
+                        response.update({'status': 0, 
+                        'msg': "Username/Password mismatch "})
+                except: 
+                    response.update(
+                        {'status': 0, 'msg': "Username/Password mismatch"})
+        else:
+            errors = serializer.errors
+            errors = stripmessage(errors)
+            error_dict = {}
+            error_dict.update({'message':'error','status':0,'errors':errors})
+            return Response(error_dict)
+        return Response(response)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UserlistAndroid(g.CreateAPIView):
+
+    # authentication_class = (ExpiringTokenAuthentication,)
+    # permission_classes = (permissions.IsAuthenticated,)
+
+    def post(cls, request, format=None):
+        """
+        API of users for android
+        ---
+        parameters:
+        - name: user_id
+          description: Pass user id
+          required: true
+          type: integer
+          paramType: form
+        """
+        data = request.data
+        if not data.get('user_id'):
+            return Response({'status':0,'message':'user id required'})
+        try:
+            userlist = User.objects.filter().order_by("-id")
+            response=[]
+            for i in userlist:
+                user_info = {'id': i.id,
+                         'name': i.get_full_name(),
+                         'username':i.username,
+                         'email': i.email,
+                         'mobile_number': "",
+                         }
+                # role_obj = UserRoles.objects.get_or_none(user = i)
+                # if role_obj:
+                #     role_id = all()[0].user_role_ids()
+                # else:
+                role_id = i.groups.all()[0].id
+                user_info.update(role_id = role_id)
+                response.append(user_info)
+            return Response({'message':'success','status':2,'users':response})
+        except Exception as e:
+            response = [{'message': e.args[0], 'status': 0}]
+        return Response(response)
+
+def stripmessage(errors):
+    for i, j in errors.items():
+        errors[i] = j[0]
+        expr = re.search(r'\w+:', errors[i])
+        if expr:
+            ik = expr.group().replace(':', '')
+            errors[ik] = errors.pop(i)
+            errors[ik] = re.sub(r'\w+:', '', errors[ik])
+    return errors
