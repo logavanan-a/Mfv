@@ -1868,7 +1868,7 @@ class BeneficiaryResponse(BaseContent):
     beneficiary_type = models.ForeignKey(
         BeneficiaryType, blank=True, null=True,on_delete=models.DO_NOTHING)
     partner = models.ForeignKey(
-        'partner.Partner', blank=True, null=True, related_name='beneficiary_partner',on_delete=models.DO_NOTHING)
+        'application_master.Partner', blank=True, null=True, related_name='beneficiary_partner',on_delete=models.DO_NOTHING)
     creation_key = models.CharField('UUID', max_length=100, unique=True)
     list_view = models.JSONField(default=dict)
     profile_view = models.JSONField(default=dict)
