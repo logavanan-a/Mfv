@@ -13,7 +13,7 @@
     ul{
     margin-left: 20px;
     }
-    #home, #profile{
+    #home, #profile, #contact{
     margin-right: 20px;
     margin-left: 20px;
     }
@@ -112,6 +112,13 @@
                                         <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#contact" role="tab"
+                                        aria-selected="false" tabindex="-1">
+                                        <span class="d-none d-sm-block">{% if model == 'partner' %} Project Details {% endif %}</span>
+                                        <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -123,6 +130,7 @@
                     <div class="table-responsive" data-pattern="priority-columns">
                         <button type="button" class="btn btn-outline-primary waves-effect btn-xs float-end mb-2 mx-0" onclick="location.href='/application_master/vendor_partner_user_mapping/{{id}}/{{model}}/'"><i class="bx bx-plus-medical" title="Add New"></i></button>
                     </div>
+                    {% if user_obj %}
                     <div class="table-responsive">
                         <table class="table dt-responsive">
                             <thead class="table-light">
@@ -162,6 +170,11 @@
                             </tbody>
                         </table>
                     </div>
+                    {% else %}
+                    <div class ="col text-center">
+                        <h5 style="color: red;">Please map the user to a partner. No data available.</h5>
+                    </div>
+                    {% endif %}
                 </div>
                 {% if model == 'partner' %}
                 
@@ -169,6 +182,7 @@
                     <div class="table-responsive" data-pattern="priority-columns">
                         <button type="button" class="btn btn-outline-primary waves-effect btn-xs float-end mb-2 mx-0" onclick="location.href='/application_master/partner_mission_mapping/{{id}}/'"><i class="bx bx-plus-medical" title="Add New"></i></button>
                     </div>
+                    {% if parner_mission_obj %}
                     <div class="table-responsive">
                         <table class="table dt-responsive">
                             <thead class="table-light">
@@ -195,9 +209,60 @@
                                 </td>
                             </tr>
                             {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class ="col text-center">
+                    <h5 style="color: red;">Please map the Mission to a partner. No data available.</h5>
+                </div>
+                {% endif %}
+                </div>
+                {% endif %}
+                {% if model == 'partner' %}
+                <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                    {% if parner_mission_obj %}
+                    <div class="table-responsive" data-pattern="priority-columns">
+                        <button type="button" class="btn btn-outline-primary waves-effect btn-xs float-end mb-2 mx-0" onclick="location.href='/application_master/adding_project/{{id}}/'"><i class="bx bx-plus-medical" title="Add New"></i></button>
+                    </div>
+                    <div class="tab-content" id="myTabContent">
+                        <table class="table  dt-responsive ">
+                            <thead class="table-light">
+                                <tr>
+                                    <th colspan="9">Project Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>SI No</th>
+                                    <th>Name</th>
+                                    <th>Partner Mission Mapping</th>
+                                    <th>District</th>
+                                    <th>Location</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Status</th>
+                                </tr>
+                                {% for l in project_map%}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ l.name }}</td>
+                                    <td>{{l.partner_mission_mapping }}</td>
+                                    <td>{{l.district }}</td>
+                                    <td>{{l.location }}</td>
+                                    <td>{{l.start_date|default_if_none:'-' }}</td>
+                                    <td>{{l.end_date|default_if_none:'-' }}</td>
+                                    <td>{{l.get_active_display }}</td>
+                                </tr> 
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
+                    {% else %}
+                    <div class ="col mt-4 text-center">
+                        <h5 style="color: red;">Please map the partner mission first before proceeding.</h5>
+                    </div>
+                    {% endif %}
                 </div>
                 {% endif %}
             </div>
