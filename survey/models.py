@@ -1097,6 +1097,36 @@ class Question(BaseContent):
     #                 question_ids.extend(next_question.get_inner_questions())
     #     return list(set(question_ids))
 
+
+    def get_question_validation(self):
+        from cache_configuration.views import load_data_to_cache_question_validation
+        # Question Validation Make Sure each question has only one validation
+        qv_dict = load_data_to_cache_question_validation()
+        qv = None
+        qv_obj = qv_dict.get(str(self.id))#QuestionValidation.objects.filter(active=2).get_or_none(question=self)
+        validationtype = "R" if self.mandatory else "O"
+        if self.qtype in ['T', 'D'] and qv_obj and qv_obj.get('code'):
+            if qv_obj.get('code') == 'D':
+                qv = str(validationtype)+":D:"+str(qv_obj.get('min_value'))+":"+str(qv_obj.get('max_value'))+":"+str(qv_obj.get('message',''))
+            elif qv_obj.get('code') == 'N':
+                qv = str(validationtype)+":N:"+str(qv_obj.get('min_value'))+":"+str(qv_obj.get('max_value'))+":"+str(qv_obj.get('message',''))
+            elif qv_obj.get('code') == 'A':
+                qv = str(validationtype)+":A:"+str(qv_obj.get('min_value'))+":"+str(qv_obj.get('max_value'))+":"+str(qv_obj.get('message',''))
+            elif qv_obj.get('code') == 'AN':
+                qv = str(validationtype)+":AN:"+str(qv_obj.get('min_value'))+":"+str(qv_obj.get('max_value'))+":"+str(qv_obj.get('message',''))
+            elif qv_obj.get('code') == 'M':
+                qv = str(validationtype)+":M:"+str(qv_obj.get('min_value'))+":"+str(qv_obj.get('max_value'))+":"+str(qv_obj.get('message',''))
+            elif qv_obj.get('code') == 'LN':
+                qv = str(validationtype)+":LN:"+str(qv_obj.get('min_value'))+":"+str(qv_obj.get('max_value'))+":"+str(qv_obj.get('message',''))
+            elif qv_obj.get('code') == 'DT':
+                qv = str(validationtype)+":D:dd/mm/yyyy:"+str(qv_obj.get('min_value'))+":"+str(qv_obj.get('max_value'))+":"+str(qv_obj.get('message',''))
+            elif qv_obj.get('code') == 'T':
+                qv = str(validationtype)+":T:ISO:HH-mm-ss:"+str(qv_obj.get('min_value'))+":"+str(qv_obj.get('max_value'))+":"+str(qv_obj.get('message',''))
+        elif self.qtype in ['E'] and qv_obj:
+            qv = "M:"+str(validationtype)+":"+str(qv_obj.get('message',''))
+        return qv
+        
+
     def get_row_questions(self):
         row_list = Question.objects.filter(parent=self, is_grid=True)
         return row_list

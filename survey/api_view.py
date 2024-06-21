@@ -163,7 +163,7 @@ def questionlist(request):
                                    "language_id": 1,
                                    "mandatory": int(quest.mandatory),
                                    "question_order": int(quest.question_order) if quest.question_order else 0,
-                                #    "validation":  quest.get_question_validation() if quest.get_question_validation() else "" ,
+                                   "validation":  quest.get_question_validation() if quest.get_question_validation() else "" ,
     #                               "validation": "",
                                    "image_path": "",
                                    "answer": quest.qtype if (quest.is_grid == False and quest.parent == None) else 'N',

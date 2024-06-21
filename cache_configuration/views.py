@@ -64,3 +64,18 @@ def load_data_to_cache_survey_based_questions():
         cache_set_with_namespace('FORM_BUILDER', cache_key_questions, survey_questions,
                                  settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
     return survey_questions
+
+
+def load_data_to_cache_question_validation():
+    #caching the question validation for forms
+    query = "select jsonb_object_agg(question_id, q_val) from (select a.question_id, jsonb_build_object('id',a.id, 'validation_type',b.validation_type, 'code',b.code, 'max_value',a.max_value,'min_value',a.min_value,'message',a.message,'mandatory',c.mandatory) as q_val from survey_questionvalidation a inner join survey_validations b on a.validationtype_id = b.id inner join survey_question c on c.id =a.question_id where a.active = 2 ) as x"
+
+    cache_key_survey_display = 'all_question_validation_cache'
+    validation_cache_dict = cache.get(settings.INSTANCE_CACHE_PREFIX + cache_key_survey_display)
+    if not validation_cache_dict:
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            result = cursor.fetchall()
+            validation_cache_dict = json.loads(result[0][0])
+        cache_set_with_namespace('FORM_BUILDER',cache_key_survey_display,validation_cache_dict,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
+    return validation_cache_dict
