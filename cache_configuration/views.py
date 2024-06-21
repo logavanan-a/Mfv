@@ -4,6 +4,8 @@ from django.core.cache import cache
 from django.shortcuts import render
 from django.conf import settings
 from survey.models import Survey
+from django.db import connection,transaction
+import json
 # Create your views here.
 
 
@@ -47,3 +49,18 @@ def load_data_to_cache_survey_objects():
       surveys = {s.id:s for s in Survey.objects.filter(active=2).order_by('survey_order')}
       cache_set_with_namespace('FORM_BUILDER', cache_key_survey, surveys,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
    return surveys
+
+def load_data_to_cache_survey_based_questions():
+    # caching the questions based on the survey
+    query = "SELECT jsonb_object_agg(survey_id, question_info) FROM ( SELECT sb.survey_id, jsonb_agg( jsonb_build_object( 'id', a.id, 'qtype', a.qtype, 'text', a.text, 'is_grid', a.is_grid, 'mandatory', a.mandatory, 'api_json', a.api_json, 'is_editable', a.is_editable, 'api_qtype', a.api_qtype, 'parent', a.parent_id, 'training_config', a.training_config,'display_has_name', a.display_has_name,'question_filter',a.question_filter,'address_question',a.address_question,'deactivated_date',a.deactivated_date,'active',a.active ) ORDER BY a.question_order ) AS question_info FROM survey_question a inner join survey_block sb on sb.id = a.block_id WHERE a.active = 2 AND a.parent_id IS NULL GROUP BY sb.survey_id ) AS x"
+
+    cache_key_questions = 'survey_based_questions'
+    survey_questions = cache.get(settings.INSTANCE_CACHE_PREFIX + cache_key_questions)
+    if not survey_questions:
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            result = cursor.fetchall()
+            survey_questions = json.loads(result[0][0] or '{}')
+        cache_set_with_namespace('FORM_BUILDER', cache_key_questions, survey_questions,
+                                 settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
+    return survey_questions

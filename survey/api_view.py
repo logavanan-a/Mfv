@@ -21,13 +21,15 @@ from django.contrib.auth.models import User
 # from survey.serializers import *
 # from rest_framework.views import APIView
 from rest_framework.response import Response
-
+from django.db import connection,transaction
 from ast import literal_eval
 from django.db.models import Q,F
 import sys, traceback
 import  logging
 from django.conf import settings
 from collections import defaultdict
+from cache_configuration.views import *
+
 # from application_master.models import BoundaryLevel
 
 
@@ -306,7 +308,7 @@ def get_latest_survey_versions(user_id):
     # all_survey_location = get_all_survey_location(survey_list)
     #updated filter questions 
     filter_questions = list(SurveyDisplayQuestions.objects.filter(active=2).values_list('survey_id', 'display_type','questions'))
-    all_order_levels, all_labels = order_levels, labels ="level1,level2","State,District"#user_survey_level_labels_v3(survey_list, user_level)
+    order_levels, labels ="level1,level2","State,District"#user_survey_level_labels_v3(survey_list, user_level)
 
     all_beneficiary_ids, all_beneficiary_type = get_beneficiary_location_details_v3(user_level, survey_list)
     for i in survey_list:
@@ -346,13 +348,13 @@ def get_latest_survey_versions(user_id):
             category_order = 0
         status = 1
 
-        order_levels, labels, beneficiary_ids, beneficiary_type = all_order_levels.get(i.id), all_labels.get(i.id), all_beneficiary_ids.get(i.id), all_beneficiary_type.get(i.id)
+        beneficiary_ids, beneficiary_type = all_beneficiary_ids.get(i.id), all_beneficiary_type.get(i.id)
 
         facility_ids, facility_type = "",""
         
-        if i.survey_type == 1:
-            labels = all_labels.get(i.id)
-            order_levels = all_order_levels.get(i.id)
+        # if i.survey_type == 1:
+        #     labels = all_labels.get(i.id)
+        #     order_levels = all_order_levels.get(i.id)
 
         summary_qid = ','.join(','.join(map(str, item[2])) for item in filter_questions if item[1] == '1' and item[0] == i.id)
         search_filter = ','.join(','.join(map(str, item[2])) for item in filter_questions if item[1] == '3' and item[0] == i.id)
@@ -366,11 +368,11 @@ def get_latest_survey_versions(user_id):
         else:
             piriodicity = ""
         get_survey_location = 2#all_survey_location.get(i.id)
-        if (get_survey_location and get_survey_location.code >= user_level) or (i.survey_type == 0) :
+        if (get_survey_location and get_survey_location >= user_level) or (i.survey_type == 0) :
             unique_questions = ""
             
             survey_json = []
-            survey_json.append({"b_type":i.location_beneficiary_id})
+            # survey_json.append({"b_type":i.location_beneficiary_id})
 
             child_survey = None
             version_updates.append({'vn': "1.0",
@@ -403,7 +405,7 @@ def get_latest_survey_versions(user_id):
                                     'location_level': '',
                                     'display_name': display_name,
                                     'parent_link': [] ,
-                                    'linkages': i.get_beneficiary_linkages(),
+                                    'linkages': [],#i.get_beneficiary_linkages(),
                                     "constraints": unique_questions,
                                     "activity_description": description,
                                     "rule_engine": [],
@@ -1252,11 +1254,12 @@ def get_levels(request, level):
         tagged_locations = tagged_locations.order_by('modified')[:int(n)]
 
         for tl in tagged_locations:
-            location = tl.project.district
             one_location_level = {}
-            # parent_locations_list = location.get_parent_locations([]) 
-            # for loc in parent_locations_list:
-            #     one_location_level.update(loc)
+            if level == 1:
+                location = tl.project.district.state
+            else:
+                one_location_level['level1_id']=int(tl.project.district.state.id)
+                location = tl.project.district
             
             one_location_level['level'+str(level)+'_id']=int(location.id)
             one_location_level['name']=re.sub(r'[^\x00-\x7F]+','',location.name).strip()

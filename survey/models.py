@@ -397,18 +397,17 @@ class Survey(BaseContent):
             
     #     return data                                    
 
-    # def get_beneficiary_type(self):
-    #     from beneficiary.models import BeneficiaryType
-    #     beneficiary_type = None
-    #     if self.survey_type == 0:
-    #         beneficiary_type = BeneficiaryType.objects.get_or_none(id=self.object_id)
-    #     elif self.survey_type == 1:
-    #         for i in self.config:
-    #             for key in i.keys():
-    #                 indexvalue = key.split('_')[-1]
-    #                 if i[key] == "BeneficiaryType":
-    #                     beneficiary_type = BeneficiaryType.objects.get_or_none(id=int(i.get('object_id_' + indexvalue)))
-    #     return beneficiary_type
+    def get_beneficiary_type(self):
+        beneficiary_type = None
+        if self.survey_type == 0:
+            beneficiary_type = BeneficiaryType.objects.get(id=self.object_id)
+        elif self.survey_type == 1:
+            for i in self.config:
+                for key in i.keys():
+                    indexvalue = key.split('_')[-1]
+                    if i[key] == "BeneficiaryType":
+                        beneficiary_type = BeneficiaryType.objects.get_or_none(id=int(i.get('object_id_' + indexvalue)))
+        return beneficiary_type
 
 #     def get_survey_location(self):
 #         from beneficiary.models import BeneficiaryType
