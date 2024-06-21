@@ -466,11 +466,7 @@ class RoleTypesListAndroid(g.CreateAPIView):
         if not request.data.get('user_id'):
             return Response({'status':0,'message':'user_id required'})
         try:
-<<<<<<< Updated upstream
             objs = Group.objects.filter().order_by('-id')
-=======
-            objs = Group.objects.filter(active=2).order_by('-id')
->>>>>>> Stashed changes
             data=[{'id': i.id, 
             			'name':i.name,
             			} for i in objs]
