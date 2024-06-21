@@ -507,7 +507,7 @@ def get_beneficiary_location_details_v3(user_level,survey_list):
     all_beneficiary_type,all_beneficiary_ids = {},{}
     # boundary_level_dict = {str(obj.id):obj for obj in BoundaryLevel.objects.filter(active=2)}
     boundary_type_dict = {obj.id:obj for obj in BeneficiaryType.objects.filter(active=2)}
-    beneficiary_based_survey_dict = dict(Survey.objects.filter(active=2,survey_type=0, content_type_id=26).values_list('object_id','id'))
+    beneficiary_based_survey_dict = dict(Survey.objects.filter(active=2,survey_type=0).values_list('object_id','id'))
     for survey in survey_list:
         beneficiary_type,beneficiary_ids = '',''
         benf_type_list,benf_id_list =[],[]
