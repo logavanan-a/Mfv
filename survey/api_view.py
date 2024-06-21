@@ -1261,10 +1261,10 @@ def get_levels(request, level):
             if level == 1:
                 location = tl.project.district.state
             else:
-                one_location_level['level1_id']=int(tl.project.district.state.id)
+                one_location_level['level1_id']=tl.project.district.state.id + 1000
                 location = tl.project.district
             
-            one_location_level['level'+str(level)+'_id']=int(location.id)
+            one_location_level['level'+str(level)+'_id']=location.id if level == 2 else location.id+1000
             one_location_level['name']=re.sub(r'[^\x00-\x7F]+','',location.name).strip()
             one_location_level['active']=str(location.active)
             one_location_level['modified_date']=datetime.strftime(location.modified, '%Y-%m-%d %H:%M:%S.%f')

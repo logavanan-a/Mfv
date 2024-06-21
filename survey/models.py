@@ -1940,7 +1940,7 @@ class BeneficiaryResponse(BaseContent):
 
     def get_response_name(self):
         disp_name = ''
-        code_concate = user_setup().get('user_display_code',0)
+        code_concate = 0#user_setup().get('user_display_code',0)
         try:
             question = self.survey.questions().filter(display_has_name=True)[0]
         except:
