@@ -1283,3 +1283,41 @@ def get_levels(request, level):
     except Exception as e:
         return JsonResponse({'status':0,'message':"Something went wrong","error":e.args[0]})
 
+
+
+@csrf_exempt
+def languageblocklist(request):
+    if request.method == 'POST':
+        user_id = request.POST.get("uId")
+        updatedtime = request.POST.get("updatedtime")
+        count = request.POST.get("count")
+        lang_blocks = []
+        flag = ""
+        lang_bl = Block.objects.filter().exclude(language_code={})
+        if updatedtime:
+            updated = convert_string_to_date(updatedtime)
+            lang_bl = lang_bl.filter(modified__gt=updated)
+            flag = False
+        lang_bl = lang_bl.filter().order_by('modified')[:100]
+        for lb in lang_bl:
+            for lang,l_text in lb.language_code.items():
+                lan_obj = Language.objects.get(id=int(lang))
+                lang_blocks.append({'id': int(lb.id),
+                                    'block_pid': int(lb.id),
+                                    'block_name': l_text,
+                                    'language_id': int(lan_obj.code),
+                                    'updated_time': datetime.strftime(lb.modified, '%Y-%m-%d %H:%M:%S.%f'),
+                                    'extra_column1': str(lan_obj.name),
+                                    'extra_column2': 0, })
+        if lang_blocks:
+            res = {'status': 2,
+                   'message': "Data sent successfully",
+                   "LanguageBlock": lang_blocks, }
+        elif flag == False:
+            res = {"status": 2,
+                   "message": "Data already sent", }
+        else:
+            res = {"status": 0,
+                   "message": "No blocks of different language has been tagged to this user", }
+        return JsonResponse(res)
+

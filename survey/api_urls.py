@@ -28,6 +28,6 @@ urlpatterns = [
     path('activists-responses/', avtivist_group_responses,
          name='activistsresponse_list'),       
     path('masterlookup-details/', MasterlookupDetails.as_view()),
-          
+    path('language-block-list/',languageblocklist, name="languageblocklist"),          
 
 ]
