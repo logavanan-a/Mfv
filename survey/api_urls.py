@@ -2,7 +2,7 @@ from django.urls import path, include
 
 from survey.api_view import *
 from survey.api_views_version3 import * 
-from survey.api_views_version1 import add_survey_answers_version_1
+# from survey.api_views_version1 import add_survey_answers_version_1
 
 urlpatterns = [
     path('app-login/', applogin,name='app_login'),
