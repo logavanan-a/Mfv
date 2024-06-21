@@ -1377,3 +1377,28 @@ def logdata(error_log, user_obj, stoken):
         elog_obj.save()
         text_file.close()
     return True
+
+class ProjectConfigurationDetails(g.CreateAPIView):
+    
+    def post(self, request):
+        """ 
+        Project configuration API for Convene android
+        ---
+        parameters:
+        - user_id: user_id
+          description: Pass user id
+          required: true
+          type: integer
+          paramType: form
+        """
+        try:
+            if request.data.get('user_id') and User.objects.get(id = request.data.get('user_id')):
+                app_data_setup = settings.APP_CONFIG
+                if not app_data_setup:
+                    app_data_setup = {}
+                app_data_setup.update(status= 2, message = "success")
+            else:
+                app_data_setup = {'status':0, 'message' :'A valid user id required'}
+        except Exception as e:
+            app_data_setup = {'status':0, 'message' : "Falied"}
+        return Response(app_data_setup)
