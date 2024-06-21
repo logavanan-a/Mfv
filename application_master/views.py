@@ -14,6 +14,7 @@ from rest_framework import permissions
 from django.db import transaction
 from rest_framework.views import APIView
 from application_master.serializers import LoginAndroidSerializer
+from django.http import JsonResponse
 
 def master_list_form(request,model):
     heading = 'user profile'    
@@ -83,6 +84,7 @@ def master_add_form(request, model):
         heading='user profile'
     else:
         heading=model
+        heading = heading.capitalize()
     user_form = eval(model.title()+'Form') 
     forms=user_form()
 
@@ -110,6 +112,7 @@ def master_edit_form(request,model,id):
         heading='user profile'
     else:
         heading=model
+        heading = heading.capitalize()
     if model == 'partner':
         part = Partner.objects.filter(id=id).values_list('id', flat=True)
         user_prop = UserPartnerMapping.objects.filter(partner_id__in = part)
@@ -125,8 +128,7 @@ def master_edit_form(request,model,id):
         listing_model = apps.get_model(app_label= 'application_master', model_name=model)
     obj=listing_model.objects.get(id=id)
     user_form = eval(model.title()+'Form') 
-    forms=user_form(request.POST or None,instance=obj)
-
+    forms=user_form(request.POST or None, request.FILES or None,instance=obj)
     if request.method == 'POST' and forms.is_valid():
         page = request.GET.get('page')
         forms.save()
@@ -175,8 +177,9 @@ def master_details_form(request,model,id):
         user_mapping = UserPartnerMapping.objects.filter(partner_id=id).values_list('user_id', flat=True)
         user_obj = User.objects.filter(id__in=user_mapping)
         groups_obj = Group.objects.filter(user__in=user_obj).distinct()
-        part=Partner.objects.filter(id=id)
-        parner_mission_obj = PartnerMissionMapping.objects.filter(partner_id__in=part).order_by('-id')
+        part=Partner.objects.filter(id=id, active=2)
+        parner_mission_obj = PartnerMissionMapping.objects.filter(partner_id__in=part,active=2).order_by('-id')
+        project_map = Project.objects.filter(partner_mission_mapping_id__in = parner_mission_obj).order_by('-id')
     elif model == 'project':
         heading="Project"
         user_mapping = UserProjectMapping.objects.filter(project_id=id).values_list('user_id', flat=True)
@@ -219,9 +222,12 @@ def vendor_partner_user_mapping(request,vendor_partner_id,model):
             user_mapping = None
             user_obj = None
             groups_obj = None
-        
-    groups = Group.objects.all()
-    partners = Partner.objects.all()
+    if  model == 'partner':
+        groups = Group.objects.filter(id__in = [1,4])
+    if  model == 'project':
+        groups = Group.objects.filter(id = 2)
+    
+    partners = Partner.objects.all()    
 
     if request.method == 'POST':
         try:
@@ -350,6 +356,15 @@ def edit_user_partner_project(request, id, model):
         return redirect('/application_master/details/'+ str(model) + '/'+ str(vendor_partner_id.id) + '/')
     return render(request, 'user/edit_user_link_to_role.html', locals())
 
+
+def get_district(request, state_id):
+    print(state_id, 'state_id---------------------------')  # Debug statement
+    if request.method == 'GET':
+        result_set = []
+        district_obj = District.objects.filter(state_id=state_id, active=2).order_by('name')
+        for district in district_obj:
+            result_set.append({'id': district.id, 'name': district.name})
+        return JsonResponse(result_set, safe=False)
 
 
 class LoginAndroidView(APIView):
