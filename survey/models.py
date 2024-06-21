@@ -1571,7 +1571,7 @@ class ErrorLog(BaseContent):
     user = models.ForeignKey(User,on_delete=models.DO_NOTHING)
     stoken = models.CharField(max_length=255, blank=True, null=True)
     log_file = models.FileField(
-        upload_to='media/logfiles/%Y/%m/%d', blank=True, null=True)
+        upload_to='logfiles/%Y/%m/%d', blank=True, null=True)
 
     def __str__(self):
         return str(self.id)

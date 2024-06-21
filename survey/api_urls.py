@@ -29,5 +29,5 @@ urlpatterns = [
          name='activistsresponse_list'),       
     path('masterlookup-details/', MasterlookupDetails.as_view()),
     path('language-block-list/',languageblocklist, name="languageblocklist"),          
-
+    path('feederrorlog/', feed_error_log, name='feed_error_log'),
 ]

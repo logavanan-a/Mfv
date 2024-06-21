@@ -29,6 +29,9 @@ import  logging
 from django.conf import settings
 from collections import defaultdict
 from cache_configuration.views import *
+import logging
+
+logger = logging.getLogger(__name__)
 
 # from application_master.models import BoundaryLevel
 
@@ -207,7 +210,7 @@ def choicelist(request):
         ch_list = []
         flag = ""
         updatedtime = request.POST.get("updatedtime")
-        choice = Choice.objects.all().select_related('question','question__block','question__block__survey').prefetch_related('boundary','skip_question')
+        choice = Choice.objects.all().select_related('question','question__block','question__block__survey').prefetch_related('skip_question')
         if updatedtime:
             updated = convert_string_to_date(updatedtime)
             choice = choice.filter(modified__gt=updated)
@@ -216,7 +219,7 @@ def choicelist(request):
         for ch in choice:
             skip_quest = ""
             if ch.skip_question.all():
-                val = [str(i) for i in sorted(ch.skip_question.ids())]
+                val = [str(i) for i in sorted(list(ch.skip_question.values_list('id',flat=True)))]
                 val = ",".join(val)
             elif ch.code == -1:
                 val = str(ch.code)
@@ -244,7 +247,7 @@ def choicelist(request):
                             'other_choice': ch.is_other_choice,
                             'code_display': str(ch.code_display) if ch.code_display  else '0',
                             'score':float(ch.score) if ch.score else 0,
-                            'locations': ','.join(map(str,ch.boundary.all().values_list('id',flat=True)))  if ch.boundary.all()  else "" ,
+                            'locations': "",#','.join(map(str,ch.boundary.all().values_list('id',flat=True)))  if ch.boundary.all()  else "" ,
                             })
                             #"display_as_code": user_setup().get("is_code_display") if user_setup().get("is_code_display") else 0,
         if ch_list:
@@ -671,7 +674,7 @@ def assessmentlist(request):
                                   'question_pid': met.parent.id if met.parent else 0,
                                   'active': met.active,
                                   'mandatory': int(met.mandatory),
-                                #   'group_validation': met.get_question_validation() if met.get_question_validation() else "",
+                                  'group_validation': met.get_question_validation() if met.get_question_validation() else "",
                                   'survey_id': int(met.block.survey.id),
                                   'language_id': 1,
                                   'updated_time': datetime.strftime(met.modified, '%Y-%m-%d %H:%M:%S.%f'),
@@ -1321,3 +1324,56 @@ def languageblocklist(request):
                    "message": "No blocks of different language has been tagged to this user", }
         return JsonResponse(res)
 
+
+@csrf_exempt
+def feed_error_log(request):
+    status, message = False, ''
+    if request.method == 'POST':
+        user_id = request.POST.get('uId')
+        error_log = request.POST.get('ErrorLog')
+        stoken = request.POST.get('sToken')
+        user_obj = User.objects.get(id=int(user_id))
+        if user_obj:
+            f = logdata(error_log, user_obj, stoken)
+            status = True
+            message = "ErrorLog Data saved successfully"
+    res = {'status': status, 'message': message}
+    return JsonResponse(res)
+
+
+def logdata(error_log, user_obj, stoken):
+    from mfv_mis.settings import BASE_DIR
+    from django.core.files.base import ContentFile, File
+    import time
+    unique_time = int(time.time())
+    today_date = datetime.now()
+    year = today_date.strftime("%Y")
+    dt = today_date.strftime("%d")
+    m = today_date.strftime("%m")
+    hour = today_date.strftime("%H")
+    minute = today_date.strftime("%M")
+    new_file_path = '%s/media/logfiles/%s/%s/%s/' % (BASE_DIR,year,m,dt)
+    if not os.path.exists(new_file_path):
+        os.makedirs(new_file_path)
+    file_name = "ErrorLog" + "-" + str(user_obj.id) + "-" + str(unique_time) + "-" + year + "-" + m + "-" + dt + ".txt"
+    # full_filename = os.path.join(BASE_DIR,new_file_path,file_name)
+    full_filename = new_file_path+file_name
+    logger.info("Date : " + dt + "-" + m + "-" + year + "\n")
+    logger.info("Time : "+ hour + "hrs" + ":" + minute + "min" + "\n\n")
+    logger.info("Error : "+error_log)
+    with open(full_filename, 'w+', encoding='utf-8') as text_file:
+        text_file.writelines("Date : " + dt + "-" + m + "-" + year + "\n")
+        # text_file.write(bytes("Date : " + dt + "-" + m + "-" + year + "\n", encoding="raw_unicode_escape"))
+        text_file.writelines("Time : "+ hour + "hrs" + ":" + minute + "min" + "\n\n")
+        # text_file.write(bytes("Time : "+ hour + "hrs" + ":" + minute + "min" + "\n\n", encoding="raw_unicode_escape"))
+        text_file.writelines("Error : "+error_log)
+        # text_file.write(bytes("Error : "+error_log, encoding="raw_unicode_escape"))
+        elog_obj = ErrorLog.objects.create(user=user_obj, stoken=stoken)
+        # elog_obj.log_file = File(text_file)
+        print(text_file)
+        elog_obj.log_file.save(file_name, File(text_file))
+        if os.path.exists(full_filename):
+            os.remove(full_filename)
+        elog_obj.save()
+        text_file.close()
+    return True
