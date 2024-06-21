@@ -130,6 +130,7 @@
                     <div class="table-responsive" data-pattern="priority-columns">
                         <button type="button" class="btn btn-outline-primary waves-effect btn-xs float-end mb-2 mx-0" onclick="location.href='/application_master/vendor_partner_user_mapping/{{id}}/{{model}}/'"><i class="bx bx-plus-medical" title="Add New"></i></button>
                     </div>
+                    {% if user_obj %}
                     <div class="table-responsive">
                         <table class="table dt-responsive">
                             <thead class="table-light">
@@ -169,6 +170,11 @@
                             </tbody>
                         </table>
                     </div>
+                    {% else %}
+                    <div class ="col text-center">
+                        <h5 style="color: red;">Please map the user to a partner. No data available.</h5>
+                    </div>
+                    {% endif %}
                 </div>
                 {% if model == 'partner' %}
                 
@@ -176,6 +182,7 @@
                     <div class="table-responsive" data-pattern="priority-columns">
                         <button type="button" class="btn btn-outline-primary waves-effect btn-xs float-end mb-2 mx-0" onclick="location.href='/application_master/partner_mission_mapping/{{id}}/'"><i class="bx bx-plus-medical" title="Add New"></i></button>
                     </div>
+                    {% if parner_mission_obj %}
                     <div class="table-responsive">
                         <table class="table dt-responsive">
                             <thead class="table-light">
@@ -202,16 +209,21 @@
                                 </td>
                             </tr>
                             {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class ="col text-center">
+                    <h5 style="color: red;">Please map the Mission to a partner. No data available.</h5>
+                </div>
+                {% endif %}
                 </div>
                 {% endif %}
                 {% if model == 'partner' %}
                 <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
                     {% if parner_mission_obj %}
                     <div class="table-responsive" data-pattern="priority-columns">
-                        <button type="button" class="btn btn-outline-primary waves-effect btn-xs float-end mb-2 mx-0" onclick="location.href='/application_master/add/project/'"><i class="bx bx-plus-medical" title="Add New"></i></button>
+                        <button type="button" class="btn btn-outline-primary waves-effect btn-xs float-end mb-2 mx-0" onclick="location.href='/application_master/adding_project/{{id}}/'"><i class="bx bx-plus-medical" title="Add New"></i></button>
                     </div>
                     <div class="tab-content" id="myTabContent">
                         <table class="table  dt-responsive ">

@@ -3,13 +3,13 @@ from survey.models import *
 from application_master.models import *
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-# from survey.capture_sur_levels import convert_string_to_date, convert_date_to_string
+from survey.capture_sur_levels import convert_string_to_date, convert_date_to_string
 # from survey.api_views_version1 import common_responses_details_v1
 # from survey.api_views_version1 import prepare_responses_info, get_duplicate_ration_ids, get_duplicate_samagra_ids, get_duplicate_akrspi_uids
 # from survey.api_views_version1 import get_aw_questions_dict, get_grid_questions_dict, execute_query, get_beneficiary_aw_meta
 # from survey.api_views_version1 import get_beneficiary_aw_meta, get_beneficiary_creation_keys, get_household_for_people
 # from survey.api_views_version1 import get_questions, get_actual_response_v1, get_beneficiary_cluster_info
-# from survey.api_views_version1 import get_questions, get_aw_questions_dict, get_grid_questions_dict, execute_query, get_beneficiary_aw_meta
+from survey.api_views_version1 import get_questions, get_aw_questions_dict, get_grid_questions_dict, execute_query, get_beneficiary_aw_meta
 from django.http import JsonResponse
 # from django.db.models import Q
 # from projectmanagement.models import Lineitem, ProjectUserRelation
@@ -18,6 +18,8 @@ import logging
 import json
 from django.db import connection
 from django.utils import timezone
+from collections import defaultdict
+from datetime import datetime
 # from .new_apis import file_respone_details_v3
 # from configuration_settings.user_location_views import get_higher_level_locations
 # from .serializers import RemarksSerializer,Remarks,ActivityExpensesSerializer
@@ -51,7 +53,8 @@ def new_responses_list_v3(request):
         if not loc_list:
             # user_boundary = list(user_role.get_poject_based_location())
             # loc_list = [str(i) for i in user_boundary]
-            loc_list=[]
+            # loc_list=[]
+            loc_list = list(UserProjectMapping.objects.filter(active=2, user_id=user_id).values_list('project__district_id', flat=True).distinct())
             cache_set_with_namespace('RESPONSE_SURVEY_V3', loc_list_cache_key, loc_list, 14400)
             logger.info("## TIME-TRACKER UserID-loc_list::" + str(user_id) + " : " + str(loc_list))
         if len(loc_list) > 0:
@@ -71,32 +74,33 @@ def new_responses_list_v3(request):
             
             if len(res_list) == 0:
                 # logger.info("#############TIME-TRACKER (Activities-Start): " + str(datetime.now()))
-                cache_key = 'user_based_surveys' + '-' + user_id
-                lineitem_obj = cache.get(settings.INSTANCE_CACHE_PREFIX + cache_key)
-                if not lineitem_obj:
-                    project_list = ProjectUserRelation.objects.filter(user__in=[user_role.id]).values_list('project', flat=True)
-                    lineitem_obj = list(Lineitem.objects.filter(active=2, project__in=project_list).values_list('activity', flat=True))
-                    location_based_survey = list(Survey.objects.filter(active=2,survey_type=1,data_entry_level_id=1).values_list('id',flat=True))
-                    lineitem_obj += location_based_survey
-                    cache_set_with_namespace('RESPONSE_SURVEY_V3', cache_key, lineitem_obj, 14400)
+                # cache_key = 'user_based_surveys' + '-' + user_id
+                # lineitem_obj = cache.get(settings.INSTANCE_CACHE_PREFIX + cache_key)
+                # if not lineitem_obj:
+                #     project_list = ProjectUserRelation.objects.filter(user__in=[user_role.id]).values_list('project', flat=True)
+                #     lineitem_obj = list(Lineitem.objects.filter(active=2, project__in=project_list).values_list('activity', flat=True))
+                #     location_based_survey = list(Survey.objects.filter(active=2,survey_type=1,data_entry_level_id=1).values_list('id',flat=True))
+                #     lineitem_obj += location_based_survey
+                #     cache_set_with_namespace('RESPONSE_SURVEY_V3', cache_key, lineitem_obj, 14400)
 
-                cache_key = 'user_based_form_surveys'
-                user_based_survey = cache.get(settings.INSTANCE_CACHE_PREFIX + cache_key)
-                if not user_based_survey:
-                    user_based_survey = list(Survey.objects.filter(active=2,survey_type=1,data_entry_level_id=4).values_list('id',flat=True))
-                    cache_set_with_namespace('RESPONSE_SURVEY_V3', cache_key, user_based_survey, 14400)
+                # cache_key = 'user_based_form_surveys'
+                # user_based_survey = cache.get(settings.INSTANCE_CACHE_PREFIX + cache_key)
+                # if not user_based_survey:
+                #     user_based_survey = list(Survey.objects.filter(active=2,survey_type=1,data_entry_level_id=4).values_list('id',flat=True))
+                #     cache_set_with_namespace('RESPONSE_SURVEY_V3', cache_key, user_based_survey, 14400)
 
                 # activities =  JsonAnswer.objects.filter(survey_id__in=lineitem_obj,boundary_id__in = loc_list,submission_date__date__gte=fy_date).order_by('modified')
-                if boudnary_level_filter != 5:
-                    loc_list = Boundary.objects.filter(id__in=loc_list)
-                    loc_list = get_higher_level_locations(loc_list, boudnary_level_filter, 5)
+                # if boudnary_level_filter != 5:
+                #     loc_list = Boundary.objects.filter(id__in=loc_list)
+                #     loc_list = get_higher_level_locations(loc_list, boudnary_level_filter, 5)
 
                 #current financial year start and end
-                financial_year = get_financial_years()
+                # financial_year = get_financial_years()
                 
-                project_location_query = Q(survey_id__in=lineitem_obj, boundary_id__in=loc_list)
-                userbased_query = Q(survey_id__in=user_based_survey,user_id=user_id)
-                activities = JsonAnswer.objects.filter(project_location_query | userbased_query,submission_date__date__range=[financial_year['current_financial_start'],financial_year['current_financial_end']]).order_by('modified')
+                # project_location_query = Q(survey_id__in=lineitem_obj, boundary_id__in=loc_list)
+                # userbased_query = Q(survey_id__in=user_based_survey,user_id=user_id)
+                # activities = JsonAnswer.objects.filter(project_location_query | userbased_query,submission_date__date__range=[financial_year['current_financial_start'],financial_year['current_financial_end']]).order_by('modified')
+                activities = JsonAnswer.objects.filter(active=2).order_by('modified')
                 if act_modified_date:
                     activities = activities.filter(modified__gt=act_modified_date)
                 responses = activities[:batch_count]
@@ -162,34 +166,33 @@ def common_responses_details_v3(responses, user_id,user_role):
     if len(ben_survey_in_output) > 0:
         has_beneficiaries = True
     flag = ""
-    if has_activities == True:
-        transitions = TransitionCollection.objects.filter(object_id__in=list(responses.values_list('id',flat=True))).values('object_id','current_state_id')
-        activity_approval = {i['object_id']:i['current_state_id'] for i in transitions}
-        role_type = user_role.role_type.values_list('id', flat=True)
-        role_workflow_linkage = WrokflowStateRoleRelation.objects.filter(content_type_id=58, active=2).values('state_id', 'role_id')
-        role_workflow_dict = {item['role_id'] : item['state_id'] for item in role_workflow_linkage}
-        # state_dict = {i.id:i.label for i in State.objects.filter(active=2)}
-        for row in responses:
-            if row.cluster and row.cluster.get('Boundary'):
-                res_activity_boundary_list.append(row.cluster.get('Boundary'))
+    # if has_activities == True:
+        # transitions = TransitionCollection.objects.filter(object_id__in=list(responses.values_list('id',flat=True))).values('object_id','current_state_id')
+        # activity_approval = {i['object_id']:i['current_state_id'] for i in transitions}
+        # role_type = user_role.role_type.values_list('id', flat=True)
+        # role_workflow_linkage = WrokflowStateRoleRelation.objects.filter(content_type_id=58, active=2).values('state_id', 'role_id')
+        # role_workflow_dict = {item['role_id'] : item['state_id'] for item in role_workflow_linkage}
+        # # state_dict = {i.id:i.label for i in State.objects.filter(active=2)}
+        # for row in responses:
+        #     if row.cluster and row.cluster.get('Boundary'):
+        #         res_activity_boundary_list.append(row.cluster.get('Boundary'))
             
-            #checking user have permission to edit the activity
-            approval_status = 0
-            if role_type and activity_approval.get(row.id) == role_workflow_dict.get(role_type[0]):
-                approval_status = 1
+            # #checking user have permission to edit the activity
+            # approval_status = 0
+            # if role_type and activity_approval.get(row.id) == role_workflow_dict.get(role_type[0]):
+            #     approval_status = 1
 
-            approved_status_dict.update({row.id:approval_status})
-            activity_status_dict.update({row.id:activity_approval.get(row.id)})
-        result = Boundary.objects.filter(
-            id__in=res_activity_boundary_list).values_list('id', 'name')
+            # approved_status_dict.update({row.id:approval_status})
+            # activity_status_dict.update({row.id:activity_approval.get(row.id)})
+        # result = Boundary.objects.filter(id__in=res_activity_boundary_list).values_list('id', 'name')
 
-        # Rejected activites list based on remarks        
-        rejected_activities = list(Remarks.objects.filter(destination_state_id = role_workflow_dict.get(role_type[0]),action=0,id__in=Remarks.objects.filter(active=2,object_id__in=list(responses.values_list('id', flat=True))).values('object_id').annotate(max_id=Max('id')).values_list('max_id')).values_list('object_id',flat=True))
+        # # Rejected activites list based on remarks        
+        # rejected_activities = list(Remarks.objects.filter(destination_state_id = role_workflow_dict.get(role_type[0]),action=0,id__in=Remarks.objects.filter(active=2,object_id__in=list(responses.values_list('id', flat=True))).values('object_id').annotate(max_id=Max('id')).values_list('max_id')).values_list('object_id',flat=True))
         
-        # rejected_activities = [d['object_id'] for d in activity_remarks if d['destination_state'] == role_workflow_dict.get(role_type[0])]
+        # # rejected_activities = [d['object_id'] for d in activity_remarks if d['destination_state'] == role_workflow_dict.get(role_type[0])]
 
-        for b in result:
-            activity_boundary_dict.update({b[0]: b[1]})
+        # for b in result:
+        #     activity_boundary_dict.update({b[0]: b[1]})
         
     # if has_households == True:
     #     duplicate_ration_id = get_duplicate_ration_ids(connection, user_id)
@@ -202,9 +205,9 @@ def common_responses_details_v3(responses, user_id,user_role):
     aw_questions_dict = get_aw_questions_dict()
     grid_questions_dict = get_grid_questions_dict()
 
-    sql_query = "select survey_id, boundary_level_type_id from survey_boundary_level_view"
-    survey_boundary_list = execute_query(connection, sql_query)
-    survey_boundary_dict = [{i[0]:i[1]} for i in survey_boundary_list]
+    # sql_query = "select survey_id, boundary_level_type_id from survey_boundary_level_view"
+    # survey_boundary_list = execute_query(connection, sql_query)
+    # survey_boundary_dict = [{i[0]:i[1]} for i in survey_boundary_list]
 
     ben_cluster_data = {}
     if has_beneficiaries:
@@ -229,15 +232,15 @@ def common_responses_details_v3(responses, user_id,user_role):
 
 
     # activity lists of expenses
-    expense_dict = {}
-    if has_activities == True:
-        all_covered_amt = CoveredAmount.objects.filter(active=2,response_id__in=responses).values('response_id','donor_id','covered_amount_cash','covered_amount_kind')
-        expense_dict = {i['response_id']: []for i in all_covered_amt}
-        for i in all_covered_amt:
-            # resp_covered_amt = {i['donor_id']:{"covered_amount_cash":str(i['covered_amount_cash']),"covered_amount_kind":str(i['covered_amount_kind'])}}
-            # resp_covered_amt = {i['donor_id']:{"covered_amount_cash":str(i['covered_amount_cash']),"covered_amount_kind":str(i['covered_amount_kind'])}}
-            resp_covered_amt = {"cash":{i['donor_id']:str(i['covered_amount_cash'])},"kind":{i['donor_id']:str(i['covered_amount_kind'])}}
-            expense_dict[i['response_id']].append(resp_covered_amt)
+    # expense_dict = {}
+    # if has_activities == True:
+    #     all_covered_amt = CoveredAmount.objects.filter(active=2,response_id__in=responses).values('response_id','donor_id','covered_amount_cash','covered_amount_kind')
+    #     expense_dict = {i['response_id']: []for i in all_covered_amt}
+    #     for i in all_covered_amt:
+    #         # resp_covered_amt = {i['donor_id']:{"covered_amount_cash":str(i['covered_amount_cash']),"covered_amount_kind":str(i['covered_amount_kind'])}}
+    #         # resp_covered_amt = {i['donor_id']:{"covered_amount_cash":str(i['covered_amount_cash']),"covered_amount_kind":str(i['covered_amount_kind'])}}
+    #         resp_covered_amt = {"cash":{i['donor_id']:str(i['covered_amount_cash'])},"kind":{i['donor_id']:str(i['covered_amount_kind'])}}
+    #         expense_dict[i['response_id']].append(resp_covered_amt)
     # loop through the resposes and set related information/attributes like location, cluster info (beneficiary/boundary details)
     # mark for duplicate ID usage, list of GD and In type questions used, etc
 
@@ -245,11 +248,11 @@ def common_responses_details_v3(responses, user_id,user_role):
     all_files_data = file_respone_details_v3(responses)
 
     for res in responses:
-        cash = {}
-        kind = {}
-        for i in expense_dict.get(res.id,{}):
-            cash.update(i.get('cash'))
-            kind.update(i.get('kind'))
+        # cash = {}
+        # kind = {}
+        # for i in expense_dict.get(res.id,{}):
+        #     cash.update(i.get('cash'))
+        #     kind.update(i.get('kind'))
         duplicate_status = "0"
         # if has_households == True and (res.response.get('1221') in duplicate_ration_id or res.response.get('1222') in duplicate_samagra_id or res.response.get('1223') in duplicate_akrspi_uid):
         #     duplicate_status = "1"
@@ -345,7 +348,7 @@ def common_responses_details_v3(responses, user_id,user_role):
                          'activity_status':activity_status_dict.get(res.id,''),
                          # rejected key will return 1 if the record is rejected 
                          'rejected':1 if res.id in rejected_activities else 0,
-                         'expenses':{"cash":json.dumps(cash),"kind":json.dumps(kind)},
+                         'expenses':{"cash":"","kind":""},#{"cash":json.dumps(cash),"kind":json.dumps(kind)},
                          'approved_by':ben_approved_users.get(res.id,''),
                          'approved_on':datetime.strftime(ben_approved_on.get(res.id), '%Y-%m-%d %H:%M:%S.%f')if ben_approved_on.get(res.id) else '',
                          })
@@ -366,29 +369,33 @@ def prepare_responses_info(responses):
     act_survey_in_output = []
     ai_ben_ques = []
     act_responses_in_output = []
-    beneficiary_survey_ids = [70, 71, 73, 181]
+    response_info = defaultdict(list)
+    all_surveys = load_data_to_cache_survey_objects()
+    beneficiary_survey_ids = [i for i,obj in all_surveys.items() if not bool(obj.survey_type)]
+    # beneficiary_survey_ids = [70, 71, 73, 181]
     # group responses and surveys in responses to query for related data
     # print(responses)
     for res in responses:
-        # if res.survey_id==343:
-
-        # print(res.survey_id)
-        if res.survey_id == 70:
+        if res.survey_id in beneficiary_survey_ids:
             ben_survey_in_output.append(res.survey_id)
             ben_responses_in_output.append(str(res.id))
-            household_responses_in_output.append(str(res.id))
-        elif res.survey_id == 73:
-            ben_survey_in_output.append(res.survey_id)
-            ben_responses_in_output.append(str(res.id))
-            people_responses_in_output.append(str(res.id))
-        elif res.survey_id == 71:
-            ben_survey_in_output.append(res.survey_id)
-            ben_responses_in_output.append(str(res.id))
-            group_responses_in_output.append(str(res.id))
-        elif res.survey_id == 602:
-            ben_survey_in_output.append(res.survey_id)
-            ben_responses_in_output.append(str(res.id))
-            assets_responses_in_output.append(str(res.id))
+            response_info[str(res.survey_id)].append(str(res.id))
+        # if res.survey_id == 70:
+        #     ben_survey_in_output.append(res.survey_id)
+        #     ben_responses_in_output.append(str(res.id))
+        #     household_responses_in_output.append(str(res.id))
+        # elif res.survey_id == 73:
+        #     ben_survey_in_output.append(res.survey_id)
+        #     ben_responses_in_output.append(str(res.id))
+        #     people_responses_in_output.append(str(res.id))
+        # elif res.survey_id == 71:
+        #     ben_survey_in_output.append(res.survey_id)
+        #     ben_responses_in_output.append(str(res.id))
+        #     group_responses_in_output.append(str(res.id))
+        # elif res.survey_id == 181:
+        #     ben_survey_in_output.append(res.survey_id)
+        #     ben_responses_in_output.append(str(res.id))
+        #     institution_responses_in_output.append(str(res.id))
         else:
             # if res.survey_id == 335:
             #     if res.response.get('1289'):
@@ -400,9 +407,12 @@ def prepare_responses_info(responses):
             # else:
             act_survey_in_output.append(res.survey_id)
             act_responses_in_output.append(str(res.id))
-    response_info = {"70": household_responses_in_output, "73": people_responses_in_output,
-                     "71": group_responses_in_output, "602": assets_responses_in_output,
-                     "ben": ben_responses_in_output, "act": act_responses_in_output, "ai_ben_ques": ai_ben_ques}
+    response_info['ben'] = ben_responses_in_output
+    response_info['act'] = act_responses_in_output
+    response_info['ai_ben_ques'] = ai_ben_ques
+    # response_info = {"70": household_responses_in_output, "73": people_responses_in_output,
+    #                  "71": group_responses_in_output, "181": institution_responses_in_output,
+    #                  "ben": ben_responses_in_output, "act": act_responses_in_output, "ai_ben_ques": ai_ben_ques}
     ben_survey_in_output = list(set(ben_survey_in_output))
     act_survey_in_output = list(set(act_survey_in_output))
     et = datetime.now()
@@ -497,7 +507,7 @@ def get_beneficiary_creation_keys(ai_ben_ques):
     st = datetime.now()
     ben_creation_key_dict = {}
     query_list = []
-    sql_query = """select id, creation_key from beneficiary_beneficiaryresponse 
+    sql_query = """select id, creation_key from survey_beneficiaryresponse 
         where creation_key in (""" + str(ai_ben_ques)[1:-1] + """) """
     result = execute_query(connection, sql_query)
     for row in result:
@@ -512,11 +522,11 @@ def get_beneficiary_creation_keys(ai_ben_ques):
 def get_household_for_people(response_info):
     st = datetime.now()
     household_ben_dict = {}
-    people_res_list = response_info.get('73')
+    people_res_list = response_info.get('73',[])
     if len(people_res_list) > 0:
         sql_query = """select (a.response ->> '640')::varchar as household_ben_id, b.creation_key as household_creation_key
                     from survey_jsonanswer as a
-                    inner join beneficiary_beneficiaryresponse as b on (a.response ->> '640')::varchar = b.creation_key::varchar
+                    inner join survey_beneficiaryresponse as b on (a.response ->> '640')::varchar = b.creation_key::varchar
                     where a.survey_id = 73 
                     and a.id in ("""+(','.join(people_res_list)) + """)
                     """
@@ -589,9 +599,9 @@ def get_beneficiary_cluster_info(response_info, ben_aw_meta, ben_survey_in_outpu
             sql_query = """select b1.id as response_id,p1.response #>> ('{ address, 1,' || '""" + str(aw_meta.get("parent_aw_qid")) + """'|| ',' ||'""" + str(aw_meta.get("location_level"))+"""' || '}')::text[] as cluster_id,
                 mbd.name as cluster_name
                 from survey_jsonanswer b1
-                inner join beneficiary_beneficiaryresponse b2 on b1.response #>> ('{' ||'""" + str(aw_meta.get("ai_qid"))+"""' || '}')::text[] =b2.creation_key::text
+                inner join survey_beneficiaryresponse b2 on b1.response #>> ('{' ||'""" + str(aw_meta.get("ai_qid"))+"""' || '}')::text[] =b2.creation_key::text
                 inner join survey_jsonanswer p1 on p1.id = b2.json_answer_id
-                inner join masterdata_boundary mbd on mbd.id::text = p1.response #>> ('{ address, 1,' ||'""" + str(aw_meta.get("parent_aw_qid")) + """'|| ',' ||'""" + str(aw_meta.get("location_level")) + """'|| '}')::text[]
+                inner join application_master_boundary mbd on mbd.id::text = p1.response #>> ('{ address, 1,' ||'""" + str(aw_meta.get("parent_aw_qid")) + """'|| ',' ||'""" + str(aw_meta.get("location_level")) + """'|| '}')::text[]
                 where b1.survey_id = """ + str(survey_id) + """ and b1.id in (""" + ','.join(response_info.get(str(survey_id))) + """) """
 
         else:
@@ -599,12 +609,12 @@ def get_beneficiary_cluster_info(response_info, ben_aw_meta, ben_survey_in_outpu
             b1.response #>> ('{ address, 1,' || '"""+str(aw_meta.get("aw_qid"))+"""' || ',' ||'""" + str(aw_meta.get("location_level")) + """'|| '}' )::text[] as cluster_id,
             mbd.name as cluster_name
             from survey_jsonanswer b1
-            inner join masterdata_boundary mbd on mbd.id::text = b1.response #>> ('{ address, 1,' ||'"""+str(aw_meta.get("aw_qid"))+"""'|| ',' ||'""" + str(aw_meta.get("location_level"))+"""' || '}')::text[]
+            inner join application_master_district mbd on mbd.id::text = b1.response #>> ('{ address, 1,' ||'"""+str(aw_meta.get("aw_qid"))+"""'|| ',' ||'""" + str(aw_meta.get("location_level"))+"""' || '}')::text[]
             where b1.survey_id = """ + str(survey_id) + """ and b1.id in (""" + ','.join(response_info.get(str(survey_id))) + """)"""
             # select b1.id as response_id,
             # b1.response #>> '{ address, 1, 940, 7}' as cluster_id, mbd.name as cluster_name
             # from survey_jsonanswer b1
-            # inner join masterdata_boundary mbd on mbd.id::text = b1.response #>> '{ address, 1, 940, 7}'
+            # inner join application_master_boundary mbd on mbd.id::text = b1.response #>> '{ address, 1, 940, 7}'
             # where b1.survey_id = 71 and b1.id in (92242, 92228, 92225, 92223, 92217)
         query_list.append(sql_query)
         sql_query = ' UNION ALL '.join(query_list)
@@ -710,24 +720,3 @@ def file_respone_details_v3(responses):
             logging.error(error_stack)
     return file_data_dict
 
-def convert_string_to_date(string):
-    date_object = ''
-    try:
-        date_object = datetime.strptime(string, '%Y-%m-%d %H:%M:%S')
-    except:
-        date_object = None
-    if not date_object:
-        try:
-            date_obj = datetime.strptime(string, '%Y-%m-%d %H:%M:%S.%f')
-            date_object = datetime(int(date_obj.year),int(date_obj.month),int(date_obj.day),int(date_obj.hour),int(date_obj.minute),int(date_obj.second),int(date_obj.microsecond),pytz.UTC)
-        except:
-            date_object = None
-    return date_object
-
-def convert_date_to_string(string):
-    date_object = None
-    try:
-        date_object = string.strftime('%Y-%m-%d %H:%M:%S.%f')
-    except:
-        date_object = None
-    return date_object
