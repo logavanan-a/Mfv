@@ -1252,7 +1252,7 @@ def get_beneficiary_aw_meta(connection):
     if not ben_aw_info:
         st = datetime.now()
         sql_query = """select b1.survey_id, b1.aw_id, coalesce(b2.ai_id,0), coalesce(p1.aw_id,0) as pb_aw_id,
-                    5 as location_level
+                    2 as location_level
             from (select c.id as survey_id, a.id as aw_id 
                     from survey_question a 
                     inner join survey_block b on a.block_id = b.id and a.active = 2 
