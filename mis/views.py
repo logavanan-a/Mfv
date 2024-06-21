@@ -513,7 +513,7 @@ def add_user(request, user_location=None):
     Renders the add user page and handles the creation of a new user.
     """
     heading = "Add User"
-    groups = Group.objects.all()
+    groups = Group.objects.filter(id__in=[2,3])
     partners = Partner.objects.all()
 
     if True:
@@ -573,6 +573,7 @@ def user_profile(request, id):
     Renders the user profile page.
     """
     user = User.objects.get(id=id)
+    print(user.last_login,'-----------------------')
     return render(request, 'user/user_profile.html', locals())
 
 @ login_required(login_url='/')

@@ -27,11 +27,11 @@ class DistrictForm(forms.ModelForm):
 
 class PartnerForm(forms.ModelForm):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'Enter Name'}), max_length=150, strip=True)
-    partner_logo = forms.FileField(required=False)
+    # partner_logo = forms.FileField(required=False)
 
     class Meta:
         model = Partner
-        fields = ['name', 'partner_logo']
+        fields = ['name']
 
     def save(self, commit=True):
         instance = super(PartnerForm, self).save(commit=False)  
@@ -94,6 +94,16 @@ class ProjectForm(forms.ModelForm):
             if self.instance.district.state:
                 self.fields['district'].queryset = self.fields['district'].queryset.filter(state_id=self.instance.district.state.id)
             self.fields['state'].initial = self.instance.district.state
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get('start_date')
+        end_date = cleaned_data.get('end_date')
+
+        if start_date and end_date and start_date > end_date:
+            self.add_error('end_date', 'End date must be later than start date.')
+
+        return cleaned_data
             
     class Meta:
         model = Project
@@ -102,11 +112,11 @@ class ProjectForm(forms.ModelForm):
 
 class DonorForm(forms.ModelForm):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'Enter Name'}), max_length=150, strip=True)
-    logo = forms.FileField(required=False)
+    # logo = forms.FileField(required=False)
     
     class Meta:
         model = Donor
-        fields = ['name', 'logo']
+        fields = ['name']
 
 class MissionindicatorcategoryForm(forms.ModelForm):
     CATEGORY_CHOICES = ((1,'Programme Indicator'),

@@ -84,6 +84,7 @@ def master_add_form(request, model):
         heading='user profile'
     else:
         heading=model
+        heading = heading.capitalize()
     user_form = eval(model.title()+'Form') 
     forms=user_form()
 
@@ -111,6 +112,7 @@ def master_edit_form(request,model,id):
         heading='user profile'
     else:
         heading=model
+        heading = heading.capitalize()
     if model == 'partner':
         part = Partner.objects.filter(id=id).values_list('id', flat=True)
         user_prop = UserPartnerMapping.objects.filter(partner_id__in = part)
@@ -175,8 +177,9 @@ def master_details_form(request,model,id):
         user_mapping = UserPartnerMapping.objects.filter(partner_id=id).values_list('user_id', flat=True)
         user_obj = User.objects.filter(id__in=user_mapping)
         groups_obj = Group.objects.filter(user__in=user_obj).distinct()
-        part=Partner.objects.filter(id=id)
-        parner_mission_obj = PartnerMissionMapping.objects.filter(partner_id__in=part).order_by('-id')
+        part=Partner.objects.filter(id=id, active=2)
+        parner_mission_obj = PartnerMissionMapping.objects.filter(partner_id__in=part,active=2).order_by('-id')
+        project_map = Project.objects.filter(partner_mission_mapping_id__in = parner_mission_obj).order_by('-id')
     elif model == 'project':
         heading="Project"
         user_mapping = UserProjectMapping.objects.filter(project_id=id).values_list('user_id', flat=True)
@@ -219,9 +222,12 @@ def vendor_partner_user_mapping(request,vendor_partner_id,model):
             user_mapping = None
             user_obj = None
             groups_obj = None
-        
-    groups = Group.objects.all()
-    partners = Partner.objects.all()
+    if  model == 'partner':
+        groups = Group.objects.filter(id__in = [1,4])
+    if  model == 'project':
+        groups = Group.objects.filter(id = 2)
+    
+    partners = Partner.objects.all()    
 
     if request.method == 'POST':
         try:
