@@ -499,3 +499,39 @@ def stripmessage(errors):
             errors[ik] = errors.pop(i)
             errors[ik] = re.sub(r'\w+:', '', errors[ik])
     return errors
+
+
+def adding_project(request,id):
+    states = State.objects.filter(active=2).order_by('name')
+    districts = District.objects.filter(active=2).order_by('name')
+    donors = Donor.objects.filter(active=2)
+    partner = Partner.objects.filter(id=id).values_list('id', flat=True)
+    partner_mission = PartnerMissionMapping.objects.filter(partner_id__in=partner)
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        partner_mission = request.POST.get('partner_mission')
+        state = request.POST.get('state')
+        district = request.POST.get('district')
+        location = request.POST.get('location')
+        donor = request.POST.get('donor')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        additional_info = request.POST.get('additional_info')
+        
+        pro_details = Project.objects.create(
+            name=name,
+            partner_mission_mapping_id=partner_mission,
+            district_id=district,
+            location=location,
+            additional_info=additional_info,
+            start_date=start_date,
+            end_date=end_date,            
+        )
+        pro_details.save()
+        ProjectDonorMapping.objects.update_or_create(
+                    project_id=pro_details.id,
+                    defaults={'donor_id': donor}
+                )
+        return redirect('/application_master/details/partner/'+ str(id) + '/')
+
+    return render(request, 'user/adding_project.html', locals())

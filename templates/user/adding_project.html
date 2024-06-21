@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block contents %}
+<div class="row align-items-center">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <!-- <form method='POST' class="needs-validation" autocomplete="off" oninput='password2.setCustomValidity(password2.value != password.value ? "Passwords do not match." : "")'> -->
+                <form id="myForm" method='POST' class="needs-validation" autocomplete="off"  novalidate>
+                    {% csrf_token %}
+                    <div class='text-danger'>
+                        {{error}}
+                    </div> 
+                    <div class="row mb-4">
+                        <label class="col-md-2 col-form-label">Name<span class="required-field"></span></label>
+                        <div class="col-md-4"> 
+                            <input type="text"  name= "name" class="form-control" placeholder="Enter Name" required />
+                            <div class="invalid-feedback">
+                                Please enter name.
+                            </div>
+                        </div>
+                        <label class="col-md-2 col-form-label">Partner mission mapping<span class="required-field"></span></label>
+                        <div class="col-md-4">
+                            <select name="partner_mission" class="form-select select2" required>
+                                <option value="" disabled selected>Select partner mission mapping</option>
+                                {% for donor in partner_mission %}
+                                    <option value="{{ donor.id }}">{{ donor }}</option>
+                                {% endfor %}
+                            </select> 
+                            <div class="invalid-feedback">
+                                Please select partner mission.
+                            </div>                       
+                        </div> 
+                    </div>  
+                    <div class="row mb-4">
+                        <label class="col-md-2 col-form-label">State<span class="required-field"></span></label>
+                        <div class="col-md-4">
+                            <select name="state" id="id_state" class="form-select select2" required>
+                                <option value="" selected>Select State</option>
+                                {% for state in states %}
+                                    <option value="{{state.id}}">{{ state }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select state.
+                            </div>
+                        </div> 
+                        <label class="col-md-2 col-form-label">District<span class="required-field"></span></label>
+                        <div class="col-md-4">
+                            <select name="district" id="id_district" class="form-select select2" required>
+                                <option value="" disabled selected>Select District</option>
+                                {% for district in districts %}
+                                    <option value="{{district.id}}">{{ district }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select district.
+                            </div>
+                        </div> 
+                    </div>
+                    <div class="row mb-4">
+                        <label class="col-md-2 col-form-label">Location<span class="required-field"></span></label>
+                        <div class="col-md-4">
+                            <input type="text"  name= "location" class="form-control" required placeholder="Enter Location" />
+                            <div class="invalid-feedback">
+                                Please enter location.
+                            </div>
+                        </div>
+                        <label class="col-md-2 col-form-label">Donor<span class="required-field"></span></label>
+                        <div class="col-md-4">
+                            <select name="donor" class="form-select select2" required>
+                                <option value="" disabled selected>Select Donor</option>
+                                {% for donor in donors %}
+                                    <option value="{{ donor.id }}">{{ donor }}</option>
+                                {% endfor %}
+                            </select> 
+                            <div class="invalid-feedback">
+                                Please select donor.
+                            </div>                       
+                        </div> 
+                    </div>  
+                    <div class="row mb-4">
+                        <label class="col-md-2 col-form-label">Start Date</label>
+                        <div class="col-md-4">
+                            <input type="date" name= "start_date"  class="form-control" id="myDateInput"  onfocus="this.max=new Date().toISOString().split('T')[0]">
+                            <div class="invalid-feedback">
+                                Please choose date.
+                            </div>
+                        </div>
+                        <label class="col-md-2 col-form-label">End Date</label>
+                        <div class="col-md-4">
+                            <input type="date" name= "end_date"  class="form-control" id="myDateInput"  onfocus="this.max=new Date().toISOString().split('T')[0]">
+                            <div class="invalid-feedback">
+                                Please choose date.
+                            </div>
+                        </div>
+                    </div>
+                      
+                    <div class="row mb-4">
+                        <label class="col-md-2 col-form-label">Additional Info<span ></span></label>
+                        <div class="col-md-4">
+                            <textarea type="text" class="form-control" id="" name='additional_info' placeholder="Enter Additional info"  rows="5" cols="50"> </textarea>
+                        </div>
+                    </div>
+                    <div class="gap-2" style="float:right;">
+                        <button type="reset"  onclick="location.href='javascript:history.back()'" class="btn btn-secondary waves-effect">
+                            Cancel
+                        </button>
+                        <button type="submit" id="submitting" style="margin-left: 5px;" class="btn btn-primary w-md">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'libs/jquery/dist/jquery.min.js' %}"></script>
+<script src="{% static 'js/pages/form-validation.init.js' %}"></script> 
+
+<script>
+    $(document).ready(function() {
+        $('select').addClass('form-control');
+        $('input').addClass('form-control');
+  
+        $('#id_state').change(function() {
+            var stateId = $(this).val();
+            console.log('State ID selected:', stateId); // Debug statement
+  
+            if (stateId === "") {
+                $('#id_district').prop('readonly', true);
+                $("#id_district option").remove();
+            } else {
+                $.ajax({
+                    type: "GET",
+                    url: '/application_master/ajax/district/' + stateId + '/',
+                    success: function(result) {
+                        console.log('Result received:', result); // Debug statement
+                        var districtSelect = $('#id_district');
+                        districtSelect.empty();
+                        districtSelect.append('<option value="">Select District</option>');
+                        result.forEach(function(district) {
+                            districtSelect.append('<option value="' + district.id + '">' + district.name + '</option>');
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error occurred:', status, error); // Debug statement
+                    }
+                });
+            }
+        });
+    });
+  </script>
+
+{% endblock %}
