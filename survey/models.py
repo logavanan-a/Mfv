@@ -104,6 +104,14 @@ class Survey(BaseContent):
                 self.name, str(uuid4().int)[:4]))
         super(Survey, self).save(*args, **kwargs)
 
+    def is_beneficiary_based_child(self):
+        # this is to get the beneficiary address where the child beneficiary doesnt have address question
+        # child beneficiary is saved based on beneficiary_address.
+        #TO check the child beneficiary has address qquestion and 
+        #if parent beneficiary is api type in child beneficiary this function is used
+       status = Question.objects.filter(block__survey=self,api_json__is_beneficiary_ques=2).exists()
+       return status
+
     # #TODO: Not used in subhiksha application but used in apis not have any logic in subhiksha for rule engine
     # def get_survey_rule_engine(self):
     #     rule_engine_obj = None
@@ -787,18 +795,17 @@ class Survey(BaseContent):
 #        status = Question.objects.filter(block__survey=self,api_json__is_beneficiary_ques=2).exists()
 #        return status
 
-#     # #TODO: Not used in subhiksha application 
-#     # def get_parent_beneficiary_address(self):
-#     #     from beneficiary.models import BeneficiaryType
-#     #     ques = Question.objects.get_or_none(block__survey=self,api_json__is_beneficiary_ques=2)
-#     #     if ques:
-#     #         benef_id = ques.api_json.get('parent_beneficiary_id')
-#     #         ben_obj = BeneficiaryType.objects.get_or_none(id=benef_id)
-#     #         survey = Survey.objects.get(survey_type=0,content_type = ContentType.objects.get_for_model(ben_obj),object_id=ben_obj.id)
-#     #         qid = survey.questions().filter(qtype='AW')[0]
-#     #     else:
-#     #         qid = None
-#     #     return qid
+    def get_parent_beneficiary_address(self):
+        from survey.models import BeneficiaryType
+        ques = Question.objects.filter(block__survey=self,api_json__is_beneficiary_ques=2).first()
+        if ques:
+            benef_id = ques.api_json.get('parent_beneficiary_id')
+            ben_obj = BeneficiaryType.objects.filter(id=benef_id).first()
+            survey = Survey.objects.get(survey_type=0,content_type = ContentType.objects.get_for_model(ben_obj),object_id=ben_obj.id)
+            qid = survey.questions().filter(qtype='AW')[0]
+        else:
+            qid = None
+        return qid
 
 # def get_linkage_rule_sets(links,key):
 #     survey_dict = {'0':'score_based_survey','1':'score_based_survey_or'}
