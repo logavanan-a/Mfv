@@ -55,13 +55,13 @@ def new_responses_list_v3(request):
             # loc_list = [str(i) for i in user_boundary]
             # loc_list=[]
             loc_list = list(UserProjectMapping.objects.filter(active=2, user_id=user_id).values_list('project__district_id', flat=True).distinct())
+            loc_list = list(map(str,loc_list))
             cache_set_with_namespace('RESPONSE_SURVEY_V3', loc_list_cache_key, loc_list, 14400)
             logger.info("## TIME-TRACKER UserID-loc_list::" + str(user_id) + " : " + str(loc_list))
         if len(loc_list) > 0:
             # boudnary_level_filter = user_role.organization_unit.organization_level_id
             # query_set = {f"address_{boudnary_level_filter}__in": loc_list}
-            beneficiaries_json = BeneficiaryResponse.objects.filter(active=2).values_list('json_answer_id', flat=True)
-
+            beneficiaries_json = BeneficiaryResponse.objects.filter(active=2,address_2__in=loc_list).values_list('json_answer_id', flat=True)
             beneficiaries = JsonAnswer.objects.filter(id__in=beneficiaries_json).order_by('modified')
             if ben_modified_date:
                 beneficiaries = beneficiaries.filter(modified__gt=ben_modified_date)
@@ -100,7 +100,7 @@ def new_responses_list_v3(request):
                 # project_location_query = Q(survey_id__in=lineitem_obj, boundary_id__in=loc_list)
                 # userbased_query = Q(survey_id__in=user_based_survey,user_id=user_id)
                 # activities = JsonAnswer.objects.filter(project_location_query | userbased_query,submission_date__date__range=[financial_year['current_financial_start'],financial_year['current_financial_end']]).order_by('modified')
-                activities = JsonAnswer.objects.filter(active=2).order_by('modified')
+                activities = JsonAnswer.objects.filter(active=2,cluster__BeneficiaryResponse__in = list(beneficiaries_json.values_list('creation_key',flat=True))).exclude(survey__survey_type = 0).order_by('modified')
                 if act_modified_date:
                     activities = activities.filter(modified__gt=act_modified_date)
                 responses = activities[:batch_count]
