@@ -139,7 +139,6 @@ def questionlist(request):
         flag = ""
         updatedtime = request.POST.get("updatedtime")
         questions = Question.objects.filter().select_related('block','block__survey')
-
         if updatedtime:
             updated = convert_string_to_date(updatedtime)
             questions = questions.filter(modified__gt=updated)
@@ -151,42 +150,42 @@ def questionlist(request):
         for quest in questions:
             quest.api_json.update({"editable":quest.is_editable})
 
-            if (quest.parent == None and quest.is_grid == False) or (quest.parent != None and quest.is_grid == True):
-                quest_list.append({'id': int(quest.id),
-                                   'question_type':quest.qtype,
-                                   'question_code': int(quest.code),
-                                   'answer_type': qtype_dict.get(quest.qtype),
-                                   "survey_id": int(quest.block.survey.id),
-                                   "block_id": int(quest.block.id),
-                                   "sub_question": quest.parent.id if quest.parent else 0,
-                                   "question_text": quest.text,
-                                   "help_text": quest.help_text,
-                                   'instruction_text': "",
-                                   "active": quest.active,
-                                   "language_id": 1,
-                                   "mandatory": int(quest.mandatory),
-                                   "question_order": int(quest.question_order) if quest.question_order else 0,
-                                   "validation":  quest.get_question_validation() if quest.get_question_validation() else "" ,
-    #                               "validation": "",
-                                   "image_path": "",
-                                   "answer": quest.qtype if (quest.is_grid == False and quest.parent == None) else 'N',
-                                   "keyword": quest.api_qtype,
-                                   'updated_time': datetime.strftime(quest.modified, '%Y-%m-%d %H:%M:%S.%f'),
-                                   'extra_column1': "English",
-                                   'extra_column2': 0,
-                                   'short_text': "",
-                                   'is_attendance_question':quest.training_config.get('is_attendence_question') if quest.training_config.get('is_attendence_question') else 0,
-                                   'display_as_name':quest.display_has_name,
-                                   'question_json': quest.api_json, "question_id":
-                                       quest.api_json.get('question_id', 0),
-                                   "parent_beneficiary_id": quest.api_json.get(
-                                       'parent_beneficiary_id', 0),
-                                   'code_display': str(quest.code_display) if quest.code_display  else '0',
-                                #    'individual_qid': quest.reference_question_id or 0 ,
-                                #    'editable':int(quest.is_editable),
-                                   # if is_code_display is 1 then display the code_display
-                                   #"display_as_code": user_setup().get("is_code_display") if user_setup().get("is_code_display") else 0 
-                                   })
+            # if (quest.parent == None and quest.is_grid == False) or (quest.parent != None and quest.is_grid == True):
+            quest_list.append({'id': int(quest.id),
+                                'question_type':quest.qtype,
+                                'question_code': int(quest.code),
+                                'answer_type': qtype_dict.get(quest.qtype),
+                                "survey_id": int(quest.block.survey.id),
+                                "block_id": int(quest.block.id),
+                                "sub_question": quest.parent.id if quest.parent else 0,
+                                "question_text": quest.text,
+                                "help_text": quest.help_text,
+                                'instruction_text': "",
+                                "active": quest.active,
+                                "language_id": 1,
+                                "mandatory": int(quest.mandatory),
+                                "question_order": int(quest.question_order) if quest.question_order else 0,
+                                "validation":  quest.get_question_validation() if quest.get_question_validation() else "" ,
+#                               "validation": "",
+                                "image_path": "",
+                                "answer": quest.qtype if (quest.is_grid == False and quest.parent == None) else 'N',
+                                "keyword": quest.api_qtype,
+                                'updated_time': datetime.strftime(quest.modified, '%Y-%m-%d %H:%M:%S.%f'),
+                                'extra_column1': "English",
+                                'extra_column2': 0,
+                                'short_text': "",
+                                'is_attendance_question':quest.training_config.get('is_attendence_question') if quest.training_config.get('is_attendence_question') else 0,
+                                'display_as_name':quest.display_has_name,
+                                'question_json': quest.api_json, "question_id":
+                                    quest.api_json.get('question_id', 0),
+                                "parent_beneficiary_id": quest.api_json.get(
+                                    'parent_beneficiary_id', 0),
+                                'code_display': str(quest.code_display) if quest.code_display  else '0',
+                            #    'individual_qid': quest.reference_question_id or 0 ,
+                            #    'editable':int(quest.is_editable),
+                                # if is_code_display is 1 then display the code_display
+                                #"display_as_code": user_setup().get("is_code_display") if user_setup().get("is_code_display") else 0 
+                                })
         if quest_list:
             res = {'status': 2,
                    'message': "Data sent successfully",
