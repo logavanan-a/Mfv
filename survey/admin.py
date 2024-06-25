@@ -125,3 +125,12 @@ class LanguageTranslationTextAdmin(ImportExportModelAdmin, ImportExportFormat):
 @admin.register(LabelLanguageTranslation)    
 class LabelLanguageTranslationAdmin(ImportExportModelAdmin, ImportExportFormat):
     pass
+
+
+@admin.register(BeneficiaryResponse)    
+class BeneficiaryResponseAdmin(ImportExportModelAdmin, ImportExportFormat):
+    pass
+
+@admin.register(BeneficiaryType)    
+class BeneficiaryTypeAdmin(ImportExportModelAdmin, ImportExportFormat):
+    pass

@@ -1,7 +1,7 @@
 from django.contrib import admin
-from import_export.admin import ImportExportActionModelAdmin
+from import_export.admin import ImportExportActionModelAdmin,ImportExportModelAdmin, ImportExportMixin
 from django.contrib.auth.models import User
-
+from survey.admin import ImportExportFormat
 from application_master.models import (District, Donor, Menus, Mission,
                                        MissionIndicator,
                                        MissionIndicatorCategory,
@@ -9,7 +9,7 @@ from application_master.models import (District, Donor, Menus, Mission,
                                        PartnerMissionMapping, Project,
                                        ProjectDonorMapping, ProjectFiles,
                                        State, UserPartnerMapping,
-                                       UserProjectMapping)
+                                       UserProjectMapping,MasterLookUp)
 
 
 class MissionIndicatorCategoryInline(admin.TabularInline): #StackedInline
@@ -231,4 +231,18 @@ class AdminMenus(ImportExportActionModelAdmin, admin.ModelAdmin):
         """
         return [field.name for field in self.model._meta.concrete_fields]
 
+@admin.register(MasterLookUp)    
+class MasterLookUpAdmin(ImportExportModelAdmin, ImportExportFormat):
+    pass
     
+# from django.apps import apps
+
+# # Get all models in the project
+# all_models = apps.get_models()
+
+# # Loop through the models and register only those that are not already registered
+# for model in all_models:
+#     try:
+#         admin.site.register(model)
+#     except admin.sites.AlreadyRegistered:
+#         pass

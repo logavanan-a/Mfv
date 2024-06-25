@@ -14,5 +14,7 @@ urlpatterns = [
     path('choice/edit/<int:pk>/', EditQuestionChoice.as_view()),
     path('skip-questions/<int:pk>/', SkipQuestionChoice.as_view()),
     path('import-questions/<int:pk>/', ImportQuestions.as_view()),
-    path('import-modified-questions/<int:pk>/',ImportMQuestions.as_view())
+    path('import-modified-questions/<int:pk>/',ImportMQuestions.as_view()),
+    path('survey/program-linkages/', ProgramRetreiveLinkages.as_view()),
+
 ]

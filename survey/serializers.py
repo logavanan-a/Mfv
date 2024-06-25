@@ -21,3 +21,7 @@ class LabelLanguageTranslationSerializer(serializers.ModelSerializer):
         # handle null value in parent fields
         # representation['parent'] = 0 if representation['parent'] is None else representation['parent']
         return representation
+    
+
+class LinkageListingSerializer(serializers.Serializer):
+    modified_on = serializers.CharField(required=False)    

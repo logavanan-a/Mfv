@@ -447,7 +447,7 @@ class UserlistAndroid(g.CreateAPIView):
         if not data.get('user_id'):
             return Response({'status':0,'message':'user id required'})
         try:
-            userlist = User.objects.filter().order_by("-id")
+            userlist = User.objects.filter().prefetch_related('groups').order_by("-id")
             response=[]
             for i in userlist:
                 user_info = {'id': i.id,
@@ -460,7 +460,8 @@ class UserlistAndroid(g.CreateAPIView):
                 # if role_obj:
                 #     role_id = all()[0].user_role_ids()
                 # else:
-                role_id = i.groups.all()[0].id
+                group_id = i.groups.all()
+                role_id = str(group_id[0].id) if group_id else ""
                 user_info.update(role_id = role_id)
                 response.append(user_info)
             return Response({'message':'success','status':2,'users':response})
@@ -483,7 +484,7 @@ class RoleTypesListAndroid(g.CreateAPIView):
         if not request.data.get('user_id'):
             return Response({'status':0,'message':'user_id required'})
         try:
-            objs = Group.objects.filter(active=2).order_by('-id')
+            objs = Group.objects.filter().order_by('-id')
             data=[{'id': i.id, 
             			'name':i.name,
             			} for i in objs]

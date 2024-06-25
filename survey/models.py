@@ -104,6 +104,14 @@ class Survey(BaseContent):
                 self.name, str(uuid4().int)[:4]))
         super(Survey, self).save(*args, **kwargs)
 
+    def is_beneficiary_based_child(self):
+        # this is to get the beneficiary address where the child beneficiary doesnt have address question
+        # child beneficiary is saved based on beneficiary_address.
+        #TO check the child beneficiary has address qquestion and 
+        #if parent beneficiary is api type in child beneficiary this function is used
+       status = Question.objects.filter(block__survey=self,api_json__is_beneficiary_ques=2).exists()
+       return status
+
     # #TODO: Not used in subhiksha application but used in apis not have any logic in subhiksha for rule engine
     # def get_survey_rule_engine(self):
     #     rule_engine_obj = None
@@ -397,18 +405,17 @@ class Survey(BaseContent):
             
     #     return data                                    
 
-    # def get_beneficiary_type(self):
-    #     from beneficiary.models import BeneficiaryType
-    #     beneficiary_type = None
-    #     if self.survey_type == 0:
-    #         beneficiary_type = BeneficiaryType.objects.get_or_none(id=self.object_id)
-    #     elif self.survey_type == 1:
-    #         for i in self.config:
-    #             for key in i.keys():
-    #                 indexvalue = key.split('_')[-1]
-    #                 if i[key] == "BeneficiaryType":
-    #                     beneficiary_type = BeneficiaryType.objects.get_or_none(id=int(i.get('object_id_' + indexvalue)))
-    #     return beneficiary_type
+    def get_beneficiary_type(self):
+        beneficiary_type = None
+        if self.survey_type == 0:
+            beneficiary_type = BeneficiaryType.objects.get(id=self.object_id)
+        elif self.survey_type == 1:
+            for i in self.config:
+                for key in i.keys():
+                    indexvalue = key.split('_')[-1]
+                    if i[key] == "BeneficiaryType":
+                        beneficiary_type = BeneficiaryType.objects.get_or_none(id=int(i.get('object_id_' + indexvalue)))
+        return beneficiary_type
 
 #     def get_survey_location(self):
 #         from beneficiary.models import BeneficiaryType
@@ -788,18 +795,17 @@ class Survey(BaseContent):
 #        status = Question.objects.filter(block__survey=self,api_json__is_beneficiary_ques=2).exists()
 #        return status
 
-#     # #TODO: Not used in subhiksha application 
-#     # def get_parent_beneficiary_address(self):
-#     #     from beneficiary.models import BeneficiaryType
-#     #     ques = Question.objects.get_or_none(block__survey=self,api_json__is_beneficiary_ques=2)
-#     #     if ques:
-#     #         benef_id = ques.api_json.get('parent_beneficiary_id')
-#     #         ben_obj = BeneficiaryType.objects.get_or_none(id=benef_id)
-#     #         survey = Survey.objects.get(survey_type=0,content_type = ContentType.objects.get_for_model(ben_obj),object_id=ben_obj.id)
-#     #         qid = survey.questions().filter(qtype='AW')[0]
-#     #     else:
-#     #         qid = None
-#     #     return qid
+    def get_parent_beneficiary_address(self):
+        from survey.models import BeneficiaryType
+        ques = Question.objects.filter(block__survey=self,api_json__is_beneficiary_ques=2).first()
+        if ques:
+            benef_id = ques.api_json.get('parent_beneficiary_id')
+            ben_obj = BeneficiaryType.objects.filter(id=benef_id).first()
+            survey = Survey.objects.get(survey_type=0,content_type = ContentType.objects.get_for_model(ben_obj),object_id=ben_obj.id)
+            qid = survey.questions().filter(qtype='AW')[0]
+        else:
+            qid = None
+        return qid
 
 # def get_linkage_rule_sets(links,key):
 #     survey_dict = {'0':'score_based_survey','1':'score_based_survey_or'}
@@ -1098,6 +1104,36 @@ class Question(BaseContent):
     #                 question_ids.extend(next_question.get_inner_questions())
     #     return list(set(question_ids))
 
+
+    def get_question_validation(self):
+        from cache_configuration.views import load_data_to_cache_question_validation
+        # Question Validation Make Sure each question has only one validation
+        qv_dict = load_data_to_cache_question_validation()
+        qv = None
+        qv_obj = qv_dict.get(str(self.id))#QuestionValidation.objects.filter(active=2).get_or_none(question=self)
+        validationtype = "R" if self.mandatory else "O"
+        if self.qtype in ['T', 'D'] and qv_obj and qv_obj.get('code'):
+            if qv_obj.get('code') == 'D':
+                qv = str(validationtype)+":D:"+str(qv_obj.get('min_value'))+":"+str(qv_obj.get('max_value'))+":"+str(qv_obj.get('message',''))
+            elif qv_obj.get('code') == 'N':
+                qv = str(validationtype)+":N:"+str(qv_obj.get('min_value'))+":"+str(qv_obj.get('max_value'))+":"+str(qv_obj.get('message',''))
+            elif qv_obj.get('code') == 'A':
+                qv = str(validationtype)+":A:"+str(qv_obj.get('min_value'))+":"+str(qv_obj.get('max_value'))+":"+str(qv_obj.get('message',''))
+            elif qv_obj.get('code') == 'AN':
+                qv = str(validationtype)+":AN:"+str(qv_obj.get('min_value'))+":"+str(qv_obj.get('max_value'))+":"+str(qv_obj.get('message',''))
+            elif qv_obj.get('code') == 'M':
+                qv = str(validationtype)+":M:"+str(qv_obj.get('min_value'))+":"+str(qv_obj.get('max_value'))+":"+str(qv_obj.get('message',''))
+            elif qv_obj.get('code') == 'LN':
+                qv = str(validationtype)+":LN:"+str(qv_obj.get('min_value'))+":"+str(qv_obj.get('max_value'))+":"+str(qv_obj.get('message',''))
+            elif qv_obj.get('code') == 'DT':
+                qv = str(validationtype)+":D:dd/mm/yyyy:"+str(qv_obj.get('min_value'))+":"+str(qv_obj.get('max_value'))+":"+str(qv_obj.get('message',''))
+            elif qv_obj.get('code') == 'T':
+                qv = str(validationtype)+":T:ISO:HH-mm-ss:"+str(qv_obj.get('min_value'))+":"+str(qv_obj.get('max_value'))+":"+str(qv_obj.get('message',''))
+        elif self.qtype in ['E'] and qv_obj:
+            qv = "M:"+str(validationtype)+":"+str(qv_obj.get('message',''))
+        return qv
+        
+
     def get_row_questions(self):
         row_list = Question.objects.filter(parent=self, is_grid=True)
         return row_list
@@ -1270,7 +1306,7 @@ class Choice(BaseContent):
     config = models.JSONField('Configurations', default=dict, **OPTIONAL)
     code_display = models.IntegerField(default=0,null=True, blank=True)
     score = models.FloatField(default=0,null=True, blank=True)
-    boundary=models.ManyToManyField(Boundary)
+    # boundary=models.ManyToManyField(Boundary)
     uuid = models.CharField('UUID', max_length=100,blank=True,null=True)
     deactivated_reason = models.CharField(max_length=500,blank=True,null=True,choices=CHOICE_DEACTIVATE_REASON)
     deactivated_date   = models.DateTimeField(blank=True, null=True)
@@ -1542,7 +1578,7 @@ class ErrorLog(BaseContent):
     user = models.ForeignKey(User,on_delete=models.DO_NOTHING)
     stoken = models.CharField(max_length=255, blank=True, null=True)
     log_file = models.FileField(
-        upload_to='media/logfiles/%Y/%m/%d', blank=True, null=True)
+        upload_to='logfiles/%Y/%m/%d', blank=True, null=True)
 
     def __str__(self):
         return str(self.id)
@@ -1557,7 +1593,7 @@ class Language(BaseContent):
     char_field2 = models.CharField(max_length=500, blank=True, null=True)
     integer_field1 = models.IntegerField(default=0)
     integer_field2 = models.IntegerField(default=0)
-    states = models.ManyToManyField(Boundary)
+    # states = models.ManyToManyField(Boundary)
 
     def __str__(self):
         return self.name
@@ -1911,7 +1947,7 @@ class BeneficiaryResponse(BaseContent):
 
     def get_response_name(self):
         disp_name = ''
-        code_concate = user_setup().get('user_display_code',0)
+        code_concate = 0#user_setup().get('user_display_code',0)
         try:
             question = self.survey.questions().filter(display_has_name=True)[0]
         except:
