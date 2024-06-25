@@ -205,6 +205,8 @@ def vendor_partner_user_mapping(request,vendor_partner_id,model):
             user_mapping = UserPartnerMapping.objects.filter(partner_id=vendor_partner_id).values_list('user_id', flat=True)
             user_obj = User.objects.filter(id=vendor_partner_id)
             groups_obj = Group.objects.filter(user__in=user_obj).distinct()
+            user_group = User.objects.filter(id__in=user_mapping).values_list('groups__id', flat=True)
+            groups = Group.objects.filter(id__in = [1,4]).exclude(id__in=user_group)
         except:
             user_mapping = None
             user_obj = None
@@ -217,15 +219,16 @@ def vendor_partner_user_mapping(request,vendor_partner_id,model):
             user_mapping = UserProjectMapping.objects.filter(project_id=vendor_partner_id).values_list('user_id', flat=True)
             user_obj = User.objects.filter(id__in=user_mapping)
             groups_obj = Group.objects.filter(user__in=user_obj).distinct()
-            
+            user_group = User.objects.filter(id__in=user_mapping).values_list('groups__id', flat=True)
+            groups = Group.objects.filter(id = 2).exclude(id__in=user_group)
         except:
             user_mapping = None
             user_obj = None
             groups_obj = None
-    if  model == 'partner':
-        groups = Group.objects.filter(id__in = [1,4])
-    if  model == 'project':
-        groups = Group.objects.filter(id = 2)
+    # if  model == 'partner':
+    #     groups = Group.objects.filter(id__in = [1,4])
+    # if  model == 'project':
+    #     groups = Group.objects.filter(id = 2)
     
     partners = Partner.objects.all()    
 
@@ -330,12 +333,12 @@ def edit_user_partner_project(request, id, model):
     if model == 'partner':
         vendor_id = UserPartnerMapping.objects.filter(user_id=user).values_list('partner_id', flat=True)
         vendor_partner_id = Partner.objects.filter(id__in = vendor_id).first()
+        user_partner_config = UserPartnerMapping.objects.get(user=user)
     elif model == 'project':
         vendor_id = UserProjectMapping.objects.filter(user_id=user).values_list('project_id', flat=True)
         vendor_partner_id = Project.objects.filter(id__in = vendor_id).first()
+        user_partner_config = UserProjectMapping.objects.get(user=user)
 
-    user_partner_config = UserPartnerMapping.objects.get(
-        user=user)
     if request.method == 'POST':
         data = request.POST
         username = data.get('username')
