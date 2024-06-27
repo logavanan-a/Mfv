@@ -226,7 +226,7 @@ def choicelist(request):
                 val = ""
             ch_list.append({'id': int(ch.id),
                             'question_pid': int(ch.question.id),
-                            # 'option_code': str(ch.uuid) if user_setup().get('send_choice_code_as_uuid', 0) == 2 else str(ch.code),
+                            'option_code': str(ch.code),
                             "option_flag": 1,
                             "skip_code": val,
                             "validation": "",
