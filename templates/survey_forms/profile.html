@@ -1,0 +1,83 @@
+{% load static %}
+{% comment %} <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> {% endcomment %}
+    <div class="mb-2">
+        <ul class="nav  nav-ul" role="tablist" >
+            {% if options_dropdown.count > 1 %}
+                <li class="nav-item dropdown mt-2 " style='margin-right:2px'>
+                    <a class="btn nav-link dropdown-toggle text-white nav_label {% if not survey_slug %}bg-warning{% else %}bg-primary{% endif %}" href='/manage/profile/{{creation_key}}/'  id="dropdownMenuButton"  style='font-size:1.1rem'>
+                        Profile
+                    </a>
+                </li>
+                {% for survey_tags in options_dropdown  %}
+                    <li class="nav-item dropdown mt-2 " style='margin-right:2px'>
+                        <a {% if survey_tags.id in profile_obj.survey.extra_config.reject_hidefields and profile_obj.response.616 != '620' %}onclick="return false;"{% endif %}  class="btn nav-link dropdown-toggle text-white nav_label {% if survey_tags.id == survey.id %}bg-warning {% elif survey_tags.id in profile_obj.survey.extra_config.reject_hidefields and profile_obj.response.616 != '620' %}bg-secondary{% else %}bg-primary{% endif %}" href='/manage/profile/{{survey_tags.slug}}/{{creation_key}}/'  id="dropdownMenuButton"  style='font-size:1.1rem'>
+                            {{survey_tags.short_name|default:survey_tags.name}} 
+                        </a>
+                    </li>
+                {% endfor %}      
+            {% endif %}                  
+        </ul>
+    </div>
+    
+    {% comment %} {% if survey_slug %} {% endcomment %}
+        <div class="row border border-dark " style="width:99%;margin:0px 1px 0px 1px;">
+            <!-- Profile block which is static for all form -->
+            {% for key,item in profile_fields.items %}
+                {% comment %} {% if item.qtype == 'AW'  %} {% endcomment %}
+                    {% comment %} {% for question_id,answers in profile_obj.response.address.1.items %}
+                        <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
+                            <div class='p-2 w-50 '>
+                                <h5 class="fw-bold " style="font-size:.95rem"></h5>
+                            </div>
+                            <div class='p-2 w-50 '>
+                                <p style="font-size:.95rem" class='text-primary'></p>
+                            </div>
+                        </div>
+                    {% endfor %} {% endcomment %}
+                {% comment %} {% elif item.qtype == 'H' %}
+                    <div class="col-lg-12 col-sm-12 col-md-12 d-flex justify-content-start ">
+                        <div class='p-2'>
+                            <p style="font-size:.95rem" class='text-primary'>{{status_text}}</p>
+                        </div>
+                    </div> {% endcomment %}
+                {% comment %} {% else %} {% endcomment %}
+                    <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
+                        <div class='p-2 w-50 '>
+                            <h5 class="fw-bold " style="font-size:.95rem">{{key}}</h5>
+                        </div>
+                        <div class='p-2 w-50 '>
+                            <p style="font-size:.95rem" class='text-primary'>{{item}}</p>
+                        </div>
+                    </div>
+                    
+                {% comment %} {% endif %} {% endcomment %}
+            {% endfor %}
+            <div class="col-lg-12 col-sm-12 col-md-12 d-flex justify-content-start ">
+                <div class='p-2'>
+                    <p style="font-size:.95rem" class='text-primary'>{{status_text}}</p>
+                </div>
+            </div>
+            
+        </div>
+    
+    {% comment %} {% endif %} {% endcomment %}
+    {% comment %} <div class='row mt-5'>
+        <!-- Data display place-->
+        <h3></h3>
+        {% for question_id,answers in profile_obj.response.items %}
+            {% if question_id|add:0 not in header_ids %}
+                <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
+                    <div class='p-2 w-50 '>
+                        <h5 class="fw-bold " style="font-size:.95rem">{{question_id|get_question_text:profile_obj.survey_id}}</h5>
+                    </div>
+                    <div class='p-2 w-50 '>
+                        <p style="font-size:.95rem" class='text-primary'>{% get_answer_text profile_obj.survey_id answers question_id%}</p>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div> {% endcomment %}
+
+                
+        
+

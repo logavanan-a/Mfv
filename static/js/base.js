@@ -71,6 +71,69 @@ function onSelectChange_cwc_type(){
 //     }
    
 // }
+//function for get the code of questions based on question type
+function name_return_fun(type, group = null) {
+    if (group == 'inline') {
+        if (type.is("select")) {
+            return 'S'
+        } else if (type.is("input")) {
+            if (type.attr('type') == 'text') {
+                return 'T'
+            } else if (type.attr('type') == 'date' || type.attr('type') == 'month') {
+                return 'D'
+            } else if (type.attr('type') == 'checkbox') {
+                return 'C'
+            } else if (type.attr('type') == 'number') {
+                return 'T'
+            }
+        }
+    } else {
+        if (type.is("select")) {
+            return 'S_0_0'
+        } else if (type.is("input")) {
+            if (type.attr('type') == 'text') {
+                return 'T_0_0'
+            } else if (type.attr('type') == 'date' || type.attr('type') == 'month') {
+                return 'D_0_0'
+            } else if (type.attr('type') == 'checkbox') {
+                return 'C_0_0'
+            } else if (type.attr('type') == 'number') {
+                return 'T_0_0'
+            } else if (type.attr('type') == 'hidden') {
+                return 'H_0_0'
+            }
+        }
+    }
+}
+
+function formating_main_questions(questions, main_ans) {
+    $(questions).each(function () {
+        inner_ans = {}
+        if ($(this).is(':checkbox')) {
+            values = Array.from(document.querySelectorAll('input[id="' + $(this).attr('id') + '"][type="checkbox"]')).filter((checkbox) => checkbox.checked).map((checkbox) => checkbox.value)
+            inner_ans[name_return_fun($(this))] = JSON.stringify(values.map(Number))
+        } else if (($(this).attr('type') == 'date' || $(this).attr('type') == 'month') && $.trim($(this).val()) != '') {
+            var dateObj = new Date($.trim($(this).val()));
+            var day = dateObj.getDate();
+            var month = dateObj.getMonth() + 1;
+            var year = dateObj.getFullYear();
+            if ($(this).attr('type') == 'month') {
+                var formattedDate = month + '-' + year
+            } else {
+                var formattedDate = day + '-' + month + '-' + year
+            }
+            inner_ans[name_return_fun($(this))] = formattedDate
+        } else if ($(this).is("select") && $(this).prop('multiple')) {
+            inner_ans[name_return_fun($(this))] = JSON.stringify($(this).val().map(Number))
+        } else if ($(this).is("select")) {
+            inner_ans[name_return_fun($(this))] = $('#' + $(this).attr('id') + ' option:selected').val()
+        } else {
+            inner_ans[name_return_fun($(this))] = $.trim($(this).val())
+        }
+        main_ans[$(this).attr('id')] = [inner_ans]
+    })
+    return main_ans
+}
 
 function makeRequired(){
     var sel = document.getElementById('reason_select');
