@@ -10,19 +10,19 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                {% if filters and not creation_key %}
+                <!-- {% if filters and not creation_key %} -->
                     {% include './survey_listing_filters.html' %}
-                {% endif %}
+                <!-- {% endif %} -->
 
                 {% if survey_slug and not creation_key %}
                     <div class='row'>
-                        {% with profile_obj.survey.slug|default:survey.slug|make_string:"add" as keystrings %}
+                        {% comment %}{% with profile_obj.survey.slug|default:survey.slug|make_string:"add" as keystrings %}
                             {% if not main_add_button and request|has_permission_for_action:keystrings %}
                             <div class='col-auto'>
                                 <button type="button" class="btn btn-primary btn-lg waves-effect waves-light p-2 mb-3" id="add_buton_listing" onclick="location.href='/manage/add-survey-form/{{survey.id}}/'"> Add New</button>
                             </div>
                             {% endif %}
-                        {% endwith %}
+                        {% endwith %}{% endcomment %}
                         <div class='col-auto'>
                             <button type="button" class="btn btn-primary btn-lg waves-effect waves-light p-2 mb-3" id="add_buton_listing" onclick="location.href='/configuration/add-survey-form/{{survey.id}}/'"> Add New</button>
                         </div>
@@ -227,9 +227,9 @@
                                     {% for header in survey_heading_questions %}
                                         <th>{{header.text}}</th>
                                     {% endfor %}
-                                    {% if profile_obj or not main_add_button and options_dropdown.count > 0  %}
+                                    {% comment %}{% if profile_obj or not main_add_button and options_dropdown.count > 0  %}
+                                    {% endif %}{% endcomment %}
                                         <th width='15%'>Action</th>
-                                    {% endif %}
                                 </tr>
                             </thead>
                             <tbody>
@@ -244,7 +244,7 @@
                                                 <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}>{{json_answer|get_item_ans:header_id|safe}}</td>
                                             {% endif %}
                                         {% endfor %}
-                                        {% if profile_obj or not main_add_button and options_dropdown.count > 0  %}
+                                        {% comment %}{% if profile_obj or not main_add_button and options_dropdown.count > 0  %}{% endcomment %}
                                             <td>
                                                 <div class="row">
                                                     {% with profile_obj.survey.slug|default:survey.slug|make_string:"edit" as keystrings %}
@@ -266,11 +266,12 @@
                                                                         Activities <i class="mdi mdi-chevron-down"></i>
                                                                     </button>
                                                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                        {% with profile_obj.survey.slug|default:survey.slug|make_string:"edit" as keystrings %}
+                                                                        {% comment %}{% with profile_obj.survey.slug|default:survey.slug|make_string:"edit" as keystrings %}
                                                                             {% if not main_add_button and request|has_permission_for_action:keystrings %}
-                                                                                <a class="dropdown-item" href="/manage/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/">Edit</a>
+                                                                            <a class="dropdown-item" href="/manage/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/">Edit</a>
                                                                             {% endif %}
-                                                                        {% endwith %}
+                                                                        {% endwith %}{% endcomment %}
+                                                                        <a class="dropdown-item" href="/configuration/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/">Edit</a>
                                                                         {% for survey_tags in options_dropdown %}
                                                                             <a {% if survey_tags.id in json_answer.survey.extra_config.reject_hidefields and json_answer.response.616 != '620' %}onclick="return false;"{% endif %} class="dropdown-item {% if survey_tags.id in json_answer.survey.extra_config.reject_hidefields and json_answer.response.616 != '620' %}bg-secondary{% endif %}" href="/manage/profile/{{survey_tags.slug}}/{{json_answer.creation_key}}/">{{survey_tags.short_name|default:survey_tags.name}}</a>
                                                                         {% endfor %}
@@ -289,7 +290,7 @@
                                                             {% endwith %}
                                                         </div>
                                                     {% endif %}
-                                                    {% with profile_obj.survey.slug|default:survey.slug|make_string:"delete" as keystrings %}
+                                                    {% comment %}{% with profile_obj.survey.slug|default:survey.slug|make_string:"delete" as keystrings %}
                                                         {% if request|has_permission_for_action:keystrings %}
                                                             <div class="col-auto ">
                                                                 <a id='{{json_answer.creation_key}}' class='delete_button' uid='{{json_answer.response.6}}'>
@@ -299,10 +300,9 @@
                                                                 </a>
                                                             </div>
                                                         {% endif %}
-                                                    {% endwith %}
+                                                    {% endwith %}{% endcomment %}
                                                 </div>
                                             </td>
-                                        {% endif %}
                                     </tr>
                                 {% endfor %}
                             </tbody>

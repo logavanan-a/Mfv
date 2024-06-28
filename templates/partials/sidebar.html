@@ -41,6 +41,12 @@
               </a>
             </li>
             {% endif %}
+            <li>
+              <a href="{{i.app_link}}" class="waves-effect">
+                <i class="{{i.icon}}"></i>
+                <span key="t-file-manager">{{i.name}}</span>
+              </a>
+            </li>
             {% endif %}
             {% endfor %}
           {% if request.user.groups.all.0.id != 1 %}
@@ -58,7 +64,7 @@
             </a>
           </li>
           <li>
-            <a href="/configuration/list/school-1406/" class="waves-effect">
+            <a href="/configuration/list/school-2354/" class="waves-effect">
               <i class="bx bx-tone"></i>
               <span key="t-file-manager">Facility Data</span>
             </a>
@@ -131,6 +137,6 @@
       var url = slug+'?month_year='+date
       window.location.href = url
   };
-  </script>
+</script>
 {% endblock %}
 

@@ -113,6 +113,14 @@ def get_beneficiry_facility_id(cluster):
     except:
         beneficiry_json=None
 
+def create_device_details_version1(request,data):
+    obj = DeviceDetails.objects.create(
+    user_id=data.get('u_uuid'),
+    app_size=data.get('as'),
+    disk_free_space=data.get('dfs'),
+    primary_storage=data.get('ps'),
+    secondary_storage=data.get('ss'))
+
 @csrf_exempt
 @validate_post_method
 # @validate_user_version
@@ -146,11 +154,12 @@ def add_survey_answers_version_1(request, **kwargs):
                 return JsonResponse({'status':False,'message':sync_window.get('SYNC_MESSAGE').replace('@@SYNC_FROM_TIME',sync_window.get('SYNC_FROM_TIME')).replace('@@SYNC_TO_TIME',sync_window.get('SYNC_TO_TIME')),"sync_res": []})
     try:
         create_post_log_v2(request,data)
-        # create_device_details_version1(request,data)
+        create_device_details_version1(request,data)
     except JsonAnswer.DoesNotExist as e:
         exc_type, exc_value, exc_traceback = sys.exc_info()
         error_stack = repr(traceback.format_exception(exc_type, exc_value, exc_traceback))
         logging.error(error_stack)
+    # import ipdb;  ipdb.set_trace()
     user_id = int(data['u_uuid'])
     sync_res = []
     message = "Success"
@@ -212,9 +221,9 @@ def add_survey_answers_version_1(request, **kwargs):
                     #============================================
                     object_lists = JsonAnswer.objects.filter(survey=survy,active=2,cluster__BeneficiaryResponse=beneficiary).values('survey_id','response').order_by('-created')
                     
-                    response = JsonAnswer.objects.get_or_none(creation_key = r_uuid)
-                    response_id = response.id if response else None
-                    
+                    response = JsonAnswer.objects.get(creation_key = r_uuid) if JsonAnswer.objects.filter(creation_key = r_uuid) else None
+                    # response_id = JsonAnswer.objects.get(creation_key = r_uuid).id if response else None
+                    response_id = response
                     # custom_field_validations()
                     if not response_id:
                         restrict_for_add=add_button_validation_profile(survy,object_lists)
@@ -232,52 +241,53 @@ def add_survey_answers_version_1(request, **kwargs):
                             #create_media_answers(user, **media_params)
                     
                     # condition check facility is submitted and response coming as 
-                    if response and response.response.get('616') == '620' and (answers_list.get('616') is None or list(answers_list.get('616')[0].values())[0] in ['617','618','619']):
-                        sync_status = 4
-                        server_created_date = ""
-                        error_msg = 'This facility has already been approved. Please sync to view the details.'
-                        logging.error(f"{response.creation_key} - {error_msg}")
-                    elif response and answers_list.get('74') and response.response.get('74','') != list(answers_list.get('74')[0].values())[0]:
-                        sync_status = 4
-                        server_created_date = ""
-                        error_msg = 'The facility ID has been updated on the server. Mobile changes have been rejected. Please resync and apply the updates.'
-                        logging.error(f"{response.creation_key} - {error_msg}")
-                    else:
-                        ans_params = {'answers_list':answers_list, 'app_answer_obj':app_answer_obj,'cluster_id':cluster_id,'survey_ids':survey_ids,
-                                        'project_id' : project_id,'response_id':response_id, 'beneficiary':beneficiary,'facility':facility,'r_uuid':r_uuid,
-                                        'last_updated_date':last_updated_date,"response_created_date":response_created}
-                        
-                        status,json_obj = create_answers_version1(user,response, **ans_params)
-                        server_primary_key = json_obj.id if type(json_obj) != dict else 0 
-                        updated_question={}
-                        if status:
-                            if survey_ids == '4':
-                                data_facility=json_obj.id
-                                updated_question.update({"survey_id":survey_ids,"question_id":74,"ans_text":json_obj.response.get('74')})
-                            elif survey_ids == '1':
-                                data_facility=get_inmate_facility_id(json_obj.response)
-                                updated_question.update({"survey_id":survey_ids,"question_id":6,"ans_text":json_obj.response.get('6')})
-                            else:
-                                data_facility=get_beneficiry_facility_id(json_obj.cluster)
+                    # if response and response.response.get('616') == '620' and (answers_list.get('616') is None or list(answers_list.get('616')[0].values())[0] in ['617','618','619']):
+                    #     sync_status = 4
+                    #     server_created_date = ""
+                    #     error_msg = 'This facility has already been approved. Please sync to view the details.'
+                    #     logging.error(f"{response.creation_key} - {error_msg}")
+                    # elif response and answers_list.get('74') and response.response.get('74','') != list(answers_list.get('74')[0].values())[0]:
+                    #     sync_status = 4
+                    #     server_created_date = ""
+                    #     error_msg = 'The facility ID has been updated on the server. Mobile changes have been rejected. Please resync and apply the updates.'
+                    #     logging.error(f"{response.creation_key} - {error_msg}")
+                    # else:
+                    ans_params = {'answers_list':answers_list, 'app_answer_obj':app_answer_obj,'cluster_id':cluster_id,'survey_ids':survey_ids,
+                                    'project_id' : project_id,'response_id':response_id, 'beneficiary':beneficiary,'facility':facility,'r_uuid':r_uuid,
+                                    'last_updated_date':last_updated_date,"response_created_date":response_created}
+                    
+                    status,json_obj = create_answers_version1(user,response, **ans_params)
+                    server_primary_key = json_obj.id if type(json_obj) != dict else 0 
+                    updated_question={}
+                    if status:
+                        # if survey_ids == '4':
+                        #     data_facility=json_obj.id
+                        #     updated_question.update({"survey_id":survey_ids,"question_id":74,"ans_text":json_obj.response.get('74')})
+                        # elif survey_ids == '1':
+                        #     data_facility=get_inmate_facility_id(json_obj.response)
+                        #     updated_question.update({"survey_id":survey_ids,"question_id":6,"ans_text":json_obj.response.get('6')})
+                        # else:
+                        #     data_facility=get_beneficiry_facility_id(json_obj.cluster)
 
-                            json_obj.facility_id=data_facility
-                            json_obj.interface=interface
-                            json_obj.save()
-                            response_type,status = 1, True
-                            sync_status = 4 if data_facility not in loc_list and 27 in user_role_id and survey_ids == '1' else 2
-                            server_created_date = json_obj.created.strftime("%Y-%m-%d %H:%M:%S")
-                            error_msg=''
-                        else:
-                            error_msg=""
-                            for idx,(i,msg) in enumerate(json_obj.items()):
-                                and_txt=""
-                                if idx != 0:
-                                    and_txt=" and "
-                                if type(msg) == dict:
-                                    msg = msg.get('message','')
-                                error_msg+=and_txt+msg
-                            sync_status = 3
-                            server_created_date = ""
+                        # json_obj.facility_id=data_facility
+                        json_obj.interface=interface
+                        json_obj.save()
+                        response_type,status = 1, True
+                        sync_status = 2
+                        # if data_facility not in loc_list and 27 in user_role_id and survey_ids == '1' else 2
+                        server_created_date = json_obj.created.strftime("%Y-%m-%d %H:%M:%S")
+                        error_msg=''
+                    else:
+                        error_msg=""
+                        for idx,(i,msg) in enumerate(json_obj.items()):
+                            and_txt=""
+                            if idx != 0:
+                                and_txt=" and "
+                            if type(msg) == dict:
+                                msg = msg.get('message','')
+                            error_msg+=and_txt+msg
+                        sync_status = 3
+                        server_created_date = ""
 
 
             except JsonAnswer.DoesNotExist as e:
@@ -455,7 +465,7 @@ def update_operator_details_version1(val, obj):
 
 def create_answers_version1(user, response_obj, **ans_params):
     # from beneficiary.views import save_list_view
-
+    # import ipdb; ipdb.set_trace()
     insertion_list, qids_list = [], []
     answers_list = ans_params.get('answers_list')
     app_answer_obj = ans_params.get('app_answer_obj')
@@ -560,15 +570,15 @@ def create_answers_version1(user, response_obj, **ans_params):
                 * Technically using for Content from cluster form in sphoorthi
                 ###1Starts here
             '''
-            if survey.extra_config.get('cluster_activity') == 2:
-                from userroles.models import UserRoles
-                ur_obj = UserRoles.objects.get(user=user)
-                b_id = 0
-                if ur_obj.get_location_type():
-                    boundary_obj = Boundary.objects.get(
-                        id=ur_obj.get_location_type()[0])
-                    b_id = boundary_obj.parent.id if boundary_obj.parent else 0
-                cluster_dict.update({'Cluster_id': b_id})
+            # if survey.extra_config.get('cluster_activity') == 2:
+            #     from userroles.models import UserRoles
+            #     ur_obj = UserRoles.objects.get(user=user)
+            #     b_id = 0
+            #     if ur_obj.get_location_type():
+            #         boundary_obj = State.objects.get(
+            #             id=ur_obj.get_location_type()[0])
+            #         b_id = boundary_obj.parent.id if boundary_obj.parent else 0
+            #     cluster_dict.update({'Cluster_id': b_id})
             # 1 Ends here
             if str(beneficiary) != '0':
                 try:

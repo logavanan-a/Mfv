@@ -27,7 +27,7 @@ class Menus(BaseContent):
     # slug field is used
     #--------------------#
     name = models.CharField(max_length=100)
-    group = models.ForeignKey(Group, on_delete=models.DO_NOTHING, blank=False, null=False)
+    group = models.ManyToManyField(Group, blank=True)
     slug = models.SlugField(
         "SEO friendly url, use only aplhabets and hyphen", max_length=60,unique=True)
     parent = models.ForeignKey('self',on_delete=models.DO_NOTHING, blank=True, null=True)

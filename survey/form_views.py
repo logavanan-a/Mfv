@@ -173,13 +173,13 @@ def get_answer(answer,question):
         date_format = re.compile(r'\d{2}-\d{2}-\d{4}')
         age=None
         if not date_format.match(answer) and not question.get('training_config').get('month'):
-            date_object = datetime.datetime.strptime(answer, '%Y-%m-%d')
+            date_object = datetime.strptime(answer, '%Y-%m-%d')
             answer=date_object.strftime(DATE_DISPLAY_FORMAT)
         elif not question.get('training_config').get('month'):
-            date_object = datetime.datetime.strptime(answer, '%d-%m-%Y')
+            date_object = datetime.strptime(answer, '%d-%m-%Y')
             answer=date_object.strftime(DATE_DISPLAY_FORMAT)
         elif question.get('training_config').get('month'):
-            date_object = datetime.datetime.strptime(answer, '%m-%Y')
+            date_object = datetime.strptime(answer, '%m-%Y')
             answer=date_object.strftime(MONTH_DISPLAY_FORMAT)
         if question.get('training_config').get('dob'):
             today = date.today()
@@ -425,7 +425,7 @@ class WebResponseListing(View):
             fixed_questions=fixed_questions.filter(parent=None)
             profile_fields = question_based_answers(profile_obj.survey_id,profile_obj.response,fixed_profile_ids)
         
-        
+        print(survey_slug,'survey_slug')
         if survey_slug:
             survey_heading_questions=survey_questions.get(survey_key_question)
             survey_heading_questions=survey_heading_questions.filter(id__in=header_ids)#.order_by(preserved)
@@ -433,6 +433,7 @@ class WebResponseListing(View):
             #filter and searching the listing page
             #### filter and search fields ####
             filters=survey.extra_config.get('filters',{})
+            print(filters,'filters')
             search_field=survey.extra_config.get('search_fields',{})
             address_widget_filter=[]
 
@@ -692,6 +693,7 @@ def add_survey_form(request,pk):
                     }]
             }
             # ans=json.loads(request.POST.get('all_in_one'))
+            # import ipdb; ipdb.set_trace()
             content=add_survey_answers_version_1(request,**responses)
             logger.info('Data sent to database from web:' ,json.loads(content.content.decode('utf-8')))
             result=json.loads(content.content.decode('utf-8'))
@@ -1455,3 +1457,173 @@ def custom_validation_survey_wise_version1(request):
         #     return JsonResponse(error)
         # else:
         return JsonResponse({'success':True})
+
+def load_data_to_cache_survey_slug():
+    #caching the surveys based on slug
+
+    query2 = "SELECT jsonb_object_agg(slug, s_val) FROM ( SELECT a.slug, jsonb_build_object('id',a.id,'slug',a.slug, 'name', a.name, 'survey_type', a.survey_type, 'survey_order', a.survey_order, 'short_name', a.short_name, 'extra_config', coalesce(a.extra_config, '[]'::jsonb) ) as s_val FROM survey_survey a WHERE a.active = 2 ) as x"
+
+    cache_key_survey_slug = INSTANCE_CACHE_PREFIX+'all_choice_surveys_slug'
+    survey_cache_dict =  cache.get(cache_key_survey_slug)
+    if not survey_cache_dict:
+        with connection.cursor() as cursor:
+            cursor.execute(query2)
+            result2 = cursor.fetchall()
+            survey_cache_dict = json.loads(result2[0][0])
+        cache_set_with_namespace(INSTANCE_CACHE_PREFIX+'FORM_BUILDER',cache_key_survey_slug,survey_cache_dict,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
+    return survey_cache_dict    
+
+
+def conditional_field_disable(json_response,config):
+    return_data=[]
+    conditional_disable=config.get('conditional_disable',{})  
+    for key,value in conditional_disable.items():
+        if json_response.get(key) == value:
+            return_data.append(key)
+    return return_data
+
+from operator import itemgetter
+@login_required(login_url='/')
+def edit_survey_form(request,survey_slug,creation_key):
+    template_name = 'survey_forms/edit_answer_form.html'
+    # survey=Survey.objects.get(slug=survey_slug)
+    survey_dict=load_data_to_cache_survey_slug()
+    survey = survey_dict.get(str(survey_slug))
+    heading=survey.get('name')
+    # caching the block based on survey id
+    blocks =  load_data_to_cache_block()
+    blocks = blocks.get(str(survey.get('id'))) 
+    response_obj = JsonAnswer.objects.get(creation_key=creation_key)
+    if survey.get('id') in [2,7]:
+        disable=True
+    ben_uuid=request.GET.get('ben',request.POST.get('ben',response_obj.response.get('2')))
+    skip_questions=[]
+    #block for shows the beneficiary details 
+    try:
+        if ben_uuid:
+            cached_surveys = load_data_to_cache_survey()
+            benificiary=JsonAnswer.objects.get(creation_key=ben_uuid)
+            json_response=benificiary.response
+            profile_obj=benificiary
+            ben_survey = cached_surveys.get(str(benificiary.survey_id))
+            print(ben_uuid,'ben_uuid',benificiary.survey_id)
+            fixed_profile_ids=ben_survey.get('extra_config').get('profile_fields',[])
+            profile_fields = question_based_answers(benificiary.survey_id,benificiary.response,fixed_profile_ids)
+        else:
+            json_response={}
+            # profile_cache_key = 'survey_heading_questions_for_'+str(benificiary.survey_id)
+            # fixed_questions =  cache.get(profile_cache_key)
+            # if not fixed_questions:
+            #     fixed_questions = Question.objects.filter(block__survey=benificiary.survey).values('id','text','qtype','training_config').order_by('question_order')
+            #     cache_set_with_namespace('FORM_BUILDER',profile_cache_key,fixed_questions,CACHES.get("default")['DEFAULT_SHORT_DURATION'])
+        
+            # preserved_prfile = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(fixed_profile_ids)])
+            # profile_fields=fixed_questions.filter(id__in=fixed_profile_ids).order_by(preserved_prfile)
+
+        #Hardcoded code for show the status of inmate 
+        if ben_uuid and profile_obj.survey_id == 1 :
+            # survey_heading_choices = load_data_to_cache_choices()
+            # query="select response->>'574' as known_hiv,response->>'575' as new_hiv,response->>'577' as death_result,response->>'576' as tb_result,response->>'578' as sti_result,response->>'579' as syphilis_result,response->>'580' as hbv_result,response->>'581' as hbv_result,response->>'720' as death_report from survey_jsonanswer where cluster->>'BeneficiaryResponse' = '{0}' or creation_key = '{0}';".format(ben_uuid)
+            # with connection.cursor() as cursor:
+            #     cursor.execute(query)
+            #     result = cursor.fetchall()
+            #     selected_choices=[item for tuple in result for item in tuple]
+            #     new_list = list(filter(lambda x: x not in ['',None],selected_choices ))
+            # # status_choices=[item.get('text') for item in survey_heading_choices if str(item.get('id')) in new_list]
+            # status_text=', '.join(new_list)
+            try:
+                status_text= ', '.join(eval(profile_obj.response.get('574','[]') or '[]'))
+            except:
+                status_text=profile_obj.response.get('574','')
+    except Exception as e:
+        error_msg =e.args[0]
+        logging.error(error_msg)
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        error_stack = repr(traceback.format_exception(exc_type, exc_value, exc_traceback))
+        logging.error(error_stack)
+        print(error_stack)
+        json_response={}
+    
+    # added this block because in edit form loop the questions 
+    survey_questions = load_data_to_cache_survey_based_questions()
+    question_ids_list = list(map(itemgetter('id'), survey_questions.get(str(survey.get('id')))))
+
+    # survey_question_key = 'survey_heading_questions_for_'+str(survey.id)
+    # survey_questions =  cache.get(survey_question_key)
+    # if not survey_questions:
+    # survey_questions = Question.objects.filter(block__survey=survey).values('id','text','qtype','training_config').order_by('question_order')
+    #     cache_set_with_namespace('FORM_BUILDER',survey_question_key,survey_questions,CACHES.get("default")['DEFAULT_SHORT_DURATION'])
+  
+    #Based on the skip questions hide questions inside the grid 
+    if survey.get('extra_config').get('skip_question') and json_response:
+        config=survey.get('extra_config').get('skip_question')
+        for k,v in config.items():
+            skip_questions.extend(config.get(k).get(json_response.get(k)))
+
+    #static code for if the survey have records or not 
+    if survey.get('id') == 8 and json_response:
+        is_first_record=False
+        first_record=JsonAnswer.objects.filter(cluster__BeneficiaryResponse=ben_uuid,survey_id=8).order_by('created').first()
+        if creation_key == first_record.creation_key:
+            is_first_record=True
+
+        # gender based field for hiv form hide the question In Case of PPW inmate Linked with PPTCT
+        gender_male=False
+        if json_response.get('9') == '65':
+            gender_male=True
+
+    #boundaries based on user
+    cache_key_boundaries = INSTANCE_CACHE_PREFIX+'all_boundary_caching'
+    boundaries =  cache.get(cache_key_boundaries)
+    if not boundaries:
+        boundaries=list(State.objects.all().exclude(active=0).values('id','name').order_by('name'))
+        cache_set_with_namespace(INSTANCE_CACHE_PREFIX+'BOUNDARY_DATA',cache_key_boundaries,boundaries,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
+
+    if not request.user.is_superuser and not request.user.is_staff:
+        next_level_boundries=load_data_to_cache_boundarylevel()
+        if survey.get('id') != 2 :
+            boundarys=[item for item in boundaries if item.get('id') in request.session['user_parent_boundary_list']]
+        else:
+            boundarys=[item for item in boundaries if item.get('boundary_level_type_id') == 1]
+            
+    conditional_disable=conditional_field_disable(response_obj.response,survey.get('extra_config'))
+
+    if request.method  == 'POST':
+        now = datetime.now()
+        date_time_str = now.strftime("%Y-%m-%d %H:%M:%S")
+        # response_obj = JsonAnswer.objects.get(creation_key=creation_key)
+        answers=json.loads(request.POST.getlist('all_in_one')[0])
+        # import ipdb;ipdb.set_trace()
+        ben_uuid=request.GET.get('ben',request.POST.get('ben','0'))
+        responses={
+            "u_uuid": request.user.id,
+            "d_uuid": "",
+            "pushInput": [
+                {
+                "r_uuid": creation_key,
+                "survey_id": str(response_obj.survey_id),
+                "last_updated_date": date_time_str,
+                "beneficiary_id": ben_uuid,
+                "cluster_id": request.POST.get('cluster_id'),
+                "answers_array":answers,
+                }]
+        }
+        # ans=json.loads(request.POST.get('all_in_one'))
+        content=add_survey_answers_version_1(request,**responses)
+        print(json.loads(content.content.decode('utf-8')))
+        logger.info('Data status updated to database:' ,json.loads(content.content.decode('utf-8')))
+        result=json.loads(content.content.decode('utf-8'))
+        if not result['status']:
+            return render(request,template_name,locals())
+        
+        # add_survey_answers_version_1(request)
+        if ben_uuid != '0':
+            profile_url=f'/configuration/profile/{survey_slug}/{ben_uuid}/'
+        # elif survey.get('id') in [1,4]:
+        #     profile_url=f'/configuration/profile/{creation_key}/'
+        #     print(profile_url,'2')
+        else:
+            profile_url=f'/configuration/list/{survey_slug}/'
+        # profile_url='/manage/profile/'+survey_slug+'/'+ben_uuid+'/' if ben_uuid != '0' else '/configuration/list/'+survey_slug+'/'
+        return HttpResponseRedirect(profile_url)
+    return render(request,template_name,locals())
