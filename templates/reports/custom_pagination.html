@@ -1,0 +1,31 @@
+{% load configuration_tags %}
+{% query_transform request as urls %}
+<div class="col-md-12">
+<div class="pagination" style="float:right;">
+                            <span class="step-links">
+                                <ul class="pagination justify-content-end">
+                                    {% if page_id > 1 %}
+                                    <li class="paginate_button page-item first" id="datatables_first">
+                                        <a class="page-link" href="{% if url_filter_params %}?{{url_filter_params}}&{% else %}?{% endif %}page=1" aria-controls="datatables" data-dt-idx="0" tabindex="0">First</a>
+                                    </li>
+                                    <li class="paginate_button page-item first " id="datatables_first">
+                                        <a class="page-link" href="{% if url_filter_params %}?{{url_filter_params}}&{% else %}?{% endif %}page={{previous_page}}" aria-controls="datatables" data-dt-idx="0" tabindex="0">Previous</a>
+                                    </li>
+                                    {% endif %}
+                                    <li class="paginate_button page-item active">
+                                        <span class="paginate_button page-item page-link current">
+                                        {{ page_id }}
+                                        </span>
+                                    </li>
+                                    {% if page_id < total_pages %}
+                                    <li class="paginate_button page-item first " id="datatables_first">
+                                        <a class="page-link" href="{% if url_filter_params %}?{{url_filter_params}}&{% else %}?{% endif %}page={{next_page}}" aria-controls="datatables" data-dt-idx="0" tabindex="0">Next</a>
+                                    </li>
+                                    <li class="paginate_button page-item first " id="datatables_first">
+                                        <a class="page-link" href="{% if url_filter_params %}?{{url_filter_params}}&{% else %}?{% endif %}page={{total_pages}}" aria-controls="datatables" data-dt-idx="0" tabindex="0">Last</a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </span>
+                        </div>
+                        </div>
