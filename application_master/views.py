@@ -92,8 +92,35 @@ def master_add_form(request, model):
         fields = user_form(request.POST, request.FILES)
         if fields.is_valid():
             instance = fields.save()
-            instance.code = instance.name
-            instance.save()
+            # instance.code = instance.name
+            # instance.save()
+            if model == 'state':
+                boundary_data = {
+                    'name': instance.name,
+                    'boundary_level': 1, 
+                    'parent': None,
+                    'content_object': instance,
+                }
+            elif model == 'district':
+                state_id = request.POST.get('state')
+                state_instance = State.objects.get(id=state_id)
+                state_boundary, created = Boundary.objects.get_or_create(
+                    object_id=state_instance.id,
+                    defaults={
+                        'name': state_instance.name,
+                        'boundary_level': 1, 
+                        'udf1': 0,
+                    }
+                )
+
+                boundary_data = {
+                    'name': instance.name,
+                    'boundary_level': 2,
+                    'parent': state_boundary,
+                    'content_object': instance,
+                }
+            Boundary.objects.create(**boundary_data)
+
             if model == 'project':
                 donor = request.POST.get('donor')
                 ProjectDonorMapping.objects.update_or_create(
@@ -131,7 +158,40 @@ def master_edit_form(request,model,id):
     forms=user_form(request.POST or None, request.FILES or None,instance=obj)
     if request.method == 'POST' and forms.is_valid():
         page = request.GET.get('page')
-        forms.save()
+        instance = forms.save()
+
+        if model == 'state':
+            boundary_data = {
+                'name': instance.name,
+                'boundary_level': 1,
+                'parent': None,
+            }
+            boundary_data['content_type'] = ContentType.objects.get_for_model(instance)
+            boundary_data['object_id'] = instance.id
+            Boundary.objects.update_or_create(object_id=instance.id, defaults=boundary_data)
+
+        elif model == 'district':
+            state_id = request.POST.get('state')
+            state_instance = State.objects.get(id=state_id)
+            state_boundary, created = Boundary.objects.get_or_create(
+                object_id=state_instance.id,
+                content_type=ContentType.objects.get_for_model(state_instance),
+                defaults={
+                    'name': state_instance.name,
+                    'boundary_level': 1,
+                    'udf1': 0,
+                }
+            )
+
+            boundary_data = {
+                'name': instance.name,
+                'boundary_level': 2,
+                'parent': state_boundary,
+            }
+            boundary_data['content_type'] = ContentType.objects.get_for_model(instance)
+            boundary_data['object_id'] = instance.id
+            Boundary.objects.update_or_create(object_id=instance.id, defaults=boundary_data)
+            
         if model == 'project':
             donor = request.POST.get('donor')
             proj_donor = ProjectDonorMapping.objects.update_or_create(
