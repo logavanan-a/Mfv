@@ -172,6 +172,7 @@ class Project(BaseContent):
     #-------------------#
     # Project model represents a project with its name, slug, and additional attributes.
     #--------------------#
+    
     name = models.CharField(max_length = 350)
     partner_mission_mapping =  models.ForeignKey(PartnerMissionMapping, on_delete = models.DO_NOTHING, blank=True, null=True)
     district = models.ForeignKey(District, on_delete = models.DO_NOTHING, blank=True, null=True)
@@ -179,6 +180,7 @@ class Project(BaseContent):
     additional_info = models.TextField(blank=True, null=True)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
+    application_type = models.ForeignKey('application_master.MasterLookup', related_name='masterlookup_application', **OPTIONAL,on_delete=models.DO_NOTHING)
 
     class Meta:
         ordering = ('name',)
