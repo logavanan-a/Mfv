@@ -284,7 +284,7 @@ def task_list(request):
     below_last_two_month = datetime.now().date() - relativedelta(months=2)
 
     mission_objs = Mission.objects.filter(active=2,id__in=request.session['user_mission_list'])
-    project_objs = Project.objects.filter(active=2,id__in=request.session['user_project_list']).order_by('name')
+    project_objs = Project.objects.filter(active=2,id__in=request.session['user_project_list'],application_type_id=510).order_by('name')
     partner_objs = Partner.objects.filter(active=2,id__in=request.session['user_partner_list']).order_by('name')
     filter_data = request.GET
     archive = filter_data.get('archive') if(filter_data.get('archive') != 'None') else None
@@ -386,7 +386,7 @@ def project_list(request):
     heading= 'Project List'
     partner = UserPartnerMapping.objects.get(user = request.user).partner
     partner_mission_mapping_ids = PartnerMissionMapping.objects.filter(partner = partner).values_list('id', flat=True)
-    project_obj = Project.objects.filter(partner_mission_mapping__id__in = partner_mission_mapping_ids, partner_mission_mapping__mission__id__in = [2,1])
+    project_obj = Project.objects.filter(partner_mission_mapping__id__in = partner_mission_mapping_ids, partner_mission_mapping__mission__id__in = [2,1],application_type_id=510)
     object_list = get_pagination(request, project_obj)
 
     page_number_display_count = 5
@@ -442,7 +442,7 @@ class ProjectAdd(View):
         if partner_mission_mapping_id:
             partner = UserPartnerMapping.objects.get(user = request.user).partner
             partner_mission_mapping_obj = PartnerMissionMapping.objects.get(partner = partner, id = partner_mission_mapping_id)
-        project_add = Project.objects.create(name = name, start_date = start_date, partner_mission_mapping = partner_mission_mapping_obj, district = district_obj, location=location )
+        project_add = Project.objects.create(name = name, start_date = start_date, partner_mission_mapping = partner_mission_mapping_obj, district = district_obj, location=location,application_type_id=510 )
         return redirect('/project-list/')
 
 
@@ -648,9 +648,9 @@ def project_list_filter(request):
     if request.method == "POST":
         mission_id =request.POST.get('mission_id')
         if mission_id:
-            project_obj =  Project.objects.filter(active=2).filter(partner_mission_mapping__mission__id = mission_id,id__in=request.session['user_project_list'])
+            project_obj =  Project.objects.filter(active=2).filter(partner_mission_mapping__mission__id = mission_id,id__in=request.session['user_project_list'],application_type_id=510)
         else:
-            project_obj =  Project.objects.filter(active=2).filter(id__in=request.session['user_project_list'])
+            project_obj =  Project.objects.filter(active=2).filter(id__in=request.session['user_project_list'],application_type_id=510)
         data=list(project_obj.values('id',"name").order_by("name"))
         return HttpResponse(json.dumps(data), content_type="application/json")   
 

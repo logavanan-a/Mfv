@@ -179,7 +179,7 @@ def master_details_form(request,model,id):
         groups_obj = Group.objects.filter(user__in=user_obj).distinct()
         part=Partner.objects.filter(id=id, active=2)
         parner_mission_obj = PartnerMissionMapping.objects.filter(partner_id__in=part,active=2).order_by('-id')
-        project_map = Project.objects.filter(partner_mission_mapping_id__in = parner_mission_obj).order_by('-id')
+        project_map = Project.objects.filter(partner_mission_mapping_id__in = parner_mission_obj,application_type_id=510).order_by('-id')
     elif model == 'project':
         heading="Project"
         user_mapping = UserProjectMapping.objects.filter(project_id=id).values_list('user_id', flat=True)
@@ -332,7 +332,7 @@ def edit_user_partner_project(request, id, model):
         vendor_partner_id = Partner.objects.filter(id__in = vendor_id).first()
     elif model == 'project':
         vendor_id = UserProjectMapping.objects.filter(user_id=user).values_list('project_id', flat=True)
-        vendor_partner_id = Project.objects.filter(id__in = vendor_id).first()
+        vendor_partner_id = Project.objects.filter(id__in = vendor_id,application_type_id=510).first()
 
     user_partner_config = UserPartnerMapping.objects.get(
         user=user)
@@ -526,7 +526,8 @@ def adding_project(request,id):
             location=location,
             additional_info=additional_info,
             start_date=start_date,
-            end_date=end_date,            
+            end_date=end_date,    
+            application_type_id=510,        
         )
         pro_details.save()
         ProjectDonorMapping.objects.update_or_create(
