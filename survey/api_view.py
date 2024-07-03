@@ -1242,11 +1242,16 @@ def get_levels(request, level):
     #    orguser = OrganizationLocation.objects.filter(user__id=userrole.id)
         user = User.objects.get(id=request.POST.get('uid'))
         boundary_level = {1:State,2:District}
-        tagged_locations = UserProjectMapping.objects.filter(user=user,active=2).select_related('project','project__district','project__district__state')
+        # tagged_locations = UserProjectMapping.objects.filter(user=user,active=2).select_related('project','project__district','project__district__state')
+        project_mapped_locations = list(UserProjectMapping.objects.filter(user=user,active=2).select_related('project__district').values_list('project__district',flat=True))
         # level_obj = BoundaryLevel.objects.get(code=int(url_level))
         # user_locations = user_projects_locations(user, level_obj)
-        # tagged_locations = Boundary.objects.filter(id__in=user_locations)
-        tagged_locations_all = tagged_locations
+        tagged_locations = Boundary.objects.filter(boundary_level_type_id=2,code__in=list(map(str,project_mapped_locations))).order_by('modified').select_related('parent','boundary_level_type','parent__boundary_level_type')
+        if level == 1:
+            tagged_locations_all = tagged_locations.values_list('parent_id',flat=True)
+        else:
+            tagged_locations_all = tagged_locations.values_list('id',flat=True)
+
         modified_obj = request.POST.get("modified_date")
         if modified_obj:
             modified_date = convert_string_to_date(modified_obj)
@@ -1255,15 +1260,15 @@ def get_levels(request, level):
         parent_locations = []
         tagged_locations = tagged_locations.order_by('modified')[:int(n)]
 
-        for tl in tagged_locations:
-            one_location_level = {}
+        for location in tagged_locations:
             if level == 1:
-                location = tl.project.district.state
-            else:
-                one_location_level['level1_id']=tl.project.district.state.id + 1000
-                location = tl.project.district
-            
-            one_location_level['level'+str(level)+'_id']=location.id if level == 2 else location.id+1000
+                location = location.parent
+            one_location_level = {}
+            parent_locations_list = location.get_parent_locations([]) 
+            for loc in parent_locations_list:
+                one_location_level.update(loc)
+            # import ipdb;ipdb.set_trace()
+            one_location_level['level'+str(level)+'_id']=int(location.id)
             one_location_level['name']=re.sub(r'[^\x00-\x7F]+','',location.name).strip()
             one_location_level['active']=str(location.active)
             one_location_level['modified_date']=datetime.strftime(location.modified, '%Y-%m-%d %H:%M:%S.%f')
@@ -1278,7 +1283,7 @@ def get_levels(request, level):
         else:
             flag = 1
         if parent_locations:
-            return JsonResponse({'status':2,'Level '+str(level):parent_locations,'flag':flag,'location_ids':list(tagged_locations_all.values_list('id',flat=True))
+            return JsonResponse({'status':2,'Level '+str(level):parent_locations,'flag':flag,'location_ids':list(tagged_locations_all)
                         })
         else:
             return JsonResponse({"status":2, "message":"Data already sent",})
