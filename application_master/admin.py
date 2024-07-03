@@ -9,8 +9,38 @@ from application_master.models import (District, Donor, Menus, Mission,
                                        PartnerMissionMapping, Project,
                                        ProjectDonorMapping, ProjectFiles,
                                        State, UserPartnerMapping,
-                                       UserProjectMapping,MasterLookUp)
+                                       UserProjectMapping,MasterLookUp,BoundaryLevel,Boundary)
 
+# @admin.register(BoundaryLevel)
+# @admin.register(Boundary)
+
+@admin.register(BoundaryLevel)
+class AdminBoundaryLevel(ImportExportActionModelAdmin, admin.ModelAdmin):
+    """
+    Custom admin configuration for the 'Partner' model.
+    """
+    search_fields = ['name', 'slug']
+    list_filter = ['active']
+
+    def get_list_display(self, request):
+        """
+        Customize the list display for the admin page.
+        """
+        return [field.name for field in self.model._meta.concrete_fields]
+
+@admin.register(Boundary)
+class AdminBoundary(ImportExportActionModelAdmin, admin.ModelAdmin):
+    """
+    Custom admin configuration for the 'Partner' model.
+    """
+    search_fields = ['name', 'slug']
+    list_filter = ['active']
+
+    def get_list_display(self, request):
+        """
+        Customize the list display for the admin page.
+        """
+        return [field.name for field in self.model._meta.concrete_fields]
 
 class MissionIndicatorCategoryInline(admin.TabularInline): #StackedInline
     model = MissionIndicatorCategory

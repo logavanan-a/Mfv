@@ -22,6 +22,7 @@ import logging
 from application_master.models import Mission,Project,Donor,Partner,MissionIndicator,MissionIndicatorCategory,UserPartnerMapping,UserProjectMapping,ProjectDonorMapping,PartnerMissionMapping
 from django.contrib.auth.models import User
 from datetime import datetime as dt
+from dashboard.models import *
 
 logger = logging.getLogger(__name__)
 # ****************************************************************************
@@ -833,3 +834,299 @@ def get_project(request):
                 result_set.append({'id': project.id, 'name': project.name})
         return JsonResponse(result_set, safe=False)
     return HttpResponse(status=400)
+
+#################################### ADD Export Report ##################################################
+
+def execute_query(conn, sql_query, query_type):
+    
+    #typ1 = insert
+    #typ2 = update
+    #typ3 = select
+    #typ4 = stored procedure
+    #typ5 = insert returning id
+    #typ6 = DDL
+    # import ipdb;ipdb.set_trace()
+    result = None
+    cursor = None
+    try:
+        db_conn = None
+        if conn is None:
+            db_name = settings.DATABASES['default'].get('NAME')
+            username = settings.DATABASES['default'].get('USER')
+            password = settings.DATABASES['default'].get('PASSWORD')
+            host = settings.DATABASES['default'].get('HOST') if settings.DATABASES['default'].get('HOST') else 'localhost'
+            db_conn = psycopg2.connect(database=db_name, user=username, password=password, host=host)
+        else:
+            db_conn = conn
+        cursor = db_conn.cursor()
+        cursor.execute(sql_query)
+        if query_type == 3 or query_type == 4:
+            result = cursor.fetchall()
+        elif query_type == 5:
+            result = cursor.fetchone()[0]
+    finally :
+        if cursor:
+            cursor.close()
+        #close db_conn (psycopg2 conn) created if connection not passed as parametner
+        if conn is None and db_conn:
+            db_conn.close()
+    return result
+
+def get_session_name(request):
+    menuobj = None
+    try:
+        if request.path == "/budget/manage/lineitem/" and request.GET.get('key') == "achievements":
+            request.session['side_menu'] = "achievements-lineitem"
+            request.session['parent_menu'] = "fund-management"
+        elif request.path == "/budget/manage/lineitem/" and request.GET.get('key') == "planning":
+            request.session['side_menu'] = "target-entry"
+            request.session['parent_menu'] = "fund-management"
+        else:
+            try:
+                menuobj = Menus.objects.get(backend_link__icontains = request.get_full_path())
+            except:
+                menuobj = Menus.objects.get_or_none(backend_link__icontains = request.path)
+            # for child of chidl menu
+            if menuobj.parent.parent:
+                request.session['parent_menu'] = menuobj.parent.parent.slug if menuobj.parent.parent else menuobj.parent.slug
+                request.session['parent_side_menu'] = menuobj.parent.slug if menuobj.parent else menuobj.slug
+#...........for child menu
+            elif menuobj.parent:
+                if request.session.get('parent_side_menu'):
+                    request.session.pop('parent_side_menu')
+                request.session['parent_menu'] = menuobj.parent.slug if menuobj.parent else menuobj.slug
+            request.session['side_menu'] = menuobj.slug if menuobj else ''
+                
+    except:
+        pass
+    return menuobj
+
+month_dict={'01':'Jan','02':'Feb','03':'Mar','04':'Apr','05':'May','06':'Jun','07':'Jul','08':'Aug', '09':'Sep','10':'Oct','11':'Nov','12':'Dec'}
+
+def user_projects(user):
+    user_projects = Project.objects.filter(active=2)
+    userrole = UserRoles.objects.get_or_none(user=user)
+    project_level = userrole.organization_unit.is_project_level if userrole and userrole.organization_unit else None
+    if not user.is_superuser and project_level == True:
+        user_role = get_role(user)
+        user_project_relation = ProjectUserRelation.objects.filter(
+            user__in=[user_role]).values_list('project', flat=True)
+        user_projects = Project.objects.filter(
+            id__in=user_project_relation, active=2)
+    return user_projects
+
+def get_report_query(request, widget_obj, page_id,rows_per_page, locations_list, filter_from_date, filter_to_date, location_id=None):
+    import datetime
+    import dateutil.relativedelta
+    obj = eval(widget_obj.widgetquery)
+    sql_query = obj.get('sql_query')
+    # config_x_days = user_setup().get('config_x_days')
+    filter_from_date_where,query, filter_to_date_where = '', '',''
+    # date format - 'yyyy-mm-dd'
+    if filter_to_date and filter_from_date:
+        filter_from_date_where = " and filter_date >= '" + filter_from_date + "' "
+        filter_to_date_where = " and filter_date <= '" + filter_to_date + "' "
+    sql_query = sql_query.replace("@@filter_from_date", filter_from_date_where);
+    sql_query = sql_query.replace("@@filter_to_date", filter_to_date_where);
+    village_id = locations_list[4] if len(locations_list)>=5 else 0
+    cluster_id = locations_list[3]  if len(locations_list)>=4 else 0
+    taluka_id = locations_list[2] if len(locations_list)>=3 else 0
+    district_id = locations_list[1] if len(locations_list)>=2 else 0
+    state_id = locations_list[0] if len(locations_list)>=1 else 0
+    village_filter,cluster_filter,taluka_filter,district_filter,state_filter = "","","","",""
+    if village_id:
+        village_filter = ' and filter_village_id = ' + str(village_id) + ' '
+    sql_query = sql_query.replace("@@village_filter", village_filter)
+    if cluster_id:
+        cluster_filter = ' and filter_cluster_id = ' + str(cluster_id) + ' '
+    sql_query = sql_query.replace("@@cluster_filter", cluster_filter)
+    if taluka_id:
+        taluka_filter = ' and filter_taluka_id = ' + str(taluka_id) + ' '
+    sql_query = sql_query.replace("@@taluka_filter", taluka_filter)
+    if district_id:
+        district_filter = ' and filter_district_id = ' + str(district_id) + ' '
+    sql_query = sql_query.replace("@@district_filter", district_filter)
+    if state_id:
+        state_filter = ' and filter_state_id = ' + str(state_id) + ' '
+    sql_query = sql_query.replace("@@state_filter", state_filter)
+
+    # if rows_per_page and page_id and widget_obj.query_type == 'SQL':
+    #     if filter_to_date and filter_from_date:
+    #         query = " and date(ss.created) >= '"+str(filter_from_date)+"' and date(ss.created) <= '"+str(filter_to_date)+"'"
+    #         # sql_query = sql_query + ' where ' + query 
+    #         sql_query = sql_query.replace("@@date_filter",query) 
+    #     sql_query = sql_query + ' LIMIT ' + str(rows_per_page)
+    #     sql_query = sql_query + ' OFFSET ' + str(((page_id - 1) * rows_per_page))
+    # print(sql_query,'get_report_query')
+    return sql_query
+
+
+@login_required(login_url='/login/')
+def export_reportcsv(request,slug):
+    import re
+    from django.db import connection
+    from datetime import datetime
+    menu_slug_name = get_session_name(request)
+    today = datetime.today()
+    today_month = month_dict['{:02d}'.format(today.month)]
+    today_year = today.year
+    filters_cond = True
+    # projectlist = user_projects(request.user)
+    # user_boundary_levelcode = UserRoles.objects.get(user=user)
+    # project_list = OrganizationLocation.objects.filter(user=1208).values_list('project',flat=True)
+    # projectlist = Project.objects.filter(id__in=ProjectUserRelation.objects.filter(user=1208)).values("id","name")
+    # project_list = list(set(list(project_list)+list(projectlist)))
+    # theme_list = Theme.objects.filter(active=2)
+    # levels_to_filter = BoundaryLevel.objects.filter(code__gte=2, code__lte=5).order_by('code')
+    # if levels_to_filter:
+    #         first_level_options = get_first_level_options(request, levels_to_filter, None)
+    # if user_setup().get('reports') == 2:
+    #     filters_cond = False
+    # allfilters = True if user_setup().get("all-filters") == 2 else False
+    location_id, from_date, to_date, frm, to = None, None, None, None, None
+    # from_to_filters = True if slug in user_setup().get("provide-from-to-filters",[]) else False
+
+    filter_from_date = request.GET.get('from_date','') 
+    filter_to_date = request.GET.get('to_date','')
+    #frontend purpose we are adding one more varaibale
+    from_date_filter = request.GET.get('from_date','')
+    to_date_filter = request.GET.get('to_date','')
+    theme_filter = request.GET.getlist('theme','')
+    search_filter = request.GET.get('search_box','')
+    # filter_locations = get_location_filters(request)
+    export_request = False
+    media_url = settings.EXPORT_MEDIA_URL
+    # if export and export == 'true':
+    #     export_request = True
+
+    # state_id, region_id, district_id, cluster_id ,block_id = None, None, None, None, None
+    # filter_locations = (state_id, district_id, block_id)
+
+    filter_locations = {}
+    page_id, rows_per_page = 0, 10
+    page_id = int(request.GET.get('page',0))
+
+    if page_id <= 0:
+        page_id = 1
+    report_slug = slug
+    user = request.user
+    locations_list=[]
+    if report_slug:
+        widget_obj = DashboardChartWidgets.objects.get(slug = report_slug)
+        qlist = eval(widget_obj.widgetquery).get('headers')
+        if widget_obj.query_type == 'SQL_P':
+            # sql_query = get_report_query_sp(request , widget_obj ,page_id,rows_per_page, filter_locations, filter_from_date, filter_to_date,location_id)
+            sql_query = get_report_query(request , widget_obj ,page_id,rows_per_page, filter_locations, filter_from_date, filter_to_date,location_id)
+            total_no_of_records = -1
+            object_list = execute_query(connection, sql_query,typ=1,extra=True)
+        else:
+            if export_request == True:
+                page_id = None
+            
+            sql_query = get_report_query(request , widget_obj ,page_id,rows_per_page, filter_locations, filter_from_date, filter_to_date,location_id)
+            # get the count query and execute it to get the total records
+            # This is executed every time so we dont pass the count in the query string and also
+            # any additional records getting added can be included in the count
+            if request.GET.get('Project'):
+                project_list_str = request.GET.getlist('Project')
+                project_list_id = (str([eval(i) for i in project_list_str]))[1:-1]
+                filter_from_date = filter_to_date = ''
+                sql_query = get_report_query(request , widget_obj ,page_id,rows_per_page, filter_locations, filter_from_date, filter_to_date,location_id)
+                if request.GET.getlist('theme'):
+                    theme_list_str = request.GET.getlist('theme')
+                    theme_list_id = (str([eval(i) for i in theme_list_str]))[1:-1]
+                    sql_query = sql_query.replace('@@searchfilter',f"and pp.id in ({project_list_id}) and plt.project_theme_id in ({theme_list_id}) and 1=1")
+                else:
+                    sql_query = sql_query.replace('@@searchfilter',f"and pp.id in ({project_list_id}) and 1=1")
+                url_filter_params = ""
+                state_obj = Project.objects.filter(id__in = request.GET.getlist('Project')).values_list('state',flat=True)
+                level_2 = Boundary.objects.filter(active=2,id__in=state_obj)
+                level_options = {"District":level_2} 
+                location_values = {}
+            
+                temp_val = []
+                filters = request.GET.dict()
+                filters.pop('search_box',None)
+                for idx,key in enumerate(levels_to_filter):
+                    locations = request.GET.getlist(key.name,[''])
+                    if locations[0] != '':
+                        for loc in locations:
+                            url_filter_params += f'{key.name}={loc}&'
+                        location_values.update({key.name:','.join(locations)})
+                        level_2 = Boundary.objects.filter(active=2,parent_id__in=temp_val)
+                        if level_2:
+                            level_options.update({key.name:level_2})
+                        temp_val = locations  
+                        # next_value = request.GET.getlist(levels_to_filter.get(idx+1).name) 
+                        if levels_to_filter.count() > idx+1 and levels_to_filter[idx+1] and not request.GET.getlist(levels_to_filter[idx+1].name) :
+                            level_options.update({levels_to_filter[idx+1].name: Boundary.objects.filter(active=2,parent__id__in=level_options.get(key.name))})
+                    # first_level_options = get_first_level_options(request, levels_to_filter, None)    
+                    # url_filter_params = url_filter_params_1+url_filter_params_2
+            if request.GET.get('search_box'):
+                sql_query = sql_query.replace('@@searchfilter',"and upper(ss.name) like \'%"+request.GET.get('search_box').upper()+"%\' and 1=1")
+            else:
+                sql_query = sql_query.replace('@@searchfilter','and 1=1 ')
+
+
+            count_sql_query = f'select count(*) from ({sql_query}) as x1'
+            
+            # survey_list = request.session.get('survey_list')
+            # if survey_list:
+            #     survey_list.extend([70,71,73,181])
+            # count_sql_query = f'select count(*) from survey_survey where active != 0 and 1=1'
+            # if survey_list:
+            #     filter_condition = '"id" in (' + ','.join([str(i) for i in survey_list]) + ') '
+            #     sql_query = sql_query.replace('1=1', filter_condition)
+            #     count_sql_query = count_sql_query.replace('1=1', filter_condition)
+            count_sql_query = re.sub(r'(LIMIT .*?$)',r') as x1',count_sql_query,1)
+            total_no_of_records = execute_query(connection, count_sql_query,3)[0][0]
+            total_pages =  (total_no_of_records//rows_per_page)+ 1 if total_no_of_records%rows_per_page != 0 else total_no_of_records/rows_per_page
+            if (request.GET.get('Project','') != '' and widget_obj.id == 32) or widget_obj.id != 32: 
+                object_list = execute_query(connection, sql_query,3)
+            else:
+                object_list = execute_query(connection, sql_query,3)
+            
+            # for index, loc in enumerate(filter_locations):
+            #     if loc[0] != 0:
+            #         url_filter_params = url_filter_params + "&address_" + str(index+1) + "=" + str(loc[0])
+            #         print(object_list)
+    object_list = list(map(lambda x : ['-' if i == None or i == '' else i for i in x], object_list))
+    # skip pagination for stored procedure -- until the out param issue is fixed
+    if total_no_of_records == -1:
+        start_index = 1
+        previous_page = 0
+        next_page = 0
+        total_pages = 1
+        page_id = 1
+    else:
+        start_index = (page_id-1)*rows_per_page+1
+        previous_page = page_id - 1
+        next_page = page_id + 1
+        total_pages =  (total_no_of_records//rows_per_page)+ 1 if total_no_of_records%rows_per_page != 0 else round(total_no_of_records/rows_per_page)
+    print(object_list,'------------')
+    return render(request,'reports/export_reportcsv.html',locals())
+
+
+
+import xlsxwriter
+
+def custom_report_csv(request, report_id):
+    report_meta = ReportMeta.objects.get(id=report_id, active=2)
+    sql_query = report_meta.report_query
+    data = return_sql_results(sql_query['sql_query'])
+    workbook = xlsxwriter.Workbook(f"{BASE_DIR+'/media/'+report_meta.report_slug}.xlsx")
+    worksheet = workbook.add_worksheet()
+    headers = report_meta.custom_export_header
+    for col_num, header in enumerate(headers["headers"]):
+        worksheet.write(0, col_num, header)
+    # Write data to the Excel file
+    for row_num, row_data in enumerate(data):
+        for col_num, cell_data in enumerate(row_data):
+            worksheet.write(row_num + 1, col_num, cell_data)  # Start writing data from the second row
+
+    workbook.close()
+    # Respond with the Excel file
+    with open(f"{BASE_DIR+'/media/'+report_meta.report_slug}.xlsx", 'rb') as file:
+        response = HttpResponse(file.read(), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        response['Content-Disposition'] = f'attachment; filename={report_meta.report_slug}.xlsx'
+    return response

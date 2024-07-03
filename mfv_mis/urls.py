@@ -21,6 +21,7 @@ urlpatterns = [
     path('', include('mis.urls')),
     path('dashboard/', include('dashboard.urls')),
     path('', include('reports.urls')),
+    path('', include('export_data.urls')),
     path('api/', include('survey.api_urls')),
     path('application_master/', include('application_master.urls')),
     path('', include('application_master.user_url')),
