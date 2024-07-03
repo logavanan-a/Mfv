@@ -26,6 +26,7 @@ def get_menu_list(request):
     """
     Return a list of menus.
     """
+    # import ipdb; ipdb.set_trace()
     group =request.user.groups.all()[0].id
     return Menus.objects.filter(active = 2, parent=None,group=group).order_by("menu_order")
 
