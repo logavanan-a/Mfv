@@ -278,10 +278,10 @@ class MasterLookUpAdmin(ImportExportModelAdmin, ImportExportFormat):
 #     except admin.sites.AlreadyRegistered:
 #         pass
 
-@admin.register(BoundaryLevel)
-class AdminBoundaryLevel(ImportExportActionModelAdmin, admin.ModelAdmin):
-    search_fields = ['name',]
+# @admin.register(BoundaryLevel)
+# class AdminBoundaryLevel(ImportExportActionModelAdmin, admin.ModelAdmin):
+#     search_fields = ['name',]
 
-@admin.register(Boundary)
-class AdminBoundary(ImportExportActionModelAdmin, admin.ModelAdmin):
-    search_fields = ['name',]
+# @admin.register(Boundary)
+# class AdminBoundary(ImportExportActionModelAdmin, admin.ModelAdmin):
+#     search_fields = ['name',]
