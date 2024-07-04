@@ -481,3 +481,57 @@ function password_checking(pass1,pass2){
         document.getElementById('confirm_password').innerHTML='Please enter the valid confirm password.';
     }
 }
+
+$("#boundary_1").on("change", function (event) {
+    var optionSelected = $(this).find("option:selected");
+    var valueSelected = optionSelected.attr('value');
+    adres_widget_1(valueSelected)
+});
+
+
+//ajax call for get the locations
+function adres_widget_1(parent_valueSelected, selected = null) {
+    var next_dropdown_boundry = 'boundary_2'
+    var survey_id = $('#__survey_id').val();
+    data = {
+        'selected_boundry': parent_valueSelected,
+        'survey_id': survey_id,
+        'transfer_page': $('#transfer_page').val()
+    };
+    $.ajax({
+        type: "GET",
+        url: '/configuration/ajax/get_location/',
+        data: data,
+        success: function (result) {
+            $("#" + next_dropdown_boundry + " option").remove();
+            $("#facility option").remove();
+
+            ans = JSON.parse(result)
+            if (ans[ans.length - 1]) {
+                a = '<option selected value="" > </option>';
+                $("#" + next_dropdown_boundry).append(a);
+            }
+            if (JSON.parse(result) == 0) {
+                $("#" + next_dropdown_boundry + " option").remove();
+                a =
+                    '<option selected  value=""> </option>';
+                $("#" + next_dropdown_boundry).append(a);
+            } else {
+                $.each(JSON.parse(result), function (key, value) {
+                    if (typeof value['id'] !== "undefined") {
+                        if (parseInt(selected) == value['id'] || JSON.parse(result).length == 1) {
+                            a = '<option value=' + value['id'] + ' selected>' +
+                                value['name'] + '</option>';
+                            $("#" + next_dropdown_boundry).append(a);
+                            $("#" + next_dropdown_boundry).trigger('change')
+                        } else {
+                            a = '<option value=' + value['id'] + '>' +
+                                value['name'] + '</option>';
+                            $("#" + next_dropdown_boundry).append(a);
+                        }
+                    }
+                })
+            }
+        }
+    })
+}

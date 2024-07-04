@@ -365,89 +365,11 @@
                     {% comment %} {{response_obj.response|get_item_str:question.id}}----------- {% endcomment %}
                     <input type="hidden" class='main_question' value='{{response_obj.response|get_item_str:question.id}}' name='{{question.id}}' id="{{question.id}}">
                 {% elif question.qtype == 'AI' %}
-                    {% if question.api_qtype == 'S' %}
-                    {% if question.api_json.prison_child_dropdown and not response_obj %}
-                        {% comment %} {% for level in question.api_json.prison_parent_level.0 %}
-                            <div class="col-lg-6" id='skip_{{level}}_{{question.id}}'>
-                                <div class="mb-3">
-                                    <label class="form-label" >{{level}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
-                                    <select class=" form-select select2 main_question S_0_0 {% if question.mandatory %}required{% endif %}"  id='{{level}}' 
-                                        aria-label="Floating label select example"   {% if question.mandatory %}required{% endif %}  {% if creation_key and not question.is_editable %} disabled {% endif %}>
-                                        <option selected disabled value=""></option>
-                                    </select>
-                                    <div class="invalid-feedback">
-                                        Please select atleast one option from the list
-                                    </div>
-                                </div> 
-                                <script>
-                                    {% get_dict_value level question.api_json.prison_parent_level.0 as boundry%}
-
-                                    $(document).ready(function() {
-                                        {% if not boundry.has_parent  %}
-                                            parent_dropdown_{{level}}(0)
-                                        {% endif %}
-                                        $('select#{{level}}').change(function () {
-                                            var optionSelected = $(this).find("option:selected")
-                                            var valueSelected = optionSelected.val()
-                                            if (valueSelected != null){
-                                                parent_dropdown_{{level}}(valueSelected)
-                                            }
-                                        })
-                                    });
-                                    
-                                    function parent_dropdown_{{level}}(selected_choice){
-                                        data = {
-                                            'selected_boundry': selected_choice,
-                                            'boundry_level':{{boundry.boundry_level}},
-                                            'user_id':'{{request.user.id}}',
-                                        }
-                                        $.ajax({
-                                            type: "{{question.api_json.method}}",
-                                            url: '{{question.api_json.api}}',
-                                            data: data,
-                                            success: function (result) {
-                                                if(selected_choice == 0){
-                                                    $("#{{level}} option").remove();
-                                                    b = '<option   value=""></option>';
-                                                    $("#{{level}}").append(b);
-                                                    if (JSON.parse(result) != 0) {
-                                                        $.each(JSON.parse(result), function (key, value) {
-                                                                a = '<option value=' + value['id'] + '>' +
-                                                                    value['name'] + '</option>';
-                                                                $("#{{level}}").append(a);
-                                                        });
-                                                    }
-                                                }else{
-                                                    //if('{{question.id}}' == '{{level}}'){
-                                                    //   console.log('inside')
-                                                    //}
-                                                    $("#{{boundry.next_level}} option").remove();
-                                                    b = '<option   value=""></option>';
-                                                    $("#{{boundry.next_level}}").append(b);
-                                                    if (JSON.parse(result) != 0) {
-                                                        $.each(JSON.parse(result), function (key, value) {
-                                                            if(value['id'] == parseInt(selected_choice)){
-                                                                a = '<option value="' + value['value'] +'"'+ 'selected class ="'+value['id']+'">' +
-                                                                    value['name'] + '</option>';
-                                                                $("#{{boundry.next_level}}").append(a);
-                                                            }else{
-                                                                a = '<option value="' + value['value'] + '" class ="'+value['id']+'">' +
-                                                                    value['name'] + '</option>';
-                                                                $("#{{boundry.next_level}}").append(a);
-                                                            }
-                                                        });
-                                                    }
-                                                }
-                                            }
-                                        });
-                                    }
-                                </script>
-                            </div> 
-                        {% endfor %} {% endcomment %}
-                    {% else %}
+                {% if question.api_qtype == 'S' %}
+                
+                {% if question.api_json.prison_child_dropdown and not response_obj %}
+                {% else %}
                         <script>
-                                {% comment %} $('select#{{question.api_json.prison_parent_level.onclick_event_id|default:0}}').change(function () { {% endcomment %}
-
                             $(document).ready(function(){
                                 $("select#{{question.api_json.prison_parent_level.onclick_event_id|default:0}}").on("change", function(event, informationObj) {
                                     var optionSelected = $(this).find("option:selected")
@@ -485,28 +407,6 @@
                                                     }
                                                 });
                                             }
-                                            $('#2').on('change', function() {
-                                                //368 = Prison
-                                                //369 = OCS
-                                                //17 = Type of Inmate
-                                                //292 = CV
-                                                //293 = UT
-                                                //294 = CSR
-                                                var selected_id = $('#2 option[value="' + $(this).val() + '"]').attr('id_1')
-
-                                                if (selected_id == '368'){
-                                                    $('#17').val('')
-                                                    $('#17 option[value="294"]').prop('disabled', true);
-                                                    $('#17 option[value="292"]').prop('disabled', false);
-                                                    $('#17 option[value="293"]').prop('disabled', false);
-                                                }else if(selected_id == '369'){
-                                                    $('#17').val('')
-                                                    $('#17 option[value="294"]').prop('disabled', false);
-                                                    $('#17 option[value="292"]').prop('disabled', true);
-                                                    $('#17 option[value="293"]').prop('disabled', true);
-                                                }
-                                            });
-                                            
                                         }
                                     })
                                     
@@ -547,29 +447,14 @@
                             <label class="form-label" >{{question.form_question_number|default:''}}. {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
                             <select class=" form-select select2 main_question S_0_0 {% if question.mandatory %}required{% endif %} api_question"  name='{{question.id}}' id='{{question.id}}' 
                                 aria-label="Floating label select example"   {% if question.mandatory %}required{% endif %} {% if not question.is_editable and response_obj.response and response_obj.response.616 != '619'   and creation_key %}disabled{% endif %}>
-                                {% comment %} {% for choice in question.choice_list %}
-                                <option value="{{choice.id}}" >{{choice.choice}}</option>
-                                {% endfor %} {% endcomment %}
                                 {% if question.api_json.is_beneficiary_ques == 2 and creation_key %}
-                                    <option value="{{ben_uuid}}" >{{json_response.235}}</option>
+                                    <option value="{{ben_uuid}}" >{{json_response.237}}</option>
                                 {% endif %}
                             </select>
                             <div class="invalid-feedback">
                                 {% if validation_code.message %}{{validation_code.message}}{% else %}Please select atleast one option from the list{% endif %}
                             </div>
                         </div> 
-                        
-                        {% comment %} <script>
-                            {% if question.api_json.linked_auto_populate %}
-                                $(document).ready(function() {
-                                    $('[name="{{question.id}}"]').change(function () {
-                                        var optionSelected = $(this).find("option:selected")
-                                        var valueSelected = optionSelected.attr('class')
-                                        $('#{{question.api_json.linked_auto_populate}}').val(valueSelected)
-                                    })
-                                });
-                            {% endif %}
-                        </script> {% endcomment %}
                     </div> 
                     {% endif %}
                 {% elif question.qtype == 'AW' %}

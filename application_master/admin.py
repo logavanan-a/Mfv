@@ -9,7 +9,7 @@ from application_master.models import (District, Donor, Menus, Mission,
                                        PartnerMissionMapping, Project,
                                        ProjectDonorMapping, ProjectFiles,
                                        State, UserPartnerMapping,
-                                       UserProjectMapping,MasterLookUp)
+                                       UserProjectMapping,MasterLookUp,Boundary,BoundaryLevel)
 
 
 class MissionIndicatorCategoryInline(admin.TabularInline): #StackedInline
@@ -246,3 +246,9 @@ class MasterLookUpAdmin(ImportExportModelAdmin, ImportExportFormat):
 #         admin.site.register(model)
 #     except admin.sites.AlreadyRegistered:
 #         pass
+@admin.register(BoundaryLevel)    
+class MasterLookUpAdmin(ImportExportModelAdmin, ImportExportFormat):
+    pass
+@admin.register(Boundary)    
+class MasterLookUpAdmin(ImportExportModelAdmin, ImportExportFormat):
+    pass

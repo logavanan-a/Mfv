@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 # form views
 from django.views.generic import View, RedirectView
-from django.http import HttpResponseRedirect
+from django.shortcuts import render,HttpResponse,HttpResponseRedirect
 from django.contrib.auth import authenticate, logout, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.contenttypes.models import ContentType
-from django.shortcuts import render
 from dateutil.relativedelta import relativedelta
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
@@ -225,13 +224,6 @@ def load_data_to_cache():
         survey_heading_choices=list(Choice.objects.all().exclude(active=0).values('id','question_id','text'))
         cache_set_with_namespace(INSTANCE_CACHE_PREFIX+'FORM_BUILDER',cache_key_choices,survey_heading_choices,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
     
-    #Caching the all boundaries 
-    cache_key_boundaries = INSTANCE_CACHE_PREFIX+'all_boundary_caching'
-    boundaries =  cache.get(cache_key_boundaries)
-    if not boundaries:
-        boundaries=list(State.objects.all().exclude(active=0).values('id','name'))
-        cache_set_with_namespace(INSTANCE_CACHE_PREFIX+'BOUNDARY_DATA',cache_key_boundaries,boundaries,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
-
     #Caching the all mastelookups 
     cache_key_lookup = INSTANCE_CACHE_PREFIX+'all_master_lookup_caching'
     master_lookup =  cache.get(cache_key_lookup)
@@ -340,8 +332,7 @@ class WebResponseListing(View):
             else:
                 user_facility_list=BeneficiaryResponse.objects.filter((Q(address_2__in=locations)|Q(address_1__in=locations)|Q(survey_id=2)),active=2).values_list('json_answer_id',flat=True)
                 #boundaries based on user
-                cache_key_boundaries = INSTANCE_CACHE_PREFIX+'all_boundary_caching'
-                boundaries =  cache.get(cache_key_boundaries)
+                boundaries =  load_data_to_cache_boundaries_name()
                 district_boundarys=[item.get('id') for item in boundaries if item.get('parent') in locations or item.get('id') in locations] 
                 facilities=facilities+" or (survey_id in (7) and js.cluster ->> 'Boundary' in ({0}))".format(str(list(map(str, district_boundarys if district_boundarys else [-1])))[1:-1])
 
@@ -447,7 +438,7 @@ class WebResponseListing(View):
                 for i in filter_questions:
                     if i.get('qtype') == 'AW':
                         address_widget_filter.append(i.get('id'))
-                        boundaries=cache.get(INSTANCE_CACHE_PREFIX+'all_boundary_caching')
+                        boundaries=load_data_to_cache_boundaries_name()
                         boundarys=[item for item in boundaries if (request.user.is_superuser or item.get('id') in request.session.get('user_parent_boundary_list')) and item.get('boundary_level_type_id') == 1 ]
                         request_data.update({str(i.get('id')):request.GET.getlist(str(i.get('id')))})
                     else:
@@ -563,7 +554,7 @@ def load_data_to_cache_block():
 def load_data_to_cache_boundarylevel():
     #caching the boundary level
 
-    query = "SELECT jsonb_object_agg(id, b_val) FROM ( SELECT a.id, jsonb_build_object( 'id',a.id,'name', a.name ) AS b_val FROM masterdata_boundarylevel a WHERE a.active = 2 ) AS x"
+    query = "SELECT jsonb_object_agg(id, b_val) FROM ( SELECT a.id, jsonb_build_object( 'id',a.id,'name', a.name ) AS b_val FROM application_master_boundarylevel a WHERE a.active = 2 ) AS x"
 
     cache_key_boundary_level = INSTANCE_CACHE_PREFIX+'boundarylevel_meta'
     boundarylevel_cache_dict =  cache.get(cache_key_boundary_level)
@@ -575,6 +566,15 @@ def load_data_to_cache_boundarylevel():
         cache_set_with_namespace(INSTANCE_CACHE_PREFIX+'FORM_BUILDER',cache_key_boundary_level,boundarylevel_cache_dict,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
     return boundarylevel_cache_dict
 
+def load_data_to_cache_boundaries_name():
+    #boundaries based on user
+    cache_key_boundaries = INSTANCE_CACHE_PREFIX+'all_boundary_caching'
+    boundaries =  cache.get(cache_key_boundaries)
+    if not boundaries:
+        boundaries=list(Boundary.objects.all().exclude(active=0).values('id','name','boundary_level_type_id','parent','code').order_by('name'))
+        cache_set_with_namespace(INSTANCE_CACHE_PREFIX+'BOUNDARY_DATA',cache_key_boundaries,boundaries,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
+    return boundaries
+    
 from survey.api_views_version1 import add_survey_answers_version_1
 from django.shortcuts import redirect
 @login_required(login_url='/')
@@ -655,13 +655,7 @@ def add_survey_form(request,pk):
         if json_response.get('9') == '65':
             gender_male=True
 
-    #boundaries based on user
-    cache_key_boundaries = INSTANCE_CACHE_PREFIX+'all_boundary_caching'
-    boundaries =  cache.get(cache_key_boundaries)
-    if not boundaries:
-        boundaries=list(State.objects.all().exclude(active=0).values('id','name').order_by('name'))
-        cache_set_with_namespace(INSTANCE_CACHE_PREFIX+'BOUNDARY_DATA',cache_key_boundaries,boundaries,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
-    
+    boundaries = load_data_to_cache_boundaries_name()
     if not request.user.is_superuser and not request.user.is_staff:
         next_level_boundries=load_data_to_cache_boundarylevel()
         boundarys=[item for item in boundaries if item.get('id') in request.session['user_parent_boundary_list']] 
@@ -1573,11 +1567,7 @@ def edit_survey_form(request,survey_slug,creation_key):
             gender_male=True
 
     #boundaries based on user
-    cache_key_boundaries = INSTANCE_CACHE_PREFIX+'all_boundary_caching'
-    boundaries =  cache.get(cache_key_boundaries)
-    if not boundaries:
-        boundaries=list(State.objects.all().exclude(active=0).values('id','name').order_by('name'))
-        cache_set_with_namespace(INSTANCE_CACHE_PREFIX+'BOUNDARY_DATA',cache_key_boundaries,boundaries,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
+    boundaries =  load_data_to_cache_boundaries_name()
 
     if not request.user.is_superuser and not request.user.is_staff:
         next_level_boundries=load_data_to_cache_boundarylevel()
@@ -1592,8 +1582,8 @@ def edit_survey_form(request,survey_slug,creation_key):
         now = datetime.now()
         date_time_str = now.strftime("%Y-%m-%d %H:%M:%S")
         # response_obj = JsonAnswer.objects.get(creation_key=creation_key)
-        answers=json.loads(request.POST.getlist('all_in_one')[0])
         # import ipdb;ipdb.set_trace()
+        answers=json.loads(request.POST.getlist('all_in_one')[0])
         ben_uuid=request.GET.get('ben',request.POST.get('ben','0'))
         responses={
             "u_uuid": request.user.id,
@@ -1627,3 +1617,62 @@ def edit_survey_form(request,survey_slug,creation_key):
         # profile_url='/manage/profile/'+survey_slug+'/'+ben_uuid+'/' if ben_uuid != '0' else '/configuration/list/'+survey_slug+'/'
         return HttpResponseRedirect(profile_url)
     return render(request,template_name,locals())
+
+
+
+@login_required(login_url='/')
+def get_boundry_based_on_parentboundry(request):
+    if request.method == 'GET':
+        result_set=[]
+        boundry_level = request.GET.get('boundry_level', '')
+        selected_boundry = request.GET.get('selected_boundry', '')
+
+        user_id = request.GET.get('user_id', 0)
+        selected_user = request.GET.get('selected_user',0)
+        if selected_boundry == '0' :
+            boundarys=Boundary.objects.filter(boundary_level_type_id=boundry_level,active=2).order_by('name')
+            for boundary in boundarys:
+                result_set.append(
+                    {'id':boundary.id, 'name': boundary.name, })
+        else:
+            
+            dj_query=Q(survey_id=1)
+            #for super user 
+            # if request.user.is_superuser or 3 in request.session['user_role_id']:
+            dj_query.add(Q(response__address__1__234__2__in=selected_boundry),Q.AND)
+            #for ppm user only
+            # elif request.session['user_boundary_levelcode'] == 2 and 27 in request.session['user_role_id']:
+                # dj_query.add(Q(id__in=user_facility_list),Q.AND)
+                # dj_query.add(Q(response__address__1__234__2=selected_boundry),Q.AND)
+            # elif request.session['user_boundary_levelcode'] == 2 and int(selected_boundry) not in request.session['user_boundary_list']:
+            #     selected_boundry='0'
+            #     dj_query.add(Q(response__address__1__234__2=selected_boundry),Q.AND)
+            # elif request.session['user_boundary_levelcode'] == 1:
+            #     dj_query.add(Q(response__address__1__234__2=selected_boundry),Q.AND)
+
+
+            json_answers=JsonAnswer.objects.filter(dj_query).exclude(active=0).order_by('-modified')
+
+            for json_data in json_answers:
+                result_set.append(
+                    {'value':json_data.creation_key,'id':"", 'name': json_data.response.get("231"),'facility_type':json_data.response.get("232") })
+        
+        return HttpResponse(json.dumps(result_set))
+    
+
+
+@login_required(login_url='/')
+def get_location_boundry(request):
+    if request.method == 'GET' :
+        result_set=[]
+        selected_boundry = request.GET.get('selected_boundry', '')
+
+        #Caching the all boundaries 
+        boundaries =  load_data_to_cache_boundaries_name()
+
+        # import ipdb;ipdb.set_trace()
+        # boundarys=[item for item in boundaries if str(item.get('parent')) == selected_boundry and ((request.session['user_boundary_levelcode'] == 1 and item.get('parent') in request.session['user_parent_boundary_list']) or (item.get('id') in request.session['user_boundary_list']) or (transfer_page == 'true'))]# or survey_id == '2'
+        boundarys=[item for item in boundaries if str(item.get('parent')) == selected_boundry and item.get('code') in list(map(str,request.session.get('user_boundary_list',[])))]
+        for boundary in boundarys:
+            result_set.append({'id':boundary.get('id'), 'name': boundary.get('name'), })
+        return HttpResponse(json.dumps(result_set))
