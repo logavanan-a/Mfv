@@ -1406,3 +1406,53 @@ class ProjectConfigurationDetails(g.CreateAPIView):
         except Exception as e:
             app_data_setup = {'status':0, 'message' : "Falied"}
         return Response(app_data_setup)
+
+import numpy as np
+
+@csrf_exempt
+def archive_responses_list(request):
+    """
+    A view for listing and archiving responses.
+    """
+    PAGE_SIZE = 5000
+    if request.method == 'POST':
+        responses_ids = eval(request.POST.get("response_ids",'[]'))
+        updatedtime = request.POST.get("serverdatetime")
+        last_response_id = request.POST.get("server_primary")
+        res = []
+        responses = JsonAnswer.objects.filter(id__in=responses_ids).order_by('modified','id')
+        # if updatedtime and last_response_id: 
+        #     updated = convert_string_to_date(updatedtime)
+        #     updated = updated+ timedelta(hours=5)
+        #     updated = updated+ timedelta(minutes=30)
+        #     # responses = responses.filter(Q(submission_date__gt=updated)|Q(modified__gt=updated))
+        #     responses_list = responses.filter(Q(modified__gt=updatedtime)|Q(modified=updated,id__gt=last_response_id))
+        # elif last_response_id and updatedtime == '': # last response id will havee value and updatedtime will be blank only when calling the api for the deleted responses
+        #     responses_list = []
+        # else:
+        #     responses_list = responses  # initially api call will be without response id and modified date 
+        # responses_list = responses_list[:PAGE_SIZE]
+        # if responses_list: # first we will send all the responses that is present in the server 
+        #     responses_list = list(responses_list.values('active','modified').annotate(response_id=F('id')))
+        #     res = list(map(archive_response_dic , responses_list))
+        # else: # when we do not have any responses based on the modifed date  then we are sending all the deleted responses status 
+        sent_responses = np.array(responses_ids, dtype=int)
+        existing_responses = np.array(responses.values_list('id',flat=True), dtype=int)
+        deleted_responses = np.setdiff1d(sent_responses, existing_responses)
+
+        # if last_response_id and updatedtime == '':
+        #     deleted_responses = np.sort(deleted_responses[deleted_responses > int(last_response_id)])
+        deleted_responses = deleted_responses.tolist()
+        responses_list = deleted_responses[:PAGE_SIZE]
+        res = list(map(archive_deleted_dic , responses_list))
+            
+        res = {'status': 2,'message': "Success",'response_status':res}
+
+        return JsonResponse(res)
+    
+def archive_deleted_dic(obj):
+    data  = dict()
+    data['response_id']= obj 
+    data['active']= 11 
+    data['modified']= ''
+    return data

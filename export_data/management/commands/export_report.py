@@ -185,7 +185,7 @@ def export_excel(surveyid, excel_filename):
             #cluster_info_for_survey = {"columns":["cluster.beneficiary_type_id"],"headers":[,"Beneficiary Type ID"]}
             cluster_info_for_survey = {"columns":[],"headers":[], "validations":[]}
             if survey_id == 1:
-                response_id_header = "Child App ID"
+                response_id_header = "School App ID"
             elif survey_id == 6:
                 response_id_header = "Committee App ID"
             elif survey_id == 8:
@@ -194,8 +194,7 @@ def export_excel(surveyid, excel_filename):
                 response_id_header = "School master App ID"
             else:
                 response_id_header = "Response App ID"
-            common_info_for_survey = {"columns":["id","creation_key","submission_date","created","modified","user_id"],"headers":[response_id_header, "Beneificary Unique Key", "Submission Date", "Created On", "Modified On", "Created By User ID"],
-                                        "validations":[1,0,99,99,99,0]}
+            common_info_for_survey = {"columns":["id","creation_key","submission_date","created","modified","user_id"],"headers":[response_id_header, "Beneificary Unique Key", "Submission Date", "Created On", "Modified On", "Created By User ID"],"validations":[1,0,99,99,99,0]}
             cluster_info_for_survey["columns"].extend(["cluster.beneficiary_type_id","cluster.child_reference_id"])
             cluster_info_for_survey["headers"].extend(["Cluster - Beneficiary Type ID","Cluster - Child Reference ID"])
             cluster_info_for_survey["validations"].extend([0,0])            
@@ -218,7 +217,7 @@ def export_excel(surveyid, excel_filename):
         common_columns.extend(cluster_info_for_survey.get('columns'))
         common_headers.extend(cluster_info_for_survey.get('headers'))
         common_validations.extend(cluster_info_for_survey.get('validations'))
-        aw_qtype_text_mapping={"1":"Child","4":"School Master","6":"Committee","8":"Committee"}
+        aw_qtype_text_mapping={"1":"School","4":"School Master","6":"Committee","8":"Committee"}
         # fetch resposne column names and header text for all question types except In type (variable grid questions)
         # AW type question column names and headers are separate query with UNION ALL to combine the list with other type of questions
         address_question_text_prefix = """'""" + aw_qtype_text_mapping.get(str(survey_id),'') + """'""" if str(survey_id) in aw_qtype_text_mapping.keys() else "a.text"
@@ -409,10 +408,6 @@ def add_data_to_excel(conn, data_query, headers_query, common_columns, common_he
     loc_filter_only_id_columns = []
     loc_filter_only_id_headers = []
     loc_filter_only_id_validations = []
-    
-    #structure  : {boundary_level_id:"column_name"} 
-    #ex: {1:"ben_type_question_633_1", 2:"ben_type_question_633_2", 3:"ben_type_question_633_3"......,, 8:"ben_type_question_633_8"}
-    # the keys 1 to 8 indicates boundary level from state to hamlet
     location_filters_columns_names = {}
     if len(result) == 1:
         ben_type = result[0][0]
@@ -449,86 +444,75 @@ def add_data_to_excel(conn, data_query, headers_query, common_columns, common_he
                     loc_filter_only_id_columns.append('address.'+str(boundary[0])+'__id__')
                     loc_filter_only_id_headers.append(str(boundary[1] + ' ID '))
                     loc_filter_only_id_validations.append(0)
-        #START - COMMENTED FOR FURTHER CHANGES FOR OTHER PROJECTS
-        # Project concept removed for both
-        # if 'cluster.project_id' in columns_list:
-        #     columns_list.append('cluster.project_id_ref_name')
-        #     headers_list.append('Project Name')
-        #END - COMMENTED FOR FURTHER CHANGES FOR OTHER PROJECTS
-
         #beneficiary surveys add the beneficiary ID column
         if survey_type == 0:
             ben_type_columns_list = ['ben.id']
             ben_type_headers_list = ['Beneficiary ID']
             ben_type_validations_list = [0]
             if survey_id == 1: 
-                #Child - survey_id 1
-                #Child - Address questions for filter 
-                loc_filter_only_id_columns = ['address.1__id__','address.2__id__','address.3__id__','address.4__id__', 'address.5__id__', 'address.6__id__']
-                loc_filter_only_id_headers = ['Child - State','Child - District','Child - Block','Child - Ward','Child - Gram Panchayat','Child - Village']
-                loc_filter_only_id_validations = [0,0,0,0,0,0]
-            if survey_id == 6: 
-                #Committee - survey_id 6
-                #Committee - Address questions for filter 
-                loc_filter_only_id_columns = ['address.1__id__','address.2__id__','address.3__id__','address.4__id__', 'address.5__id__','address.6__id__']
-                loc_filter_only_id_headers = ['Committee - State','Committee - District','Committee - Block','Committee - Ward','Committee - Gram Panchayat','Committee - Village']
-                loc_filter_only_id_validations = [0,0,0,0,0,0]
-            elif survey_id == 4: 
-                #School Master - survey_id 4
-                #School Master - Address questions for filter 
-                loc_filter_only_id_columns = ['address.1__id__','address.2__id__','address.3__id__','address.4__id__', 'address.5__id__','address.6__id__']
-                loc_filter_only_id_headers = ['School Master - State','School Master - District','School Master - Block','School Master - Ward','School Master - Gram Panchayat','School Master - Village']
-                loc_filter_only_id_validations = [0,0,0,0,0,0]
-            elif survey_id == 8: 
-                #Committee members - survey_id 8
-                #fetch the Committee details for the Committee members survey
-                ai_columns_list = ['parent_ben.json_id']
-                ai_headers_list = ['Committee App ID']
-                ai_validations_list = [1,0,0]
-                #Committee members - Address questions for filter 
-                loc_filter_only_id_columns = ['address.1__id__','address.2__id__','address.3__id__','address.4__id__', 'address.5__id__', 'address.6__id__']
-                loc_filter_only_id_headers = ['Committee - State','Committee - District','Committee - Block','Committee - Ward','Committee - Gram Panchayat','Committee - Village']
-                loc_filter_only_id_validations = [0,0,0,0,0,0]
+                #School - survey_id 1
+                #School - Address questions for filter 
+                loc_filter_only_id_columns = ['address.1__id__','address.2__id__']
+                loc_filter_only_id_headers = ['School - State','School - District']
+                loc_filter_only_id_validations = [0,0]
             elif survey_id == 2: 
-                #Child - survey_id 2
-                #Child - Address questions for filter 
-                loc_filter_only_id_columns = ['address.1__id__','address.2__id__','address.3__id__','address.4__id__', 'address.5__id__', 'address.6__id__']
-                loc_filter_only_id_headers = ['Student - State','Student - District','Student - Block','Student - Ward','Student - Gram Panchayat','Student - Village']
+                #Student - survey_id 2
+                #Student - Address questions for filter 
+                loc_filter_only_id_columns = ['address.1__id__','address.2__id__']
+                loc_filter_only_id_headers = ['Student - State','Student - District']
                 loc_filter_only_id_validations = [0,0,0,0,0,0]
+            # if survey_id == 6: 
+            #     #Committee - survey_id 6
+            #     #Committee - Address questions for filter 
+            #     loc_filter_only_id_columns = ['address.1__id__','address.2__id__','address.3__id__','address.4__id__', 'address.5__id__','address.6__id__']
+            #     loc_filter_only_id_headers = ['Committee - State','Committee - District','Committee - Block','Committee - Ward','Committee - Gram Panchayat','Committee - Village']
+            #     loc_filter_only_id_validations = [0,0,0,0,0,0]
+            # elif survey_id == 4: 
+            #     #School Master - survey_id 4
+            #     #School Master - Address questions for filter 
+            #     loc_filter_only_id_columns = ['address.1__id__','address.2__id__','address.3__id__','address.4__id__', 'address.5__id__','address.6__id__']
+            #     loc_filter_only_id_headers = ['School Master - State','School Master - District','School Master - Block','School Master - Ward','School Master - Gram Panchayat','School Master - Village']
+            #     loc_filter_only_id_validations = [0,0,0,0,0,0]
+            # elif survey_id == 8: 
+            #     #Committee members - survey_id 8
+            #     #fetch the Committee details for the Committee members survey
+            #     ai_columns_list = ['parent_ben.json_id']
+            #     ai_headers_list = ['Committee App ID']
+            #     ai_validations_list = [1,0,0]
+            #     #Committee members - Address questions for filter 
+            #     loc_filter_only_id_columns = ['address.1__id__','address.2__id__','address.3__id__','address.4__id__', 'address.5__id__', 'address.6__id__']
+            #     loc_filter_only_id_headers = ['Committee - State','Committee - District','Committee - Block','Committee - Ward','Committee - Gram Panchayat','Committee - Village']
+            #     loc_filter_only_id_validations = [0,0,0,0,0,0]
+            
         else:
             # #for extended activity surveys
+            #  ben_type_id |                 name                  | id 
+            # -------------+---------------------------------------+----
+            #  2           | Follow up                             |  7
+            #  2           | Referral Management                   |  5
+            #  2           | Call Management for referred children |  9
+            #  2           | Secondary Screening                   |  4
+            #  2           | Spectacle Compliance                  |  8
+            #  3           | Teacher’s training                    | 10
+            #  2           | Primary screening                     |  3
+            #  2           | Surgery Detail                        |  6
+
             if ben_type == '2':
-                #Child - survey_id 1
-                loc_filter_only_id_columns = ['address.1__id__','address.2__id__','address.3__id__','address.4__id__', 'address.5__id__','address.6__id__']
-                loc_filter_only_id_headers = ['Child - State','Child - District','Child - Block','Child - Ward','Child - Gram Panchayat','Child - Village']
-                loc_filter_only_id_validations = [0,0,0,0,0,0]
-                ben_type_columns_list = ['ben.json_id', 'ben_type_question.7854.1', 'ben_type_question.7854.2', 'ben_type_question.7854.3', 'ben_type_question.7854.4', 'ben_type_question.7854.5','ben_type_question.7854.6', 'ben_type_question.7855', 'ben_type_question.7856', 'ben_type_question.7857', 'ben_type_question.7858', 'ben_type_question.7859']
-                ben_type_headers_list = ['Child App ID', 'Child - State','Child - District','Child - Block','Child - Ward','Child - Gram Panchayat','Child - Village', 'Child - Name of the child', 'Child - Father`s Name', 'Child - Mother`s Name', 'Child - Parents phone number', 'Child - Gender']
-                ben_type_validations_list = [1,0,0,0,0,0,0,0,0,0,0,0]
-            elif ben_type == '11':
-                #Committee members - survey_id = 8
-                loc_filter_only_id_columns = ['address.1__id__','address.2__id__','address.3__id__','address.4__id__', 'address.5__id__','address.6__id__']
-                loc_filter_only_id_headers = ['Committee members - State','Committee members - District','Committee members - Block','Committee members - Ward','Committee members - Gram Panchayat','Committee members - Village']
-                loc_filter_only_id_validations = [0,0,0,0,0,0]
-                ben_type_columns_list = ['ben.json_id', 'parent_ben.creation_key','parent_ben.json_id', 'ben_type_question.7922.1', 'ben_type_question.7922.2', 'ben_type_question.7922.3', 'ben_type_question.7922.4', 'ben_type_question.7922.5','ben_type_question.7922.6', 'ben_type_question.7926', 'ben_type_question.7927']
-                ben_type_headers_list = ['Committee Member App ID', 'Committee Creation Key', 'Committee App ID', 'Committee - State','Committee - District','Committee - Block','Committee - Gram Panchayat','Committee - Village', 'Committee - First Name', 'Committee - Last Name']
-                ben_type_validations_list = [1,0,1,0,0,0,0,0,0,0]
-            elif ben_type == '4':
-                #Committee - survey_id = 6
-                loc_filter_only_id_columns = ['address.1__id__','address.2__id__','address.3__id__','address.4__id__', 'address.5__id__','address.6__id__']
-                loc_filter_only_id_headers = ['Committee - State','Committee - District','Committee - Block','Committee - Ward','Committee - Gram Panchayat','Committee - Village']
-                loc_filter_only_id_validations = [0,0,0,0,0,0]
-                ben_type_columns_list = ['ben.json_id', 'parent_ben.creation_key','parent_ben.json_id', 'ben_type_question.7922.1', 'ben_type_question.7922.2', 'ben_type_question.7922.3', 'ben_type_question.7922.4', 'ben_type_question.7922.5','ben_type_question.7922.6', 'ben_type_question.7926', 'ben_type_question.7927']
-                ben_type_headers_list = ['Committee App ID', 'Committee Creation Key', 'Committee App ID', 'Committee - State','Committee - District','Committee - Block','Committee - Ward','Committee - Gram Panchayat','Committee - Village', 'Committee - Name', 'Committee - Committee Type']
-                ben_type_validations_list = [1,0,1,0,0,0,0,0,0,0,0]
-            elif ben_type == '3':
-                #School master - survey_id = 4
-                loc_filter_only_id_columns = ['address.1__id__','address.2__id__','address.3__id__','address.4__id__', 'address.5__id__','address.6__id__']
-                loc_filter_only_id_headers = ['School Master - State','School Master - District','School Master - Block','School Master - Ward','School Master - Gram Panchayat','School Master - Village']
-                loc_filter_only_id_validations = [0,0,0,0,0,0]
-                ben_type_columns_list = ['ben.json_id', 'ben_type_question.7882.1', 'ben_type_question.7882.2', 'ben_type_question.7882.3', 'ben_type_question.7882.4', 'ben_type_question.7882.5','ben_type_question.7882.6', 'ben_type_question.7885']
-                ben_type_headers_list = ['School master App ID', 'School master - State','School master - District','School master - Block','School master - Ward','School master - Gram Panchayat','School master - Village', 'School name']
+                #student
+                loc_filter_only_id_columns = ['address.1__id__','address.2__id__']
+                loc_filter_only_id_headers = ['Student - State','Student - District']
+                loc_filter_only_id_validations = [0,0]
+                ben_type_columns_list = ['ben.json_id', 'ben_type_question.234.1', 'ben_type_question.234.2','ben_type_question.238', 'ben_type_question.241', 'ben_type_question.242', 'ben_type_question.243', 'ben_type_question.240']
+                ben_type_headers_list = ['Student App ID', 'Student - State','Student - District','Student - Name of the Student', 'Student - Class/Division', 'Student - Roll number', 'Student - Parents phone number', 'Student - Gender']
                 ben_type_validations_list = [1,0,0,0,0,0,0,0]
+            elif ben_type == '3':
+                #School 
+                loc_filter_only_id_columns = ['address.1__id__','address.2__id__']
+                loc_filter_only_id_headers = ['School - State','School - District']
+                loc_filter_only_id_validations = [0,0]
+                ben_type_columns_list = ['ben.json_id', 'ben_type_question.234.1', 'ben_type_question.234.2', 'ben_type_question.231']
+                ben_type_headers_list = ['School App ID', 'School - State','School - District','School name']
+                ben_type_validations_list = [1,0,0,0]
         #mark the column names to be used for location based filters
         #ensure the columns are added from 1 - 8 in the list
         # if loc_q_num != ""        
