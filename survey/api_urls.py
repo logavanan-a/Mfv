@@ -33,4 +33,6 @@ urlpatterns = [
     path('language-block-list/',languageblocklist, name="languageblocklist"),          
     path('feederrorlog/', feed_error_log, name='feed_error_log'),
     path('project/configuration/details/',ProjectConfigurationDetails.as_view()),
+    path('archivedresponses-list/',archive_responses_list,name='archive_api'),
+
 ]

@@ -1242,11 +1242,16 @@ def get_levels(request, level):
     #    orguser = OrganizationLocation.objects.filter(user__id=userrole.id)
         user = User.objects.get(id=request.POST.get('uid'))
         boundary_level = {1:State,2:District}
-        tagged_locations = UserProjectMapping.objects.filter(user=user,active=2).select_related('project','project__district','project__district__state')
+        # tagged_locations = UserProjectMapping.objects.filter(user=user,active=2).select_related('project','project__district','project__district__state')
+        project_mapped_locations = list(UserProjectMapping.objects.filter(user=user,active=2).select_related('project__district').values_list('project__district',flat=True))
         # level_obj = BoundaryLevel.objects.get(code=int(url_level))
         # user_locations = user_projects_locations(user, level_obj)
-        # tagged_locations = Boundary.objects.filter(id__in=user_locations)
-        tagged_locations_all = tagged_locations
+        tagged_locations = Boundary.objects.filter(boundary_level_type_id=2,code__in=list(map(str,project_mapped_locations))).order_by('modified').select_related('parent','boundary_level_type','parent__boundary_level_type')
+        if level == 1:
+            tagged_locations_all = tagged_locations.values_list('parent_id',flat=True)
+        else:
+            tagged_locations_all = tagged_locations.values_list('id',flat=True)
+
         modified_obj = request.POST.get("modified_date")
         if modified_obj:
             modified_date = convert_string_to_date(modified_obj)
@@ -1255,15 +1260,15 @@ def get_levels(request, level):
         parent_locations = []
         tagged_locations = tagged_locations.order_by('modified')[:int(n)]
 
-        for tl in tagged_locations:
-            one_location_level = {}
+        for location in tagged_locations:
             if level == 1:
-                location = tl.project.district.state
-            else:
-                one_location_level['level1_id']=tl.project.district.state.id + 1000
-                location = tl.project.district
-            
-            one_location_level['level'+str(level)+'_id']=location.id if level == 2 else location.id+1000
+                location = location.parent
+            one_location_level = {}
+            parent_locations_list = location.get_parent_locations([]) 
+            for loc in parent_locations_list:
+                one_location_level.update(loc)
+            # import ipdb;ipdb.set_trace()
+            one_location_level['level'+str(level)+'_id']=int(location.id)
             one_location_level['name']=re.sub(r'[^\x00-\x7F]+','',location.name).strip()
             one_location_level['active']=str(location.active)
             one_location_level['modified_date']=datetime.strftime(location.modified, '%Y-%m-%d %H:%M:%S.%f')
@@ -1278,7 +1283,7 @@ def get_levels(request, level):
         else:
             flag = 1
         if parent_locations:
-            return JsonResponse({'status':2,'Level '+str(level):parent_locations,'flag':flag,'location_ids':list(tagged_locations_all.values_list('id',flat=True))
+            return JsonResponse({'status':2,'Level '+str(level):parent_locations,'flag':flag,'location_ids':list(tagged_locations_all)
                         })
         else:
             return JsonResponse({"status":2, "message":"Data already sent",})
@@ -1401,3 +1406,53 @@ class ProjectConfigurationDetails(g.CreateAPIView):
         except Exception as e:
             app_data_setup = {'status':0, 'message' : "Falied"}
         return Response(app_data_setup)
+
+import numpy as np
+
+@csrf_exempt
+def archive_responses_list(request):
+    """
+    A view for listing and archiving responses.
+    """
+    PAGE_SIZE = 5000
+    if request.method == 'POST':
+        responses_ids = eval(request.POST.get("response_ids",'[]'))
+        updatedtime = request.POST.get("serverdatetime")
+        last_response_id = request.POST.get("server_primary")
+        res = []
+        responses = JsonAnswer.objects.filter(id__in=responses_ids).order_by('modified','id')
+        # if updatedtime and last_response_id: 
+        #     updated = convert_string_to_date(updatedtime)
+        #     updated = updated+ timedelta(hours=5)
+        #     updated = updated+ timedelta(minutes=30)
+        #     # responses = responses.filter(Q(submission_date__gt=updated)|Q(modified__gt=updated))
+        #     responses_list = responses.filter(Q(modified__gt=updatedtime)|Q(modified=updated,id__gt=last_response_id))
+        # elif last_response_id and updatedtime == '': # last response id will havee value and updatedtime will be blank only when calling the api for the deleted responses
+        #     responses_list = []
+        # else:
+        #     responses_list = responses  # initially api call will be without response id and modified date 
+        # responses_list = responses_list[:PAGE_SIZE]
+        # if responses_list: # first we will send all the responses that is present in the server 
+        #     responses_list = list(responses_list.values('active','modified').annotate(response_id=F('id')))
+        #     res = list(map(archive_response_dic , responses_list))
+        # else: # when we do not have any responses based on the modifed date  then we are sending all the deleted responses status 
+        sent_responses = np.array(responses_ids, dtype=int)
+        existing_responses = np.array(responses.values_list('id',flat=True), dtype=int)
+        deleted_responses = np.setdiff1d(sent_responses, existing_responses)
+
+        # if last_response_id and updatedtime == '':
+        #     deleted_responses = np.sort(deleted_responses[deleted_responses > int(last_response_id)])
+        deleted_responses = deleted_responses.tolist()
+        responses_list = deleted_responses[:PAGE_SIZE]
+        res = list(map(archive_deleted_dic , responses_list))
+            
+        res = {'status': 2,'message': "Success",'response_status':res}
+
+        return JsonResponse(res)
+    
+def archive_deleted_dic(obj):
+    data  = dict()
+    data['response_id']= obj 
+    data['active']= 11 
+    data['modified']= ''
+    return data

@@ -9,7 +9,8 @@ from application_master.models import (District, Donor, Menus, Mission,
                                        PartnerMissionMapping, Project,
                                        ProjectDonorMapping, ProjectFiles,
                                        State, UserPartnerMapping,
-                                       UserProjectMapping,MasterLookUp,BoundaryLevel,Boundary)
+                                       UserProjectMapping,MasterLookUp,
+                                       Boundary, BoundaryLevel)
 
 # @admin.register(BoundaryLevel)
 # @admin.register(Boundary)
@@ -276,3 +277,11 @@ class MasterLookUpAdmin(ImportExportModelAdmin, ImportExportFormat):
 #         admin.site.register(model)
 #     except admin.sites.AlreadyRegistered:
 #         pass
+
+# @admin.register(BoundaryLevel)
+# class AdminBoundaryLevel(ImportExportActionModelAdmin, admin.ModelAdmin):
+#     search_fields = ['name',]
+
+# @admin.register(Boundary)
+# class AdminBoundary(ImportExportActionModelAdmin, admin.ModelAdmin):
+#     search_fields = ['name',]
