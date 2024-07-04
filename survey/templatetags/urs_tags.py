@@ -1,7 +1,7 @@
 from django import template
 from constants import data
 from django.contrib.auth.models import User
-# from survey.models import BeneficiaryStatus, JsonAnswer
+from application_master.models import Menus
 # from userroles.models import Menus, RoleConfig, RoleTypes, UserRoles, UserRolesTheme
 # from projectmanagement.models import (LineitemTheme,ProjectTheme)
 # from beneficiary.models import BeneficiaryResponse,BeneficiaryLink
@@ -81,25 +81,30 @@ def get_request():
 @register.filter
 def has_permission_for_action(request, key):
  
-     
-    # 
-    # Check for the permission of user for the action of menu 
-    # 
-    
-    user = request.user or None
-    menu, permission_key = key.split('&')
-    # if menu == "users":
-    #     import ipdb;ipdb.set_trace()
-    success = False
-    if user is not None:
-        user_role = UserRoles.objects.get(user = user)
-        for role in user_role.role_type.all():
-            role_config = RoleConfig.objects.get(role = role,
-                        menu__slug = menu)
-            if getattr(role_config, permission_key):
-                success = True
-                break
+    try:
+        # 
+        # Check for the permission of user for the action of menu 
+        # 
+        
+        user = request.user or None
+        menu, permission_key = key.split('&')
+        success = False
 
+        if user is not None:
+            # user_role = request.session['menu_permission_data']
+            # for record in user_role:
+            #     if record.get(menu) and record.get(menu).get(permission_key):
+            #         success = True
+            #         break
+            user_role = User.objects.get(id = user.id)
+            for role in user_role.groups.all():
+                role_config = Menus.objects.get(group = role.id,active=2,
+                            slug = menu)
+                if role_config:
+                    success = True
+                    break
+    except:
+        success = False
     return success
 
 ### concatenate of two strings ###

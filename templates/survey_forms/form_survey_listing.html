@@ -236,13 +236,13 @@
                                 {% for json_answer in object_lists %}
                                     <tr class="odd font-size-16">
                                         {% for header_id in survey_heading_questions %}
-                                            {% if forloop.counter == 1 and not profile_obj and not main_add_button and options_dropdown.count > 0 %}
-                                                <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}><a href="/manage/profile/{{json_answer.creation_key}}/">{{json_answer|get_item_ans:header_id|safe}}</a></td>
+                                        {% comment %}{% if forloop.counter == 1 and not profile_obj and not main_add_button and options_dropdown.count > 0 %}
                                             {% elif forloop.counter == 1 and not profile_obj and not main_add_button  %}
-                                                <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}><a href="/manage/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/">{{json_answer|get_item_ans:header_id|safe}}</a></td>
+                                            <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}><a href="/manage/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/">{{json_answer|get_item_ans:header_id|safe}}</a></td>
                                             {% else %}
-                                                <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}>{{json_answer|get_item_ans:header_id|safe}}</td>
-                                            {% endif %}
+                                            <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}>{{json_answer|get_item_ans:header_id|safe}}</td>
+                                            {% endif %}{% endcomment %}
+                                                <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}><a href="/configuration//profile/{{json_answer.creation_key}}/">{{json_answer|get_item_ans:header_id|safe}}</a></td>
                                         {% endfor %}
                                         {% comment %}{% if profile_obj or not main_add_button and options_dropdown.count > 0  %}{% endcomment %}
                                             <td>
