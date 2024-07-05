@@ -610,7 +610,7 @@ def get_beneficiary_cluster_info(response_info, ben_aw_meta, ben_survey_in_outpu
             b1.response #>> ('{ address, 1,' || '"""+str(aw_meta.get("aw_qid"))+"""' || ',' ||'""" + str(aw_meta.get("location_level")) + """'|| '}' )::text[] as cluster_id,
             mbd.name as cluster_name
             from survey_jsonanswer b1
-            inner join application_master_district mbd on mbd.id::text = b1.response #>> ('{ address, 1,' ||'"""+str(aw_meta.get("aw_qid"))+"""'|| ',' ||'""" + str(aw_meta.get("location_level"))+"""' || '}')::text[]
+            inner join application_master_boundary mbd on mbd.id::text = b1.response #>> ('{ address, 1,' ||'"""+str(aw_meta.get("aw_qid"))+"""'|| ',' ||'""" + str(aw_meta.get("location_level"))+"""' || '}')::text[]
             where b1.survey_id = """ + str(survey_id) + """ and b1.id in (""" + ','.join(response_info.get(str(survey_id))) + """)"""
             # select b1.id as response_id,
             # b1.response #>> '{ address, 1, 940, 7}' as cluster_id, mbd.name as cluster_name
