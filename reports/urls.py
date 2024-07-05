@@ -1,5 +1,5 @@
 from django.urls import path
-from reports.views import custom_report, custom_report_reload, get_indicator,reports_listing, get_project,export_reportcsv,custom_report_csv
+from reports.views import custom_report, custom_report_reload, get_indicator,reports_listing, get_project,export_reportcsv,custom_report_csv,get_district
 
 app_name = "reports"
 urlpatterns = [
@@ -8,6 +8,7 @@ urlpatterns = [
     path('report/<page_slug>/', custom_report, name="custom_report"),
     path('ajax/custom_report_reload/<page_slug>/<report_slug>/', custom_report_reload, name="custom_report_reload"),
     path('ajax/report_indicator/', get_indicator, name="get_indicator"),
+    path('ajax/report_district/', get_district, name="get_district"),
     path('ajax/report_project/', get_project, name="get_project"),
     path('reports/custom-report-csv/<int:report_id>/',custom_report_csv),
 ]

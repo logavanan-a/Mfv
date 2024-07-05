@@ -19,10 +19,16 @@ import json
 import re
 import csv
 import logging
-from application_master.models import Mission,Project,Donor,Partner,MissionIndicator,MissionIndicatorCategory,UserPartnerMapping,UserProjectMapping,ProjectDonorMapping,PartnerMissionMapping
 from django.contrib.auth.models import User
 from datetime import datetime as dt
 from dashboard.models import *
+from application_master.models import (District, Donor, Menus, Mission,
+                                       MissionIndicator,
+                                       MissionIndicatorCategory,
+                                       MissionIndicatorTarget, Partner,
+                                       PartnerMissionMapping, Project,
+                                       ProjectDonorMapping, ProjectFiles,
+                                       State, UserPartnerMapping, UserProjectMapping)
 
 logger = logging.getLogger(__name__)
 # ****************************************************************************
@@ -788,6 +794,7 @@ def load_user_details_to_sessions(request):
 
 @ login_required(login_url='/login/')
 def get_indicator(request):
+    import ipdb;ipdb.set_trace()
     if request.method == 'GET' and request.is_ajax():
         selected_category = request.GET.get('selected_category', '')
         user_location_data = request.session['user_location_data'] if 'user_location_data' in request.session else None
@@ -801,6 +808,20 @@ def get_indicator(request):
         else:  # all indicators for category
             districts = MissionIndicator.objects.filter(category_id=int(
                 selected_category), active=2).order_by('name').values_list('id', 'name')
+        for district in districts:
+            result_set.append(
+                {'id': district[0], 'name': district[1], })
+        return HttpResponse(json.dumps(result_set))
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
+@ login_required(login_url='/login/')
+def get_district(request):
+    import ipdb;ipdb.set_trace()
+    if request.method == 'POST':
+        selected_projects = request.POST.get('selected_projects[]', '')
+        district_ids = Project.objects.filter(id = int(selected_projects),active=2).values_list('district_id',flat=True) 
+        districts = District.objects.filter(id__in=district_ids,active=2).order_by('name').values_list('id', 'name')
+        result_set = []
         for district in districts:
             result_set.append(
                 {'id': district[0], 'name': district[1], })
@@ -950,15 +971,26 @@ def get_report_query(request, widget_obj, page_id,rows_per_page, locations_list,
         state_filter = ' and filter_state_id = ' + str(state_id) + ' '
     sql_query = sql_query.replace("@@state_filter", state_filter)
 
-    # if rows_per_page and page_id and widget_obj.query_type == 'SQL':
-    #     if filter_to_date and filter_from_date:
-    #         query = " and date(ss.created) >= '"+str(filter_from_date)+"' and date(ss.created) <= '"+str(filter_to_date)+"'"
-    #         # sql_query = sql_query + ' where ' + query 
-    #         sql_query = sql_query.replace("@@date_filter",query) 
-    #     sql_query = sql_query + ' LIMIT ' + str(rows_per_page)
-    #     sql_query = sql_query + ' OFFSET ' + str(((page_id - 1) * rows_per_page))
-    # print(sql_query,'get_report_query')
     return sql_query
+
+def load_user_details(request):
+    user = request.user
+    if user is not None:
+        if user.groups.filter(name__in = ['Partner Data Entry Operator','Partner Admin','Project In-charge']).exists():# project incharge
+            user_project=UserProjectMapping.objects.filter(user=request.user,active=2)
+            user_project_ids = user_project.values_list('project__id',flat=True)
+        elif user.is_superuser:
+            user_mission_id=Mission.objects.filter(active=2).values_list('id',flat=True)
+            user_project_ids=Project.objects.filter(active=2).values_list('id',flat=True)
+        user_district_ids = Project.objects.filter(id__in = user_project_ids).values_list('district_id',flat=True)
+        request.session['user_mission_list']=list(user_mission_id)
+        request.session['user_project_list']=list(user_project_ids)
+        request.session['user_district_list']=list(user_district_ids)
+    return request
+
+
+
+
 
 
 @login_required(login_url='/login/')
@@ -970,38 +1002,21 @@ def export_reportcsv(request,slug):
     today = datetime.today()
     today_month = month_dict['{:02d}'.format(today.month)]
     today_year = today.year
-    filters_cond = True
-    # projectlist = user_projects(request.user)
-    # user_boundary_levelcode = UserRoles.objects.get(user=user)
-    # project_list = OrganizationLocation.objects.filter(user=1208).values_list('project',flat=True)
-    # projectlist = Project.objects.filter(id__in=ProjectUserRelation.objects.filter(user=1208)).values("id","name")
-    # project_list = list(set(list(project_list)+list(projectlist)))
-    # theme_list = Theme.objects.filter(active=2)
-    # levels_to_filter = BoundaryLevel.objects.filter(code__gte=2, code__lte=5).order_by('code')
-    # if levels_to_filter:
-    #         first_level_options = get_first_level_options(request, levels_to_filter, None)
-    # if user_setup().get('reports') == 2:
-    #     filters_cond = False
-    # allfilters = True if user_setup().get("all-filters") == 2 else False
+    filters_cond = False
+    user_details = load_user_details(request)
+    # if 'user_project_list' in request.session:
+    #     project_ids = request.session['user_project_list']
+    # projectlist = Project.objects.filter(id__in=project_ids).values("id","name")
+    # levels_to_filter = BoundaryLevel.objects.filter(code__gte=2, code__lte=2).order_by('code')
+    # import ipdb;ipdb.set_trace()
     location_id, from_date, to_date, frm, to = None, None, None, None, None
-    # from_to_filters = True if slug in user_setup().get("provide-from-to-filters",[]) else False
-
     filter_from_date = request.GET.get('from_date','') 
     filter_to_date = request.GET.get('to_date','')
     #frontend purpose we are adding one more varaibale
-    from_date_filter = request.GET.get('from_date','')
-    to_date_filter = request.GET.get('to_date','')
-    theme_filter = request.GET.getlist('theme','')
     search_filter = request.GET.get('search_box','')
     # filter_locations = get_location_filters(request)
     export_request = False
     media_url = settings.EXPORT_MEDIA_URL
-    # if export and export == 'true':
-    #     export_request = True
-
-    # state_id, region_id, district_id, cluster_id ,block_id = None, None, None, None, None
-    # filter_locations = (state_id, district_id, block_id)
-
     filter_locations = {}
     page_id, rows_per_page = 0, 10
     page_id = int(request.GET.get('page',0))
@@ -1032,36 +1047,12 @@ def export_reportcsv(request,slug):
                 project_list_id = (str([eval(i) for i in project_list_str]))[1:-1]
                 filter_from_date = filter_to_date = ''
                 sql_query = get_report_query(request , widget_obj ,page_id,rows_per_page, filter_locations, filter_from_date, filter_to_date,location_id)
-                if request.GET.getlist('theme'):
-                    theme_list_str = request.GET.getlist('theme')
-                    theme_list_id = (str([eval(i) for i in theme_list_str]))[1:-1]
-                    sql_query = sql_query.replace('@@searchfilter',f"and pp.id in ({project_list_id}) and plt.project_theme_id in ({theme_list_id}) and 1=1")
-                else:
-                    sql_query = sql_query.replace('@@searchfilter',f"and pp.id in ({project_list_id}) and 1=1")
+                sql_query = sql_query.replace('@@searchfilter',f"and pp.id in ({project_list_id}) and 1=1")
                 url_filter_params = ""
-                state_obj = Project.objects.filter(id__in = request.GET.getlist('Project')).values_list('state',flat=True)
-                level_2 = Boundary.objects.filter(active=2,id__in=state_obj)
-                level_options = {"District":level_2} 
-                location_values = {}
-            
-                temp_val = []
-                filters = request.GET.dict()
-                filters.pop('search_box',None)
-                for idx,key in enumerate(levels_to_filter):
-                    locations = request.GET.getlist(key.name,[''])
-                    if locations[0] != '':
-                        for loc in locations:
-                            url_filter_params += f'{key.name}={loc}&'
-                        location_values.update({key.name:','.join(locations)})
-                        level_2 = Boundary.objects.filter(active=2,parent_id__in=temp_val)
-                        if level_2:
-                            level_options.update({key.name:level_2})
-                        temp_val = locations  
-                        # next_value = request.GET.getlist(levels_to_filter.get(idx+1).name) 
-                        if levels_to_filter.count() > idx+1 and levels_to_filter[idx+1] and not request.GET.getlist(levels_to_filter[idx+1].name) :
-                            level_options.update({levels_to_filter[idx+1].name: Boundary.objects.filter(active=2,parent__id__in=level_options.get(key.name))})
-                    # first_level_options = get_first_level_options(request, levels_to_filter, None)    
-                    # url_filter_params = url_filter_params_1+url_filter_params_2
+                if 'user_district_list' in request.session:
+                    district_ids = request.session['user_district_list']
+                level_2 = Boundary.objects.filter(active=2,code__in=district_ids)
+                level_options = {"District":level_2}
             if request.GET.get('search_box'):
                 sql_query = sql_query.replace('@@searchfilter',"and upper(ss.name) like \'%"+request.GET.get('search_box').upper()+"%\' and 1=1")
             else:

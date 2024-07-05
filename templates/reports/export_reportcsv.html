@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-{% load static %} 
+{% load static %}
+{% load report_tags %}
 {% block contents %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -39,6 +40,13 @@
                     {% if from_to_filters == True %}
                     <div class="col-md-4">
                             <div class="row">
+                                <!-- <div class="datetime_picker">
+                                    
+                                    <input type="text" name="from_date" title="Select From Date" class = "datepicker form-control" id="id_start_date" value="{% if filter_from_date %}{{filter_from_date}}{% endif %}" placeholder="From Date " autocomplete="off">
+                                </div>
+                                <div class="datetime_picker">
+                                   <input type="text" name="to_date" title="Select To Date" class = "datepicker form-control" id="id_end_date" placeholder="To Date" value="{% if filter_to_date %}{{filter_to_date}}{% endif %}" onclick="myFunction()" autocomplete="off">
+                                </div> -->
 
 
                                 <button id='#load_form' class="btn btn-rose btn-sm" style="float: left; top: 12px;"> Go </button>
@@ -59,7 +67,13 @@
                      {% endif %}
                      
                         <div class='col-md-8'  style=" float:right;  width: auto;margin-top: 12px; ">
+                           
                        
+                        <!-- {%if report_slug != 'export-reports'%}
+                        <a href="/reports/{{report_slug}}/?export=true{% if report_slug %}&report_slug={{report_slug}}{%endif%}" >
+                            <button class="btn btn-sm btn-info" style="float: right;">Export <div class="ripple-container"></div></button>
+                        </a>
+                        {%endif%} -->
                     </div>
                     
 
@@ -78,11 +92,20 @@
                             <form type="get" action="." style="margin: 0">
                                 {%if widget_obj.slug != 'benificiary-data' and widget_obj.slug != 'custom-report' %}
                                 <!-- date filetr start-->
+                                <!-- <div class="col-lg-4">
+                                    <div class="datetime_picker">
+                                        <input type="text" name="from_date" title="Select From Date" class = "datepicker form-control" id="id_start_date" value="{% if filter_from_date %}{{filter_from_date}}{% endif %}" placeholder="From Date" autocomplete="off">
+                                    </div>
+                                    <div class="datetime_picker">
+                                       <input type="text" name="to_date" title="Select To Date" class = "datepicker form-control" id="id_end_date" placeholder="To Date" value="{% if filter_to_date %}{{filter_to_date}}{% endif %}" onclick="myFunction()" autocomplete="off">
+                                    </div>
+                                </div> -->
                                     <div class="col-md-6 " style="display: none;" id = 'search_button'>
                                         <div class="col-md-6 p-1" >
                                             <input class="form-control col-md-6" data-width="50%" id="search_box" type="text" name="search_box"  placeholder="Search..." >
                                         </div>
                                         <div class="p-1">
+                                            <!-- <button id="search_submit" type="submit" onclick="checkLength()" >Submit</button> -->
                                             <button class="btn btn-primary btn-sm" id="search_submit" type="submit" >Search</button>
                                             <a href="/reports/exportcsv/{{report_slug}}/" class="btn btn-danger btn-sm btn_load"> Reset </a>
                                             
@@ -92,8 +115,59 @@
 
                                     <div class="d-flex flex-wrap">
 
-                                       
+                                        <!-- <div class="p-1 col-12 col-md-6">
+                                            <spen>Activity Date(From) :</spen>
+                                            <input type="date" name="from_date"  onfocus="this.max=new Date().toISOString().split('T')[0]" title="Select From Date" class = "form-control" id="id_start_date" value="{% if from_date_filter %}{{from_date_filter}}{% endif %}" placeholder="From Date" autocomplete="off">
+                                        </div>
+                                        
+                                        <div class="p-1 col-12 col-md-6">
+                                            <spen>Activity Date(To) :</spen>
+                                           <input type="date" name="to_date"  onfocus="this.max=new Date().toISOString().split('T')[0]"  title="Select To Date" class = "form-control" id="id_end_date" placeholder="To Date" value="{% if to_date_filter %}{{to_date_filter}}{% endif %}" onclick="myFunction()" autocomplete="off">
+                                        </div> -->
                                     </div>
+
+                                <!-- date filetr end -->
+
+                                <!-- flatpicker date -->
+
+                                <!-- flatpicker date end -->
+                                <!-- Theme filter start-->
+                                 <!-- <div class="col-md-6" id="div_{{level.code}}">
+                                    <div class="">
+                                        <div class="form-group label-floating select_group">
+                                            <spen>Themes</spen>
+                                            <select class="selectpicker" data-style="select-with-transition" name="theme" id="id_theme" data-live-search="true" multiple>
+                                                <option value="">Select Themes</option>
+                                                {% for theme in theme_list %}
+                                                    <option value="{{project.id}}">{{theme.name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div> -->
+                                
+                                <!--theme filter end-->
+                                <!-- project filter start-->
+                                
+                                <!-- <div class="col-md-6" id="div_{{level.code}}">
+                                    <div class="">
+                                        <div class="form-group label-floating select_group">
+                                            <spen>Projects</spen>
+                                            <select class="selectpicker" data-style="select-with-transition" name="Project" id="id_project" data-live-search="true" multiple="multiple" >
+                                                <option value="">Select Projects</option>
+                                                {% for project in projectlist %}
+                                                    <option value="{{project.id}}" {% if project.id in project_list_id  %}selected{% endif %}>{{project.id}}_{{project.name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div> 
+                                    </div>
+                                </div> -->
+                                
+                                <!-- project filter end-->
+                                
+                                
+                                
+
                                 <!-- location  filter start  -->
                                 {% if levels_to_filter %}
                                     <div class="filter_class d-flex flex-wrap">
@@ -130,7 +204,11 @@
                                                 <div class="">
                                                     <div class="form-group label-floating select_group">
                                                         <spen>{{level.name}}</spen>
-                                                        
+                                                        <select class="selectpicker select2" data-width="100%"   data-style="select-with-transition" name="{{level.name}}" id="id_{{level.code}}" data-live-search="true" next-level="{% if level.get_next_level %}{{level.get_next_level.code}}{% endif %}" {% if first_level_options|length == -1 and forloop.counter == 1  %}disabled{% endif %} level-to-hide="{{level.next_levels|safe}}" multiple>
+                                                            {% for boundary in level_options|get_item:level.name %}
+                                                                <option value="{{boundary.id}}" {% if boundary.id|slugify in location_values|get_item:level.name %}selected{% endif %}>{{boundary.name}}</option>
+                                                            {% endfor %}
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
@@ -142,10 +220,16 @@
                             {%endif%}
                                 
                                         <div class="col-6 col-md-6 mt-md-4">
-                                            <div class="d-flex justify-content-between" >
+                                            <!-- <div class="d-flex justify-content-between" >
                                                 {%if widget_obj.slug not in "'custom-report','benificiary-data'" %}
-                                                
-                                                {%endif%}
+                                                <div class="p d-flex" style="position: relative; left:10px; top: 8.5px !important; gap:10px"> -->
+                                                    <!-- <input  id="search_box" type="text" name="search_box"  placeholder="Search..." > -->
+                                                    <!-- <button id="search_submit" type="submit" onclick="checkLength()" >Submit</button> -->
+                                                    <!-- <button id="search_submit" class="btn btn-primary btn-sm " type="submit" >Submit</button>
+                                                    <a href="/reports/exportcsv/{{report_slug}}/" class="btn btn-danger btn-sm btn_load"> Reset </a>
+        
+                                                </div>
+                                                {%endif%} -->
                                                 
                                             </div>
                                         </div>
