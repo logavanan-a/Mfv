@@ -660,3 +660,102 @@ class ProgramRetreiveLinkages(CreateAPIView):
                     "linkages": []
                 })    
 
+
+
+@method_decorator(login_required, name='dispatch')
+class SurveyResponseDataImport(View):
+    template_name = 'survey_forms/survey_list_data_import.html'
+    
+    def get(self, request, *args, **kwargs):
+        surveys = Lineitem.objects.filter(active=2,activity__active=2,project__active=2).exclude(activity__capture_level_type=2).distinct('activity_id').select_related('activity','project').order_by("activity_id","activity__survey_order")
+        project_theme = dict(ProjectTheme.objects.filter(active=2).values_list('project_id','project_theme__name'))
+        beneficiaries = dict(BeneficiaryType.objects.filter(active=2).values_list('id','name'))
+        survey_beneficiaries,location_level = {},{}
+        boundary_level_dict = {str(obj.id):obj for obj in BoundaryLevel}
+        
+        for i in surveys:
+            if i.activity.survey_type == 0:
+                survey_beneficiaries[i.activity_id] = beneficiaries.get(i.activity.object_id)
+            elif i.activity.survey_type == 1:
+                for j in i.activity.config:
+                    for key in j.keys():
+                        indexvalue = key.split('_')[-1]
+                        if j[key] == "BeneficiaryType":
+                            survey_beneficiaries[i.activity_id] = beneficiaries.get(int(j.get('object_id_' + indexvalue)))
+
+                        if j[key] == "BoundaryLevel":
+                            level = boundary_level_dict.get(j.get('object_id_'+indexvalue))
+                            if not level:
+                                for obj_id, obj in boundary_level_dict.items():
+                                    if str(obj.code) == j.get('object_id_'+indexvalue):
+                                        level = obj
+                                        break
+                            location_level[i.activity_id] = level
+
+        search_txt = request.GET.get('s')
+        if search_txt:
+            surveys = surveys.filter(activity__name__icontains = search_txt)
+        object_list = get_pagination(request, surveys)
+        return render(request,self.template_name,locals())
+
+
+
+@method_decorator(login_required, name='dispatch')
+class ImportResponses(View):
+    template_name = 'survey_forms/add_responses_files.html'
+    max_file_size = RESPONSE_IMPORT['MAX_FILE_SIZE']
+    max_file_size_in_mb = max_file_size / 1024 / 1024
+    def get(self, request, pk):
+        # TODO: need to create a excel file for format create
+        format_file = f"/media/response_file_format/survey_{pk}_format.xlsx"
+        surveys = load_data_to_cache_survey()
+        survey_name = surveys.get(str(pk),{}).get('name','-')
+        uploaded_responses_list = ResponseImportFiles.objects.filter(active=2,content_type_id=54, object_id=pk).order_by('-created')
+        object_list = get_pagination(request, uploaded_responses_list)
+        return render(request,self.template_name,locals())
+
+    def post(self, request, pk):
+        file = request.FILES.get('file')
+        timestamp_str = datetime.datetime.now().strftime("%Y%b%d%H%M%S")
+        file_name_without_extension = file.name.split('.')[0] 
+        # TODO: need to create a excel file for format create
+        format_file = f"media/response_file_format/survey_{pk}_format.xlsx"
+        # import ipdb;ipdb.set_trace()
+        # Check file size
+        if file.size > self.max_file_size:
+            messages.error(request, "File has been rejected. Please check file size and try again.")
+            return render(request, self.template_name, locals())
+        
+        # Validate Excel file format and headers
+        if not (self.validate_excel_file(file) and self.check_header_equality(request,file, MEDIA_ROOT + format_file,pk)):
+            messages.error(request, "File has been rejected. Please check file format and try again.")
+            return render(request, self.template_name, locals())
+        
+        # Read Excel file
+        df = pd.read_excel(file)
+        if df.empty:
+            messages.error(request, "Please ensure that the file contains data and try again.")
+            return render(request, self.template_name, locals())
+
+        # Perform custom validation
+        df = questions_validation(df, pk)
+        if 'Error Message' in df.columns and df['Error Message'].notnull().any():
+            # Prepare error Excel file
+            excel_buffer = BytesIO()
+            df.to_excel(excel_buffer, index=False)
+            excel_buffer.seek(0)
+            response = HttpResponse(excel_buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = f'attachment; filename={file_name_without_extension}_{timestamp_str}.xlsx'
+            return response
+            
+        # Save response details
+        ResponseImportFiles.objects.update_or_create(content_type_id=54, object_id=pk, user_id=request.user.id,
+                                                        status__in=['Uploaded'],
+                                                        defaults={
+                                                            "response_image": request.FILES.get('file'),
+                                                            "status": "Uploaded",
+                                                            "modified": datetime.datetime.now(),
+                                                            "error_details": "",
+                                                        })
+        messages.success(request, "File has been uploaded successfully.")
+        return render(request,self.template_name,locals())

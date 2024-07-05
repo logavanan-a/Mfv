@@ -17,4 +17,7 @@ urlpatterns = [
     path('import-modified-questions/<int:pk>/',ImportMQuestions.as_view()),
     path('survey/program-linkages/', ProgramRetreiveLinkages.as_view()),
 
+    # data import feature
+    path('activity/import/', SurveyResponseDataImport.as_view()),
+    path('activity/import-responses/<int:pk>/',ImportResponses.as_view()),
 ]
