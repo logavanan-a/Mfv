@@ -10,8 +10,9 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 import pandas as pd
 from django.shortcuts import render,HttpResponse,HttpResponseRedirect
-import bleach
+import bleach,os
 from rest_framework.response import Response
+from cache_configuration.views import load_data_to_cache_survey,load_data_to_cache_questions,load_data_to_cache_boundary_level
 
 pg_size = settings.REST_FRAMEWORK.get('PAGE_SIZE')
 
@@ -703,7 +704,7 @@ class SurveyResponseDataImport(View):
 @method_decorator(login_required, name='dispatch')
 class ImportResponses(View):
     template_name = 'survey_forms/add_responses_files.html'
-    max_file_size = RESPONSE_IMPORT['MAX_FILE_SIZE']
+    max_file_size = settings.RESPONSE_IMPORT['MAX_FILE_SIZE']
     max_file_size_in_mb = max_file_size / 1024 / 1024
     def get(self, request, pk):
         # TODO: need to create a excel file for format create
@@ -759,3 +760,61 @@ class ImportResponses(View):
                                                         })
         messages.success(request, "File has been uploaded successfully.")
         return render(request,self.template_name,locals())
+
+
+def generate_excel(request,pk):
+    # Define your headers
+    unique_ids = settings.RESPONSE_IMPORT['unique_id']
+    headers = ['Generation Key','Project']
+    survey_questions = load_data_to_cache_questions()
+    cache_surveys = load_data_to_cache_survey()
+    survey = cache_surveys.get(str(pk))
+    if survey.get('data_entry_level_id') == 1 or not bool(survey.get('survey_type')) : #Location based activity or Beneficiary survey
+        boundary_levels = load_data_to_cache_boundary_level()
+        # boundary_levels = list(BoundaryLevel.objects.filter(active=2).order_by('code').values_list('name',flat=True))
+        headers.extend([i[2] for i in boundary_levels])
+    
+    questions = list(Question.objects.filter(block__survey_id=pk).exclude(active=0).order_by('code').values('id','qtype','text','api_json','parent_id','is_grid'))
+    headers.extend([i['text'] for i in questions if (i["qtype"] not in ["GD","AI"]) and (not i['parent_id'] )])    
+    # for i in questions:
+    #     if (i["qtype"] not in ["GD","AI"]) and (not i['parent_id'] ):
+    #         headers.append(i['text'])
+
+    api_question = list(filter(lambda x: x['qtype'] in ['AI'],questions))
+    if api_question and api_question[0].get('api_json',{}).get('lname_que_id'):
+        lname_que_id = api_question[0].get('api_json',{}).get('lname_que_id').split(',')
+        parent_question = survey_questions.get(lname_que_id[0])
+        parent_survey_id = parent_question.get('survey_id')
+        unique_id = unique_ids.get(str(parent_survey_id))
+        headers.append(survey_questions.get(unique_id,{}).get('text'))
+    
+    gd_question = list(filter(lambda x: x['qtype'] in ['GD'],questions))
+    for qu in gd_question:
+        gd_child_question = list(filter(lambda x: x['parent_id'] == qu['id'],questions))
+        headers.extend([f"{qu['text']}--{i['text']}.{j['text']}" for i in gd_child_question if i['is_grid'] for j in gd_child_question if not j['is_grid']])
+
+
+    # Create a DataFrame with the headers
+    df = pd.DataFrame(columns=headers)
+
+    # Specify the path to save the file
+    folder_path = os.path.join(settings.MEDIA_DIR, 'response_file_format')
+    file_path = os.path.join(folder_path, f'survey_{pk}_format.xlsx')
+
+    # Ensure the directory exists
+    os.makedirs(folder_path, exist_ok=True)
+
+    # Save the file to the specified directory
+    with pd.ExcelWriter(file_path, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Sheet1')
+
+    # Create a response object and specify content type
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="survey_{pk}_format.xlsx"'
+
+    # Use pandas to write the DataFrame to the response
+    with pd.ExcelWriter(response, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Sheet1')
+
+    return response
+    

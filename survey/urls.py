@@ -18,6 +18,7 @@ urlpatterns = [
     path('survey/program-linkages/', ProgramRetreiveLinkages.as_view()),
 
     # data import feature
-    path('activity/import/', SurveyResponseDataImport.as_view()),
-    path('activity/import-responses/<int:pk>/',ImportResponses.as_view()),
+    path('manage/generate-excel/<pk>/', generate_excel, name='generate_excel'),
+    path('manage/activity/import/', SurveyResponseDataImport.as_view()),
+    path('manage/activity/import-responses/<int:pk>/',ImportResponses.as_view()),
 ]
