@@ -422,7 +422,7 @@ def get_latest_survey_versions(user_id):
                                     "child_datacollection_ids": ','.join(map(str, child_survey)) if child_survey else '',
                                     "survey_categories": [{'id': i.categories.id, 'name': i.categories.name}] if i.categories else [],
                                     "search_filter":search_filter,
-                                    "survey_json":i.extra_config ,
+                                    "survey_json":[i.extra_config] ,
                                     "add": status,
                                     "is_activist_group": 1 if i.survey_module == 2 else 0,
                                     "activity_expenses":i.extra_config.get('activity_expenses',True) if i.extra_config else True,
