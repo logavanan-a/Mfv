@@ -13,7 +13,7 @@ import os,re
 from datetime import datetime, timedelta
 from django.db.models import Q
 from django.apps import apps
-from survey.serializers import LabelLanguageTranslationSerializer
+from survey.serializers import LabelLanguageTranslationSerializer,MonthlyDashboardSerializer
 from survey.capture_sur_levels import convert_string_to_date
 import pytz
 # from configuration_settings.user_location_views import user_responses
@@ -30,6 +30,7 @@ from django.conf import settings
 from collections import defaultdict
 from cache_configuration.views import *
 import logging
+from dashboard.models import MonthlyDashboard,Remarks
 
 logger = logging.getLogger(__name__)
 
@@ -1456,3 +1457,28 @@ def archive_deleted_dic(obj):
     data['active']= 11 
     data['modified']= ''
     return data
+
+
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.settings import api_settings
+from rest_framework import status
+
+class MonthlyDashboardData(g.GenericAPIView):
+    queryset = MonthlyDashboard.objects.filter(active=2)
+    serializer_class = MonthlyDashboardSerializer
+
+    def get_success_headers(self, data):
+        try:
+            return {'Location': str(data[api_settings.URL_FIELD_NAME])}
+        except (TypeError, KeyError):
+            return {}
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        serializer.save(submitted_by=request.data.get('user_id'))
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    # def perform_create(self, serializer):
