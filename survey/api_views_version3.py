@@ -54,8 +54,9 @@ def new_responses_list_v3(request):
             # user_boundary = list(user_role.get_poject_based_location())
             # loc_list = [str(i) for i in user_boundary]
             # loc_list=[]
-            loc_list = list(UserProjectMapping.objects.filter(active=2, user_id=user_id).values_list('project__district_id', flat=True).distinct())
-            loc_list = list(map(str,loc_list))
+            district_loc_list = list(UserProjectMapping.objects.filter(active=2, user_id=user_id).values_list('project__district_id', flat=True).distinct())
+            loc_list_str = list(map(str,district_loc_list))
+            loc_list = Boundary.objects.filter(active=2,code__in = loc_list_str,boundary_level_type_id=2).values_list('id',flat=True)
             cache_set_with_namespace('RESPONSE_SURVEY_V3', loc_list_cache_key, loc_list, 14400)
             logger.info("## TIME-TRACKER UserID-loc_list::" + str(user_id) + " : " + str(loc_list))
         if len(loc_list) > 0:
@@ -609,7 +610,7 @@ def get_beneficiary_cluster_info(response_info, ben_aw_meta, ben_survey_in_outpu
             b1.response #>> ('{ address, 1,' || '"""+str(aw_meta.get("aw_qid"))+"""' || ',' ||'""" + str(aw_meta.get("location_level")) + """'|| '}' )::text[] as cluster_id,
             mbd.name as cluster_name
             from survey_jsonanswer b1
-            inner join application_master_district mbd on mbd.id::text = b1.response #>> ('{ address, 1,' ||'"""+str(aw_meta.get("aw_qid"))+"""'|| ',' ||'""" + str(aw_meta.get("location_level"))+"""' || '}')::text[]
+            inner join application_master_boundary mbd on mbd.id::text = b1.response #>> ('{ address, 1,' ||'"""+str(aw_meta.get("aw_qid"))+"""'|| ',' ||'""" + str(aw_meta.get("location_level"))+"""' || '}')::text[]
             where b1.survey_id = """ + str(survey_id) + """ and b1.id in (""" + ','.join(response_info.get(str(survey_id))) + """)"""
             # select b1.id as response_id,
             # b1.response #>> '{ address, 1, 940, 7}' as cluster_id, mbd.name as cluster_name

@@ -13,7 +13,7 @@ import os,re
 from datetime import datetime, timedelta
 from django.db.models import Q
 from django.apps import apps
-from survey.serializers import LabelLanguageTranslationSerializer
+from survey.serializers import LabelLanguageTranslationSerializer,MonthlyDashboardSerializer
 from survey.capture_sur_levels import convert_string_to_date
 import pytz
 # from configuration_settings.user_location_views import user_responses
@@ -30,6 +30,7 @@ from django.conf import settings
 from collections import defaultdict
 from cache_configuration.views import *
 import logging
+from dashboard.models import MonthlyDashboard,Remarks
 
 logger = logging.getLogger(__name__)
 
@@ -422,7 +423,7 @@ def get_latest_survey_versions(user_id):
                                     "child_datacollection_ids": ','.join(map(str, child_survey)) if child_survey else '',
                                     "survey_categories": [{'id': i.categories.id, 'name': i.categories.name}] if i.categories else [],
                                     "search_filter":search_filter,
-                                    "survey_json":survey_json ,
+                                    "survey_json":[i.extra_config] ,
                                     "add": status,
                                     "is_activist_group": 1 if i.survey_module == 2 else 0,
                                     "activity_expenses":i.extra_config.get('activity_expenses',True) if i.extra_config else True,
@@ -1456,3 +1457,28 @@ def archive_deleted_dic(obj):
     data['active']= 11 
     data['modified']= ''
     return data
+
+
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.settings import api_settings
+from rest_framework import status
+
+class MonthlyDashboardData(g.GenericAPIView):
+    queryset = MonthlyDashboard.objects.filter(active=2)
+    serializer_class = MonthlyDashboardSerializer
+
+    def get_success_headers(self, data):
+        try:
+            return {'Location': str(data[api_settings.URL_FIELD_NAME])}
+        except (TypeError, KeyError):
+            return {}
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        serializer.save(submitted_by=request.data.get('user_id'))
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    # def perform_create(self, serializer):
