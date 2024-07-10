@@ -11,8 +11,25 @@ import datetime
 # from reports.activity_reports import  load_user_details_to_session
 import re
 import pandas
+from reports.views import load_user_details
+from application_master.models import (District, Donor, Menus, Mission,
+                                       MissionIndicator,
+                                       MissionIndicatorCategory,
+                                       MissionIndicatorTarget, Partner,
+                                       PartnerMissionMapping, Project,
+                                       ProjectDonorMapping, ProjectFiles,
+                                       State, UserPartnerMapping, UserProjectMapping,Boundary)
 
 logger = logging.getLogger(__name__)
+
+def return_sql_results(sql):
+    """
+    Executes an SQL query and returns the result rows.
+    """
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    rows = cursor.fetchall()
+    return rows
 
 def execute_query(conn,sql_query, typ):
     cursor = conn.cursor()
@@ -43,6 +60,23 @@ def download_file(request):
     from django.core.files.storage import FileSystemStorage
     survey_id = request.GET.get('survey_id')
     project_id = [str(i) for i in request.GET.getlist('project_id[]') if i != '' ]
+    partner_id = [str(i) for i in request.GET.getlist('partner_id[]') if i != '' ]
+    school_id = [str(i) for i in request.GET.getlist('schools_id[]') if i != '' ]
+    district_ids , school_cluster_benresponse_ids = '',''
+    user_details = load_user_details(request)
+    if 'user_partner_list' in request.session:
+        partner_id = request.session['user_partner_list']
+    # partnerlist = Partner.objects.filter(id__in=partner_ids).values("id","name")
+    if 'user_district_list' in request.session:
+        district_ids = request.session['user_district_list']
+    # if partner_id:
+    #     project_district_ids = Project.objects.filter(partner_mission_mapping__partner_id__in = partner_id,active = 2).values_list('district_id',flat=True)
+    #     district_ids = Boundary.objects.filter(active=2,boundary_level_type_id=2,code__in=[str(dist) for dist in project_district_ids]).values_list('id',flat=True)
+    #     district_ids = set(district_ids)
+    if school_id:
+        school_cluster_benresponse_ids = return_sql_results(f"""select distinct(creation_key) from survey_jsonanswer where survey_id = 2 and response->>'237' in ({str(school_id)[1:-1]}) """)
+        school_cluster_benresponse_ids = [ben_id[0] for ben_id in school_cluster_benresponse_ids]
+    # request.session['user_district_list']=[dist[0] for dist in district_id_list]
     add_2 = [i for i in request.GET.getlist('district[]') if i != '' ]
     add_3 = [i for i in request.GET.getlist('block[]') if i != '']
     add_4 = [i for i in request.GET.getlist('grampanchayat[]') if i != '']
@@ -65,7 +99,7 @@ def download_file(request):
             #TODO If Location filters are selected then query else return the comple dump file from survey report file_name
             # import ipdb;ipdb.set_trace()
             # filter_locations = load_user_details_to_session(request)
-            if not project_id:
+            if not partner_id:
                 file_name = survey.report_filename
                 path = settings.MEDIA_ROOT +"/export_data/" 
             else:
@@ -74,8 +108,8 @@ def download_file(request):
                 s_name = s_name.replace(" ","_")
                 s_name = re.sub("[^A-Za-z0–9_]","",s_name)
                 file_name = s_name + "-" + "{0}-{1}-{2}.xlsx".format(today.year,today.month,today.day)
-                export_excel(request,survey_id, file_name,filter_loc_values ,date_filter,project_id)
-                path = settings.MEDIA_ROOT +"/media/temp_export_data/"
+                export_excel(request,survey_id, file_name,filter_loc_values ,date_filter,district_ids,school_cluster_benresponse_ids)
+                path = settings.MEDIA_ROOT +"/temp_export_data/"
                 #delete only from temp folder - which stores the user related files generated at runtime
                 delete_path = path
                 delete_file_name = file_name
@@ -115,7 +149,6 @@ def delete_file(filename_with_path):
 
 # get the filter values for user location level - masterdata_boundary IDs mapped to the user
 def get_filter_values(request,loc_filter_column_map):
-    # import ipdb;ipdb.set_trace()
     filter_values_data = {}
     filter_locations = load_user_details_to_session(request)
     filter_values = []
@@ -127,37 +160,33 @@ def get_filter_values(request,loc_filter_column_map):
     return filter_values_data
 
 
-# def build_query(table_name, columns_list, headers_list,filter_values):
-#     columns_clause = ' '.join('{} as "{}",'.format(col_name, header_val) for col_name, header_val in zip(columns_list, headers_list))
-#     where_clause = ""
-#     for loc_column, loc_value in filter_values:
-#         where_clause += '{} = {} and'.format(loc_column,loc_value)
-#     sql_query = "select " + columns_clause[:-1] + " from " + table_name
-#     if where_clause == "":
-#         #remove the final " and" from the where_clause
-#         sql_query = sql_query + " where " + where_clause[:-4]
-
-# function to create query for the inline tables that include 
-def build_query(request, table_name, columns_list, headers_list, filter_values, date_filter,main_table_name,survey_id,project_id):
+def build_query(request, table_name, columns_list, headers_list, filter_values, date_filter,main_table_name,survey_id,district_ids,school_cluster_benresponse_ids):
     columns_clause = ' '.join('"{}" as "{}",'.format(col_name, header_val) for col_name, header_val in zip(columns_list, headers_list))
-    where_clause = ""
+    survey_type = Survey.objects.filter(id=survey_id,active=2).values('survey_type')
+    district_conditions,school_cluster_benresponse_conditions = "" , ""
+    where_clause = " 1=1 "
+    if district_ids != '':
+        district_conditions = f' and "address.2__id__"::int in ({str(district_ids)[1:-1]}) '
+    if school_cluster_benresponse_ids != '':
+        school_cluster_benresponse_conditions = f' and "cluster.BeneficiaryResponse" in ({str(school_cluster_benresponse_ids)[1:-1]}) '
+    where_clause += district_conditions + school_cluster_benresponse_conditions
     sql_query = ""
     # for loc_column, loc_value in filter_values.items():
     #     if loc_value != None:
     #         where_clause += '"{}" = {} and'.format(loc_column,loc_value)
-    if project_id:
-        where_clause = '"cluster.project_id"::integer in (' + ','.join(project_id) + ') and ' 
-    from_date = date_filter['from_date']
-    to_date = date_filter['to_date']
-    if from_date != '' and  to_date != '':
-        where_clause +=f"to_date(\"{columns_list[-1]}\",'YYYY-MM-DD') >= '{from_date}' and to_date(\"{columns_list[-1]}\",'YYYY-MM-DD') <= '{to_date}' and" 
+    # if project_id:
+    #     where_clause = '"cluster.project_id"::integer in (' + ','.join(project_id) + ') and ' 
+    # from_date = date_filter['from_date']
+    # to_date = date_filter['to_date']
+    # if from_date != '' and  to_date != '':
+    #     where_clause +=f"to_date(\"{columns_list[-1]}\",'YYYY-MM-DD') >= '{from_date}' and to_date(\"{columns_list[-1]}\",'YYYY-MM-DD') <= '{to_date}' and" 
     for loc_column, loc_value in filter_values.items():
         if loc_value != None and len(loc_value) > 0:
             loc_value = [str(item) for item in loc_value]
             where_clause += ' "{}" in ({}) and'.format(loc_column,','.join(loc_value))
-    if where_clause != "":
-        #remove the final " and" from the where_clause
-        where_clause =  where_clause[:-4]
+    # if where_clause != "":
+    #     #remove the final " and" from the where_clause
+    #     where_clause =  where_clause[:-4]
     #indicates the query is for the first sheet 
     if main_table_name == table_name:
         sql_query = "select " + columns_clause[:-1] + " from " + table_name
@@ -165,17 +194,17 @@ def build_query(request, table_name, columns_list, headers_list, filter_values, 
         #indicates the query is for the subsequent sheets - that is the inline questions - so join with main table on the response id and filter on the location values
         sql_query = "select " + columns_clause[:-1] + " from " + table_name + " inner join " + main_table_name + " on  " + table_name + ".response_id = " + main_table_name + ".id "
     # add project ids to where condition if not superuser
-    user_project_list = request.session.get('user_project_list') if request.session.get('user_project_list') else []
-    if request.user.is_superuser == False and  int(survey_id) not in [70,71,73,181]:
-        if len(user_project_list) > 0:
-            user_project_list = [str(item) for item in user_project_list]
-            where_clause = where_clause + ' and "cluster.project_id"::integer in (' + ','.join(user_project_list) + ')'
-        elif len(user_project_list) == 0:
-            where_clause = where_clause + ' and false'
+    # user_project_list = request.session.get('user_project_list') if request.session.get('user_project_list') else []
+    # if request.user.is_superuser == False and  int(survey_id) not in [70,71,73,181]:
+    #     if len(user_project_list) > 0:
+    #         user_project_list = [str(item) for item in user_project_list]
+    #         where_clause = where_clause + ' and "cluster.project_id"::integer in (' + ','.join(user_project_list) + ')'
+    #     elif len(user_project_list) == 0:
+    #         where_clause = where_clause + ' and false'
     sql_query = sql_query + " where " + where_clause
     return sql_query
 
-def export_excel(request,survey_id, excel_filename,filter_loc_values,date_filter,project_id):
+def export_excel(request,survey_id, excel_filename,filter_loc_values,date_filter,district_ids,school_cluster_benresponse_ids):
     import csv
     import uuid
     import json
@@ -198,7 +227,7 @@ def export_excel(request,survey_id, excel_filename,filter_loc_values,date_filter
         conn.set_client_encoding('UTF8')
         conn_str = "postgresql+psycopg2://" + username + ":" + password + "@" + hostname + "/" + db_name + "?client_encoding=UTF8"
         #survey_type used to store survey_type 0 for beneficiary and 1 for activity
-        MEDIA_ROOT = settings.MEDIA_ROOT + 'media/temp_export_data/'       
+        MEDIA_ROOT = settings.MEDIA_ROOT + '/temp_export_data/'       
         writer = None
         print(MEDIA_ROOT+excel_filename,'kjke')
         try:
@@ -223,7 +252,7 @@ def export_excel(request,survey_id, excel_filename,filter_loc_values,date_filter
                 #replaced % from header text with %% to escape the placeholder 
                 headers_list_for_query = [i.replace("%",'%%') for i in headers_list]
                 # import ipdb;ipdb.set_trace()
-                data_query = build_query(request, table_name, columns_list, headers_list_for_query,filter_values,date_filter,main_table_name,survey_id,project_id)
+                data_query = build_query(request, table_name, columns_list, headers_list_for_query,filter_values,date_filter,main_table_name,survey_id,district_ids,school_cluster_benresponse_ids)
                 write_to_excel_from_normalized_table(conn, conn_str, data_query, columns_list,headers_list,rows_in_chunk, sheet, writer)
         finally:
             if writer:
@@ -256,7 +285,7 @@ def write_to_excel_from_normalized_table(conn,conn_str, sql_query, columns_list,
             df_count = df_count +1
             if 'Activity Date' in colname_list:
                 chunk_df['Activity Date'] = pandas.to_datetime(chunk_df['Activity Date'],format="%d-%m-%Y", errors='coerce').dt.date
-            chunk_df.to_excel(excelWriter, sheet_name=sheetname, startrow = start_row, startcol = 0, header=header_info, columns=colname_list)
+            chunk_df.to_excel(excelWriter, sheet_name=sheetname, startrow = start_row, startcol = 0, header=header_info, columns=colname_list,index=False)
             # add the dataframe size (rows read from table/ chunk size) and header rows count (1 for first iteration and 0 for further iterations)
             #import ipdb;ipdb.set_trace()
             start_row = start_row + chunk_df.shape[0] + header_row_count
