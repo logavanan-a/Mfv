@@ -26,7 +26,9 @@ def get_menu_list(request):
     """
     Return a list of menus.
     """
-    return Menus.objects.filter(active = 2, parent=None).order_by("menu_order")
+    # import ipdb; ipdb.set_trace()
+    group =request.user.groups.all()[0].id
+    return Menus.objects.filter(active = 2, parent=None,group=group).order_by("menu_order")
 
 @register.simple_tag
 def disply_financial_year(start_date):

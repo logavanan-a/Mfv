@@ -3,6 +3,8 @@ from survey.capture_sur_levels import convert_string_to_date, convert_date_to_st
 from django.db import connection
 import logging
 import time
+from mfv_mis.settings import INSTANCE_CACHE_PREFIX
+from survey.form_views import add_button_validation_profile
 # from .new_api_response import common_responses_details
 # from .new_apis import get_actual_response
 # from .new_apis import file_respone_details_v3
@@ -51,6 +53,8 @@ from dateutil import tz
 from django.db.models import Max
 from django.utils.encoding import smart_str
 
+logger = logging.getLogger(__name__)
+
 
 # function required to convert it in utc
 def convert__to_localdate(utc_date):
@@ -87,6 +91,35 @@ def create_post_log_v2(request, data):
         f.close()
     return True
 
+def get_inmate_facility_id(json):
+    try:
+        # import ipdb;ipdb.set_trace()
+        facility_creation_key=json.get('2',json.get('55'))
+        # if facility_creation_key.isnumeric():
+        #     facility_creation_key=BeneficiaryResponse.objects.get(id=facility_creation_key).creation_key
+        facility_id=JsonAnswer.objects.get(creation_key=facility_creation_key).id
+    except:
+        facility_id=0
+    return facility_id
+
+def get_beneficiry_facility_id(cluster):
+    try:
+        creation_key=cluster.get('BeneficiaryResponse')
+        beneficiry_json=JsonAnswer.objects.get(creation_key=creation_key)
+        if beneficiry_json.survey_id == 4:
+            return beneficiry_json.id
+        else:
+            return get_inmate_facility_id(beneficiry_json.response)
+    except:
+        beneficiry_json=None
+
+def create_device_details_version1(request,data):
+    obj = DeviceDetails.objects.create(
+    user_id=data.get('u_uuid'),
+    app_size=data.get('as'),
+    disk_free_space=data.get('dfs'),
+    primary_storage=data.get('ps'),
+    secondary_storage=data.get('ss'))
 
 @csrf_exempt
 @validate_post_method
@@ -97,287 +130,201 @@ def add_survey_answers_version_1(request, **kwargs):
     # Start time st = datetime.now()
     # End time et = datetime.now()
     # Difference diff = et - st
-
-    response, status, error_msg, response_type, message,approved_by,approved_on,submitted_approval = {}, True, '', 0, '',"","",None
-    # data = json.loads(request.body.decode('utf-8'))
-    data = request.POST
-    create_post_log_v2(request, data)
+    
+    response, status, error_msg, response_type,message,updated_question,server_primary_key,pageNumber = {}, True, '', 0,'',{},0,0
+    
+    interface=1 #1:App 0:Web 3:Migrated Data 
+    if kwargs:
+        data=kwargs
+        interface = 0
+    else:
+        data = json.loads(request.body.decode('utf-8'))
+        sync_window = settings.SYNC_WINDOW
+        current_time = datetime.now()
+        # checking the sync window time and sync is allowed or not
+        if sync_window.get('SYNC_FROM_TIME') != '' and sync_window.get('SYNC_TO_TIME') != '' :
+            from_time = datetime.strptime(sync_window.get('SYNC_FROM_TIME'), "%H:%M:%S").time()
+            to_time = datetime.strptime(sync_window.get('SYNC_TO_TIME'), "%H:%M:%S").time()
+            # today_sync_from = datetime.combine(current_time.date(), from_time)
+            # today_sync_to = datetime.combine(current_time.date(), to_time)
+            # if to_time < from_time:
+                # today_sync_to = datetime.combine((current_time + timedelta(days=1)).date(), to_time)
+            if not (from_time <= current_time.time() <= to_time):
+                return JsonResponse({'status':False,'message':sync_window.get('SYNC_MESSAGE').replace('@@SYNC_FROM_TIME',sync_window.get('SYNC_FROM_TIME')).replace('@@SYNC_TO_TIME',sync_window.get('SYNC_TO_TIME')),"sync_res": []})
+    try:
+        create_post_log_v2(request,data)
+        create_device_details_version1(request,data)
+    except JsonAnswer.DoesNotExist as e:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        error_stack = repr(traceback.format_exception(exc_type, exc_value, exc_traceback))
+        logging.error(error_stack)
+    # import ipdb;  ipdb.set_trace()
     user_id = int(data['u_uuid'])
     sync_res = []
     message = "Success"
-    
-    # Email to store the json_id  
-    updated_record_email_ids,response_current_status,role_workflow_dict = {},{},{}
-    
-    # # Responses list from database for validating the unique check
-    # unique_responses = JsonAnswer.objects.filter(survey_id = 70,active=2)
-
-    # code for update the block id in jsonanwer with boundary id
-    activity_queries = {
-        'ben_activities': "update survey_jsonanswer a set boundary_id = (case when b.address_5 = 0 then null else b.address_5 end) from beneficiary_beneficiaryresponse b where a.cluster ->> 'BeneficiaryResponse'::text = b.creation_key and a.survey_id in (select survey_id from survey_boundary_level_view where beneficiary_type_id is not null and beneficiary_type_id != 11) and a.id in ({0});",
-        'people': "UPDATE survey_jsonanswer a SET boundary_id = (CASE WHEN household_ben.address_5 = 0 THEN null ELSE household_ben.address_5 END) FROM beneficiary_beneficiaryresponse people_ben INNER JOIN survey_jsonanswer people_json ON people_ben.json_answer_id = people_json.id INNER JOIN beneficiary_beneficiaryresponse household_ben ON people_json.response->>'16'::text = household_ben.creation_key::text WHERE a.cluster->>'BeneficiaryResponse'::text = people_ben.creation_key AND a.survey_id IN (SELECT survey_id FROM survey_boundary_level_view WHERE beneficiary_type_id = 11) and a.id in ({0});",
-        5: "UPDATE survey_jsonanswer a SET boundary_id = (CASE WHEN (a.cluster->>'Boundary'::text) = '0' THEN NULL ELSE (a.cluster->>'Boundary'::text)::INTEGER END) WHERE a.survey_id IN (SELECT survey_id FROM survey_boundary_level_view WHERE beneficiary_type_id IS NULL AND boundary_level_id = 5) and a.id in ({0});",
-    }
-    survey_boundary_key = 'survey_boundary_level_view'
-    # activities = cache.get(settings.INSTANCE_CACHE_PREFIX + survey_boundary_key)
-    # if not activities:
-        # with connection.cursor() as cursor:
-        #     sql_query = """select survey_id,beneficiary_type_id,boundary_level_id from survey_boundary_level_view"""
-            # cursor.execute(sql_query)
-            # survey_boundary_level = cursor.fetchall()
-
-        # activities = {level: [] for level in activity_queries.keys()}
-        # for activity in survey_boundary_level:
-        #     try:
-        #         if activity[1] and activity[1] != 11:
-        #             activities['ben_activities'].append(activity[0])
-        #         elif activity[1] == 11:
-        #             activities['people'].append(activity[0])
-        #         else:
-        #             activities[activity[2]].append(activity[0])
-        #     except:
-        #         pass
-        # cache_set_with_namespace(
-        #     'SYNC_SURVEY_INFO', survey_boundary_key, activities, 14400)
-    resp_ids = {level: [] for level in activity_queries.keys()}
+    pageNumber = data.get('pageNumber',0)
+    # storing the deleted record uuids
+    # deleted_record_uuids = list(DeleteLog.objects.filter(active=2).values_list('deleted_creationkey',flat=True))
+    all_input_ben_uuid = [i.get('beneficiary_id') for i in data['pushInput']]
+    all_input_ben_list =list(JsonAnswer.objects.filter(active=2,creation_key__in =all_input_ben_uuid).values_list('creation_key',flat=True))
     try:
-        pushinput = json.loads(data['pushInput'])
-        all_input_ben_uuid = [p.get('beneficiary_id','') for p in pushinput if p.get('beneficiary_id') != '0']
-        all_input_ben_list =list(JsonAnswer.objects.filter(active=2,creation_key__in =all_input_ben_uuid).values_list('creation_key',flat=True))
-        for val in pushinput:
+        for val in data['pushInput']:
+            # from survey.new_apis import create_post_log
+            # creation_key = request.POST.get('uId')
+            # create_post_log(request,call_type="App",creation_key=creation_key,res_id=None)
+            # this line are for log (ends)
             try:
-                app_answer_obj,error_msg = "",""
+                app_answer_obj = ""
                 answers_list = eval(str(val.get('answers_array')))
-
+                server_created_date = ""
                 if (not answers_list) or (val.get('beneficiary_id') != '0' and val.get('beneficiary_id') not in all_input_ben_list):
                     error_msg = "Please check answers_array is None." if not answers_list else "Please check beneficiary is not exists."
                     sync_status = 0
-                    server_created_date = ""
-                    duplicate_status = "0"
                     continue
+                # elif (val.get('r_uuid') and val.get('r_uuid') in deleted_record_uuids):
+                #     error_msg = "This record is already deleted from server. Please sync and try again."
+                #     sync_status = 5
+                #     continue
 
+                
                 cluster_id = val.get('cluster_id')
                 user = User.objects.get(id=user_id)
                 survey_ids = val.get('survey_id')
-                project_id = val.get('project_id', '')
-                # response_id = val.get('response_id')
+                project_id = val.get('project_id' , '')
+                response_id = val.get('response_id')
                 beneficiary = val.get('beneficiary_id')
                 facility = val.get('facility_id')
                 r_uuid = val.get('r_uuid')
                 last_updated_date = val.get('last_updated_date')
-                files_info = val.get('files_info')
-                expenses = val.get('expenses')
-                submitted_approval = not bool(val.get('approved_status',1)) # 0 - submit for approved; 1 - only submitted
-                # =====EXTRA LINE FOR THE DEACTIVATE FEATURE==
+                #=====EXTRA LINE FOR THE DEACTIVATE FEATURE==
                 survy = Survey.objects.get(id=int(survey_ids))
-                response_created = datetime.strptime(
-                    last_updated_date, "%Y-%m-%d %H:%M:%S")
+                response_created = datetime.strptime(last_updated_date,"%Y-%m-%d %H:%M:%S")
+
+                #getting the user mappings
+                # current_time = timezone.now()
+                # user_role_id=request.session.get('user_role_id',[27])
+                # loc_list_cache_key = f"{INSTANCE_CACHE_PREFIX}user_facility_based_boundary__{user_id}"
+                # loc_list = cache.get(loc_list_cache_key)
+                # if not loc_list:
+                #     loc_list=UserFacilityMapping.objects.filter(Q(deactivate_date__gte=current_time) | Q(deactivate_date=None),user_id=user_id).exclude(active=0).values_list('json_answer_id',flat=True)
+                #     loc_list=list(loc_list)
+                #     cache_set_with_namespace(INSTANCE_CACHE_PREFIX+'RESPONSE_SURVEY_V3',loc_list_cache_key,loc_list,14400)
+                #     logger.info("## TIME-TRACKER UserID-loc_list::" + str(user_id) + " : " + str(loc_list))
+        
                 '''if survey is deactivated before the response submission then those response will be rejected with the status 4'''
-                if survy.active == 3 and convert__to_localdate(survy.deactivated_date) < response_created:
+                if survy.active == 3 and convert__to_localdate(survy.deactivated_date) < response_created: 
                     sync_status = 4
                     server_created_date = ""
                     duplicate_status = "0"
-
                 else:
-                    # ============================================
-                    response = JsonAnswer.objects.filter(
-                        creation_key=r_uuid).first()
-                    response_id = response.id if response else None
+                    #============================================
+                    object_lists = JsonAnswer.objects.filter(survey=survy,active=2,cluster__BeneficiaryResponse=beneficiary).values('survey_id','response').order_by('-created')
+                    
+                    response = JsonAnswer.objects.get(creation_key = r_uuid) if JsonAnswer.objects.filter(creation_key = r_uuid) else None
+                    # response_id = JsonAnswer.objects.get(creation_key = r_uuid).id if response else None
+                    response_id = response
+                    # custom_field_validations()
                     if not response_id:
+                        restrict_for_add=add_button_validation_profile(survy,object_lists)
+                        if restrict_for_add:
+                            sync_status = 3
+                            server_created_date = ''
+                            error_msg = 'Please check if the existing record already exists as a positive record.'
+                            # sync_res.append({ "r_uuid":val['r_uuid'],"sync_status":3, "s_created": '',"duplicate_status":0})
+                            continue
                         obj = create_app_answer_data_version1(val)
-                        app_answer_obj = update_operator_details_version1(
-                            val, obj)
-                        media_params = {'app_answer_obj': app_answer_obj,
-                                        'cluster_id': cluster_id}
-                        # create_media_answers(user, **media_params)
-
-                    ans_params = {'answers_list': answers_list, 'app_answer_obj': app_answer_obj, 'cluster_id': cluster_id, 'survey_ids': survey_ids,
-                                  'project_id': project_id, 'response_id': response_id, 'beneficiary': beneficiary, 'facility': facility, 'r_uuid': r_uuid,
-                                  'last_updated_date': last_updated_date, "response_created_date": response_created}
-                    # code start to check the duplicate status for survey household and quid are 1221,1222,1223 for ration id, samagra id and akrspi unique id.
-                    duplicate_status = "0"
-                    if survey_ids == "70":
-                        if "1221" in answers_list:  # ration_id
-                            uid = answers_list.get("1221")[0].get("T_0_0")
-                            ration_id_count = JsonAnswer.objects.raw(
-                                "select * from survey_jsonanswer where survey_id = 70 and lower(trim((response ->> '1221')::varchar))=lower(trim('"+uid+"'::varchar)) and creation_key !='"+r_uuid+"'")
-                            if len(list(ration_id_count)) > 0:
-                                duplicate_status = "1"
-                        elif "1222" in answers_list:  # samagra_id
-                            uid = answers_list.get("1222")[0].get("T_0_0")
-                            samagra_id_count = JsonAnswer.objects.raw(
-                                "select * from survey_jsonanswer where survey_id = 70 and lower(trim((response ->> '1222')::varchar))=lower(trim('"+uid+"'::varchar)) and creation_key !='"+r_uuid+"'")
-                            if len(list(samagra_id_count)) > 0:
-                                duplicate_status = "1"
-                        elif "1223" in answers_list:  # akrspi_unique_id
-                            uid = answers_list.get("1223")[0].get("T_0_0")
-                            akrspi_unique_id_count = JsonAnswer.objects.raw(
-                                "select * from survey_jsonanswer where survey_id = 70 and lower(trim((response ->> '1223')::varchar))=lower(trim('"+uid+"'::varchar)) and creation_key !='"+r_uuid+"'")
-                            if len(list(akrspi_unique_id_count)) > 0:
-                                duplicate_status = "1"
-                    elif survey_ids == "71":
-                        uname = answers_list.get("25")[0].get("T_0_0")
-                        address5 = answers_list.get("23")[0].get("5")
-                        people_count = JsonAnswer.objects.raw("select * from survey_jsonanswer where survey_id = 71 and lower(trim((response ->> '25')::varchar))=lower(trim('" +
-                                                              uname+"'::varchar)) and lower(trim((response->'address'->'1'->'23'->>'5')::varchar))=lower(trim('"+address5+"'::varchar)) and creation_key !='"+r_uuid+"'")
-                        if len(list(people_count)) > 0:
-                            duplicate_status = "1"
-                    elif survey_ids == "181":
-                        uname = answers_list.get("944")[0].get("T_0_0")
-                        address5 = answers_list.get("1288")[0].get("5")
-                        institution_count = JsonAnswer.objects.raw("select * from survey_jsonanswer where survey_id = 181 and lower(trim((response ->> '944')::varchar))=lower(trim('" +
-                                                                   uname+"'::varchar)) and lower(trim((response->'address'->'1'->'1288'->>'5')::varchar))=lower(trim('"+address5+"'::varchar)) and creation_key !='"+r_uuid+"'")
-                        if len(list(institution_count)) > 0:
-                            duplicate_status = "1"
-                    elif survey_ids == "73":
-                        household_uid = answers_list.get("16")[0].get("AI_0_0")
-                        household = JsonAnswer.objects.filter(
-                            creation_key=household_uid)
-                        if household.count() > 1:
-                            household_id = household[0].get_beneficiary_object(
-                            ).id
-                            uname = answers_list.get("636")[0].get("T_0_0")
-                            people_count = JsonAnswer.objects.raw("select * from survey_jsonanswer where survey_id = 73 and lower(trim((response ->> '636')::varchar))=lower(trim('" +
-                                                                  uname+"'::varchar)) and lower(trim((response ->> '640')::varchar))=lower(trim('"+str(household_id)+"'::varchar)) and creation_key !='"+r_uuid+"'")
-                            if len(list(people_count)) > 0:
-                                duplicate_status = "1"
-                            # code end to check the duplicate status for survey household and quid are 1221,1222,1223 for ration id, samagra id and akrspi unique id.
-                    if response_id or duplicate_status == "0":
-                        status, res = create_answers_version1(
-                            user, response, **ans_params)
-                        # if not response_id:
-                        #     create_user_for_mediacontent(
-                        #         val, survey_ids, res.id)
-
-                        # ######### condition for work flow module ############
-                        # # 58 is the json answer content type
-                        # role_type = UserRoles.objects.get(user=user).role_type.first()
-                        # role_workflow_linkage = WrokflowStateRoleRelation.objects.filter(
-                        #     content_type_id=58, active=2).values('state_id', 'role_id')
-                        # role_workflow_dict = { item['state_id']: item['role_id'] for item in role_workflow_linkage}
-                        # role_based_states = [item['state_id'] for item in role_workflow_linkage if item['role_id'] == role_type.id]
-                        # wf = Workflow.objects.get_or_none(content_type_id=58,initial_state_id__in=role_based_states,active=2)
-                        # #,initial_state_id__in=role_based_states,file_flow=Question.objects.filter(block__survey=survy,qtype__in=['I','F'],active=2).exists()
-                        # file_flow = bool(Question.objects.filter(block__survey=survy,qtype__in=['I','F'],active=2))
-                        # survy = Survey.objects.get(id=int(survey_ids))
-                        # if wf and bool(survy.survey_type):
-                        #     meta_query = {"source_state":wf.initial_state,"workflow":wf, "active":2}
-                        #     if submitted_approval:
-                        #         meta_query.pop('source_state')
-                        #         updated_record_email_ids.update({res.id:[user.email,res,role_type.name]})
+                        app_answer_obj = update_operator_details_version1(val, obj)
+                        media_params = {'app_answer_obj':app_answer_obj, \
+                                        'cluster_id':cluster_id}
                                 
-                        #     meta = TransitionMeta.objects.filter(**meta_query).order_by('source_state__order')
+                            #create_media_answers(user, **media_params)
+                    
+                    # condition check facility is submitted and response coming as 
+                    # if response and response.response.get('616') == '620' and (answers_list.get('616') is None or list(answers_list.get('616')[0].values())[0] in ['617','618','619']):
+                    #     sync_status = 4
+                    #     server_created_date = ""
+                    #     error_msg = 'This facility has already been approved. Please sync to view the details.'
+                    #     logging.error(f"{response.creation_key} - {error_msg}")
+                    # elif response and answers_list.get('74') and response.response.get('74','') != list(answers_list.get('74')[0].values())[0]:
+                    #     sync_status = 4
+                    #     server_created_date = ""
+                    #     error_msg = 'The facility ID has been updated on the server. Mobile changes have been rejected. Please resync and apply the updates.'
+                    #     logging.error(f"{response.creation_key} - {error_msg}")
+                    # else:
+                    ans_params = {'answers_list':answers_list, 'app_answer_obj':app_answer_obj,'cluster_id':cluster_id,'survey_ids':survey_ids,
+                                    'project_id' : project_id,'response_id':response_id, 'beneficiary':beneficiary,'facility':facility,'r_uuid':r_uuid,
+                                    'last_updated_date':last_updated_date,"response_created_date":response_created}
+                    
+                    status,json_obj = create_answers_version1(user,response, **ans_params)
+                    server_primary_key = json_obj.id if type(json_obj) != dict else 0 
+                    updated_question={}
+                    if status:
+                        # if survey_ids == '4':
+                        #     data_facility=json_obj.id
+                        #     updated_question.update({"survey_id":survey_ids,"question_id":74,"ans_text":json_obj.response.get('74')})
+                        # elif survey_ids == '1':
+                        #     data_facility=get_inmate_facility_id(json_obj.response)
+                        #     updated_question.update({"survey_id":survey_ids,"question_id":6,"ans_text":json_obj.response.get('6')})
+                        # else:
+                        #     data_facility=get_beneficiry_facility_id(json_obj.cluster)
 
-                        #     #not including the file questions in the survey
-                        #     if not file_flow:
-                        #         meta = meta.exclude(destination_state_id=6).exclude(source_state_id=6) # 6= account officer state
-                        #     #included the file with submitted for approval
-                        #     elif file_flow :
-                        #         meta = meta.exclude(source_state_id__in=[1,3],destination_state_id__in=[1,3]) # regional role state
-                        #     # elif file_flow and submitted_approval :
-                        #     #     meta = meta.exclude(destination_state_id=1)
-                        #     current_status = wf.initial_state
-                        #     for mt in meta:
-                        #         status = 0
-
-                        #         if wf.initial_state == mt.source_state and submitted_approval:
-                        #             status = 2
-                        #             current_status = mt.destination_state
-                        #         obj,created = TransitionCollection.objects.update_or_create(source_state=mt.source_state, destination_state=mt.destination_state,
-                        #                                                     content_type_id=58, object_id=res.id, 
-                        #                                                     defaults={
-                        #                                                     "current_state":current_status,
-                        #                                                     "status":status ,})
-                        #         if created:
-                        #             obj.user = user
-                        #             obj.role_id = role_workflow_dict.get(mt.source_state.id)
-                        #             obj.save()
-
-                        #         response_current_status.update({res.id:current_status})
-                        # # if submitted_approval:
-                        #     # role_type = user_role.
-                        #     # role_based_states = WrokflowStateRoleRelation.objects.filter(role_id__in=role_type).values_list('state_id', flat=True)
-                        #     # transition_collection = TransitionCollection.objects.filter(object_id=res_id,current_state_id__in=role_based_states).update(status=2)
-                        
-                        # # If village level user created the beneficiaries need to get approval from the cluster level user
-                        # if not bool(survy.survey_type):# and val.get('approved_status',1) == 2
-                        #     # 18 - Village Volunteer
-                        #     # 17 - Programme officer
-                        #     # 27 - Cluster Incharge
-                        #     beneficiary_resp = BeneficiaryResponse.objects.get_or_none(creation_key=res.creation_key)
-                        #     # if cluster level user created record it should auto approve
-                        #     if beneficiary_resp and role_type.id in [17, 27]:
-                        #         beneficiary_resp.approval_status = 2
-                        #         beneficiary_resp.approved_by = user
-                        #         beneficiary_resp.approved_on = datetime.now()
-                        #     elif beneficiary_resp and role_type.id in [18]:
-                        #         beneficiary_resp.approval_status = val.get('approved_status',1)
-                        #     beneficiary_resp.save()
-                        #     res.save()
-                        #     approved_by = beneficiary_resp.approved_by.username if beneficiary_resp.approved_by else ''
-                        #     approved_on = beneficiary_resp.approved_on.strftime("%Y-%m-%d %H:%M:%S") if beneficiary_resp.approved_on else ''
-                        #     # import ipdb;ipdb.set_trace()
-                        # ####################################################
-
-                        # json_obj = JsonAnswer.objects.get(id=res_id)
-                        if files_info:
-                            image_array = file_media_array(
-                                files_info, request.FILES, res.id) if files_info else []
-                        # vns = val.get('vn')
-
-                        # function for store the expenses data 
-                        if expenses:
-                            activity_expenses_push(expenses,res,project_id)
-                        response_type, status = 1, True
+                        # json_obj.facility_id=data_facility
+                        json_obj.interface=interface
+                        json_obj.save()
+                        response_type,status = 1, True
                         sync_status = 2
-                        server_created_date = timezone.localtime(res.created).strftime(
-                            "%Y-%m-%d %H:%M:%S")
+                        # if data_facility not in loc_list and 27 in user_role_id and survey_ids == '1' else 2
+                        server_created_date = json_obj.created.strftime("%Y-%m-%d %H:%M:%S")
+                        error_msg=''
                     else:
-                        sync_status = 0
-                        server_created_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    # if not response_id:
-                    # code for update the block id for activities
-                    # for key, value in activities.items():
-                    #     if (int(survey_ids) in value) and (not response_id or not res.boundary_id):
-                    #         resp_ids[key].append(res.id) 
+                        error_msg=""
+                        for idx,(i,msg) in enumerate(json_obj.items()):
+                            and_txt=""
+                            if idx != 0:
+                                and_txt=" and "
+                            if type(msg) == dict:
+                                msg = msg.get('message','')
+                            error_msg+=and_txt+msg
+                        sync_status = 3
+                        server_created_date = ""
 
+
+            except JsonAnswer.DoesNotExist as e:
+                error_msg = str(val['r_uuid'])+' - Please check beneficiry response exists or not'
+                sync_status = 0
+                server_created_date = ""
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                error_stack = repr(traceback.format_exception(exc_type, exc_value, exc_traceback))
+                logging.error(error_stack)
             except Exception as e:
+
                 error_msg = str(val['r_uuid'])+' - '+e.args[0]
                 logging.error(str(val['r_uuid'])+' - '+error_msg)
                 sync_status = 3
                 message = "Failed"
                 server_created_date = ""
-                duplicate_status = "-1"
                 exc_type, exc_value, exc_traceback = sys.exc_info()
-                error_stack = repr(traceback.format_exception(
-                    exc_type, exc_value, exc_traceback))
+                error_stack = repr(traceback.format_exception(exc_type, exc_value, exc_traceback))
                 logging.error(error_stack)
+            
             finally:
-                sync_res.append({"r_uuid": val['r_uuid'], "sync_status": sync_status,
-                            "s_created": server_created_date, 'error_msg':error_msg, 'duplicate_status': duplicate_status,"approved_by":approved_by,"approved_on":approved_on})
-        for key, value in resp_ids.items():
-            if value and activity_queries.get(key):
-                with connection.cursor() as cursor:
-                    cursor.execute(activity_queries.get(key).format(', '.join(map(str, value))))
-        # email configuration for sending respected role users 
-        status_of_submission = 1 if submitted_approval else 0
-        # submitted_record_mails(updated_record_email_ids,response_current_status,role_workflow_dict,status_of_submission)  
-
+                sync_res.append({ "r_uuid":val['r_uuid'],"sync_status":sync_status, "s_created": server_created_date,"duplicate_status":0,"error_msg":error_msg,"updated_question":[updated_question],"server_primary_key":server_primary_key})
     except Exception as ex:
         status = False
         message = "Failed"
         error_msg = ex.args[0]
         logging.error(error_msg)
         exc_type, exc_value, exc_traceback = sys.exc_info()
-        error_stack = repr(traceback.format_exception(
-            exc_type, exc_value, exc_traceback))
+        error_stack = repr(traceback.format_exception(exc_type, exc_value, exc_traceback))
         logging.error(error_stack)
-    response = {'status': status,
-                'message': message,
-                "sync_res": sync_res
+    response = {'status':status,
+                'message':message,
+                "pageNumber":pageNumber,
+                "sync_res": sync_res,
                 }
     create_post_log_v2(request,response)
-    return JsonResponse(response)
+    return JsonResponse(response)                
+
 
 # mail passing to the respected userrole which record got submitted for approval
 # Input:
@@ -479,6 +426,7 @@ def create_app_answer_data_version1(val):
                                        gps_tracker=val.get('gps_tracker'),
                                        survey_status=val.get('survey_status'),
                                        reason=val.get('reason'),
+
                                        sample_id=val.get('r_uuid') if val.get(
                                            'r_uuid') else str(uuid4()),  # manualy creating uuid
                                        cluster_id=val.get('cluster_id'),
@@ -516,7 +464,6 @@ def update_operator_details_version1(val, obj):
 
 def create_answers_version1(user, response_obj, **ans_params):
     # from beneficiary.views import save_list_view
-
     insertion_list, qids_list = [], []
     answers_list = ans_params.get('answers_list')
     app_answer_obj = ans_params.get('app_answer_obj')
@@ -621,15 +568,15 @@ def create_answers_version1(user, response_obj, **ans_params):
                 * Technically using for Content from cluster form in sphoorthi
                 ###1Starts here
             '''
-            if survey.extra_config.get('cluster_activity') == 2:
-                from userroles.models import UserRoles
-                ur_obj = UserRoles.objects.get(user=user)
-                b_id = 0
-                if ur_obj.get_location_type():
-                    boundary_obj = Boundary.objects.get(
-                        id=ur_obj.get_location_type()[0])
-                    b_id = boundary_obj.parent.id if boundary_obj.parent else 0
-                cluster_dict.update({'Cluster_id': b_id})
+            # if survey.extra_config.get('cluster_activity') == 2:
+            #     from userroles.models import UserRoles
+            #     ur_obj = UserRoles.objects.get(user=user)
+            #     b_id = 0
+            #     if ur_obj.get_location_type():
+            #         boundary_obj = State.objects.get(
+            #             id=ur_obj.get_location_type()[0])
+            #         b_id = boundary_obj.parent.id if boundary_obj.parent else 0
+            #     cluster_dict.update({'Cluster_id': b_id})
             # 1 Ends here
             if str(beneficiary) != '0':
                 try:

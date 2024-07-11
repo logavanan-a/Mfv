@@ -1,8 +1,9 @@
 from django import template
 from constants import data
 from django.contrib.auth.models import User
-# from survey.models import BeneficiaryStatus, JsonAnswer
-# from userroles.models import Menus, RoleConfig, RoleTypes, UserRoles, UserRolesTheme
+from application_master.models import Menus
+from survey.models import *
+from survey.form_views import get_result_query
 # from projectmanagement.models import (LineitemTheme,ProjectTheme)
 # from beneficiary.models import BeneficiaryResponse,BeneficiaryLink
 import urllib3
@@ -81,31 +82,93 @@ def get_request():
 @register.filter
 def has_permission_for_action(request, key):
  
-     
-    # 
-    # Check for the permission of user for the action of menu 
-    # 
-    
-    user = request.user or None
-    menu, permission_key = key.split('&')
-    # if menu == "users":
-    #     import ipdb;ipdb.set_trace()
-    success = False
-    if user is not None:
-        user_role = UserRoles.objects.get(user = user)
-        for role in user_role.role_type.all():
-            role_config = RoleConfig.objects.get(role = role,
-                        menu__slug = menu)
-            if getattr(role_config, permission_key):
-                success = True
-                break
+    try:
+        # 
+        # Check for the permission of user for the action of menu 
+        # 
+        
+        user = request.user or None
+        menu, permission_key = key.split('&')
+        success = False
 
+        if user is not None:
+            # user_role = request.session['menu_permission_data']
+            # for record in user_role:
+            #     if record.get(menu) and record.get(menu).get(permission_key):
+            #         success = True
+            #         break
+            user_role = User.objects.get(id = user.id)
+            for role in user_role.groups.all():
+                role_config = Menus.objects.get(group = role.id,active=2,
+                            slug = menu)
+                if role_config:
+                    success = True
+                    break
+    except:
+        success = False
     return success
 
 ### concatenate of two strings ###
 @register.filter
 def make_string(val1, val2):
     return val1+"&"+val2
+
+@register.filter
+def survey_show(survey_id, creation_key):
+    from django.db import connection
+    from datetime import datetime
+    current_year = datetime.now().year
+    value = False
+    query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@year'.format(survey_id,creation_key)#
+    if survey_id in [3,4]: 
+        query=query.replace("@@year"," and to_char(js.created,'YYYY') = '{0}'".format(current_year))
+    else:
+        query=query.replace("@@year","")
+    # secondary_query= query
+    object_lists=JsonAnswer.objects.raw(query)
+    if object_lists:
+        for obj in object_lists:
+            datas = json.loads(obj.extra_config)
+            keys = datas["rule_engine"][0] if "rule_engine" in datas else ''
+            if keys:
+                ans_code = keys['ans_code']
+                survey_key = keys['survey_id'] if keys['survey_id'] is not None and keys['survey_id'] !=0  else survey_id
+                questionId = keys['questionId']
+                query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@question_id @@year'.format(survey_key,creation_key)#
+                if questionId is not None and questionId != 0:
+                    query=query.replace("@@question_id"," and js.response->>'{0}' = '{1}'".format(questionId,ans_code))
+                else:
+                    query=query.replace("@@question_id","")
+                if survey_key in [3,4]:
+                    query=query.replace("@@year"," and to_char(js.created,'YYYY') = '{0}'".format(current_year))
+                else:
+                    query=query.replace("@@year","")
+    else:
+        items = {'4':3,'7':4,'5':4,'6':5,'8':4,'9':5,'3':3}    
+        survey_key = items[str(survey_id)]
+        query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@year'.format(survey_key,creation_key)#
+        if survey_key in [3,4]:
+            query=query.replace("@@year"," and to_char(js.created,'YYYY') = '{0}'".format(current_year))
+        else:
+            query=query.replace("@@year","")
+    
+    results = get_result_query(query)
+    secondary = 0
+    if survey_id == 4 and len(results) == 1:
+        secondary_query="""with a as ("""+query+""") select coalesce(sum(case when response->>'250' in ('154','155') or a.response->>'252' in ('162','163') then 1 else 0 end),0) as ht from a"""
+        secondary_result = get_result_query(secondary_query)
+        secondary = secondary_result[0][0]
+    if secondary !=0 and len(results) == 1 and survey_id == 4:
+        value = False
+    elif len(results) == 1 and survey_id == 3:
+        value = False
+    elif len(results) == 0 and survey_id == 3:
+        value = True
+    elif len(results) != 0: 
+        value = True
+    return value
+
+        # object_lists=JsonAnswer.objects.raw(query)
 
 # @register.simple_tag
 # def check_menu_permission(user,menuname_value):
