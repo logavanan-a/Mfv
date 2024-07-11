@@ -56,30 +56,19 @@ class MonthlyDashboardSerializer(serializers.ModelSerializer):
     children_adv_uuid =  CommaSeparatedListField()
     children_prov_sgy_uuid =  CommaSeparatedListField()
     swc_uuid =  CommaSeparatedListField()
-    partner = serializers.SerializerMethodField()
+    # partner = serializers.SerializerMethodField()
     uuid = serializers.CharField(source='creation_key') 
-    creation_key = serializers.CharField(required=False)
-    submitted_by = serializers.CharField(required=False)
-    # user_id = serializers.SerializerMethodField(source='submitted_by_id')
+    approved_status = serializers.IntegerField(source='current_status') 
+    # creation_key = serializers.CharField(required=False)
+    # submitted_by = serializers.SerializerMethodField()
 
     class Meta:
         model = MonthlyDashboard
-        fields = '__all__'
-
-    def get_partner(self, user_id):
-        try:
-            return Partner.objects.filter().first().id
-        except Partner.DoesNotExist:
-            raise serializers.ValidationError("Partner does not exist for the given user_id.")
-
-    def get_user_id(self, user_id):
-        return 220
-
+        exclude = ['creation_key','partner','submitted_by','current_status']
 
     def create(self, validated_data):
-        user_id = validated_data.pop('submitted_by')
-        print('validated_data',user_id)
-        partner = self.get_partner(user_id)
+        partner = self.context.get('partner')
+        submitted_by = self.context.get('submitted_by')
         validated_data['partner_id'] = partner
-        validated_data['submitted_by_id'] = user_id
+        validated_data['submitted_by_id'] = submitted_by
         return MonthlyDashboard.objects.create(**validated_data)

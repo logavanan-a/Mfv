@@ -1459,26 +1459,64 @@ def archive_deleted_dic(obj):
     return data
 
 
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.settings import api_settings
 from rest_framework import status
 
 class MonthlyDashboardData(g.GenericAPIView):
     queryset = MonthlyDashboard.objects.filter(active=2)
     serializer_class = MonthlyDashboardSerializer
 
-    def get_success_headers(self, data):
-        try:
-            return {'Location': str(data[api_settings.URL_FIELD_NAME])}
-        except (TypeError, KeyError):
-            return {}
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+    def get_partner(self,user_id):
+        user_with_project = UserProjectMapping.objects.filter(
+            active=2,
+            user_id=user_id,
+            user__groups__id__in=[1]
+        ).select_related('project__partner_mission_mapping__partner').first()
         
-        serializer.save(submitted_by=request.data.get('user_id'))
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        if user_with_project:
+            return user_with_project.project.partner_mission_mapping.partner.id
+        return None
+        try:
+            user_id = self.context.get('request').data.get('user_id')
+            return User.objects.get(active=2,user_id = user_id)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("Partner does not exist for the given user_id.")
 
-    # def perform_create(self, serializer):
+    def post_request(self, request):
+        user_id = request.data.get('user_id')
+        creation_key = request.data.get('uuid')
+        submitted_by = request.user if request.user.is_authenticated else None
+        user_partner = self.get_partner(user_id)
+        if not user_partner:
+            response['status'] = 0
+            response['error'] = {}
+            response['message'] = "Partner does not exist for the given user_id."
+        try:
+            instance = MonthlyDashboard.objects.get(creation_key=creation_key)
+            serializer = self.get_serializer(instance, data=request.data,context = {'submitted_by':request.data.get('user_id'),'partner':user_partner}, partial=True)
+        except:
+            serializer = self.get_serializer(data=request.data,context = {'submitted_by':request.data.get('user_id'),'partner':user_partner})
+        
+        return serializer
+    
+    def pull_request(self, request):
+        user_id = request.data.get('user_id')
+        user_partner = self.get_partner(user_id)
+        dashboard_data = MonthlyDashboard.objects.filter(submitted_by_id = user_id,partner = user_partner,active=2)
+        serializer = self.get_serializer(dashboard_data,many=True)
+        return serializer
+
+    def post(self, request, method, *args, **kwargs):
+        response = {"status":2,"message":"Success"}
+        if method == "pull":
+            serializer = self.pull_request(request)
+        elif method == "push":
+            serializer = self.post_request(request)
+            if serializer.is_valid():
+                serializer.save()
+            else:
+                # print(serializer.errors)
+                response['status'] = 0
+                response['message'] = "Failed"
+        response['data'] = serializer.data
+        return Response(response, status=status.HTTP_201_CREATED)
+
