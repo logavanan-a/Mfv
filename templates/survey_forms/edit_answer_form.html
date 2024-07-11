@@ -7,7 +7,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                {% if ben_uuid %}
+                {% if ben_uuid and response_obj.survey.id != 2 %}
                     <div class="card-header mb-2">
                         {% include "../survey_forms/profile.html" %}
                     </div>
@@ -31,10 +31,10 @@
             $('#skip_139').remove()
         }
 
-        if('{{disable}}' == 'True'){
-            disable_edit_fields()
-            $(':submit').hide()
-        }
+        // if('{{disable}}' == 'True'){
+        //     disable_edit_fields()
+        //     $(':submit').hide()
+        // }
         {% with survey_slug|make_string:"edit" as keystrings %}
             {% if request|has_permission_for_action:keystrings|safe == 'False' %}
                 $('.enable').remove()
@@ -54,10 +54,10 @@
         })*/
 
         all_response={{response_obj.response|safe}}
-        if (all_response['616'] == '618'){
-            disable_edit_fields()
-            $(':submit').hide()
-        }
+        // if (all_response['616'] == '618'){
+        //     disable_edit_fields()
+        //     $(':submit').hide()
+        // }
         question_ids_list = {{question_ids_list}}
         question_ids=Object.keys(all_response).reverse()
         //for(var i = 0; i < question_ids_list; i++) {

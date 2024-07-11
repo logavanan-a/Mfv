@@ -17,8 +17,8 @@ urlpatterns = [
     path('import-questions/<int:pk>/', ImportQuestions.as_view()),
     path('import-modified-questions/<int:pk>/',ImportMQuestions.as_view()),
     path('survey/program-linkages/', ProgramRetreiveLinkages.as_view()),
-    path('list/<slug:survey_slug>/<str:key>/<int:project_id>/', WebResponseListing.as_view()),
-    path('list/<slug:survey_slug>/', login_required(WebResponseListing.as_view(),login_url='/login/')),
+    # path('list/<slug:survey_slug>/<str:key>/<int:project_id>/', WebResponseListing.as_view()),
+    # path('list/<slug:survey_slug>/', login_required(WebResponseListing.as_view(),login_url='/login/')),
     #user and facility mapping api
     path('survey/ajax/get_custom_validation/', custom_validation_survey_wise_version1),
 

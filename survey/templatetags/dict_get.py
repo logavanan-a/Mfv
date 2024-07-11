@@ -63,6 +63,13 @@ def get_item_ans(json_answer,header):
             if final_district:
                 str_res='{0}<br/>({1})'.format(final_district[0].get('name'),final_state[0].get('name'))
             return str_res
+        elif header.get('qtype') == 'C':
+            answer = ast.literal_eval(json_answer.get('response').get(str(header.get('id'))))
+            cache_key_choices = INSTANCE_CACHE_PREFIX+'survey_listing_page_answer_choices'#'survey_listing_page_answer_choices_for_'+str(survey_id)
+            survey_heading_choices =  cache.get(cache_key_choices)
+            res=[]
+            selected_choice=[res.append(item.get('text')) for item in survey_heading_choices if item.get('id') in  answer]
+            return ', '.join(res)
         elif header.get('qtype') == 'D':
             date_format = re.compile(r'\d{2}-\d{2}-\d{4}')
             date_with_format=json_answer.get('response').get(str(header.get('id')))
@@ -223,6 +230,8 @@ def index(lists,idx):
         return lists[idx]
     except:
         return '-'
+
+
 
 
     

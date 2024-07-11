@@ -10,26 +10,28 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <!-- {% if filters and not creation_key %} -->
+                {% if filters and not creation_key %}
                     {% include './survey_listing_filters.html' %}
-                <!-- {% endif %} -->
-
+                {% endif %}
                 {% if survey_slug and not creation_key %}
-                    <div class='row'>
-                        {% comment %}{% with profile_obj.survey.slug|default:survey.slug|make_string:"add" as keystrings %}
-                            {% if not main_add_button and request|has_permission_for_action:keystrings %}
-                            <div class='col-auto'>
-                                <button type="button" class="btn btn-primary btn-lg waves-effect waves-light p-2 mb-3" id="add_buton_listing" onclick="location.href='/manage/add-survey-form/{{survey.id}}/'"> Add New</button>
-                            </div>
+                <div class='d-flex justify-content-end'>
+                        {% with profile_obj.survey.slug|default:survey.slug|make_string:"add" as keystrings %}
+                            {% if not main_add_button and request.user.groups.all.0.id == 1 %}
+                                {% if school_name %}
+                                <div class='col-auto'>
+                                    <button type="button" class="btn btn-primary btn-lg waves-effect waves-light p-2 mb-3" id="add_buton_listing" onclick="location.href='/configuration/add-survey-form/{{survey.id}}/?creation_key={{school_creation_key}}&school_name={{school_name}}'"> Add New</button>
+                                </div>
+                                {% else %}
+                                <div class='col-auto'>
+                                    <button type="button" class="btn btn-primary btn-lg waves-effect waves-light p-2 mb-3" id="add_buton_listing" onclick="location.href='/configuration/add-survey-form/{{survey.id}}/'"> Add New</button>
+                                </div>
+                                {% endif %}
                             {% endif %}
-                        {% endwith %}{% endcomment %}
-                        <div class='col-auto'>
-                            <button type="button" class="btn btn-primary btn-lg waves-effect waves-light p-2 mb-3" id="add_buton_listing" onclick="location.href='/configuration/add-survey-form/{{survey.id}}/'"> Add New</button>
-                        </div>
+                        {% endwith %}
                     </div>
                 {% endif %}
-
-                {% if creation_key %}
+                        
+                {% if creation_key and response_obj.survey.id != 2 %}
                     {% include "../survey_forms/profile.html" %}
                 {% endif %} 
                 {% if survey.periodicity == 7 and creation_key and survey_slug %}
@@ -43,14 +45,14 @@
                         <div class='col-6'>
                             <div class="d-flex justify-content-end">
                                 {% with keystrings_edit=profile_obj.survey.slug|default:survey.slug|make_string:"edit" keystrings_add=profile_obj.survey.slug|default:survey.slug|make_string:"add" %}
-                                    {% if object_lists|length == 1 and not main_add_button and request|has_permission_for_action:keystrings_edit %}
-                                        <h4 class="p-2" title='Edit'><a href="/manage/edit-survey-form/{{survey_slug}}/{{object_lists.0.creation_key}}/?ben={{creation_key}}"><span class="bx bxs-edit-alt bx-md"></span></a></h4>
-                                    {% elif not main_add_button and request|has_permission_for_action:keystrings_add%}
-                                        <h4 class="p-2 " title='Add'><a href="/manage/add-survey-form/{{survey.id}}/?ben={{creation_key}}"><span class="bx bx-plus-medical bx-md"></span></a></h4>
+                                    {% if object_lists|length == 1 and not main_add_button and request.user.groups.all.0.id == 1 %}
+                                        <h4 class="p-2" title='Edit'><a href="/configuration/edit-survey-form/{{survey_slug}}/{{object_lists.0.creation_key}}/?ben={{creation_key}}"><span class="bx bxs-edit-alt bx-md"></span></a></h4>
+                                    {% elif not main_add_button and request.user.groups.all.0.id == 1 and profile_obj.survey.id|survey_show:"" %}
+                                        <h4 class="p-2 " title='Add'><a href="/configuration/add-survey-form/{{survey.id}}/?ben={{creation_key}}"><span class="bx bx-plus-medical bx-md"></span></a></h4>
                                     {% endif %}
                                 {% endwith %}
                                 {% with profile_obj.survey.slug|default:survey.slug|make_string:"delete" as keystrings %}
-                                    {% if request|has_permission_for_action:keystrings and object_lists %}
+                                    {% if request.user.groups.all.0.id == 1 and object_lists %}
                                         <h4 class="p-2" ><a id='{{object_lists.0.creation_key}}' class='delete_button'>
                                             <button class="btn btn-sm btn-just-icon text-danger" style="float:right" title="delete">
                                                 <span class="bx bx-trash bx-sm"></span>
@@ -90,8 +92,8 @@
                     <div class='row mt-4'>
                         <div class="d-flex justify-content-end">
                             {% with profile_obj.survey.slug|default:survey.slug|make_string:"edit" as keystrings %}
-                                {% if not main_add_button and request|has_permission_for_action:keystrings %}
-                                        <h4 class="p-2"><a href="/manage/edit-survey-form/{{survey.slug}}/{{creation_key}}/"><span class="bx bxs-edit-alt bx-md"></span></a></h4>
+                                {% if not main_add_button and request.user.groups.all.0.id == 1 %}
+                                        <h4 class="p-2"><a href="/configuration/edit-survey-form/{{survey.slug}}/{{creation_key}}/"><span class="bx bxs-edit-alt bx-md"></span></a></h4>
                                         {% comment %} <a id='{{creation_key}}' class='delete_button'>
                                             <button class="btn btn-sm btn-just-icon text-danger" style="float:right" title="Edit">
                                                 <span class="bx bx-trash bx-md"></span>
@@ -162,8 +164,8 @@
                         {% endfor %}
                     </div>
                     {% with profile_obj.survey.slug|default:survey.slug|make_string:"approve" as keystrings %}
-                        {% if request|has_permission_for_action:keystrings and profile_obj.response.616 == '618' %}
-                            <form method='POST' action="/manage/facility/approve_reject/{{profile_obj.creation_key}}/" id="facility_approve_reject">
+                        {% if request.user.groups.all.0.id == 1 and profile_obj.response.616 == '618' %}
+                            <form method='POST' action="/configuration/facility/approve_reject/{{profile_obj.creation_key}}/" id="facility_approve_reject">
                                 {% csrf_token %}
                                 <div class='row'>
                                     <div class=' d-flex justify-content-end '>
@@ -188,8 +190,8 @@
                         <div class='col-6'>
                             <div class="d-flex justify-content-end">
                                 {% with profile_obj.survey.slug|default:survey.slug|make_string:"add" as keystrings %}
-                                    {% if request|has_permission_for_action:keystrings %}
-                                        <h4 class="p-2 " title='Add'><a href="/manage/{% if survey.id == 20 %}custom_weekly_data_form{% else %}add-survey-form/{{survey.id}}{% endif %}/?ben={{creation_key}}"><span class="bx bx-plus-medical bx-md"></span></a></h4>
+                                {% if request.user.groups.all.0.id == 1 and survey.id|survey_show:creation_key %}
+                                <h4 class="p-2 " title='Add'><a href="/configuration/{% if survey.id == 20 %}custom_weekly_data_form{% else %}add-survey-form/{{survey.id}}{% endif %}/?ben={{creation_key}}"><span class="bx bx-plus-medical bx-md"></span></a></h4>
                                     {% endif %}
                                 {% endwith %}
                             </div>
@@ -209,12 +211,12 @@
                                     <div class="d-flex justify-content-start">
                                         <h3 class='p-2'>{{survey.name}}</h3>
                                     </div>
-                                </div>
+                                </div>                                                          
                                 {% with profile_obj.survey.slug|default:survey.slug|make_string:"add" as keystrings %}
-                                    {% if not hide_button and request|has_permission_for_action:keystrings %}
+                                    {% if not hide_button and request.user.groups.all.0.id == 1 and survey.id|survey_show:creation_key %}
                                         <div class='col-6'>
                                             <div class="d-flex justify-content-end">
-                                                <h4 class="p-2 " title='Add'><a href="/manage/{% if survey.id == 20 %}custom_weekly_data_form{% else %}add-survey-form/{{survey.id}}{% endif %}/?ben={{creation_key}}"><span class="bx bx-plus-medical bx-md"></span></a></h4>
+                                                <h4 class="p-2 " title='Add'><a href="/configuration/{% if survey.id == 20 %}custom_weekly_data_form{% else %}add-survey-form/{{survey.id}}{% endif %}/?ben={{creation_key}}"><span class="bx bx-plus-medical bx-md"></span></a></h4>
                                             </div>
                                         </div>
                                     {% endif %}
@@ -227,8 +229,8 @@
                                     {% for header in survey_heading_questions %}
                                         <th>{{header.text}}</th>
                                     {% endfor %}
-                                    {% comment %}{% if profile_obj or not main_add_button and options_dropdown.count > 0  %}
-                                    {% endif %}{% endcomment %}
+                                    {% if profile_obj or not main_add_button and options_dropdown.count > 0  %}
+                                    {% endif %}
                                         <th width='15%'>Action</th>
                                 </tr>
                             </thead>
@@ -236,21 +238,23 @@
                                 {% for json_answer in object_lists %}
                                     <tr class="odd font-size-16">
                                         {% for header_id in survey_heading_questions %}
-                                        {% comment %}{% if forloop.counter == 1 and not profile_obj and not main_add_button and options_dropdown.count > 0 %}
+                                        <!-- options_dropdown.count > 0 -->
+                                            {% if forloop.counter == 1 and not profile_obj and not main_add_button and options_dropdown %}
+                                            <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}><a href="/configuration/profile/{{json_answer.creation_key}}/">{{json_answer|get_item_ans:header_id|safe}}</a></td>
+
                                             {% elif forloop.counter == 1 and not profile_obj and not main_add_button  %}
-                                            <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}><a href="/manage/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/">{{json_answer|get_item_ans:header_id|safe}}</a></td>
+                                            <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}><a href="/configuration/list/student-details-3004/{{json_answer.creation_key}}/{{json_answer|get_item_ans:header_id|safe}}/">{{json_answer|get_item_ans:header_id|safe}}</a></td>
                                             {% else %}
                                             <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}>{{json_answer|get_item_ans:header_id|safe}}</td>
-                                            {% endif %}{% endcomment %}
-                                                <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}><a href="/configuration//profile/{{json_answer.creation_key}}/">{{json_answer|get_item_ans:header_id|safe}}</a></td>
+                                            {% endif %}
                                         {% endfor %}
-                                        {% comment %}{% if profile_obj or not main_add_button and options_dropdown.count > 0  %}{% endcomment %}
+                                        {% if profile_obj or not main_add_button and options_dropdown.count > 0  %}
                                             <td>
                                                 <div class="row">
                                                     {% with profile_obj.survey.slug|default:survey.slug|make_string:"edit" as keystrings %}
-                                                        {% if object_lists|length and creation_key and request|has_permission_for_action:keystrings %}
+                                                        {% if object_lists|length and creation_key and request.user.groups.all.0.id == 1 %}
                                                             <div class="col-auto mb-2">
-                                                                <a href="/manage/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/?ben={{creation_key}}" >
+                                                                <a href="/configuration/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/?ben={{creation_key}}" >
                                                                     <button class="btn btn-sm btn-just-icon btn-info" style="float:right" title="Edit">
                                                                         <span class="bx bx-edit bx-sm"></span>
                                                                     </button>
@@ -266,21 +270,20 @@
                                                                         Activities <i class="mdi mdi-chevron-down"></i>
                                                                     </button>
                                                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                        {% comment %}{% with profile_obj.survey.slug|default:survey.slug|make_string:"edit" as keystrings %}
-                                                                            {% if not main_add_button and request|has_permission_for_action:keystrings %}
-                                                                            <a class="dropdown-item" href="/manage/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/">Edit</a>
+                                                                        {% with profile_obj.survey.slug|default:survey.slug|make_string:"edit" as keystrings %}
+                                                                            {% if not main_add_button and request.user.groups.all.0.id == 1 %}
+                                                                            <a class="dropdown-item" href="/configuration/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/">Edit</a>
                                                                             {% endif %}
-                                                                        {% endwith %}{% endcomment %}
-                                                                        <a class="dropdown-item" href="/configuration/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/">Edit</a>
+                                                                        {% endwith %}
                                                                         {% for survey_tags in options_dropdown %}
-                                                                            <a {% if survey_tags.id in json_answer.survey.extra_config.reject_hidefields and json_answer.response.616 != '620' %}onclick="return false;"{% endif %} class="dropdown-item {% if survey_tags.id in json_answer.survey.extra_config.reject_hidefields and json_answer.response.616 != '620' %}bg-secondary{% endif %}" href="/manage/profile/{{survey_tags.slug}}/{{json_answer.creation_key}}/">{{survey_tags.short_name|default:survey_tags.name}}</a>
+                                                                            <a {% if survey_tags.id in json_answer.survey.extra_config.reject_hidefields and json_answer.response.616 != '620' %}onclick="return false;"{% endif %} class="dropdown-item {% if survey_tags.id in json_answer.survey.extra_config.reject_hidefields and json_answer.response.616 != '620' %}bg-secondary{% endif %}" href="/configuration/profile/{{survey_tags.slug}}/{{json_answer.creation_key}}/">{{survey_tags.short_name|default:survey_tags.name}}</a>
                                                                         {% endfor %}
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                             {% with profile_obj.survey.slug|default:survey.slug|make_string:"approve" as keystrings %}
                                                                 {% comment %}{% transfer_check json_answer.creation_key as transfer_status %}{% endcomment %}
-                                                                {% if survey.id == 1 and request|has_permission_for_action:keystrings and not transfer_status %}
+                                                                {% if survey.id == 1 and request.user.groups.all.0.id == 1 %}
                                                                     <a href="/configuration/transfer/add/{{json_answer.creation_key}}/" >
                                                                         <button type="button" class="btn btn-info mt-2">
                                                                     <i class="bx bx-transfer-alt d-block font-size-16"></i> 
@@ -291,7 +294,7 @@
                                                         </div>
                                                     {% endif %}
                                                     {% comment %}{% with profile_obj.survey.slug|default:survey.slug|make_string:"delete" as keystrings %}
-                                                        {% if request|has_permission_for_action:keystrings %}
+                                                        {% if request.user.groups.all.0.id == 1 %}
                                                             <div class="col-auto ">
                                                                 <a id='{{json_answer.creation_key}}' class='delete_button' uid='{{json_answer.response.6}}'>
                                                                     <button class="btn btn-sm btn-just-icon text-danger" style="float:right" title="delete">
@@ -303,6 +306,11 @@
                                                     {% endwith %}{% endcomment %}
                                                 </div>
                                             </td>
+                                        {% else %}
+                                        <td>
+                                            <button type="button" class="btn btn-primary btn-lg waves-effect waves-light p-2 mb-3" onclick="location.href='/configuration/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/'">Edit</button>
+                                        </td>
+                                        {% endif%}   
                                     </tr>
                                 {% endfor %}
                             </tbody>

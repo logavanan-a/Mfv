@@ -535,3 +535,12 @@ function adres_widget_1(parent_valueSelected, selected = null) {
         }
     })
 }
+
+
+function disable_edit_fields() {
+    $('#survey input').attr('readonly', 'readonly');
+    $('#survey input[type=checkbox]').attr("disabled", "disabled");
+    $('#survey input[type=button]').attr("disabled", "disabled")
+    $('#survey select').attr('disabled', true);
+    $('#submitting').attr('disabled', true);
+}

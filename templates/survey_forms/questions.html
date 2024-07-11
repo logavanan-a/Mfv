@@ -275,17 +275,18 @@
                 {% endif %}
             {% elif not question.parent %}
                 {% if question.qtype == 'C' %}
-                <label class="form-check-label mb-2">{{question.form_question_number|default:''}}. {{question.text}}</label>
+                <label class="form-check-label mb-2">{{question.form_question_number|default:''}}. {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
                 <div class='row'>
                     {% for choice in main_choice_list %}
                         <div class="col-lg-6" id='skip_{{question.id}}'>
                             <div class="form-check mb-3">
                                 <input class="form-check-input main_checkbox_{{question.id}} main_question C_0_0 {% if question.mandatory %}required{% endif %}" type="checkbox" name="{{question.id}}" id="{{question.id}}" value="{{choice.id}}" {% if question.mandatory %}required{% endif %}>
-                                <label class="form-check-label" for="{{choice.id}}">{% if question.mandatory %}<span class="required-field"></span>{% endif %}
+                                <label class="form-check-label" for="{{choice.id}}">
                                     {{choice.choice}}
                                 </label>
                             </div>
                         </div>
+                        {% endfor %}
                         {% if question.mandatory %}
                         <script>
                             $(document).ready(function(){
@@ -300,7 +301,6 @@
                             }); 
                         </script>
                         {% endif %}
-                    {% endfor %}
                 </div>
                 {% elif question.qtype == 'T' %}
                     <div class="col-lg-6" id='skip_{{question.id}}'>
@@ -415,7 +415,7 @@
                             });
                         </script>
                     {% endif %}
-                    {% if question.api_json.is_beneficiary_ques == 2 and not creation_key %}
+                    {% comment %}{% if question.api_json.is_beneficiary_ques == 2 and not creation_key %}
                         {% for key,bondary in next_level_boundries.items %}
                             <div class="col-lg-6" >
                                 <div class="mb-2">
@@ -441,14 +441,16 @@
                                 }
                             </style> 
                         {% endfor %}
-                    {% endif %}
+                    {% endif %}{% endcomment %}
                     <div class="col-lg-6" id='skip_{{question.id}}'>
                         <div class=" mb-3">
                             <label class="form-label" >{{question.form_question_number|default:''}}. {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
                             <select class=" form-select select2 main_question S_0_0 {% if question.mandatory %}required{% endif %} api_question"  name='{{question.id}}' id='{{question.id}}' 
                                 aria-label="Floating label select example"   {% if question.mandatory %}required{% endif %} {% if not question.is_editable and response_obj.response and response_obj.response.616 != '619'   and creation_key %}disabled{% endif %}>
-                                {% if question.api_json.is_beneficiary_ques == 2 and creation_key %}
-                                    <option value="{{ben_uuid}}" >{{json_response.237}}</option>
+                                {% if school_creation_key %}
+                                    <option value="{{school_creation_key}}" >{{school_name}}</option>
+                                {% else %}
+                                    <option value="{{benificiary.creation_key}}" >{{json_response.231}}</option>
                                 {% endif %}
                             </select>
                             <div class="invalid-feedback">

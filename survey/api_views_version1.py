@@ -133,7 +133,6 @@ def add_survey_answers_version_1(request, **kwargs):
     
     response, status, error_msg, response_type,message,updated_question,server_primary_key,pageNumber = {}, True, '', 0,'',{},0,0
     
-
     interface=1 #1:App 0:Web 3:Migrated Data 
     if kwargs:
         data=kwargs
@@ -465,7 +464,6 @@ def update_operator_details_version1(val, obj):
 
 def create_answers_version1(user, response_obj, **ans_params):
     # from beneficiary.views import save_list_view
-    # import ipdb; ipdb.set_trace()
     insertion_list, qids_list = [], []
     answers_list = ans_params.get('answers_list')
     app_answer_obj = ans_params.get('app_answer_obj')
