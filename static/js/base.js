@@ -71,6 +71,69 @@ function onSelectChange_cwc_type(){
 //     }
    
 // }
+//function for get the code of questions based on question type
+function name_return_fun(type, group = null) {
+    if (group == 'inline') {
+        if (type.is("select")) {
+            return 'S'
+        } else if (type.is("input")) {
+            if (type.attr('type') == 'text') {
+                return 'T'
+            } else if (type.attr('type') == 'date' || type.attr('type') == 'month') {
+                return 'D'
+            } else if (type.attr('type') == 'checkbox') {
+                return 'C'
+            } else if (type.attr('type') == 'number') {
+                return 'T'
+            }
+        }
+    } else {
+        if (type.is("select")) {
+            return 'S_0_0'
+        } else if (type.is("input")) {
+            if (type.attr('type') == 'text') {
+                return 'T_0_0'
+            } else if (type.attr('type') == 'date' || type.attr('type') == 'month') {
+                return 'D_0_0'
+            } else if (type.attr('type') == 'checkbox') {
+                return 'C_0_0'
+            } else if (type.attr('type') == 'number') {
+                return 'T_0_0'
+            } else if (type.attr('type') == 'hidden') {
+                return 'H_0_0'
+            }
+        }
+    }
+}
+
+function formating_main_questions(questions, main_ans) {
+    $(questions).each(function () {
+        inner_ans = {}
+        if ($(this).is(':checkbox')) {
+            values = Array.from(document.querySelectorAll('input[id="' + $(this).attr('id') + '"][type="checkbox"]')).filter((checkbox) => checkbox.checked).map((checkbox) => checkbox.value)
+            inner_ans[name_return_fun($(this))] = JSON.stringify(values.map(Number))
+        } else if (($(this).attr('type') == 'date' || $(this).attr('type') == 'month') && $.trim($(this).val()) != '') {
+            var dateObj = new Date($.trim($(this).val()));
+            var day = dateObj.getDate();
+            var month = dateObj.getMonth() + 1;
+            var year = dateObj.getFullYear();
+            if ($(this).attr('type') == 'month') {
+                var formattedDate = month + '-' + year
+            } else {
+                var formattedDate = day + '-' + month + '-' + year
+            }
+            inner_ans[name_return_fun($(this))] = formattedDate
+        } else if ($(this).is("select") && $(this).prop('multiple')) {
+            inner_ans[name_return_fun($(this))] = JSON.stringify($(this).val().map(Number))
+        } else if ($(this).is("select")) {
+            inner_ans[name_return_fun($(this))] = $('#' + $(this).attr('id') + ' option:selected').val()
+        } else {
+            inner_ans[name_return_fun($(this))] = $.trim($(this).val())
+        }
+        main_ans[$(this).attr('id')] = [inner_ans]
+    })
+    return main_ans
+}
 
 function makeRequired(){
     var sel = document.getElementById('reason_select');
@@ -417,4 +480,67 @@ function password_checking(pass1,pass2){
     }else{
         document.getElementById('confirm_password').innerHTML='Please enter the valid confirm password.';
     }
+}
+
+$("#boundary_1").on("change", function (event) {
+    var optionSelected = $(this).find("option:selected");
+    var valueSelected = optionSelected.attr('value');
+    adres_widget_1(valueSelected)
+});
+
+
+//ajax call for get the locations
+function adres_widget_1(parent_valueSelected, selected = null) {
+    var next_dropdown_boundry = 'boundary_2'
+    var survey_id = $('#__survey_id').val();
+    data = {
+        'selected_boundry': parent_valueSelected,
+        'survey_id': survey_id,
+        'transfer_page': $('#transfer_page').val()
+    };
+    $.ajax({
+        type: "GET",
+        url: '/configuration/ajax/get_location/',
+        data: data,
+        success: function (result) {
+            $("#" + next_dropdown_boundry + " option").remove();
+            $("#facility option").remove();
+
+            ans = JSON.parse(result)
+            if (ans[ans.length - 1]) {
+                a = '<option selected value="" > </option>';
+                $("#" + next_dropdown_boundry).append(a);
+            }
+            if (JSON.parse(result) == 0) {
+                $("#" + next_dropdown_boundry + " option").remove();
+                a =
+                    '<option selected  value=""> </option>';
+                $("#" + next_dropdown_boundry).append(a);
+            } else {
+                $.each(JSON.parse(result), function (key, value) {
+                    if (typeof value['id'] !== "undefined") {
+                        if (parseInt(selected) == value['id'] || JSON.parse(result).length == 1) {
+                            a = '<option value=' + value['id'] + ' selected>' +
+                                value['name'] + '</option>';
+                            $("#" + next_dropdown_boundry).append(a);
+                            $("#" + next_dropdown_boundry).trigger('change')
+                        } else {
+                            a = '<option value=' + value['id'] + '>' +
+                                value['name'] + '</option>';
+                            $("#" + next_dropdown_boundry).append(a);
+                        }
+                    }
+                })
+            }
+        }
+    })
+}
+
+
+function disable_edit_fields() {
+    $('#survey input').attr('readonly', 'readonly');
+    $('#survey input[type=checkbox]').attr("disabled", "disabled");
+    $('#survey input[type=button]').attr("disabled", "disabled")
+    $('#survey select').attr('disabled', true);
+    $('#submitting').attr('disabled', true);
 }

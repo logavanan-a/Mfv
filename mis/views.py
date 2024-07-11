@@ -62,39 +62,31 @@ def login_view(request):
         if user is not None:
             login(request, user)
             if user.groups.filter(name__in = ['Partner Data Entry Operator','Partner Admin','Project In-charge']).exists():# project incharge
-                user_project=UserProjectMapping.objects.filter(user=request.user,active=2)
+                user_project=UserProjectMapping.objects.filter(user=request.user,active=2).select_related('project','project__partner_mission_mapping','project__partner_mission_mapping__partner','project__partner_mission_mapping__mission','project__district','project__district__state')
                 user_project_ids = user_project.values_list('project__id',flat=True)
                 user_partner_id = user_project.values_list('project__partner_mission_mapping__partner_id',flat=True)
                 user_mission_id = user_project.values_list('project__partner_mission_mapping__mission_id',flat=True)
-                # partner_mission_mapping=PartnerMissionMapping.objects.filter(partner__id__in=user_partner_id,active=2)
-                # usr -> project -> partner --> mission
-                # partner_mission_mapping_ids=partner_mission_mapping.values_list('id',flat=True)
-                # user_mission_id=partner_mission_mapping.values_list('mission_id',flat=True)
-                # user_project_ids=Project.objects.filter(partner_mission_mapping_id__in=partner_mission_mapping_ids,active=2).values_list('id',flat=True)
+
                 user_donor_id=ProjectDonorMapping.objects.filter(project__id__in=user_project_ids,active=2).values_list('donor__id',flat=True).distinct()
                 user_category_list=MissionIndicatorCategory.objects.filter(mission__id__in=user_mission_id,active=2).values_list('id',flat=True)
-
-            # elif user.groups.filter(name__in = ['M & E']).exists():
-            #     user_project_ids=UserProjectMapping.objects.filter(user=request.user,active=2).values_list('project_id',flat=True)
-            #     user_partner_id=UserPartnerMapping.objects.filter(user=request.user,active=2).values_list('partner__id',flat=True)
-            #     partner_mission_ids=Project.objects.filter(id__in=user_project_ids,active=2).values_list('partner_mission_mapping_id',flat=True)
-            #     user_mission_id=PartnerMissionMapping.objects.filter(id__in=partner_mission_ids,active=2).values_list('mission_id',flat=True)
-            #     user_donor_id=ProjectDonorMapping.objects.filter(project__id__in=user_project_ids,active=2).values_list('donor__id',flat=True).distinct()
-            #     user_category_list=MissionIndicatorCategory.objects.filter(mission__id__in=user_mission_id,active=2).values_list('id',flat=True)
-
+                user_parent_boundary_list = user_project.values_list('project__district__state_id',flat=True)
+                user_boundary_list = user_project.values_list('project__district_id',flat=True)
             elif user.is_superuser:
                 user_mission_id=Mission.objects.filter(active=2).values_list('id',flat=True)
                 user_project_ids=Project.objects.filter(active=2).values_list('id',flat=True)
                 user_partner_id=Partner.objects.filter(active=2).values_list('id',flat=True)
                 user_donor_id=Donor.objects.filter(active=2).values_list('id',flat=True).distinct()
                 user_category_list=MissionIndicatorCategory.objects.filter(active=2).values_list('id',flat=True)
+                user_parent_boundary_list = State.objects.filter(active=2).values_list('id',flat=True)
+                user_boundary_list = District.objects.filter(active=2).values_list('id',flat=True)
             
             request.session['user_mission_list']=list(user_mission_id)
             request.session['user_project_list']=list(user_project_ids)
             request.session['user_partner_list']=list(user_partner_id)
             request.session['user_donor_list']=list(user_donor_id)
             request.session['user_category_list']=list(user_category_list)
-
+            request.session['user_parent_boundary_list']=list(user_parent_boundary_list)
+            request.session['user_boundary_list']=list(user_boundary_list)
             try:
                 #need to check if used or not and remove 
                 user_partner = UserPartnerMapping.objects.get(user = user)

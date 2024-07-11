@@ -25,6 +25,7 @@ urlpatterns = [
     path('api/', include('survey.api_urls')),
     path('application_master/', include('application_master.urls')),
     path('', include('application_master.user_url')),
-    path('', include('survey.urls'))
+    path('', include('survey.urls')),
+    path('configuration/', include('survey.config_urls'))
 ]
 admin.site.site_header = "MFV MIS administration"  
