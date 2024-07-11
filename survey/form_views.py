@@ -592,10 +592,10 @@ def load_data_to_cache_boundaries_name():
         cache_set_with_namespace(INSTANCE_CACHE_PREFIX+'BOUNDARY_DATA',cache_key_boundaries,boundaries,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
     return boundaries
     
-from survey.api_views_version1 import add_survey_answers_version_1
 from django.shortcuts import redirect
 @login_required(login_url='/')
 def add_survey_form(request,pk):
+    from survey.api_views_version1 import add_survey_answers_version_1
 
     template_name = 'survey_forms/survey_questions_form.html'
     cached_surveys = load_data_to_cache_survey()
