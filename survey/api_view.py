@@ -1509,14 +1509,15 @@ class MonthlyDashboardData(g.GenericAPIView):
         response = {"status":2,"message":"Success"}
         if method == "pull":
             serializer = self.pull_request(request)
+            response['data'] = serializer.data
         elif method == "push":
             serializer = self.post_request(request)
             if serializer.is_valid():
                 serializer.save()
+                response['data'] = serializer.data
             else:
-                # print(serializer.errors)
                 response['status'] = 0
-                response['message'] = "Failed"
-        response['data'] = serializer.data
+                response['message'] = f"Please check these fields - {','.join(list(serializer.errors.keys()))}"
+                response['data'] = {}
         return Response(response, status=status.HTTP_201_CREATED)
 
