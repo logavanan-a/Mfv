@@ -10,6 +10,7 @@ from django import template
 from django.conf import settings
 from django.contrib.auth.models import User
 from mis.models import MissionIndicatorAchievement, Task
+from datetime import datetime
 
 register = template.Library()
 
@@ -120,3 +121,8 @@ def get_skip_question(choice, question):
     if question in choice.skip_question.all():
         is_skip_question = True
     return is_skip_question
+
+@register.filter
+def integer_to_month(month):
+    month_obj = datetime.strptime(str(month), '%m%Y')
+    return month_obj

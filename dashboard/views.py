@@ -1,11 +1,15 @@
-from django.shortcuts import render
+from django.shortcuts import render,HttpResponse
 from django.db import connection
-from dashboard.models import DashboardSummaryLog
+from dashboard.models import DashboardSummaryLog,MonthlyDashboard,Remarks,ACTIVE_CHOICES
 from application_master.models import UserPartnerMapping,UserProjectMapping,PartnerMissionMapping
-from django.shortcuts import render
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from mis.models import *
+from survey.views import get_pagination
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+
 # Create your views here.
 def dashboard(request):
     """
@@ -139,3 +143,69 @@ def build_query(request):
     query = query.replace("@@fvalue_end_month",end_month_condition) #should be of format 202201
     query = query.replace("@@partnerfilter",partner_cond)
     return query
+
+
+
+@login_required(login_url="/login/")
+def monthly_dashboard_list(request):
+    from survey.api_view import MonthlyDashboardData
+    month = request.GET.get('month')
+    submitted_on = request.GET.get('submitted_on')
+    approval_status_id = request.GET.get('approval_status')
+    approval_status = ACTIVE_CHOICES
+    # import ipdb;ipdb.set_trace()
+    user_partner = UserProjectMapping.objects.filter(active=2,user=request.user,project__application_type_id = 511).values_list('project__partner_mission_mapping__partner_id', flat=True)
+
+    object_list = MonthlyDashboard.objects.filter(active=2,partner__in=user_partner).order_by('-modified').select_related('partner','project_incharge','partner_admin','submitted_by')
+    if month:
+        month_int = ''.join(month.split('-')[::-1])
+        object_list = object_list.filter(month = month_int)
+    
+    if submitted_on:
+        object_list = object_list.filter(created__date = submitted_on)
+    
+    if approval_status_id:
+        object_list = object_list.filter(current_status = approval_status_id)
+
+    object_list = get_pagination(request, object_list)
+    return render(request, "survey_forms/activity_list.html", locals())
+
+
+
+
+@csrf_exempt
+@login_required(login_url="/login/")
+def dashboard_data_approval(request, id):
+    from survey.api_views_version1 import submitted_record_mails
+    monthly_data = MonthlyDashboard.objects.get(id=id)
+    user_group = list(request.user.groups.all().values_list('id', flat=True))
+    role_with_permisson_map = {1:4,2:2}
+    if request.method == "POST":
+        # 4 = Partner Admin
+        # 1 = Partner Data Entry Operator
+        # 2 = Project In-charge
+        button = request.POST.get('label')
+        approval = {'reject':-1,'approve':+1}
+        monthly_data.current_status += approval.get(button)
+        
+        if 4 in user_group:
+            monthly_data.current_status = 4 if button == 'reject' else monthly_data.current_status
+            monthly_data.partner_admin = request.user
+            monthly_data.partner_submitted = datetime.today()
+        elif 2 in user_group:
+            monthly_data.project_incharge = request.user
+            monthly_data.project_incharge_submitted = datetime.today()
+
+        monthly_data.save()
+        if request.POST.get('remark'):
+            group = request.user.groups.all()[0]
+            remark_text = group.name + " - " + request.POST.get('remark')
+            Remarks.objects.create(object_id=id,content_type_id=62,remark=remark_text,user=request.user)
+        return JsonResponse({'message': 'Updated successfully'})
+
+    dashboard_data = {"No. of Children Screened":monthly_data.children_covered_count,"No. of Schools Covered":monthly_data.school_covered_count,"No. of Teachers Trained":monthly_data.teachers_train_count,"No. of Children Prescribed Spectacles":monthly_data.children_pres_count,"No. of Children Provided Spectacles":monthly_data.child_prov_spec_count,"No. of Children Advised to Continue with Same Glasses (PGP)":monthly_data.pgp_count,"No. of Children Referred to Hospital for Detailed Examination":monthly_data.children_reffered_count,"No. of Children Provided Spectacles at Hospital":monthly_data.child_prov_hos_count,"No. of Children Advised Surgery":monthly_data.children_adv_count,"No. of Children Provided Surgery":monthly_data.children_prov_sgy_count,"Spectacle Wearing Compliance After 3 Months":monthly_data.swc_count}
+
+    month_obj = datetime.strptime(str(monthly_data.month), '%m%Y')
+    remarks = Remarks.objects.filter(active=2,content_type_id=62,object_id=id).order_by('created')
+    return render(request, "survey_forms/activity_submition_view.html", locals())
+

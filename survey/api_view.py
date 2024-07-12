@@ -1244,7 +1244,7 @@ def get_levels(request, level):
         user = User.objects.get(id=request.POST.get('uid'))
         boundary_level = {1:State,2:District}
         # tagged_locations = UserProjectMapping.objects.filter(user=user,active=2).select_related('project','project__district','project__district__state')
-        project_mapped_locations = list(UserProjectMapping.objects.filter(user=user,active=2).select_related('project__district').values_list('project__district',flat=True))
+        project_mapped_locations = list(UserProjectMapping.objects.filter(user=user,active=2,project__application_type_id = 511).select_related('project__district').values_list('project__district',flat=True))
         # level_obj = BoundaryLevel.objects.get(code=int(url_level))
         # user_locations = user_projects_locations(user, level_obj)
         tagged_locations = Boundary.objects.filter(boundary_level_type_id=2,code__in=list(map(str,project_mapped_locations))).order_by('modified').select_related('parent','boundary_level_type','parent__boundary_level_type')
@@ -1469,9 +1469,9 @@ class MonthlyDashboardData(g.GenericAPIView):
         user_with_project = UserProjectMapping.objects.filter(
             active=2,
             user_id=user_id,
-            user__groups__id__in=[1]
+            user__groups__id__in=[1],
+            project__application_type_id = 511
         ).select_related('project__partner_mission_mapping__partner').first()
-        
         if user_with_project:
             return user_with_project.project.partner_mission_mapping.partner.id
         return None
