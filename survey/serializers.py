@@ -45,8 +45,8 @@ class CommaSeparatedListField(serializers.Field):
         return data
         
 class MonthlyDashboardSerializer(serializers.ModelSerializer):
-    created = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S.%f')
-    modified = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S.%f')
+    created = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S.%f',required=False)
+    modified = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S.%f',required=False)
     children_covered_uuid =  CommaSeparatedListField()
     school_covered_uuid =  CommaSeparatedListField()
     teachers_train_uuid =  CommaSeparatedListField()

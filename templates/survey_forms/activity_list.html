@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load urs_tags %}
+{% load configuration_tags %}
+
+
+{% block contents %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+        <div class="card-body">
+            <div class="card-header card-header-icon d-flex justify-content-between mb-3" data-background-color="rose">
+                <div class="p-1">
+                    <div class="d-flex align-items-center">
+                        <i class="" style="font-size: 22px;"></i>
+                        <h4 class="p-1 card-title" style="position: relative; top: 5px; "> Approval List  </h4>
+                    </div>
+                </div>
+                <div class="p-1 d-flex" style="gap:5px">
+                    <a onclick="show_or_hide_filters()">
+                        <button class="btn btn-primary btn-just-icon btn-round btn-dribbble btn-sm " style="float:right" data-bs-toggle="tooltip" data-bs-original-title="Filter">
+                            <i class="bx bx-filter" style="font-size: 20px;"></i>
+                        </button>
+                    </a>
+                </div>
+                
+
+            </div>
+            <div class="card-content card_section">
+                <div class=" filter_class ">
+                    <form action="." method='GET' class="row mb-2 mt-3" >
+                    <input type="hidden" name="status" value="{{status}}">
+                    <div class="col-md-4" id="div_{{level.code}}">
+                        <div class="">
+                            <div class="form-group  select_group">
+                            <spen>Month </spen>
+                                <input type="month"  class="form-control" name="month" id="month" value="{{month}}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4" id="div_{{level.code}}">
+                        <div class="">
+                            <div class="form-group  select_group">
+                            <spen>Submitted On </spen>
+                                <input type="date"  class="form-control" name="submitted_on" id="submitted_on" value="{{submitted_on}}">
+                            </div>
+                        </div>
+                    </div>
+                    {% comment %} <div class="col-md-4" id="div_{{level.code}}">
+                        <div class="">
+                            <div class="form-group  select_group">
+                            <spen>Project </spen>
+                                <select class="form-control" data-width="100%" data-style="form-select" name="project" id="project" data-live-search="true">                     
+                                    <option value="">Select Project</option>
+                                {% for proj in projects %}
+                                    <option {% if proj.id|slugify == project %} selected {%endif%} value="{{proj.id}}">{{proj.name}}</option>
+                                        {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div> {% endcomment %}
+                        
+                    <div class="col-md-4" id="div_{{level.code}}">
+                        <div class="">
+                            <div class="form-group  select_group">
+                            <spen>Stage </spen>
+                                <select class="form-control" data-width="100%" data-style="form-select" name="approval_status" id="approval_status" data-live-search="true">
+                                    <option value="">Select Activity</option>
+                                {% for appr_status in approval_status %}
+                                    <option {% if appr_status.0|slugify == approval_status_id %} selected {%else%} {%endif%} value="{{appr_status.0}}">{{appr_status.1}}</option>{% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    
+                    </div>
+                    
+                    
+                    
+                    <div class="col-md-4 row mt-4" >
+                        <div class="col-md-2" >
+                            <input type="submit" class="btn btn-primary btn-fill btn-rose btn-sm btn-filter" value="Filter"><div class="ripple-container"></div>
+                        </div>
+                        <div class="col-md-2" >
+                            <a href="{{request.path}}">
+                                <input type="button" class="btn btn-primary btn-fill btn-rose btn-sm btn-filter" value="Clear"><div class="ripple-container"></div>
+                            </a>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+                <div class="table-responsive width_section">
+                    <table id="datatables" class="table table-striped" cellspacing="0" width="100%" style="width:100%">
+                        <thead class="table-light" >
+                            <th>Partner Name</th>
+                            <th> Month</th>
+                            <th> Submitted By</th>
+                            <th> Submitted On</th>
+                            <th> Stage</th>
+                        </thead>
+                        <tbody style="vertical-align: middle;">
+                            {% for obj in object_list %}
+                            <tr>
+                                <td>{{obj.partner.name}}</td>
+                                <td>{{obj.month|integer_to_month|date:"M-Y"}}</td>
+                                <td>{{obj.submitted_by}}</td>
+                                <td>{{obj.created|date:'d-m-Y'}}</td>
+                                <td><a  href="{{obj.id}}/">{{ obj.get_current_status_display|default:"-" }}</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% include 'survey_forms/pagination.html' %}
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_javascript %}
+
+    <script>
+        function show_or_hide_filters(){
+            $('.filter_class').toggle()
+        }
+        $(document).ready(function() {
+            {% comment %} {% if not request.GET.keys or request.GET.keys|length in 1 and 'page' in request.GET.keys %}
+                $('.filter_class').hide()
+            {% elif 'page' in request.GET.keys or 'status' in request.GET.keys and request.GET.keys|length <= 2  %}
+                $('.filter_class').hide()
+            {% else %}
+                $('.filter_class').show()
+            {% endif %} {% endcomment %}
+          });
+    </script>
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}
