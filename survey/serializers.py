@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import *
 import pytz
-from dashboard.models import MonthlyDashboard
+from dashboard.models import MonthlyDashboard,Remarks
 
 class LabelLanguageTranslationSerializer(serializers.ModelSerializer):
     label = serializers.CharField(source='applabel.name')
@@ -45,6 +45,8 @@ class CommaSeparatedListField(serializers.Field):
         return data
         
 class MonthlyDashboardSerializer(serializers.ModelSerializer):
+    created = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S.%f')
+    modified = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S.%f')
     children_covered_uuid =  CommaSeparatedListField()
     school_covered_uuid =  CommaSeparatedListField()
     teachers_train_uuid =  CommaSeparatedListField()
@@ -72,3 +74,15 @@ class MonthlyDashboardSerializer(serializers.ModelSerializer):
         validated_data['partner_id'] = partner
         validated_data['submitted_by_id'] = submitted_by
         return MonthlyDashboard.objects.create(**validated_data)
+
+class RemarksSerializer(serializers.ModelSerializer):
+    created_at = serializers.DateTimeField(source='created',format='%Y-%m-%d %H:%M:%S.%f')
+    modified_at = serializers.DateTimeField(source='modified',format='%Y-%m-%d %H:%M:%S.%f')
+    response_id = serializers.CharField(source='content_object.creation_key') 
+    remark_uuid = serializers.CharField(source='content_object.creation_key') 
+    created_by = serializers.CharField(source='content_object.submitted_by.username') 
+
+    class Meta:
+        model = Remarks
+        exclude = ['created','modified','listing_order','object_id','user','content_type']
+

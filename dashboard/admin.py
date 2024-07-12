@@ -9,5 +9,6 @@ admin.site.register(DashboardWidgetTypes)
 admin.site.register(DashboardIndicatorFilter)  
 admin.site.register(DashboardChartWidgets)  
 admin.site.register(MonthlyDashboard)  
+admin.site.register(Remarks)  
 
     

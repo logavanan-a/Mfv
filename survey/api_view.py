@@ -13,7 +13,7 @@ import os,re
 from datetime import datetime, timedelta
 from django.db.models import Q
 from django.apps import apps
-from survey.serializers import LabelLanguageTranslationSerializer,MonthlyDashboardSerializer
+from survey.serializers import LabelLanguageTranslationSerializer,MonthlyDashboardSerializer,RemarksSerializer
 from survey.capture_sur_levels import convert_string_to_date
 import pytz
 # from configuration_settings.user_location_views import user_responses
@@ -1500,16 +1500,28 @@ class MonthlyDashboardData(g.GenericAPIView):
     
     def pull_request(self, request):
         user_id = request.data.get('user_id')
+        remark_modified = request.data.get('r_modified')
+        dashboard_modified = request.data.get('d_modified')
+        print(remark_modified,dashboard_modified)
         user_partner = self.get_partner(user_id)
-        dashboard_data = MonthlyDashboard.objects.filter(submitted_by_id = user_id,partner = user_partner,active=2)
+        dashboard_data = MonthlyDashboard.objects.filter(submitted_by_id = user_id,partner = user_partner,active=2).order_by('modified')
+        remarks = Remarks.objects.filter(active=2,content_type_id = 62,object_id__in=dashboard_data).order_by('modified') #62 is common content type for monthly dashboard in all instance
+        if dashboard_modified:
+            dashboard_data = dashboard_data.filter(modified__gt=dashboard_modified)
+        
+        if remark_modified:
+            remarks = remarks.filter(modified__gt=remark_modified)
+        
         serializer = self.get_serializer(dashboard_data,many=True)
-        return serializer
+        remarks_serializer = RemarksSerializer(remarks,many=True)
+        return serializer , remarks_serializer
 
     def post(self, request, method, *args, **kwargs):
         response = {"status":2,"message":"Success"}
         if method == "pull":
-            serializer = self.pull_request(request)
+            serializer, remarks_serializer = self.pull_request(request)
             response['data'] = serializer.data
+            response['remarks'] = remarks_serializer.data
         elif method == "push":
             serializer = self.post_request(request)
             if serializer.is_valid():
