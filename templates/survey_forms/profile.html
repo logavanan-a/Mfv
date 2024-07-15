@@ -3,15 +3,24 @@
     <div class="mb-2">
         <ul class="nav  nav-ul" role="tablist" >
            
-            {% if options_dropdown.count > 1 %}
+            {% if options_dropdown.count > 0 %}
+                {% if school_creation_key  %}
+                <li class="nav-item dropdown mt-2 " style='margin-right:2px'>
+                    <a class="btn nav-link dropdown-toggle text-white nav_label {% if not survey_slug %}bg-warning{% else %}bg-primary{% endif %}" href='/configuration/list/student-details-3004/{{school_creation_key}}/{{school_name}}/'  id="dropdownMenuButton"  style='font-size:1.1rem'>
+                        Profile
+                    </a>
+                </li>
+                {% else %}
                 <li class="nav-item dropdown mt-2 " style='margin-right:2px'>
                     <a class="btn nav-link dropdown-toggle text-white nav_label {% if not survey_slug %}bg-warning{% else %}bg-primary{% endif %}" href='/configuration/profile/{{creation_key}}/'  id="dropdownMenuButton"  style='font-size:1.1rem'>
                         Profile
                     </a>
                 </li>
+
+                {% endif %}
                 {% for survey_tags in options_dropdown  %}
                     <li class="nav-item dropdown mt-2 " style='margin-right:2px'>
-                        <a {% if survey_tags.id in profile_obj.survey.extra_config.reject_hidefields and profile_obj.response.616 != '620' %}onclick="return false;"{% endif %}  class="btn nav-link dropdown-toggle text-white nav_label {% if survey_tags.id == survey.id %}bg-warning {% elif survey_tags.id in profile_obj.survey.extra_config.reject_hidefields and profile_obj.response.616 != '620' %}bg-secondary{% else %}bg-primary{% endif %}" href='/configuration/profile/{{survey_tags.slug}}/{{creation_key}}/'  id="dropdownMenuButton"  style='font-size:1.1rem'>
+                        <a {% if survey_tags.id in profile_obj.survey.extra_config.reject_hidefields and profile_obj.response.616 != '620' %}onclick="return false;"{% endif %}  class="btn nav-link dropdown-toggle text-white nav_label {% if survey_tags.id == survey.id %}bg-warning {% elif survey_tags.id in profile_obj.survey.extra_config.reject_hidefields and profile_obj.response.616 != '620' %}bg-secondary{% else %}bg-primary{% endif %}" href='/configuration/profile/{{survey_tags.slug}}/{% if school_creation_key %}{{school_creation_key}}{% else %}{{creation_key}}{% endif %}/'  id="dropdownMenuButton"  style='font-size:1.1rem'>
                             {{survey_tags.short_name|default:survey_tags.name}} 
                         </a>
                     </li>

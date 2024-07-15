@@ -353,16 +353,7 @@ def add_survey_answers_version_1(request, **kwargs):
                     exc_type, exc_value, exc_traceback))
                 logging.error(error_stack)
             finally:
-                sync_res.append({"r_uuid": val['r_uuid'], "sync_status": sync_status,
-                            "s_created": server_created_date, 'error_msg':error_msg, 'duplicate_status': duplicate_status,"approved_by":approved_by,"approved_on":approved_on})
-        for key, value in resp_ids.items():
-            if value and activity_queries.get(key):
-                with connection.cursor() as cursor:
-                    cursor.execute(activity_queries.get(key).format(', '.join(map(str, value))))
-        # email configuration for sending respected role users 
-        status_of_submission = 1 if submitted_approval else 0
-        # submitted_record_mails(updated_record_email_ids,response_current_status,role_workflow_dict,status_of_submission)  
-
+                sync_res.append({ "r_uuid":val['r_uuid'],"sync_status":sync_status, "s_created": server_created_date,"duplicate_status":0,"error_msg":error_msg,"updated_question":[updated_question],"server_primary_key":server_primary_key,"ben_uuid":app_answer_obj.sample_id if app_answer_obj else ''})
     except Exception as ex:
         status = False
         message = "Failed"

@@ -38,6 +38,7 @@
                                 </div>
                             </div>   
                         </div>
+                        
                     </div>                    
                     <div class='row'>
                         <div class="col-md-6">
@@ -88,6 +89,27 @@
                                 <label for="floatingnameInput">Enter Email</label>
                                 <div class="invalid-feedback">
                                     Please enter the email.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" name='mobile_no' id="floatingnameInput"  placeholder="Mobile no" pattern="[0-9]{10}">
+                                <label for="floatingnameInput">Mobile No</label>
+                                <div class="invalid-feedback">
+                                    Please enter the Mobile no.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <select  class="select2 form-control select2 "  
+                                data-placeholder="Choose Login Type" id="validationCustom04" name='login_type' required> 
+                                    <option value="" disabled selected>Select Login Type</option>
+                                    <option value="1">WEB</option>
+                                    <option value="2">APP</option>
+                                </select> 
+                                <div class="invalid-feedback">
+                                    Please select the Login Type.
                                 </div>
                             </div>
                         </div>

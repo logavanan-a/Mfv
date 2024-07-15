@@ -3,7 +3,7 @@ from constants import data
 from django.contrib.auth.models import User
 from application_master.models import Menus
 from survey.models import *
-from survey.form_views import get_result_query
+from survey.form_views import get_result_query,get_financial_year_dates
 # from projectmanagement.models import (LineitemTheme,ProjectTheme)
 # from beneficiary.models import BeneficiaryResponse,BeneficiaryLink
 import urllib3
@@ -117,14 +117,16 @@ def make_string(val1, val2):
 def survey_show(survey_id, creation_key):
     from django.db import connection
     from datetime import datetime
-    current_year = datetime.now().year
+    start_date, end_date = get_financial_year_dates()
     value = False
-    query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@year'.format(survey_id,creation_key)#
-    if survey_id in [3,4]: 
-        query=query.replace("@@year"," and to_char(js.created,'YYYY') = '{0}'".format(current_year))
+    # import ipdb; ipdb.set_trace()
+    query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@financial_year'.format(survey_id,creation_key)#
+    if survey_id in [3,4,5]: 
+        query=query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
     else:
-        query=query.replace("@@year","")
-    # secondary_query= query
+        query=query.replace("@@financial_year","")
+    # import ipdb; ipdb.set_trace()
+    secondary_query= query
     object_lists=JsonAnswer.objects.raw(query)
     if object_lists:
         for obj in object_lists:
@@ -134,35 +136,38 @@ def survey_show(survey_id, creation_key):
                 ans_code = keys['ans_code']
                 survey_key = keys['survey_id'] if keys['survey_id'] is not None and keys['survey_id'] !=0  else survey_id
                 questionId = keys['questionId']
-                query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@question_id @@year'.format(survey_key,creation_key)#
+                query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@question_id @@financial_year'.format(survey_key,creation_key)#
                 if questionId is not None and questionId != 0:
                     query=query.replace("@@question_id"," and js.response->>'{0}' = '{1}'".format(questionId,ans_code))
                 else:
                     query=query.replace("@@question_id","")
                 if survey_key in [3,4]:
-                    query=query.replace("@@year"," and to_char(js.created,'YYYY') = '{0}'".format(current_year))
+                    query=query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
                 else:
-                    query=query.replace("@@year","")
+                    query=query.replace("@@financial_year","")
     else:
-        items = {'4':3,'7':4,'5':4,'6':5,'8':4,'9':5,'3':3}    
+        items = {'4':3,'7':4,'5':4,'6':5,'8':4,'9':5,'3':3,'10':10}    
         survey_key = items[str(survey_id)]
-        query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@year'.format(survey_key,creation_key)#
-        if survey_key in [3,4]:
-            query=query.replace("@@year"," and to_char(js.created,'YYYY') = '{0}'".format(current_year))
+        query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@financial_year'.format(survey_key,creation_key)#
+        if survey_key in [3,4,5]:
+            query=query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
         else:
-            query=query.replace("@@year","")
-    
+            query=query.replace("@@financial_year","")
     results = get_result_query(query)
-    secondary = 0
-    if survey_id == 4 and len(results) == 1:
-        secondary_query="""with a as ("""+query+""") select coalesce(sum(case when response->>'250' in ('154','155') or a.response->>'252' in ('162','163') then 1 else 0 end),0) as ht from a"""
+    primary=0
+    secondary=0
+    if survey_id == 4:
+        query="""with a as ("""+query+""") select coalesce(sum(case when response->>'250' in ('154','155') or a.response->>'252' in ('162','163') then 1 else 0 end),0) as ht from a"""
+        results = get_result_query(query)
+        primary = results[0][0]
+    if primary == 0 and survey_id in [4,5] and len(results) == 1:
         secondary_result = get_result_query(secondary_query)
-        secondary = secondary_result[0][0]
-    if secondary !=0 and len(results) == 1 and survey_id == 4:
+        secondary = len(secondary_result)
+    if primary == 0 and secondary !=0 and len(results) == 1 and survey_id in [4,5]:
         value = False
     elif len(results) == 1 and survey_id == 3:
         value = False
-    elif len(results) == 0 and survey_id == 3:
+    elif len(results) == 0 and survey_id in [3,10]:
         value = True
     elif len(results) != 0: 
         value = True

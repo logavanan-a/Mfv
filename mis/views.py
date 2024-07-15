@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from django.core.exceptions import ObjectDoesNotExist
 
 # import requests
 from application_master.models import (District, Donor, Menus, Mission,
@@ -8,7 +9,7 @@ from application_master.models import (District, Donor, Menus, Mission,
                                        MissionIndicatorTarget, Partner,
                                        PartnerMissionMapping, Project,
                                        ProjectDonorMapping, ProjectFiles,
-                                       State, UserPartnerMapping, UserProjectMapping)
+                                       State, UserPartnerMapping, UserProjectMapping,UserProfile)
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user, login, logout
@@ -483,7 +484,7 @@ def user_listing(request):
     """
     heading = "User Management"
     search = request.GET.get('search', '')
-    user_role_location_config = UserPartnerMapping.objects.filter(
+    user_role_location_config = UserProfile.objects.filter(
         active=2).order_by('user__username')
     groups = Group.objects.all().exclude(id=11)
     if search:
@@ -505,40 +506,12 @@ def add_user(request, user_location=None):
     Renders the add user page and handles the creation of a new user.
     """
     heading = "Add User"
-    groups = Group.objects.filter(id__in=[2,3])
+    groups = Group.objects.filter(id=3)
     partners = Partner.objects.all()
 
-    if True:
-        if request.method == 'POST':
-            try:
-                data = request.POST
-                username = data.get('username')
-                password = data.get('password1')
-                partner = data.get('partner')
-                user_role = data.get('user_role')
-                first_name = data.get('first_name')
-                last_name = data.get('last_name')
-                email = data.get('email')
-
-                user = User.objects.create_user(username, password)
-
-                user.email =  email
-                user.first_name = first_name
-                user.last_name = last_name
-                user.groups.add(Group.objects.get(id = user_role ))
-                user.save()
-
-                user_role_config = UserPartnerMapping.objects.create(
-                    user=user, partner = Partner.objects.get(id = partner)
-                )
-
-                return redirect('mis:user_listing')
-            except ObjectDoesNotExist:
-                return redirect('mis:add_user')
-            return redirect('mis:user_listing')
-        return render(request, 'user/add_user.html', locals())
-    else:
-        if request.method == 'POST':
+    if request.method == 'POST':
+        try:
+            # import ipdb; ipdb.set_trace()
             data = request.POST
             username = data.get('username')
             password = data.get('password1')
@@ -547,18 +520,38 @@ def add_user(request, user_location=None):
             first_name = data.get('first_name')
             last_name = data.get('last_name')
             email = data.get('email')
-
+            login_type = data.get('login_type')
+            mobile_no = data.get('mobile_no')
             if User.objects.filter(username__iexact=username).exists():
                 user_location = None
                 user_exist_error = 'Username already exist'
-            else:
-                selected_role_model = user_group_dict.get(
-                    user_role)._meta.model_name
-                states = State.objects.filter(active=2)
-                heading = username  # + ' - '+selected_group.name
-            return render(request, 'user/add_user.html', locals())
-        return render(request, 'user/add_user.html', locals())
+                return render(request, 'user/add_user.html', locals())
+            if User.objects.filter(email__iexact=email).exists():
+                user_location = None
+                user_exist_error = 'Email already exist'
+                return render(request, 'user/add_user.html', locals())
+            if UserProfile.objects.filter(phone_no__iexact=mobile_no).exists():
+                user_location = None
+                user_exist_error = 'Mobile no already exist'
+                return render(request, 'user/add_user.html', locals())
+            user = User.objects.create_user(username, password)
+            user.email =  email
+            user.first_name = first_name
+            user.last_name = last_name
+            user.groups.add(Group.objects.get(id = user_role ))
+            user.save()
 
+            # user_role_config = UserPartnerMapping.objects.create(
+            #     user=user, partner = Partner.objects.get(id = partner)
+            # )
+            user_profile=UserProfile.objects.create(user=user, phone_no=mobile_no, login_type=login_type)
+            user_profile.save()
+            return redirect('mis:user_listing')
+        except:
+            user.delete()
+            return redirect('mis:add_user')
+    return render(request, 'user/add_user.html', locals())
+    
 @ login_required(login_url='/')
 def user_profile(request, id):
     """
@@ -577,8 +570,9 @@ def edit_user(request, id):
     partners = Partner.objects.all()
 
     user = User.objects.get(id=id)
-    user_partner_config = UserPartnerMapping.objects.get(
-        user=user)
+    user_profile = UserProfile.objects.get(user=user)
+    # user_partner_config = UserPartnerMapping.objects.get(
+    #     user=user)
     if request.method == 'POST':
         data = request.POST
         username = data.get('username')
@@ -587,18 +581,35 @@ def edit_user(request, id):
         email = data.get('email')
         user_role = data.get('user_role')
         partner = data.get('partner')
+        login_type = data.get('login_type')
+        mobile_no = data.get('mobile_no')
+        if User.objects.filter(username__iexact=username).exclude(id=user.id).exists():
+            user_location = None
+            user_exist_error = 'Username already exist'
+            return render(request, 'user/add_user.html', locals())
+        if User.objects.filter(email__iexact=email).exclude(id=user.id).exists():
+                user_location = None
+                user_exist_error = 'Email already exist'
+                return render(request, 'user/add_user.html', locals())
+        if UserProfile.objects.filter(phone_no__iexact=mobile_no).exclude(id=user_profile.id).exists():
+            user_location = None
+            user_exist_error = 'Mobile no already exist'
+            return render(request, 'user/add_user.html', locals())
         user.username = username
         user.first_name = first_name
         user.last_name = last_name
         user.email = email
+
         if user_role:
             user.groups.clear()
             user.groups.add( Group.objects.get(id = user_role))
         user.save()
-        
-        if partner:
-            user_partner_config.partner = Partner.objects.get(id = partner)
-        user_partner_config.save()
+        user_profile.phone_no = mobile_no
+        user_profile.login_type = login_type
+        user_profile.save()
+        # if partner:
+        #     user_partner_config.partner = Partner.objects.get(id = partner)
+        # user_partner_config.save()
 
         return redirect('mis:user_profile', id = id)
     

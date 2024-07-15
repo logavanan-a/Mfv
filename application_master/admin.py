@@ -34,7 +34,7 @@ class AdminBoundary(ImportExportActionModelAdmin, admin.ModelAdmin):
     Custom admin configuration for the 'Partner' model.
     """
     search_fields = ['name', 'slug']
-    list_filter = ['active']
+    list_filter = ['active','boundary_level_type']
 
     def get_list_display(self, request):
         """

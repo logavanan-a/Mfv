@@ -10,6 +10,9 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
+                {% if school_creation_key  %}
+                    {% include "../survey_forms/profile.html" %}
+                {% endif %} 
                 {% if filters and not creation_key %}
                     {% include './survey_listing_filters.html' %}
                 {% endif %}
@@ -31,7 +34,7 @@
                     </div>
                 {% endif %}
                         
-                {% if creation_key and response_obj.survey.id != 2 %}
+                {% if creation_key and survey.id != 1 and survey.id != 10 %}
                     {% include "../survey_forms/profile.html" %}
                 {% endif %} 
                 {% if survey.periodicity == 7 and creation_key and survey_slug %}
@@ -239,16 +242,15 @@
                                     <tr class="odd font-size-16">
                                         {% for header_id in survey_heading_questions %}
                                         <!-- options_dropdown.count > 0 -->
-                                            {% if forloop.counter == 1 and not profile_obj and not main_add_button and options_dropdown %}
+                                            {% if forloop.counter == 1 and not profile_obj and not main_add_button and options_dropdown and survey.id == 2 %}
                                             <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}><a href="/configuration/profile/{{json_answer.creation_key}}/">{{json_answer|get_item_ans:header_id|safe}}</a></td>
-
-                                            {% elif forloop.counter == 1 and not profile_obj and not main_add_button  %}
+                                            {% elif forloop.counter == 1 and not profile_obj and not main_add_button and options_dropdown %}
                                             <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}><a href="/configuration/list/student-details-3004/{{json_answer.creation_key}}/{{json_answer|get_item_ans:header_id|safe}}/">{{json_answer|get_item_ans:header_id|safe}}</a></td>
                                             {% else %}
                                             <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}>{{json_answer|get_item_ans:header_id|safe}}</td>
                                             {% endif %}
                                         {% endfor %}
-                                        {% if profile_obj or not main_add_button and options_dropdown.count > 0  %}
+                                        {% if profile_obj or not main_add_button and survey.id != 1 and options_dropdown.count > 0  %}
                                             <td>
                                                 <div class="row">
                                                     {% with profile_obj.survey.slug|default:survey.slug|make_string:"edit" as keystrings %}

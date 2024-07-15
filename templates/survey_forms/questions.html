@@ -145,7 +145,7 @@
                 <label class="form-check-label mb-2">{{question.form_question_number|default:''}}. {{question.text}}</label>
                 <div class='row'>
                     {% for choice in main_choice_list %}
-                        <div class="col-lg-6" id='skip_{{question.id}}'>
+                        <div class="col-lg-6"question.qtype == 'C id='skip_{{question.id}}'>
                             <div class="form-check mb-3">
                                 <input class="form-check-input main_checkbox_{{question.id}} main_question C_0_0 {% if question.mandatory %}required{% endif %}" type="checkbox" name="{{question.id}}" id="{{question.id}}" value="{{choice.id}}" {% if question.mandatory %}required{% endif %}>
                                 <label class="form-check-label" for="{{choice.id}}">{% if question.mandatory %}<span class="required-field"></span>{% endif %}

@@ -42,9 +42,10 @@
                                     <th>Username</th>
                                     <th>User Role</th>
                                     <th>Email Address</th>
-                                    <!-- <th>First Name</th>
-                                    <th>Last Name</th> -->
-                                    <th>Partner</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Phone No</th>
+                                    <th>Login Type</th>
                                     <!-- <th>Active Status</th> -->
                                 </tr>
                             </thead>
@@ -58,9 +59,10 @@
                                                     {{ u.user.groups.all.0 }} 
                                                 </td>
                                                 <td>{{u.user.email|default:'-'}}</td>
-                                                <!-- <td>{{u.user.first_name|default:'-'}}</td>
-                                                <td>{{u.user.last_name|default:'-'}}</td> -->
-                                                <td>{{u.partner.name|default:'-'}}</td>
+                                                <td>{{u.user.first_name|default:'-'}}</td>
+                                                <td>{{u.user.last_name|default:'-'}}</td> 
+                                                <td>{{u.phone_no|default:'-'}}</td>
+                                                <td>{{u.get_login_type_display|default:'-'}}</td>
                                                 <!-- <td>{% if u.user.is_active %}<i class='bx bxs-check-circle bx-sm text-success'></i>{% else %}<i class='bx bxs-x-circle bx-sm text-danger'></i>{% endif %}</td> -->
                                             </tr>
                                         </tr>
