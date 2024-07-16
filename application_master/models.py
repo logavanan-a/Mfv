@@ -8,6 +8,8 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
 
+from django.contrib.auth.models import AbstractUser
+
 
 # BaseContent model represents a base class for content-related models.
 class BaseContent(models.Model):
@@ -167,6 +169,7 @@ class PartnerMissionMapping(BaseContent):
 
     def __str__(self):
         return f"{self.partner.name} - {self.mission.name}"
+
 
 class Project(BaseContent):
     #-------------------#
@@ -425,3 +428,9 @@ class MasterLookUp(BaseContent):
     #     else:
     #         locations= ','.join(str(i) for i in locations)
     #     return locations
+LOGIN_CHOICES  = ((1, 'WEB'),(2,"APP"))
+
+class UserProfile(BaseContent):
+    user = models.OneToOneField(User, on_delete = models.CASCADE)
+    phone_no  = models.CharField(max_length=10, blank=True, null=True)
+    login_type  = models.PositiveIntegerField(choices = LOGIN_CHOICES)

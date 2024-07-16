@@ -28,9 +28,9 @@
                             <div class="form-floating mb-3">
                                 <select  class="select2 form-control select2 "  
                                 data-placeholder="Choose User Role" id="validationCustom04" name='user_role' required>      
-                                    <option selected disabled value="">Select User Role</option>
+                                    <!-- <option selected disabled value="">Select User Role</option> -->
                                     {% for group in groups %}
-                                    <option value="{{group.id}}">{{group.name}}</option>
+                                    <option value="{{group.id}}" {% if group.id == 3 %}selected{% endif %}>{{group.name}}</option>
                                     {% endfor %}
                                 </select>
                                 <div class="invalid-feedback">
@@ -87,7 +87,8 @@
                                     Please enter the first name.
                                 </div>
                             </div>
-                        </div><div class="col-lg-6">
+                        </div>
+                        <div class="col-lg-6">
                             <div class="form-floating mb-3">
                                 <input type="text" class="form-control" name='last_name' id="floatingnameInput"  placeholder="Enter Last Name" >
                                 <label for="floatingnameInput">Enter Last Name</label>
@@ -96,14 +97,33 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class='row'>
                         <div class="col-lg-6">
                             <div class="form-floating mb-3">
                                 <input type="email" class="form-control" name='email' id="floatingnameInput"  placeholder="Enter Email" >
                                 <label for="floatingnameInput">Enter Email</label>
                                 <div class="invalid-feedback">
                                     Please enter the email.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" name='mobile_no' id="floatingnameInput"  placeholder="Mobile no" pattern="[0-9]{10}">
+                                <label for="floatingnameInput">Mobile No</label>
+                                <div class="invalid-feedback">
+                                    Please enter the Mobile no.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <select  class="select2 form-control select2 "  
+                                data-placeholder="Choose Login Type" id="validationCustom04" name='login_type' required> 
+                                    <option value="" disabled selected>Select Login Type</option>
+                                    <option value="1">WEB</option>
+                                    <option value="2">APP</option>
+                                </select> 
+                                <div class="invalid-feedback">
+                                    Please select the Login Type.
                                 </div>
                             </div>
                         </div>
