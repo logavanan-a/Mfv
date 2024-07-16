@@ -163,6 +163,8 @@ def survey_show(survey_id, creation_key):
     if primary == 0 and survey_id in [4,5] and len(results) == 1:
         secondary_result = get_result_query(secondary_query)
         secondary = len(secondary_result)
+        referred_to_hospital="""with a as ("""+secondary_query+""") select coalesce(sum(case when js.response->>'284'='180' then 1 else 0 end),0) as ht from a"""
+        referred_to_hospital_result = len(referred_to_hospital)
     if primary == 0 and secondary !=0 and len(results) == 1 and survey_id in [4,5]:
         value = False
     elif len(results) == 1 and survey_id == 3:
@@ -171,6 +173,7 @@ def survey_show(survey_id, creation_key):
         value = True
     elif len(results) != 0: 
         value = True
+    print(referred_to_hospital,'referred_to_hospital_result')
     return value
 
         # object_lists=JsonAnswer.objects.raw(query)

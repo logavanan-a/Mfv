@@ -8,7 +8,7 @@ from application_master.models import (District, Donor, Menus, Mission,
                                        MissionIndicatorTarget, Partner,
                                        PartnerMissionMapping, Project,
                                        ProjectDonorMapping, ProjectFiles,
-                                       State, UserPartnerMapping,
+                                       State, UserPartnerMapping,UserProfile,
                                        UserProjectMapping,MasterLookUp,Boundary,BoundaryLevel)
 
 # @admin.register(BoundaryLevel)
@@ -263,7 +263,15 @@ class AdminMenus(ImportExportActionModelAdmin, admin.ModelAdmin):
 
 @admin.register(MasterLookUp)    
 class MasterLookUpAdmin(ImportExportModelAdmin, ImportExportFormat):
-    pass
+    def get_list_display(self, request):
+        """
+        Customize the list display for the admin page.
+        """
+        return [field.name for field in self.model._meta.concrete_fields]
+
+@admin.register(UserProfile)    
+class UserProfileAdmin(ImportExportModelAdmin, ImportExportFormat):
+    list_display = ['user']
     
 # from django.apps import apps
 
