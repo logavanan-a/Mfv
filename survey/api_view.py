@@ -242,7 +242,7 @@ def choicelist(request):
                             'extra_column1': "",
                             'extra_column2': 0,
                             'assessment_pid': int(ch.question.id),
-                            'is_correct_choice':ch.config.get('is_correct_choice',0) if ch.config else 0,
+                            'is_correct_choice':0,
                             'Rule_engine': ch.config,#ch.get_text_choices_rule_engine(),
                             'other_choice': ch.is_other_choice,
                             'code_display': str(ch.code_display) if ch.code_display  else '0',
