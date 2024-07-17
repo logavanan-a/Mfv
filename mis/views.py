@@ -506,7 +506,7 @@ def add_user(request, user_location=None):
     Renders the add user page and handles the creation of a new user.
     """
     heading = "Add User"
-    groups = Group.objects.filter(id=3)
+    groups = Group.objects.filter()
     partners = Partner.objects.all()
 
     if request.method == 'POST':
@@ -553,13 +553,61 @@ def add_user(request, user_location=None):
     return render(request, 'user/add_user.html', locals())
     
 @ login_required(login_url='/')
-def user_profile(request, id):
+def user_profile(request, user_id):
     """
     Renders the user profile page.
     """
-    user = User.objects.get(id=id)
-    print(user.last_login,'-----------------------')
+    user = User.objects.get(id=user_id)
+    user_profile_obj = UserProjectMapping.objects.filter(user=user)
+
     return render(request, 'user/user_profile.html', locals())
+
+    
+
+@ login_required(login_url='/')
+def add_map_project(request, user_id):
+    heading = "Add User Project Mapping"
+
+    states = State.objects.filter(active=2).order_by('name')
+    districts = District.objects.filter(active=2).order_by('name')
+    donors = Donor.objects.filter(active=2)
+    partner_mission = PartnerMissionMapping.objects.filter()
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        partner_mission = request.POST.get('partner_mission')
+        state = request.POST.get('state')
+        district = request.POST.get('district')
+        location = request.POST.get('location')
+        donor = request.POST.get('donor')
+        start_date = request.POST.get('start_date',None)
+        end_date = request.POST.get('end_date',None)
+
+        additional_info = request.POST.get('additional_info',None)
+        pro_details = Project.objects.create(
+            name=name,
+            partner_mission_mapping_id=partner_mission,
+            district_id=district,
+            location=location,
+            additional_info=additional_info,
+            start_date=start_date,
+            end_date=end_date,    
+            application_type_id=510,        
+        )
+        pro_details.save()
+        user_project_mapping= UserProjectMapping.objects.create(
+            project_id=pro_details.id,
+            user_id=user_id
+        )
+        user_project_mapping.save()
+        project_donor_mapping =ProjectDonorMapping.objects.create(
+                    project_id=pro_details.id,
+                    donor_id=donor
+                )
+                    # defaults={'donor_id': donor}
+                
+        return redirect('/user-profile/'+ str(user_id) + '/')
+
+    return render(request, 'user/adding_project.html', locals())
 
 @ login_required(login_url='/')
 def edit_user(request, id):

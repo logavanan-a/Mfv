@@ -202,7 +202,9 @@ def master_details_form(request,model,id):
         user_obj = User.objects.filter(id__in=user_mapping)
         groups_obj = Group.objects.filter(user__in=user_obj).distinct()
         part=Partner.objects.filter(id=id, active=2)
+        missions = Mission.objects.filter(active=2).count()
         parner_mission_obj = PartnerMissionMapping.objects.filter(partner_id__in=part,active=2).order_by('-id')
+        total = parner_mission_obj.count()
         project_map = Project.objects.filter(partner_mission_mapping_id__in = parner_mission_obj,application_type_id=510).order_by('-id')
     elif model == 'project':
         heading="Project"
@@ -289,13 +291,14 @@ def partner_mission_mapping(request, partner_id):
     
     if request.method == "POST":
         selected_missions = request.POST.getlist('missions')  
-        for mission_id in selected_missions:
-            part_mission=PartnerMissionMapping.objects.create(
-                partner_id=partner_id,
-                mission_id=mission_id,
-            )
-            part_mission.save()
-        return redirect('/application_master/details/partner/' + str(partner_id) + '/')
+        if selected_missions:
+            for mission_id in selected_missions:
+                part_mission=PartnerMissionMapping.objects.create(
+                    partner_id=partner_id,
+                    mission_id=mission_id,
+                )
+                part_mission.save()
+            return redirect('/application_master/details/partner/' + str(partner_id) + '/')
     
     return render(request, 'user/user_partner_mapping.html',locals())
 

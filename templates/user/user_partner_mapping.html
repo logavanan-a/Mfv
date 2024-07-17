@@ -11,7 +11,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <form method='POST' class="needs-validation repeater" autocomplete="off" enctype="multipart/form-data" id="donor_form">
+                <form method='POST' class="needs-validation repeater" autocomplete="off" enctype="multipart/form-data" id="donor_form" novalidate>
                     {% csrf_token %}
                     <div class='text-danger'>
                         {{error_message}}
@@ -23,7 +23,7 @@
                                 <div class="col-md-10">
                                     {% for mission in missions %}
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="missions" id="mission_{{ mission.id }}" value="{{ mission.id }}">
+                                            <input class="form-check-input" type="checkbox" name="missions" id="mission_{{ mission.id }}" value="{{ mission.id }}" >
                                             <label class="form-check-label" for="mission_{{ mission.id }}">
                                                 {{ mission.name }}
                                             </label>
@@ -46,7 +46,23 @@
     </div>
 </div>
 
+<script>
+    {% for mission in missions %}
+    {% if selected_missions %}
+    $("#mission_{{mission.id}}").prop('required',false);
+    {% else%}
+    $("#mission_{{mission.id}}").prop('required',true);
+    {% endif %}
+    $("#mission_{{mission.id}}").click(function(){
+        if($(this).is(":checked")){
+            {% for i in missions %}
 
+            $("#mission_{{i.id}}").prop('required',false);
+            {% endfor %}
+        }
+    });
+    {% endfor %}
+</script>
 {% endblock %}
 
 

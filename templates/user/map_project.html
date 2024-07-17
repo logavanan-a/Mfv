@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link href="{% static 'libs/sweetalert2/dist/sweetalert2.min.css' %}" rel="stylesheet" type="text/css" />
+
+<!-- DataTables -->
+<link href="{% static 'libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}" rel="stylesheet"
+    type="text/css" />
+<link href="{% static 'libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css' %}" rel="stylesheet"
+    type="text/css" />
+
+<!-- Responsive datatable examples -->
+<link href="{% static 'libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css' %}" rel="stylesheet"
+    type="text/css" />
+
+<!-- Edit icon  -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+{% endblock %}
+
+{% block contents %}
+
+<style>
+    .btn{
+        padding: 5px 10px;
+        margin-right: 10px;
+    }
+</style>
+<div class="row align-items-center">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body pb-0">
+                <div class="table-responsive mb-3" data-pattern="priority-columns">
+                    <button type="button" class="btn btn-outline-primary waves-effect btn-xs float-end mb-2 mx-0" onclick="location.href='/add/map-project/{{user_id}}/'"><i class="bx bx-plus-medical" title="Add New"></i></button>
+                    <table id="datatable-buttons" class="table  dt-responsive w-100 mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Id</th>
+                                <th>Name</th>
+                                <th>Partner Mission Mapping	</th>
+                                <th>District</th>
+                                <th>Location</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Status</th>
+                            </tr>    
+                        </thead>
+                        <tbody>
+                            {% for l in user_profile_obj %}
+                            <tr>
+                                <td>{{ l.id }}</td>
+                                <td>{{ l.project.name }}</td>
+                                <td>{{ l.project }}</td>
+                                <td>{{ l.project.district|default_if_none:'-' }}</td>
+                                <td>{{ l.project.location|default_if_none:'-' }}</td>
+                                <td>{{ l.project.start_date|default_if_none:'-' }}</td>
+                                <td>{{ l.project.end_date|default_if_none:'-' }}</td>
+                                <td>{% if l.active == 2 %}Active {% else %}Inactive{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div> 
+                <nav aria-label="..." class="d-flex justify-content-between mb-3">
+                    <div>
+                        <button type="reset" onclick="location.href='/user-profile/{{user_id}}/'" class="btn btn-secondary waves-effect justify-content-start">
+                            Cancel
+                        </button>
+                    </div>
+                    <div>
+                        {% if data.has_other_pages %}
+                        <ul class="pagination justify-content-end ">
+                            {% if data.has_previous %}
+                            <li class="paginate_button page-item"><a class="page-link" href="?page=1">First</a></li>
+                            {% else %}
+                            <li class="paginate_button page-item disabled"><span class="page-link">First</span></li>
+                            {% endif %}
+                            {% for i in display_page_range %}
+                                {% if data.number == i %}
+                                <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
+                                {% else %}
+                                <li class="paginate_button paginate_button page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if data.has_next %}
+                                <li class="paginate_button page-item"><a class="page-link" href="?page={{ data.paginator.num_pages }}">Last</a></li>
+                            {% else %}
+                                <li class="paginate_button page-item disabled"><span class="page-link">Last</span></li>
+                            {% endif %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </nav>
+            </div>     
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+
+
+{% block extra_javascript %}
+<script src="{% static 'libs/sweetalert2/dist/sweetalert2.min.js' %}"></script>
+
+<!-- Required datatable js -->
+<script src="{% static 'libs/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<!-- <script src="{% static 'libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script> -->
+<!-- Buttons examples -->
+<script src="{% static 'libs/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-buttons/js/buttons.colVis.min.js' %}"></script>
+
+<!-- Responsive examples -->
+<script src="{% static 'libs/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
+
+<!-- Datatable init js -->
+<script src="{% static 'js/pages/datatables.init.js' %}"></script>
+<script type="text/javascript" >
+    function Confirm(id, title) {
+        Swal.fire({
+            title: "Are you sure!",
+            text:"You want to "+ title +"?",
+            showCancelButton: !0,
+            confirmButtonColor: "#34c38f",
+            cancelButtonColor: "#f46a6a",
+            confirmButtonText: "Yes",
+        }).then((result) => {
+            if (result.isConfirmed){
+                window.location.href = '/partner-donor-status/'+id+'/';
+            };
+                
+        })
+    };
+
+</script>
+
+{% endblock %}
+
