@@ -20,7 +20,8 @@ urlpatterns = [
 
     path("user_listing/", user_listing, name="user_listing"),
     path("user-add/", add_user, name="add_user"),
-    path("user-profile/<id>/", user_profile, name="user_profile"),
+    path("user-profile/<user_id>/", user_profile, name="user_profile"),
+    path("add/map-project/<user_id>/", add_map_project, name="add_map_project"),
     path("user-change-password/<id>/", user_change_password, name="user_change_password"),
     path("user-edit/<id>/", edit_user, name="edit_user"),
     path('ajax-project/', project_list_filter),

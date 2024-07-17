@@ -434,3 +434,5 @@ class UserProfile(BaseContent):
     user = models.OneToOneField(User, on_delete = models.CASCADE)
     phone_no  = models.CharField(max_length=10, blank=True, null=True)
     login_type  = models.PositiveIntegerField(choices = LOGIN_CHOICES)
+
+    
