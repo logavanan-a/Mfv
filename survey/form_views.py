@@ -208,8 +208,8 @@ def load_data_to_cache_masterlookup_meta():
     return master_lookup
 
 def question_based_answers(survey_id,answer,questions):
+    print(answer,questions,'answer,questions')
     final_result = {}
-    # import ipdb; ipdb.set_trace()
     questions_dict = load_data_to_cache_questions()
     for question_id in questions:
         single_question = questions_dict.get(str(question_id))
@@ -295,6 +295,26 @@ def add_button_validation_profile(survey,object_lists):
                         #break          
     return hide_button
 
+
+def get_financial_year_dates():
+    from datetime import datetime, timedelta
+    # Get the current date
+    today = datetime.today()
+    
+    # Determine the start and end dates based on the current date
+    if today.month >= 4:
+        # Financial year starts April 1st of the current year
+        start_date = datetime(today.year, 4, 1)
+        # Financial year ends March 31st of the next year
+        end_date = datetime(today.year + 1, 3, 31)
+    else:
+        # Financial year starts April 1st of the previous year
+        start_date = datetime(today.year - 1, 4, 1)
+        # Financial year ends March 31st of the current year
+        end_date = datetime(today.year, 3, 31)
+    
+    return start_date.date(), end_date.date()
+
 from django.forms.models import model_to_dict
 
 class WebResponseListing(View):
@@ -360,6 +380,7 @@ class WebResponseListing(View):
         # if not user_location_json_list:
 
 
+        # import ipdb; ipdb.set_trace()
 
         if creation_key:
             profile_obj = JsonAnswer.objects.get(creation_key=creation_key)
@@ -367,10 +388,17 @@ class WebResponseListing(View):
             fixed_profile_ids=profile_obj.survey.extra_config.get('profile_fields',survey.extra_config.get('header_for_listing',[]))
             profile_cache_key = INSTANCE_CACHE_PREFIX+'survey_heading_questions_for_'+str(survey.id)
             cache_survey_id.update({profile_cache_key:survey.id})
-
+            survey_id = profile_obj.survey
         if survey_slug:
             survey = Survey.objects.get(slug=survey_slug)
             listing_order=survey.extra_config.get('listing_order',['-created'])
+            if not creation_key:
+                fixed_profile_ids=survey.extra_config.get('profile_fields',survey.extra_config.get('header_for_listing',[]))
+                profile_cache_key = INSTANCE_CACHE_PREFIX+'survey_heading_questions_for_'+str(survey.id)
+                cache_survey_id.update({profile_cache_key:survey.id})
+                survey_id = survey
+            
+
             # if survey.data_entry_level_id == 1:
                 # level_obj = BoundaryLevel.objects.get(code=request.session.get('user_boundary_levelcode'))
                 # user_locations = user_projects_locations(request.user, level_obj)
@@ -387,7 +415,7 @@ class WebResponseListing(View):
 
             creation_key_wise_district = "','".join(list(BeneficiaryResponse.objects.filter(address_2__in=district).values_list('creation_key',flat=True)))
             query='select js.id,survey_id,response,s.slug,creation_key,js.created,js.modified,js.active from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} {1}  @@creation_key @@filters  order by @@order_by'.format(survey.id,facilities,creation_key_wise_district)#@@filters
-            if survey.id == 1:
+            if survey.id == 1 and request.user.groups.all()[0].id == 1:
                 query='select js.id,survey_id,response,s.slug,creation_key,js.created,js.modified,js.active from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} {1} and creation_key in (\'{2}\')  @@creation_key @@filters  order by @@order_by'.format(survey.id,facilities,creation_key_wise_district)#@@filters
             if school_creation_key:
                 query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} {1} and js.response->>\'237\'=\'{2}\'  @@creation_key @@filters order by @@order_by'.format(survey.id,facilities,school_creation_key)#@@filters
@@ -425,14 +453,20 @@ class WebResponseListing(View):
                 questions = Question.objects.filter(block__survey=cache_survey_id.get(i)).exclude(active=0).values('id','text','qtype','training_config').order_by('question_order')
                 cache_set_with_namespace(INSTANCE_CACHE_PREFIX+'FORM_BUILDER',i,questions,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
                 survey_questions.update({i:questions})
-        
+        # import ipdb; ipdb.set_trace()
         fixed_questions=survey_questions.get(profile_cache_key)
         if fixed_questions:
             preserved_prfile = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(fixed_profile_ids)])
             # profile_fields=fixed_questions.filter(id__in=fixed_profile_ids).order_by(preserved_prfile)
             fixed_questions=fixed_questions.filter(parent=None)
-            ans=JsonAnswer.objects.get(creation_key=profile_obj.response['237']).response
-            profile_fields = question_based_answers(profile_obj.survey_id,ans,fixed_profile_ids)
+            if survey.id == 10:
+                school_creation_key = creation_key
+            if school_creation_key:
+                ans=JsonAnswer.objects.get(creation_key=school_creation_key).response
+                profile_fields = question_based_answers(survey_id,ans,fixed_profile_ids)
+            elif survey.id != 1:
+                ans=JsonAnswer.objects.get(creation_key=profile_obj.response['237']).response
+                profile_fields = question_based_answers(survey_id,ans,fixed_profile_ids)
         
         if survey_slug:
             survey_heading_questions=survey_questions.get(survey_key_question)
@@ -450,7 +484,7 @@ class WebResponseListing(View):
                 filter_questions=[item for item in filter_all_questions if str(item.get('id')) in list(filters.keys())]
 
                 filter_choices={}
-                # next_level_boundries=BoundaryLevel.objects.filter(active=2)#code=request.session['user_boundary_levelcode']
+                next_level_boundries=BoundaryLevel.objects.filter(active=2)#code=request.session['user_boundary_levelcode']
                 for i in filter_questions:
                     if i.get('qtype') == 'AW':
                         address_widget_filter.append(i.get('id'))
@@ -465,7 +499,6 @@ class WebResponseListing(View):
                         filter_choices[i.get('id')]=choices_dict
 
                 
-            print(request,'request')
             filtered_query=search_filter_replace(request,query,filters,search_field,address_widget_filter)
             # import ipdb; ipdb.set_trace()
             filtered_query=filtered_query.replace('@@order_by','created desc')
@@ -484,6 +517,12 @@ class WebResponseListing(View):
         
         #getting the actions dropdowns from extra config
         options_survey_ids=survey.extra_config.get('action_options',[])
+        if survey.id == 10:
+            school_creation_key=creation_key
+        if school_creation_key:
+            school_survey= JsonAnswer.objects.get(creation_key=school_creation_key or creation_key)
+            school_name=school_survey.response['231']
+            options_survey_ids = school_survey.survey.extra_config.get('action_options',[])
         preserved_survey = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(options_survey_ids)])
         options_dropdown=Survey.objects.filter(id__in=options_survey_ids).exclude(active=0).order_by(preserved_survey)
         
@@ -522,7 +561,7 @@ class WebResponseListing(View):
         filter_request=request.META['QUERY_STRING']
         filtered_items = [item for item in filter_request.split('&') if not item.startswith('page=')]
         filter_request_data='&'.join(filtered_items)
-
+        print(survey.id,'surveysurvey')
         return render(request,self.template_name,locals())
 
 def load_data_to_cache_choices():
@@ -617,7 +656,9 @@ def add_survey_form(request,pk):
             profile_obj=benificiary
             ben_survey = cached_surveys.get(str(benificiary.survey_id))
             fixed_profile_ids=ben_survey.get('extra_config').get('profile_fields',[])
-            ans=JsonAnswer.objects.get(creation_key=json_response['237']).response
+            ans=json_response
+            if benificiary.survey.id != 1:
+                ans=JsonAnswer.objects.get(creation_key=json_response['237']).response
             profile_fields = question_based_answers(benificiary.survey_id,ans,fixed_profile_ids)
         else:
             json_response={}
@@ -707,7 +748,6 @@ def add_survey_form(request,pk):
                     }]
             }
             # ans=json.loads(request.POST.get('all_in_one'))
-            # import ipdb; ipdb.set_trace()
             content=add_survey_answers_version_1(request,**responses)
             logger.info('Data sent to database from web:' ,json.loads(content.content.decode('utf-8')))
             result=json.loads(content.content.decode('utf-8'))
@@ -717,7 +757,9 @@ def add_survey_form(request,pk):
             if ben_uuid != '0':
                 profile_url=f'/configuration/profile/{survey.get("slug")}/{ben_uuid}/'
             elif school_creation_key:
-                profile_url = f'/configuration/list/{survey.get("slug")}/{school_creation_key}/{school_name}/'
+                ben_uuid=result['sync_res'][0]['ben_uuid']
+                profile_url=f'/configuration/profile/{ben_uuid}/'
+                # profile_url = f'/configuration/list/{survey.get("slug")}/{school_creation_key}/{school_name}/'
             else:
                 profile_url = f'/configuration/list/{survey.get("slug")}/'
             return HttpResponseRedirect(profile_url)
@@ -1458,7 +1500,6 @@ def custom_validation_survey_wise_version1(request):
         survey_id = request.GET.get('survey_id')
         json_id = request.GET.get('json_id')
         ben_uuid = request.GET.get('ben')
-        print(ben_uuid,'oooo')
         json_answer=JsonAnswer.objects.filter(active=2,id=json_id)
         answers_list=json.loads(data)
         if (ben_uuid == 'None' or not ben_uuid) and (answers_list.get('2')) :
@@ -1517,11 +1558,13 @@ def edit_survey_form(request,survey_slug,creation_key):
     response_obj = JsonAnswer.objects.get(creation_key=creation_key)
     if survey.get('id') in [2,7]:
         disable=True
-    ben_uuid=request.GET.get('ben',request.POST.get('ben',response_obj.response.get('237')))
+    ben=None
+    if response_obj.survey.id !=10:
+        ben = response_obj.response.get('237')
+    ben_uuid=request.GET.get('ben',request.POST.get('ben',ben))
     skip_questions=[]
     #block for shows the beneficiary details 
     try:
-        # import ipdb; ipdb.set_trace()
         if ben_uuid:
             cached_surveys = load_data_to_cache_survey()
             benificiary=JsonAnswer.objects.get(creation_key=ben_uuid)
@@ -1530,12 +1573,14 @@ def edit_survey_form(request,survey_slug,creation_key):
             profile_obj=benificiary
             ben_survey = cached_surveys.get(str(benificiary.survey_id))
             fixed_profile_ids=ben_survey.get('extra_config').get('profile_fields',[])
-            if response_obj.survey.id != 2:
-                ans=JsonAnswer.objects.get(creation_key=json_response['237'])
-                profile_fields = question_based_answers(benificiary.survey_id,ans.response,fixed_profile_ids)
+            # print(json_response['237'],'json_response[]')
+            if not response_obj.survey.id in [2,10]:
+                ans=JsonAnswer.objects.get(creation_key=json_response['237']).response
+                profile_fields = question_based_answers(benificiary.survey_id,ans,fixed_profile_ids)
+            if response_obj.survey.id == 10:
+                profile_fields = question_based_answers(benificiary.survey_id,json_response,fixed_profile_ids)
         else:
             json_response={}
-        print(json_response,'json_response')
             # profile_cache_key = 'survey_heading_questions_for_'+str(benificiary.survey_id)
             # fixed_questions =  cache.get(profile_cache_key)
             # if not fixed_questions:
@@ -1635,13 +1680,13 @@ def edit_survey_form(request,survey_slug,creation_key):
             return render(request,template_name,locals())
         
         # add_survey_answers_version_1(request)
+    
         if ben_uuid != '0':
             # profile_url=f'/configuration/profile/{survey_slug}/{ben_uuid}/'
             profile_url=f'/configuration/profile/{survey.get("slug")}/{ben_uuid}/'
 
-        # elif survey.get('id') in [1,4]:
-        #     profile_url=f'/configuration/profile/{creation_key}/'
-        #     print(profile_url,'2')
+        elif survey.get('id') == 2 and creation_key:
+            profile_url=f'/configuration/profile/{creation_key}/'
         elif school_creation_key:
             profile_url = f'/configuration/list/{survey.get("slug")}/{school_creation_key}/{school_name}/'
         else:

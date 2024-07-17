@@ -25,6 +25,20 @@ class DistrictForm(forms.ModelForm):
         model=District
         fields=['state', 'name']
 
+
+class ProjectDonorMappingForm(forms.ModelForm):
+    project = forms.ModelChoiceField(queryset=State.objects.filter(active=2).order_by("name"),required = True,empty_label="Select State")
+    donor = forms.ModelChoiceField(queryset=State.objects.filter(active=2).order_by("name"),required = True,empty_label="Select State")
+
+    def __init__(self, *args, **kwargs):
+        super(ProjectDonorMappingForm, self).__init__(*args, **kwargs)
+        self.fields['project'].widget.attrs['class'] = 'form-select select2'
+        self.fields['donor'].widget.attrs['class'] = 'form-select select2'
+
+    class Meta:
+        model=ProjectDonorMapping
+        fields=['project', 'donor']
+
 class PartnerForm(forms.ModelForm):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'Enter Name'}), max_length=150, strip=True)
     # partner_logo = forms.FileField(required=False)
