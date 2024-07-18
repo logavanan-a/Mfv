@@ -567,47 +567,24 @@ def user_profile(request, user_id):
 @ login_required(login_url='/')
 def add_map_project(request, user_id):
     heading = "Add User Project Mapping"
-
-    states = State.objects.filter(active=2).order_by('name')
-    districts = District.objects.filter(active=2).order_by('name')
-    donors = Donor.objects.filter(active=2)
-    partner_mission = PartnerMissionMapping.objects.filter()
+    partner = Partner.objects.filter()
+    user_profile = UserProjectMapping.objects.filter(user_id=user_id,active=2)
+    vlu=''
+    if user_profile.exists:
+        vlu = user_profile.first().project.partner_mission_mapping.partner.id
+        project = Project.objects.filter(partner_mission_mapping__partner__id=vlu)
     if request.method == 'POST':
-        name = request.POST.get('name')
-        partner_mission = request.POST.get('partner_mission')
-        state = request.POST.get('state')
-        district = request.POST.get('district')
-        location = request.POST.get('location')
-        donor = request.POST.get('donor')
-        start_date = request.POST.get('start_date',None)
-        end_date = request.POST.get('end_date',None)
-
-        additional_info = request.POST.get('additional_info',None)
-        pro_details = Project.objects.create(
-            name=name,
-            partner_mission_mapping_id=partner_mission,
-            district_id=district,
-            location=location,
-            additional_info=additional_info,
-            start_date=start_date,
-            end_date=end_date,    
-            application_type_id=510,        
-        )
-        pro_details.save()
-        user_project_mapping= UserProjectMapping.objects.create(
-            project_id=pro_details.id,
-            user_id=user_id
-        )
-        user_project_mapping.save()
-        project_donor_mapping =ProjectDonorMapping.objects.create(
-                    project_id=pro_details.id,
-                    donor_id=donor
-                )
-                    # defaults={'donor_id': donor}
-                
-        return redirect('/user-profile/'+ str(user_id) + '/')
-
-    return render(request, 'user/adding_project.html', locals())
+        project = request.POST.get('project')
+        if not UserProjectMapping.objects.filter(project_id=project,user_id=user_id).exists():
+            user_project_mapping= UserProjectMapping.objects.create(
+                project_id=project,
+                user_id=user_id
+            )
+            user_project_mapping.save()
+            return redirect('/user-profile/'+ str(user_id) + '/')
+        else:
+            error = "Already exist this project"
+    return render(request, 'user/map_project.html', locals())
 
 @ login_required(login_url='/')
 def edit_user(request, id):

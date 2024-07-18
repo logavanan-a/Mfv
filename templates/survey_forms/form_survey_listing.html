@@ -267,20 +267,13 @@
                                                     {% if not profile_obj %}
                                                         <div class="col-auto">
                                                             <div class="col-sm-6">
-                                                                <div class="dropdown">
-                                                                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                        Activities <i class="mdi mdi-chevron-down"></i>
-                                                                    </button>
-                                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                        {% with profile_obj.survey.slug|default:survey.slug|make_string:"edit" as keystrings %}
-                                                                            {% if not main_add_button and request.user.groups.all.0.id == 1 %}
-                                                                            <a class="dropdown-item" href="/configuration/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/">Edit</a>
-                                                                            {% endif %}
+                                                                <div class="dropdown">                                                                    
+                                                                    {% with profile_obj.survey.slug|default:survey.slug|make_string:"edit" as keystrings %}
+                                                                    {% if not main_add_button and request.user.groups.all.0.id == 1 %}
+                                                                        <button type="button" class="btn btn-primary btn-lg waves-effect waves-light p-2 mb-3" onclick="location.href='/configuration/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/'">Edit</button>
+                                                                        {% endif %}
                                                                         {% endwith %}
-                                                                        {% for survey_tags in options_dropdown %}
-                                                                            <a {% if survey_tags.id in json_answer.survey.extra_config.reject_hidefields and json_answer.response.616 != '620' %}onclick="return false;"{% endif %} class="dropdown-item {% if survey_tags.id in json_answer.survey.extra_config.reject_hidefields and json_answer.response.616 != '620' %}bg-secondary{% endif %}" href="/configuration/profile/{{survey_tags.slug}}/{{json_answer.creation_key}}/">{{survey_tags.short_name|default:survey_tags.name}}</a>
-                                                                        {% endfor %}
-                                                                    </div>
+                                                                        
                                                                 </div>
                                                             </div>
                                                             {% with profile_obj.survey.slug|default:survey.slug|make_string:"approve" as keystrings %}
