@@ -523,27 +523,21 @@ def add_user(request, user_location=None):
             login_type = data.get('login_type')
             mobile_no = data.get('mobile_no')
             if User.objects.filter(username__iexact=username).exists():
-                user_location = None
                 user_exist_error = 'Username already exist'
                 return render(request, 'user/add_user.html', locals())
             if User.objects.filter(email__iexact=email).exists():
-                user_location = None
-                user_exist_error = 'Email already exist'
+                email_error = 'Email already exist'
                 return render(request, 'user/add_user.html', locals())
             if UserProfile.objects.filter(phone_no__iexact=mobile_no).exists():
-                user_location = None
-                user_exist_error = 'Mobile no already exist'
+                mobile_no_error = 'Mobile no already exist'
                 return render(request, 'user/add_user.html', locals())
-            user = User.objects.create_user(username, password)
+            user = User.objects.create_user(username=username, password=password)
             user.email =  email
             user.first_name = first_name
             user.last_name = last_name
             user.groups.add(Group.objects.get(id = user_role ))
             user.save()
 
-            # user_role_config = UserPartnerMapping.objects.create(
-            #     user=user, partner = Partner.objects.get(id = partner)
-            # )
             user_profile=UserProfile.objects.create(user=user, phone_no=mobile_no, login_type=login_type)
             user_profile.save()
             return redirect('mis:user_listing')

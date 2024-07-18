@@ -104,6 +104,11 @@
                                 <div class="invalid-feedback">
                                     Please enter the email.
                                 </div>
+                                {% if email_error %}
+                                <div class="text-danger">
+                                    {{email_error}}
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -113,6 +118,11 @@
                                 <div class="invalid-feedback">
                                     Please enter the Mobile no.
                                 </div>
+                                {% if email_error %}
+                                <div class="text-danger">
+                                    {{mobile_no_error}}
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-lg-6">
