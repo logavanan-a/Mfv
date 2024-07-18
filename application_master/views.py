@@ -194,6 +194,16 @@ def partner_mission_status_update(request, dpl_id):
     return redirect('/application_master/details/partner/'+str(dpl_data.partner.id)+'/')      
 
 
+def user_project_status_update(request, id, user_id):
+    dpl_data=UserProjectMapping.objects.get(id=id)
+    if dpl_data.active == 2:
+        dpl_data.active = 1
+    else:
+        dpl_data.active = 2
+    dpl_data.save()
+    return redirect('/user-profile/'+str(user_id)+'/')      
+
+
 def master_details_form(request,model,id):
     heading=model
     if model == 'partner':
@@ -395,6 +405,14 @@ def get_district(request, state_id):
             result_set.append({'id': district.id, 'name': district.name})
         return JsonResponse(result_set, safe=False)
 
+def get_project(request, partner_id):
+    if request.method == 'GET':
+        result_set = []
+        partner_list =PartnerMissionMapping.objects.filter(partner_id=partner_id,active=2).values_list('id',flat=True)
+        project_obj = Project.objects.filter(partner_mission_mapping_id__in=partner_list, active=2).order_by('name')
+        for project in project_obj:
+            result_set.append({'id': project.id, 'name': project.name})
+        return HttpResponse(json.dumps(result_set))
 
 class LoginAndroidView(APIView):
     serializer_class = LoginAndroidSerializer

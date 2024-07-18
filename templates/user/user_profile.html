@@ -94,26 +94,22 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Id</th>
-                                <th>Name</th>
-                                <th>Partner Mission Mapping	</th>
-                                <th>District</th>
-                                <th>Location</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
+                                <th>Partner</th>
+                                <th>Project</th>
                                 <th>Status</th>
+                                <th>Action</th>
                             </tr>    
                         </thead>
                         <tbody>
                             {% for l in user_profile_obj %}
                             <tr>
                                 <td>{{ l.id }}</td>
+                                <td>{{ l.project.partner_mission_mapping.partner.name }}</td>
                                 <td>{{ l.project.name }}</td>
-                                <td>{{ l.project }}</td>
-                                <td>{{ l.project.district|default_if_none:'-' }}</td>
-                                <td>{{ l.project.location|default_if_none:'-' }}</td>
-                                <td>{{ l.project.start_date|default_if_none:'-' }}</td>
-                                <td>{{ l.project.end_date|default_if_none:'-' }}</td>
                                 <td>{% if l.active == 2 %}Active {% else %}Inactive{% endif %}</td>
+                                <td>
+                                {% if l.active == 2 %}<button class='btn btn-outline-danger' onclick="Confirm('{{l.id}}', 'Deactivate')"><i class="mdi mdi-close-circle"  title="Deactivate"></i></button>{% else %}<button class='btn btn-outline-success' onclick="Confirm('{{l.id}}', 'Activate')"><i class="mdi mdi-checkbox-marked-circle" title="Activate"></i></button>{% endif %}
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -182,5 +178,22 @@
 <!-- Datatable init js -->
 <script src="{% static 'js/pages/datatables.init.js' %}"></script>
 
+<script type="text/javascript" >
+    function Confirm(id,title) {
+        Swal.fire({
+            title: "Are you sure!",
+            text:"You want to "+ title +"?",
+            showCancelButton: !0,
+            confirmButtonColor: "#34c38f",
+            cancelButtonColor: "#f46a6a",
+            confirmButtonText: "Yes, "+ title +" it!",
+        }).then((result) => {
+            if (result.isConfirmed){
+                window.location.href = '/application_master/user_mapping/'+id+'/{{user_id}}/';
+            };
+                
+        })
+    };
 
+</script>
 {% endblock %}
