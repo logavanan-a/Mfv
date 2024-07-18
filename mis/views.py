@@ -570,7 +570,7 @@ def add_map_project(request, user_id):
     partner = Partner.objects.filter()
     user_profile = UserProjectMapping.objects.filter(user_id=user_id,active=2)
     vlu=''
-    if user_profile.exists:
+    if user_profile.exists():
         vlu = user_profile.first().project.partner_mission_mapping.partner.id
         project = Project.objects.filter(partner_mission_mapping__partner__id=vlu)
     if request.method == 'POST':
