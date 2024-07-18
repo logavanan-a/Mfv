@@ -353,7 +353,7 @@ def add_survey_answers_version_1(request, **kwargs):
                     exc_type, exc_value, exc_traceback))
                 logging.error(error_stack)
             finally:
-                sync_res.append({ "r_uuid":val['r_uuid'],"sync_status":sync_status, "s_created": server_created_date,"duplicate_status":0,"error_msg":error_msg,"updated_question":[updated_question],"server_primary_key":server_primary_key,"ben_uuid":app_answer_obj.sample_id if app_answer_obj else ''})
+                sync_res.append({"r_uuid": val['r_uuid'], "sync_status": sync_status,"s_created": server_created_date, 'error_msg':error_msg, 'duplicate_status': duplicate_status,"approved_by":approved_by,"approved_on":approved_on})
     except Exception as ex:
         status = False
         message = "Failed"
