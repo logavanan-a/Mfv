@@ -716,11 +716,10 @@ def add_survey_form(request,pk):
         gender_male=False
         if json_response.get('9') == '65':
             gender_male=True
-
     boundaries = load_data_to_cache_boundaries_name()
     if not request.user.is_superuser and not request.user.is_staff:
         next_level_boundries=load_data_to_cache_boundarylevel()
-        boundarys=[item for item in boundaries if item.get('id') in request.session['user_parent_boundary_list']] 
+        boundarys=[item for item in boundaries if int(item.get('boundary_level_type_id')) == 1 and int(item.get('code')) in request.session['user_parent_boundary_list']] 
 
     # cached dict values of choices
     cache_key_choice = INSTANCE_CACHE_PREFIX+'all_choice_cache'
