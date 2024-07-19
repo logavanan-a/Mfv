@@ -6,13 +6,13 @@
             {% if options_dropdown.count > 0 %}
                 {% if school_creation_key  %}
                 <li class="nav-item dropdown mt-2 " style='margin-right:2px'>
-                    <a class="btn nav-link dropdown-toggle text-white nav_label {% if not survey_slug %}bg-warning{% else %}bg-primary{% endif %}" href='/configuration/list/student-details-3004/{{school_creation_key}}/{{school_name}}/'  id="dropdownMenuButton"  style='font-size:1.1rem'>
+                    <a class="btn nav-link dropdown-toggle nav_label {% if not survey_slug %}bg-warning text-dark{% else %}bg-primary text-white{% endif %}" href='/configuration/list/student-details-3004/{{school_creation_key}}/{{school_name}}/'  id="dropdownMenuButton"  style='font-size:1.1rem'>
                         Profile
                     </a>
                 </li>
                 {% else %}
                 <li class="nav-item dropdown mt-2 " style='margin-right:2px'>
-                    <a class="btn nav-link dropdown-toggle text-white nav_label {% if not survey_slug %}bg-warning{% else %}bg-primary{% endif %}" href='/configuration/profile/{{creation_key}}/'  id="dropdownMenuButton"  style='font-size:1.1rem'>
+                    <a class="btn nav-link dropdown-toggle  nav_label {% if not survey_slug %}bg-warning text-dark{% else %}bg-primary text-white{% endif %}" href='/configuration/profile/{{creation_key}}/'  id="dropdownMenuButton"  style='font-size:1.1rem'>
                         Profile
                     </a>
                 </li>
@@ -20,7 +20,7 @@
                 {% endif %}
                 {% for survey_tags in options_dropdown  %}
                     <li class="nav-item dropdown mt-2 " style='margin-right:2px'>
-                        <a {% if survey_tags.id in profile_obj.survey.extra_config.reject_hidefields and profile_obj.response.616 != '620' %}onclick="return false;"{% endif %}  class="btn nav-link dropdown-toggle text-white nav_label {% if survey_tags.id == survey.id %}bg-warning {% elif survey_tags.id in profile_obj.survey.extra_config.reject_hidefields and profile_obj.response.616 != '620' %}bg-secondary{% else %}bg-primary{% endif %}" href='/configuration/profile/{{survey_tags.slug}}/{% if school_creation_key %}{{school_creation_key}}{% else %}{{creation_key}}{% endif %}/'  id="dropdownMenuButton"  style='font-size:1.1rem'>
+                        <a {% if survey_tags.id in profile_obj.survey.extra_config.reject_hidefields and profile_obj.response.616 != '620' %}onclick="return false;"{% endif %}  class="btn nav-link dropdown-toggle  nav_label {% if survey_tags.id == survey.id %}bg-warning text-dark{% elif survey_tags.id in profile_obj.survey.extra_config.reject_hidefields and profile_obj.response.616 != '620' %}bg-secondary{% else %}bg-primary text-white{% endif %}" href='/configuration/profile/{{survey_tags.slug}}/{% if school_creation_key %}{{school_creation_key}}{% else %}{{creation_key}}{% endif %}/'  id="dropdownMenuButton"  style='font-size:1.1rem'>
                             {{survey_tags.short_name|default:survey_tags.name}} 
                         </a>
                     </li>
@@ -51,12 +51,14 @@
                         </div>
                     </div> {% endcomment %}
                 {% comment %} {% else %} {% endcomment %}
-                    <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
-                        <div class='p-2 w-50 '>
-                            <h5 class="fw-bold " style="font-size:.95rem">{{key}}</h5>
-                        </div>
-                        <div class='p-2 w-50 '>
-                            <p style="font-size:.95rem" class='text-primary'>{{item}}</p>
+                    <div class="col-lg-4 col-sm-4 col-md-4  mt-3">
+                        <div  class="row">
+                            <div class='col-4 '>
+                                <p class="fw-bold " style="font-size:.95rem">{{key}} :</p>
+                            </div>
+                            <div class='col-8 p-0'>
+                                <p style="font-size:.95rem" class='p-0'>{{item}}</p>
+                            </div>
                         </div>
                     </div>
                     
@@ -78,7 +80,7 @@
             {% if question_id|add:0 not in header_ids %}
                 <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
                     <div class='p-2 w-50 '>
-                        <h5 class="fw-bold " style="font-size:.95rem">{{question_id|get_question_text:profile_obj.survey_id}}</h5>
+                        <h5 class="fw-bold " style="font-size:.95rem">{{question_id|get_question_text:profile_obj.survey_id}} :</h5>
                     </div>
                     <div class='p-2 w-50 '>
                         <p style="font-size:.95rem" class='text-primary'>{% get_answer_text profile_obj.survey_id answers question_id%}</p>

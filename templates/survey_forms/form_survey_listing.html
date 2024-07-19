@@ -14,17 +14,37 @@
                     {% include "../survey_forms/profile.html" %}
                 {% endif %} 
                 {% if filters and not creation_key %}
-                    {% include './survey_listing_filters.html' %}
+                    {% if not school_name %}
+                        {% include './survey_listing_filters.html' %}
+                    {% else %}
+                    <form method="GET" class="mt-4">
+                        <div class='d-flex justify-content-between'>
+                            <div class="d-flex">
+                                <div class=" mb-2 me-3">
+                                    <input  id='' type="search" name="search" class="form-control" value="{{request_data|get_item:'search'|default:''}}" placeholder="search...">
+                                </div>
+                                <div class="">
+                                    <input type='submit' class="btn btn-success btn-lg waves-effect waves-light mb-2 fs-6" value="Go"></input>
+                                </div>
+                            </div>
+                            {% with profile_obj.survey.slug|default:survey.slug|make_string:"add" as keystrings %}
+                                {% if not main_add_button and request.user.groups.all.0.id == 1 %}
+                                    {% if school_name %}
+                                    <div >
+                                        <button type="button" class="btn btn-primary btn-lg waves-effect waves-light p-2 mb-2" id="add_buton_listing" onclick="location.href='/configuration/add-survey-form/{{survey.id}}/?creation_key={{school_creation_key}}&school_name={{school_name}}'"> Add New</button>
+                                    </div>
+                                    {% endif %}
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    {% endif %}
                 {% endif %}
+                
                 {% if survey_slug and not creation_key %}
                 <div class='d-flex justify-content-end'>
                         {% with profile_obj.survey.slug|default:survey.slug|make_string:"add" as keystrings %}
                             {% if not main_add_button and request.user.groups.all.0.id == 1 %}
-                                {% if school_name %}
-                                <div class='col-auto'>
-                                    <button type="button" class="btn btn-primary btn-lg waves-effect waves-light p-2 mb-3" id="add_buton_listing" onclick="location.href='/configuration/add-survey-form/{{survey.id}}/?creation_key={{school_creation_key}}&school_name={{school_name}}'"> Add New</button>
-                                </div>
-                                {% else %}
+                                {% if not school_name %}
                                 <div class='col-auto'>
                                     <button type="button" class="btn btn-primary btn-lg waves-effect waves-light p-2 mb-3" id="add_buton_listing" onclick="location.href='/configuration/add-survey-form/{{survey.id}}/'"> Add New</button>
                                 </div>
@@ -37,12 +57,13 @@
                 {% if creation_key and survey.id != 1 and survey.id != 10 %}
                     {% include "../survey_forms/profile.html" %}
                 {% endif %} 
+                
                 {% if survey.periodicity == 7 and creation_key and survey_slug %}
                     <!--header of one time activity-->
                     <div class='row mt-4 mb-2'>
                         <div class='col-6'>
-                            <div class="d-flex justify-content-start">
-                                <h3 class='p-2'>{{survey.name}}</h3>
+                            <div class="d-flex justify-content-start mt-2">
+                                <h5 class='p-2'> <b>{{survey.name}}</b></h5>.
                             </div>
                         </div>
                         <div class='col-6'>
@@ -71,7 +92,7 @@
                                 {% for question_id,answers in profile_obj.response.address.1.items %}
                                     <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
                                         <div class='p-2 w-50 '>
-                                            <h5 class="fw-bold " style="font-size:.95rem">{{item.id|get_question_text:profile_obj.survey_id}}</h5>
+                                            <h5 class="fw-bold " style="font-size:.95rem">{{item.id|get_question_text:profile_obj.survey_id}} :</h5>
                                         </div>
                                         <div class='p-2 w-50 '>
                                             <p style="font-size:.95rem" class='text-primary'>{% get_answer_text survey.id object_lists.0.response|get_item_str:item.id item %}</p>
@@ -81,10 +102,10 @@
                             {% else %}
                                 <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
                                     <div class='p-2 w-50 '>
-                                        <h5 class="fw-bold " style="font-size:.95rem">{{item.id|get_question_text:survey.id}}</h5>
+                                        <p class="fw-bold " style="font-size:.95rem">{{item.id|get_question_text:survey.id}} :</p>
                                     </div>
                                     <div class='p-2 w-50 '>
-                                        <p style="font-size:.95rem" class='text-primary'>{% get_answer_text survey.id object_lists.0.response|get_item_str:item.id item %}</p>
+                                        <p style="font-size:.95rem" class=''>{% get_answer_text survey.id object_lists.0.response|get_item_str:item.id item %}</p>
                                     </div>
                                 </div>
                             {% endif %}
@@ -111,16 +132,16 @@
                                     {% for question_id,answers in profile_obj.response.address.1.items %}
                                         <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
                                             <div class='p-2 w-50 '>
-                                                <h5 class="fw-bold " style="font-size:.95rem">{{item.id|get_question_text:profile_obj.survey_id}}</h5>
+                                                <p class="fw-bold " style="font-size:.95rem">{{item.id|get_question_text:profile_obj.survey_id}} :</p>
                                             </div>
                                             <div class='p-2 w-50 '>
 
-                                                <p style="font-size:.95rem" class='text-primary'>{% get_answer_text profile_obj.survey_id answers item %}</p>
+                                                <p style="font-size:.95rem" class=''>{% get_answer_text profile_obj.survey_id answers item %}</p>
                                             </div>
                                         </div>
                                     {% endfor %}
                                 {% elif item.qtype == 'GD' %}
-                                    <h5 class="fw-bold " style="font-size:.95rem">{{item.text}}</h5>
+                                    <h5 class="fw-bold " style="font-size:.95rem">{{item.text}} :</h5>
                                     {% if profile_obj.response|get_item_str:item.id %}
                                         <div class="col-lg-12 col-sm-12 col-md-12 d-flex justify-content-start ">
                                             
@@ -146,20 +167,20 @@
                                     {% else %}
                                         <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
                                             <div class='p-2 w-50 '>
-                                                <h5 class="fw-bold " style="font-size:.95rem">{{question_id|get_question_text:profile_obj.survey_id}}</h5>
+                                                <p class="fw-bold " style="font-size:.95rem">{{question_id|get_question_text:profile_obj.survey_id}}</p>
                                             </div>
                                             <div class='p-2 w-50 '>
-                                                <p style="font-size:.95rem" class='text-primary'>-</p>
+                                                <p style="font-size:.95rem" class=''>-</p>
                                             </div>
                                         </div>
                                     {% endif %}
                                 {% else %}
                                     <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
                                         <div class='p-2 w-50 '>
-                                            <h5 class="fw-bold " style="font-size:.95rem">{{item.id|get_question_text:profile_obj.survey_id}}</h5>
+                                            <p class="fw-bold " style="font-size:.95rem">{{item.id|get_question_text:profile_obj.survey_id}} :</p>
                                         </div>
                                         <div class='p-2 w-50 '>
-                                            <p style="font-size:.95rem" class='text-primary'>{% get_answer_text profile_obj.survey_id profile_obj.response|get_item_str:item.id item %}</p>
+                                            <p style="font-size:.95rem" class=''>{% get_answer_text profile_obj.survey_id profile_obj.response|get_item_str:item.id item %}</p>
                                         </div>
                                     </div>
                                 {% endif %}
@@ -186,13 +207,14 @@
                     <!-- activity listing page with no data -->
                     <div class='row'>
                         <div class='col-6'>
-                            <div class="d-flex justify-content-start">
-                                <h3 class='p-2'>{{survey.name}}</h3>
+                            <div class="d-flex justify-content-start mt-2">
+                                <h5 class='p-2'> <b>{{survey.name}}</b></h5>.
                             </div>
                         </div>
                         <div class='col-6'>
                             <div class="d-flex justify-content-end">
                                 {% with profile_obj.survey.slug|default:survey.slug|make_string:"add" as keystrings %}
+                                
                                 {% if request.user.groups.all.0.id == 1 and survey.id|survey_show:creation_key %}
                                 <h4 class="p-2 " title='Add'><a href="/configuration/{% if survey.id == 20 %}custom_weekly_data_form{% else %}add-survey-form/{{survey.id}}{% endif %}/?ben={{creation_key}}"><span class="bx bx-plus-medical bx-md"></span></a></h4>
                                     {% endif %}
@@ -211,8 +233,8 @@
                         {% if creation_key %}
                             <div class='row'>
                                 <div class='col-6'>
-                                    <div class="d-flex justify-content-start">
-                                        <h3 class='p-2'>{{survey.name}}</h3>
+                                    <div class="d-flex justify-content-start mt-2">
+                                        <h5 class='p-2'> <b>{{survey.name}}</b></h5>.
                                     </div>
                                 </div>                                                          
                                 {% with profile_obj.survey.slug|default:survey.slug|make_string:"add" as keystrings %}
@@ -243,9 +265,9 @@
                                         {% for header_id in survey_heading_questions %}
                                         <!-- options_dropdown.count > 0 -->
                                             {% if forloop.counter == 1 and not profile_obj and not main_add_button and options_dropdown and survey.id == 2 %}
-                                            <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}><a href="/configuration/profile/{{json_answer.creation_key}}/">{{json_answer|get_item_ans:header_id|safe}}</a></td>
+                                            <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}><a href="/configuration/profile/{{json_answer.creation_key}}/"><b>{{json_answer|get_item_ans:header_id|safe}}</b></a></td>
                                             {% elif forloop.counter == 1 and not profile_obj and not main_add_button and options_dropdown %}
-                                            <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}><a href="/configuration/list/student-details-3004/{{json_answer.creation_key}}/{{json_answer|get_item_ans:header_id|safe}}/">{{json_answer|get_item_ans:header_id|safe}}</a></td>
+                                            <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}><a href="/configuration/list/student-details-3004/{{json_answer.creation_key}}/{{json_answer|get_item_ans:header_id|safe}}/"><b>{{json_answer|get_item_ans:header_id|safe}}</b></a></td>
                                             {% else %}
                                             <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}>{{json_answer|get_item_ans:header_id|safe}}</td>
                                             {% endif %}

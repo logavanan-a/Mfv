@@ -719,13 +719,14 @@ def add_survey_form(request,pk):
     boundaries = load_data_to_cache_boundaries_name()
     if not request.user.is_superuser and not request.user.is_staff:
         next_level_boundries=load_data_to_cache_boundarylevel()
-        boundarys=[item for item in boundaries if int(item.get('boundary_level_type_id')) == 1 and int(item.get('code')) in request.session['user_parent_boundary_list']] 
+        boundarys=[item for item in boundaries if item.get('boundary_level_type_id') == 1 and item.get('code') in list(map(str, request.session['user_parent_boundary_list']))] 
 
     # cached dict values of choices
     cache_key_choice = INSTANCE_CACHE_PREFIX+'all_choice_cache'
     choice_cache_dict =  cache.get(cache_key_choice) 
 
     if request.method  == 'POST':
+        
         # Condition for custom page of weekly inmate data report
         if request.POST.get('continue'):
             previous_form_data=request.POST.dict()
@@ -757,9 +758,8 @@ def add_survey_form(request,pk):
             if ben_uuid != '0':
                 profile_url=f'/configuration/profile/{survey.get("slug")}/{ben_uuid}/'
             elif school_creation_key:
-                ben_uuid=result['sync_res'][0]['ben_uuid']
+                ben_uuid=result['u_uuid']
                 profile_url=f'/configuration/profile/{ben_uuid}/'
-                # profile_url = f'/configuration/list/{survey.get("slug")}/{school_creation_key}/{school_name}/'
             else:
                 profile_url = f'/configuration/list/{survey.get("slug")}/'
             return HttpResponseRedirect(profile_url)
@@ -1169,7 +1169,6 @@ def custom_validation_survey_wise(resp_dict,survey_id,json_id,ben_uuid=None):
                 error_msg['126']="Can't make this record positive. Please enter valid data" 
                 break
     if survey_id in [1,3] and ben_uuid != 'None':
-        print('ben_uuid')
         ben_respons=JsonAnswer.objects.get(creation_key=ben_uuid).response
         dob = datetime.strptime(resp_dict.get('8',resp_dict.get('58')), "%d-%m-%Y")
         seventeen_delta = datetime.today().date() - relativedelta(years=17)
