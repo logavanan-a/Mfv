@@ -119,15 +119,15 @@ def survey_show(survey_id, creation_key):
     from datetime import datetime
     start_date, end_date = get_financial_year_dates()
     value = False
-    # import ipdb; ipdb.set_trace()
     query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@financial_year'.format(survey_id,creation_key)#
     if survey_id in [3,4,5]: 
         query=query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
     else:
         query=query.replace("@@financial_year","")
-    # import ipdb; ipdb.set_trace()
+    import ipdb; ipdb.set_trace()
     secondary_query= query
     object_lists=JsonAnswer.objects.raw(query)
+    
     if object_lists:
         for obj in object_lists:
             datas = json.loads(obj.extra_config)
@@ -146,7 +146,7 @@ def survey_show(survey_id, creation_key):
                 else:
                     query=query.replace("@@financial_year","")
     else:
-        items = {'4':3,'7':4,'5':4,'6':5,'8':4,'9':5,'3':3,'10':10}    
+        items = {'4':3,'7':4,'5':4,'6':6,'8':4,'9':9,'3':3,'10':10}    
         survey_key = items[str(survey_id)]
         query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@financial_year'.format(survey_key,creation_key)#
         if survey_key in [3,4,5]:
@@ -169,11 +169,12 @@ def survey_show(survey_id, creation_key):
         value = False
     elif len(results) == 1 and survey_id == 3:
         value = False
-    elif len(results) == 0 and survey_id in [3,10]:
+    elif len(results) == 0 and survey_id in [3,6,9,10]:
         value = True
+    
     elif len(results) != 0: 
         value = True
-    print(referred_to_hospital,'referred_to_hospital_result')
+    print(survey_id)
     return value
 
         # object_lists=JsonAnswer.objects.raw(query)

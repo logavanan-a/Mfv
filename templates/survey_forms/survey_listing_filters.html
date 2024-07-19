@@ -1,6 +1,7 @@
 <form method="GET">
     <div class='row'>
         {% for filter in filter_questions %}
+            
             {% if filter.qtype == 'AW' %}
                 {% for bondary in next_level_boundries %}
                     <div class="col-3" >
@@ -42,13 +43,13 @@
         <div class='col-3'>
             <div class="mb-2">
                 <label class="form-label" for="">Search</label>
-                <input  id='' type="search" name="search" class="form-control" value="{{request_data|get_item:'search'|default:''}}">
+                <input  id='' type="search" name="search" class="form-control" value="{{request_data|get_item:'search'|default:''}}" >
             </div>
         </div>
         <div class='col-auto'>
             <label class="form-label" for=""></label>
-            <div class="">
-                <input type='submit' class="btn btn-success btn-lg waves-effect waves-light mb-3" value="Go"></input>
+            <div class="mt-2">
+                <input type='submit' class="btn btn-success btn-lg waves-effect waves-light fs-6" value="Go"></input>
             </div>
             {% comment %} <div class="col-auto mt-3 ">
                 <button type="reset" id="filter_reset"  class="form-control btn btn-primary waves-effect btn-lg float-right" value="True">Reset</button>

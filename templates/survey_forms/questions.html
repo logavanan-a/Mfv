@@ -28,7 +28,7 @@
             {% elif question.qtype == 'SM' %}
                     <div class="col-lg-6" id='skip_{{question.id}}'>
                         <div class=" mb-3">
-                            <label class="form-label" >{{question.form_question_number|default:''}}. {{question.text}}{% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                            <label class="form-label" >{{question.form_question_number|default:''}} {{question.text}}{% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
                             <select {% if question.api_json.select_multiple %}multiple{% endif %}  class="{% if question.api_json.select_multiple %}select2{% endif %} form-select main_question S_0_0 {% if question.mandatory %}required{% endif %}"  name='{{question.id}}' id='{{question.id}}' 
                                 aria-label="Floating label select example"  {% if question.mandatory %}required{% endif %}  {% if creation_key and not question.is_editable and response_obj.response and response_obj.response.616 != '619'   %} disabled {% endif %}>
                                 {% comment %} <option selected disabled value=""></option> {% endcomment %}
@@ -142,7 +142,7 @@
                     </div> 
             {% elif main_is_skip_question and main_get_inner_questions  %}<!--and not question.parent.qtype == 'In,GD'-->
                 {% if question.qtype == 'C' %}
-                <label class="form-check-label mb-2">{{question.form_question_number|default:''}}. {{question.text}}</label>
+                <label class="form-check-label mb-2">{{question.form_question_number|default:''}} {{question.text}}</label>
                 <div class='row'>
                     {% for choice in main_choice_list %}
                         <div class="col-lg-6"question.qtype == 'C id='skip_{{question.id}}'>
@@ -198,7 +198,7 @@
                 {% elif question.qtype == 'S' %}
                 <div class="col-lg-6" id='skip_{{question.id}}'>
                     <div class=" mb-3">
-                        <label class="form-label" >{{question.form_question_number|default:''}}. {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                        <label class="form-label" >{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
                         <select class=" form-select {{question.id}} main_question S_0_0 {% if question.mandatory %}required{% endif %}"  name='{{question.id}}' id='{{question.id}}'
                             aria-label="Floating label select example" data-placeholder=" "  {% if question.mandatory %}required{% endif %} {% if question.id|slugify in conditional_disable or not question.is_editable and response_obj.response and response_obj.response.616 != '619'   and creation_key  %}disabled{% endif %}>
                             <option selected {% if question.mandatory %}disabled{% endif %} value=""></option>
@@ -275,7 +275,7 @@
                 {% endif %}
             {% elif not question.parent %}
                 {% if question.qtype == 'C' %}
-                <label class="form-check-label mb-2">{{question.form_question_number|default:''}}. {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                <label class="form-check-label mb-2">{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
                 <div class='row'>
                     {% for choice in main_choice_list %}
                         <div class="col-lg-6" id='skip_{{question.id}}'>
@@ -306,7 +306,7 @@
                     <div class="col-lg-6" id='skip_{{question.id}}'>
                         <div class=" mb-3 ">
                             <div class="mb-3">
-                                <label class="form-label" for="{{question.id}}">{{question.form_question_number|default:''}}. {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                                <label class="form-label" for="{{question.id}}">{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
                                 <input  id='{{question.id}}' {% if question.training_config.custom_pattern %} pattern="{{question.training_config.value}}" {% endif %}{% if validation_code.code == 'AN' %} pattern="[a-zA-Z0-9\s]+" {% elif validation_code.code == 'A' %}  pattern="[a-zA-Z\s]+" {% endif %} type="{% if validation_code.code == 'N' or validation_code.code == 'D'%}number{% else %}text{% endif %}" min='{{validation_code.MinMax.min}}'  max='{{validation_code.MinMax.max}}' name="{{question.id}}" maxlength='{{validation_code.MinMax.max_length}}' minlength='{{validation_code.MinMax.min_length}}' class="form-control main_question T_0_0 {% if question.mandatory %}required{% endif %}"  {% if question.mandatory %}required{% endif %} {% if not question.is_editable and response_obj.response and response_obj.response.616 != '619'   and creation_key %}readonly{% endif %}>
                                 <div class="invalid-feedback">
                                     {% if validation_code.message %}{{validation_code.message}}{% else %}Please enter a valid {{question.text}}{% endif %}
@@ -318,7 +318,7 @@
                 {% elif question.qtype == 'AF' %}
                         <div class="col-lg-6 AP_Questions" >
                             <div class=" mb-3 ">
-                                <label class="form-label" >{{question.form_question_number|default:''}}. {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                                <label class="form-label" >{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
                                 <input id='{{question.id}}' value='' type="text" name="{{question.id}}" class="form-control main_question T_0_0 {% if question.mandatory %}required{% endif %}" {% if question.mandatory %}required{% endif %} readonly>
                             </div>
                         </div>
@@ -326,14 +326,14 @@
                         <input type="hidden" id='auto_populate' name='auto_populate' value='{{temp_code}}_{{question.id}}'>
                         <div class="col-lg-6 AP_Questions" id='skip_{{question.id}}'>
                             <div class=" mb-3 ">
-                                <label class="form-label" >{{question.form_question_number|default:''}}. {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                                <label class="form-label" >{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
                                 <input id='{{question.id}}' type="text" name="{{question.id}}" class="form-control main_question T_0_0 {% if question.mandatory %}required{% endif %}" {% if question.mandatory %}required{% endif %} readonly {% if question.training_config.current_user %}value="{{request.user.username}}"{% endif %}>
                             </div>
                         </div>
                 {% elif question.qtype == 'S' %}
                     <div class="col-lg-6" id='skip_{{question.id}}'>
                         <div class=" mb-3">
-                            <label class="form-label" >{{question.form_question_number|default:''}}. {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                            <label class="form-label" >{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
                             <select {% if question.api_json.select_multiple %}multiple{% endif %} class=" {% if question.api_json.select_multiple %}select2{% endif %} form-select main_question S_0_0 {% if question.mandatory %}required{% endif %}"  name='{{question.id}}' id='{{question.id}}' 
                                 aria-label="Floating label select example" data-placeholder=""  {% if question.mandatory %}required{% endif %} {% if question.id|slugify in conditional_disable or not question.is_editable and response_obj.response and response_obj.response.616 != '619'   and creation_key %}disabled{% endif %}>
                                 <option selected {% if question.mandatory %} disabled {% endif %} value=""></option>
@@ -350,7 +350,7 @@
                 {% elif question.qtype == 'D' %}
                     <div class="col-lg-6" id='skip_{{question.id}}'>
                         <div class=" mb-3">
-                            <label class="form-label" for="floatingnameInput">{{question.form_question_number|default:''}}. {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                            <label class="form-label" for="floatingnameInput">{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
                             <input type="{% if question.training_config.month %}month{% else %}date{% endif %}" class="form-control main_question D_0_0 {% if question.mandatory %}required{% endif %}" {% if question.training_config.dob %}onchange="getAge(this,{{question.id}},{{question.training_config.minor|default:'false'}})"{% endif %} pattern="DD/MM/YYYY" name="{{question.id}}" min='{% if question.training_config.month %}{{validation_code.MinMax.min|slice:":-"|slice:"-3"}}{% else %}{{validation_code.MinMax.min}}{% endif%}' max='{% if question.training_config.month %}{{validation_code.MinMax.max|slice:":-"|slice:"-3"}}{% else %}{{validation_code.MinMax.max}}{% endif %}' id="{{question.id}}" {% if question.mandatory %}required{% endif %} {% if not question.is_editable and response_obj.response and response_obj.response.616 != '619'   and creation_key %}readonly{% endif %}>
                             <div class="invalid-feedback">
                                 {% if validation_code.message %}{{validation_code.message}}{% else %}Please enter a valid {{question.text}}{% endif %}
@@ -444,7 +444,7 @@
                     {% endif %}{% endcomment %}
                     <div class="col-lg-6" id='skip_{{question.id}}'>
                         <div class=" mb-3">
-                            <label class="form-label" >{{question.form_question_number|default:''}}. {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                            <label class="form-label" >{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
                             <select class=" form-select select2 main_question S_0_0 {% if question.mandatory %}required{% endif %} api_question"  name='{{question.id}}' id='{{question.id}}' 
                                 aria-label="Floating label select example"   {% if question.mandatory %}required{% endif %} {% if not question.is_editable and response_obj.response and response_obj.response.616 != '619'   and creation_key %}disabled{% endif %}>
                                 {% if school_creation_key %}

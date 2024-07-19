@@ -102,6 +102,8 @@ def add_survey_answers_version_1(request, **kwargs):
     # data = json.loads(request.body.decode('utf-8'))
     data = request.POST
     create_post_log_v2(request, data)
+    if kwargs:
+        data=kwargs
     user_id = int(data['u_uuid'])
     sync_res = []
     message = "Success"
@@ -141,7 +143,10 @@ def add_survey_answers_version_1(request, **kwargs):
         #     'SYNC_SURVEY_INFO', survey_boundary_key, activities, 14400)
     resp_ids = {level: [] for level in activity_queries.keys()}
     try:
-        pushinput = json.loads(data['pushInput'])
+        if kwargs:
+            pushinput = data['pushInput']
+        else:
+            pushinput = json.loads(data['pushInput'])
         all_input_ben_uuid = [p.get('beneficiary_id','') for p in pushinput if p.get('beneficiary_id') != '0']
         all_input_ben_list =list(JsonAnswer.objects.filter(active=2,creation_key__in =all_input_ben_uuid).values_list('creation_key',flat=True))
         for val in pushinput:
@@ -353,10 +358,11 @@ def add_survey_answers_version_1(request, **kwargs):
                     exc_type, exc_value, exc_traceback))
                 logging.error(error_stack)
             finally:
-                sync_res.append({"r_uuid": val['r_uuid'], "sync_status": sync_status,"s_created": server_created_date, 'error_msg':error_msg, 'duplicate_status': duplicate_status,"approved_by":approved_by,"approved_on":approved_on})
+                sync_res.append({"r_uuid": val['r_uuid'], "sync_status": sync_status,"s_created": server_created_date, 'error_msg':error_msg, 'duplicate_status': duplicate_status,"approved_by":approved_by,"approved_on":approved_on,})
     except Exception as ex:
         status = False
         message = "Failed"
+        obj=None
         error_msg = ex.args[0]
         logging.error(error_msg)
         exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -365,7 +371,8 @@ def add_survey_answers_version_1(request, **kwargs):
         logging.error(error_stack)
     response = {'status': status,
                 'message': message,
-                "sync_res": sync_res
+                "sync_res": sync_res,
+                'u_uuid':res.creation_key if res else ''
                 }
     create_post_log_v2(request,response)
     return JsonResponse(response)
