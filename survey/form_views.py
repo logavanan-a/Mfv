@@ -1544,6 +1544,7 @@ def conditional_field_disable(json_response,config):
 from operator import itemgetter
 @login_required(login_url='/')
 def edit_survey_form(request,survey_slug,creation_key):
+    from survey.api_views_version1 import add_survey_answers_version_1
     template_name = 'survey_forms/edit_answer_form.html'
     # survey=Survey.objects.get(slug=survey_slug)
     survey_dict=load_data_to_cache_survey_slug()
