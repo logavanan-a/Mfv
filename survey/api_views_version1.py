@@ -102,7 +102,6 @@ def add_survey_answers_version_1(request, **kwargs):
     # data = json.loads(request.body.decode('utf-8'))
     data = request.POST
     create_post_log_v2(request, data)
-    # import ipdb; ipdb.set_trace()
     if kwargs:
         data=kwargs
     user_id = int(data['u_uuid'])
@@ -373,7 +372,7 @@ def add_survey_answers_version_1(request, **kwargs):
     response = {'status': status,
                 'message': message,
                 "sync_res": sync_res,
-                'u_uuid':obj.sample_id if obj else ''
+                'u_uuid':res.creation_key if res else ''
                 }
     create_post_log_v2(request,response)
     return JsonResponse(response)
