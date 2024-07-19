@@ -158,7 +158,7 @@ def survey_show(survey_id, creation_key):
     primary=0
     secondary=0
     if survey_id in [9,5,6,7,8,11]:
-        secondary_query= c
+        secondary_query= query
     if survey_id !=3:
         query="""with a as ("""+query+""") select coalesce(sum(case when response->>'250' in ('154','155') or a.response->>'252' in ('162','163') then 1 else 0 end),0) as ht from a"""
         results = get_result_query(query)
