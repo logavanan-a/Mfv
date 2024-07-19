@@ -380,7 +380,7 @@ class WebResponseListing(View):
         # if not user_location_json_list:
 
 
-        # import ipdb; ipdb.set_trace()
+        
 
         if creation_key:
             profile_obj = JsonAnswer.objects.get(creation_key=creation_key)
@@ -445,7 +445,7 @@ class WebResponseListing(View):
         # cache_delete_namespace('SURVEY_LISTING_PAGE')
 
         #Survey listing page headings 
-        # import ipdb; ipdb.set_trace()
+        
         cache_keys=[profile_cache_key,survey_key_question]
         survey_questions =  cache.get_many(cache_keys)
         for i in cache_keys:        
@@ -453,7 +453,7 @@ class WebResponseListing(View):
                 questions = Question.objects.filter(block__survey=cache_survey_id.get(i)).exclude(active=0).values('id','text','qtype','training_config').order_by('question_order')
                 cache_set_with_namespace(INSTANCE_CACHE_PREFIX+'FORM_BUILDER',i,questions,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
                 survey_questions.update({i:questions})
-        # import ipdb; ipdb.set_trace()
+        
         fixed_questions=survey_questions.get(profile_cache_key)
         if fixed_questions:
             preserved_prfile = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(fixed_profile_ids)])
@@ -500,7 +500,7 @@ class WebResponseListing(View):
 
                 
             filtered_query=search_filter_replace(request,query,filters,search_field,address_widget_filter)
-            # import ipdb; ipdb.set_trace()
+            
             filtered_query=filtered_query.replace('@@order_by','created desc')
             object_lists=JsonAnswer.objects.raw(filtered_query)
             #validation of add button inside the profile page
@@ -519,12 +519,13 @@ class WebResponseListing(View):
         options_survey_ids=survey.extra_config.get('action_options',[])
         if survey.id == 10:
             school_creation_key=creation_key
-        # import ipdb; ipdb.set_trace()
+        
         if school_creation_key:
             school_survey= JsonAnswer.objects.get(creation_key=school_creation_key or creation_key)
             school_name=school_survey.response['231']
             options_survey_ids = school_survey.survey.extra_config.get('action_options',[])
         preserved_survey = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(options_survey_ids)])
+        
         options_dropdown=Survey.objects.filter(id__in=options_survey_ids).exclude(active=0).order_by(preserved_survey)
         
         heading=profile_obj.survey.name if profile_obj else survey.name
@@ -643,7 +644,7 @@ def add_survey_form(request,pk):
     # caching the block based on survey id
     blocks =  load_data_to_cache_block()
     blocks = blocks.get(str(pk))
-    # import ipdb; ipdb.set_trace()
+    
     school_creation_key = request.GET.get('creation_key')
     school_name = request.GET.get('school_name')
     heading=survey.get('name')
@@ -1471,7 +1472,7 @@ def sequence_id_creator(survey_id,resp_dict):
                     sub_result = cursor.fetchall()
                     short_codes.append(sub_result[0][0])
                     query=query.format(sub_result[0][0])
-                # import ipdb; ipdb.set_trace()
+                
                 cursor.execute(query)
                 result = cursor.fetchall()
 

@@ -58,7 +58,7 @@
                     {% include "../survey_forms/profile.html" %}
                 {% endif %} 
                 
-                {% if survey.periodicity == 7 and creation_key and survey_slug %}
+                {% comment %}{% if survey.periodicity == 7 and creation_key and survey_slug %}
                     <!--header of one time activity-->
                     <div class='row mt-4 mb-2'>
                         <div class='col-6'>
@@ -69,9 +69,7 @@
                         <div class='col-6'>
                             <div class="d-flex justify-content-end">
                                 {% with keystrings_edit=profile_obj.survey.slug|default:survey.slug|make_string:"edit" keystrings_add=profile_obj.survey.slug|default:survey.slug|make_string:"add" %}
-                                    {% if object_lists|length == 1 and not main_add_button and request.user.groups.all.0.id == 1 %}
-                                        <h4 class="p-2" title='Edit'><a href="/configuration/edit-survey-form/{{survey_slug}}/{{object_lists.0.creation_key}}/?ben={{creation_key}}"><span class="bx bxs-edit-alt bx-md"></span></a></h4>
-                                    {% elif not main_add_button and request.user.groups.all.0.id == 1 and profile_obj.survey.id|survey_show:"" %}
+                                    {% if not main_add_button and request.user.groups.all.0.id == 1 and profile_obj.survey.id|survey_show:"" %}
                                         <h4 class="p-2 " title='Add'><a href="/configuration/add-survey-form/{{survey.id}}/?ben={{creation_key}}"><span class="bx bx-plus-medical bx-md"></span></a></h4>
                                     {% endif %}
                                 {% endwith %}
@@ -110,9 +108,10 @@
                                 </div>
                             {% endif %}
                         {% endfor %}
-                    </div>
-                {% elif not survey_slug and creation_key and options_dropdown.count > 1 %}
+                    </div>{% endcomment %}
+                {% if not survey_slug and creation_key and options_dropdown.count > 1 %}
                     <!-- profile page view the data -->
+                     
                     <div class='row mt-4'>
                         <div class="d-flex justify-content-end">
                             {% with profile_obj.survey.slug|default:survey.slug|make_string:"edit" as keystrings %}
@@ -214,7 +213,6 @@
                         <div class='col-6'>
                             <div class="d-flex justify-content-end">
                                 {% with profile_obj.survey.slug|default:survey.slug|make_string:"add" as keystrings %}
-                                
                                 {% if request.user.groups.all.0.id == 1 and survey.id|survey_show:creation_key %}
                                 <h4 class="p-2 " title='Add'><a href="/configuration/{% if survey.id == 20 %}custom_weekly_data_form{% else %}add-survey-form/{{survey.id}}{% endif %}/?ben={{creation_key}}"><span class="bx bx-plus-medical bx-md"></span></a></h4>
                                     {% endif %}
