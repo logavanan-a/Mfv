@@ -60,6 +60,11 @@
 </div>
 <!-- Left Sidebar End -->
 <script type="text/javascript">
+    $(document).ready(function() {
+        $('#side-menu').on('hidden.metisMenu', function(event) {
+            $(event.target).prev().removeClass('mm-active');
+        });
+    });
   function CurrentMonth(slug)
   {
       var today = new Date();
