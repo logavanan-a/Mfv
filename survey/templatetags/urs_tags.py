@@ -187,11 +187,11 @@ def survey_show(survey_id, creation_key):
                 value = True
         elif len(results) == 1 and survey_id == 3:
             value = False
-        elif survey_id == 10:
-            value = True
+        
     elif len(primary_result) == 0 and survey_id == 3:
         value = True
-    
+    elif survey_id == 10:
+        value = True
     return value
 
         # object_lists=JsonAnswer.objects.raw(query)
