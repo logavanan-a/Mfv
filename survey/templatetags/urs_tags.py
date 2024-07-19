@@ -124,8 +124,9 @@ def survey_show(survey_id, creation_key):
         query=query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
     else:
         query=query.replace("@@financial_year","")
-    import ipdb; ipdb.set_trace()
-    secondary_query= query
+    # import ipdb; ipdb.set_trace()
+    if not survey_id in [9,5,6,7,8,11]:
+        secondary_query= query
     object_lists=JsonAnswer.objects.raw(query)
     
     if object_lists:
@@ -141,12 +142,12 @@ def survey_show(survey_id, creation_key):
                     query=query.replace("@@question_id"," and js.response->>'{0}' = '{1}'".format(questionId,ans_code))
                 else:
                     query=query.replace("@@question_id","")
-                if survey_key in [3,4]:
+                if survey_key in [9,5,6,7,8,11]:
                     query=query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
                 else:
                     query=query.replace("@@financial_year","")
     else:
-        items = {'4':3,'7':4,'5':4,'6':6,'8':4,'9':9,'3':3,'10':10}    
+        items = {'4':3,'7':4,'5':4,'6':4,'8':4,'9':4,'3':3,'10':10,'11':4}    
         survey_key = items[str(survey_id)]
         query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@financial_year'.format(survey_key,creation_key)#
         if survey_key in [3,4,5]:
@@ -156,23 +157,31 @@ def survey_show(survey_id, creation_key):
     results = get_result_query(query)
     primary=0
     secondary=0
-    if survey_id == 4:
+    if survey_id in [9,5,6,7,8,11]:
+        secondary_query= c
+    if survey_id !=3:
         query="""with a as ("""+query+""") select coalesce(sum(case when response->>'250' in ('154','155') or a.response->>'252' in ('162','163') then 1 else 0 end),0) as ht from a"""
         results = get_result_query(query)
         primary = results[0][0]
-    if primary == 0 and survey_id in [4,5] and len(results) == 1:
+    if primary == 0 and survey_id !=3 and len(results) == 1:
         secondary_result = get_result_query(secondary_query)
         secondary = len(secondary_result)
-        referred_to_hospital="""with a as ("""+secondary_query+""") select coalesce(sum(case when js.response->>'284'='180' then 1 else 0 end),0) as ht from a"""
-        referred_to_hospital_result = len(referred_to_hospital)
-    if primary == 0 and secondary !=0 and len(results) == 1 and survey_id in [4,5]:
+        referred_to_hospital="""with a as ("""+secondary_query+""") select coalesce(sum(case when response->>'284'='180' then 1 else 0 end),0) as ht from a"""
+        referred_to_hospital_result = get_result_query(referred_to_hospital)
+        all_result = referred_to_hospital_result[0][0]
+    if primary == 0 and secondary !=0 and len(results) == 1 and survey_id == 4:
         value = False
+    elif primary == 0 and secondary == 0 and survey_id == 4 and len(results) == 1:
+        value = True
+    elif primary == 0 and survey_id == 4:
+        value = False
+    elif all_result == 1 and survey_id in [9,5,6,7,8]:
+        value = True
+    elif all_result == 0 and survey_id in [9,11,8]:
+        value = True
     elif len(results) == 1 and survey_id == 3:
         value = False
-    elif len(results) == 0 and survey_id in [3,6,9,10]:
-        value = True
-    
-    elif len(results) != 0: 
+    elif survey_id == 10:
         value = True
     print(survey_id)
     return value
