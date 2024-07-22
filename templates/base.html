@@ -39,6 +39,9 @@
     <link href="{% static 'css/app.min.css' %}" id="app-style" rel="stylesheet" type="text/css" />
     {% endblock css %}
     <style>
+        .logo-light {
+            display: block;
+        }
         table, th, td {
           border: 1px solid rgba(0, 0, 0, 0.87);
           border-collapse: collapse;
@@ -52,11 +55,16 @@
         .modal-footer {
             border-top: 0px;
         }
+        .table th {background-color: #e2e3e4};
+        * {
+  
+            font-family: "Poppins", sans-serif;
+            }
         </style>
 </head>
 
 
-<body data-sidebar="dark">
+<body >
 
     <!-- Begin page -->
     
@@ -82,8 +90,17 @@
                     <div class="row">   
                         <div class="col-12">
                             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                                {% if heading in 'Student Details' %}
+                                <div>
                                     <h2 class="mb-sm-0 font-size-20"><b>&nbsp;{{heading}} </b><span class="mb-sm-0 font-size-16">{% if mission_obj.short_description %}: &nbsp;{{mission_obj.short_description}}{% endif %}</span></h2>
-                            </div>
+                                </div>
+                                <div style="width: 30%;">
+                                    {% include "survey_forms/activity_dropdown.html" %}
+                                </div>
+                                {% else %}
+                                <h2 class="mb-sm-0 font-size-20"><b>&nbsp;{{heading}} </b><span class="mb-sm-0 font-size-16">{% if mission_obj.short_description %}: &nbsp;{{mission_obj.short_description}}{% endif %}</span></h2>
+                                {% endif %}
+                            </div>  
                         </div>              
                     </div>
     {% endif %}  
@@ -124,7 +141,5 @@
 
             <script src="{% static 'js/app.js' %}"></script>    
             {% endblock javascript %}
-    
         </body>
-
     </html>
