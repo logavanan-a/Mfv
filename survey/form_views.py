@@ -527,9 +527,11 @@ class WebResponseListing(View):
         preserved_survey = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(options_survey_ids)])
         
         options_dropdown=Survey.objects.filter(id__in=options_survey_ids).exclude(active=0).order_by(preserved_survey)
-        
-        heading=profile_obj.survey.name if profile_obj else survey.name
-
+        if survey.id != 10:
+            heading=profile_obj.survey.name if profile_obj else survey.name
+        else:
+            heading = 'Student Details'
+        # heading='Student Details'
         # partner_creation_key = request.session.get('partner_key')
         # responses = BeneficiaryResponse.objects.none()
 
@@ -563,7 +565,7 @@ class WebResponseListing(View):
         filter_request=request.META['QUERY_STRING']
         filtered_items = [item for item in filter_request.split('&') if not item.startswith('page=')]
         filter_request_data='&'.join(filtered_items)
-        print(survey.id,'surveysurvey')
+        
         return render(request,self.template_name,locals())
 
 def load_data_to_cache_choices():

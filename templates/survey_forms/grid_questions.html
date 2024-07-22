@@ -29,7 +29,7 @@
                         {% endif %}
                         {% if is_grid_question.is_grid %}
                         <tr>
-                            {% if grid_get_row_questions|length > 1 %}<th class="text-nowrap" scope="row">{{is_grid_question.text}}</th>{% endif %}
+                            {% if grid_get_row_questions|length > 1 %}<td class="text-nowrap" scope="row">{{is_grid_question.text}}</td>{% endif %}
                                 {% for grid_question in grid_get_column_questions %}
                                 {% get_validation_code grid_question.id as grid_validation_code %}
                                 {% choice_list grid_question.id as grid_choice_list %}
