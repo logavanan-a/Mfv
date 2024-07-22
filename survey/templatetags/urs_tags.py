@@ -115,22 +115,25 @@ def make_string(val1, val2):
 
 @register.filter
 def survey_show(survey_id, creation_key):
+
     from django.db import connection
     from datetime import datetime
     start_date, end_date = get_financial_year_dates()
     value = False
     query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@financial_year'.format(survey_id,creation_key)#
-    if survey_id in [3,4,5]: 
+    periodicity= list(Survey.objects.filter(periodicity=7).values_list('periodicity',flat=True))
+    if survey_id in periodicity: 
         query=query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
     else:
         query=query.replace("@@financial_year","")
     if not survey_id in [9,5,6,7,8,11]:
         secondary_query= query
     object_lists=JsonAnswer.objects.raw(query)
-    # import ipdb; ipdb.set_trace()
     primary_query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@financial_year'.format(3,creation_key)#
     primary_query=primary_query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
+    
     if object_lists:
+        obj=1
         for obj in object_lists:
             datas = json.loads(obj.extra_config)
             keys = datas["rule_engine"][0] if "rule_engine" in datas else ''
@@ -142,7 +145,7 @@ def survey_show(survey_id, creation_key):
                     
                 query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@financial_year'.format(survey_key,creation_key)#
                 
-                if survey_key in [3,4,5]:
+                if survey_key in periodicity:
                     query=query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
                 else:
                     query=query.replace("@@financial_year","")
@@ -187,7 +190,6 @@ def survey_show(survey_id, creation_key):
                 value = True
         elif len(results) == 1 and survey_id == 3:
             value = False
-        
     elif len(primary_result) == 0 and survey_id == 3:
         value = True
     elif survey_id == 10:
