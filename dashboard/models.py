@@ -98,6 +98,22 @@ class MonthlyDashboard(BaseContent):
     def __str__(self):
         return f"Coverage Data for {self.month}"
 
+    def get_all_array_fields(self):
+        all_arrays = (
+            self.children_covered_uuid +
+            self.school_covered_uuid +
+            self.teachers_train_uuid +
+            self.children_pres_uuid +
+            self.child_prov_spec_uuid +
+            self.pgp_uuid +
+            self.children_reffered_uuid +
+            self.child_prov_hos_uuid +
+            self.children_adv_uuid +
+            self.children_prov_sgy_uuid +
+            self.swc_uuid
+        )
+        return {tuple(all_arrays):self.current_status}
+
 class Remarks(BaseContent):
     user = models.ForeignKey(User, on_delete=models.CASCADE, **OPTIONAL)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)

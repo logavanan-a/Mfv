@@ -489,7 +489,7 @@ class WebResponseListing(View):
                     if i.get('qtype') == 'AW':
                         address_widget_filter.append(i.get('id'))
                         boundaries=load_data_to_cache_boundaries_name()
-                        boundarys=[item for item in boundaries if (request.user.is_superuser or item.get('id') in request.session.get('user_parent_boundary_list')) and item.get('boundary_level_type_id') == 1 ]
+                        boundarys=[item for item in boundaries if item.get('boundary_level_type_id') == 1 and item.get('code') in list(map(str, request.session['user_parent_boundary_list']))] 
                         request_data.update({str(i.get('id')):request.GET.getlist(str(i.get('id')))})
                     else:
                         choices_dict={}
@@ -1646,10 +1646,11 @@ def edit_survey_form(request,survey_slug,creation_key):
 
     if not request.user.is_superuser and not request.user.is_staff:
         next_level_boundries=load_data_to_cache_boundarylevel()
-        if survey.get('id') != 2 :
-            boundarys=[item for item in boundaries if item.get('id') in request.session['user_parent_boundary_list']]
-        else:
-            boundarys=[item for item in boundaries if item.get('boundary_level_type_id') == 1]
+        boundarys=[item for item in boundaries if item.get('boundary_level_type_id') == 1 and item.get('code') in list(map(str, request.session['user_parent_boundary_list']))] 
+        # if survey.get('id') != 2 :
+        #     boundarys=[item for item in boundaries if item.get('id') in request.session['user_parent_boundary_list']]
+        # else:
+        #     boundarys=[item for item in boundaries if item.get('boundary_level_type_id') == 1]
             
     conditional_disable=conditional_field_disable(response_obj.response,survey.get('extra_config'))
 
