@@ -113,22 +113,20 @@
                         {% for item in survey_heading_questions %}
                             {% if item.qtype == 'AW' %}
                                 {% for question_id,answers in profile_obj.response.address.1.items %}
-                                    <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
-                                        <div class='p-2 w-50 '>
-                                            <h5 class="fw-bold " style="font-size:1rem">{{item.id|get_question_text:profile_obj.survey_id}} :</h5>
-                                        </div>
-                                        <div class='p-2 w-50 '>
-                                            <p style="font-size:.97rem" class='text-primary'>{% get_answer_text survey.id object_lists.0.response|get_item_str:item.id item %}</p>
+                                    <div class="col-lg-4 col-sm-4 col-md-4">
+                                        <div class='d-flex'  >
+                                            <p class="fw-bold" style="font-size:1rem;width: 30%;">{{item.id|get_question_text:profile_obj.survey_id}}</p>
+                                            <p class="fw-bold text-center" style="font-size:1rem;width: 10%;">:</p>
+                                            <p style="font-size:1rem" class='text-primary'>{% get_answer_text survey.id object_lists.0.response|get_item_str:item.id item %}</p>
                                         </div>
                                     </div>
                                 {% endfor %}
                             {% else %}
-                                <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
-                                    <div class='p-2 w-50 '>
-                                        <p class="fw-bold " style="font-size:1rem">{{item.id|get_question_text:survey.id}} :</p>
-                                    </div>
-                                    <div class='p-2 w-50 '>
-                                        <p style="font-size:.97rem" class=''>{% get_answer_text survey.id object_lists.0.response|get_item_str:item.id item %}</p>
+                                <div class="col-lg-4 col-sm-4 col-md-4">
+                                    <div class='d-flex'>
+                                        <p class="fw-bold" style="font-size:1rem;width: 30%;">{{item.id|get_question_text:survey.id}}</p>
+                                        <p class="fw-bold text-center" style="font-size:1rem;width: 10%;">:</p>
+                                        <p style="font-size:1rem;width: 60%;">{% get_answer_text survey.id object_lists.0.response|get_item_str:item.id item %}</p>
                                     </div>
                                 </div>
                             {% endif %}
@@ -154,13 +152,11 @@
                             {% if item.id not in fixed_profile_ids %}
                                 {% if item.qtype == 'AW' %}
                                     {% for question_id,answers in profile_obj.response.address.1.items %}
-                                        <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
-                                            <div class='p-2 w-50 '>
-                                                <p class="fw-bold " style="font-size:1rem">{{item.id|get_question_text:profile_obj.survey_id}} :</p>
-                                            </div>
-                                            <div class='p-2 w-50 '>
-
-                                                <p style="font-size:.97rem" class=''>{% get_answer_text profile_obj.survey_id answers item %}</p>
+                                        <div class="col-lg-4 col-sm-4 col-md-4">
+                                            <div class='d-flex' >
+                                                <p class="fw-bold " style="font-size:1rem;width: 30%;">{{item.id|get_question_text:profile_obj.survey_id}}</p>
+                                                <p class="fw-bold text-center" style="font-size:1rem;width: 10%;">:</p>
+                                                <p style="font-size:1rem;width: 60%;">{% get_answer_text profile_obj.survey_id answers item %}</p>
                                             </div>
                                         </div>
                                     {% endfor %}
@@ -189,22 +185,20 @@
                                             </div>
                                         </div>
                                     {% else %}
-                                        <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
-                                            <div class='p-2 w-50 '>
-                                                <p class="fw-bold " style="font-size:1rem">{{question_id|get_question_text:profile_obj.survey_id}}</p>
-                                            </div>
-                                            <div class='p-2 w-50 '>
-                                                <p style="font-size:.97rem" class=''>-</p>
+                                        <div class="col-lg-4 col-sm-4 col-md-4">
+                                            <div class='p-2' style="width: 30%;">
+                                                <p class="fw-bold" style="font-size:1rem;width: 30%;">{{question_id|get_question_text:profile_obj.survey_id}} :</p>
+                                                <p class="fw-bold text-center" style="font-size:1rem;width: 10%;">:</p>
+                                                <p style="font-size:1rem;width: 60%;">-</p>
                                             </div>
                                         </div>
                                     {% endif %}
                                 {% else %}
-                                    <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
-                                        <div class='p-2 w-50 '>
-                                            <p class="fw-bold " style="font-size:1rem">{{item.id|get_question_text:profile_obj.survey_id}} :</p>
-                                        </div>
-                                        <div class='p-2 w-50 '>
-                                            <p style="font-size:.97rem" class=''>{% get_answer_text profile_obj.survey_id profile_obj.response|get_item_str:item.id item %}</p>
+                                    <div class="col-lg-4 col-sm-4 col-md-4">
+                                        <div class='d-flex p-2' >
+                                            <p class="fw-bold " style="font-size:1rem;width: 30%;">{{item.id|get_question_text:profile_obj.survey_id}}</p>
+                                            <p class="fw-bold text-center" style="font-size:1rem;width: 10%;">:</p>
+                                            <p style="font-size:1rem;width: 60%;">{% get_answer_text profile_obj.survey_id profile_obj.response|get_item_str:item.id item %}</p>
                                         </div>
                                     </div>
                                 {% endif %}
@@ -244,9 +238,9 @@
                                 {% endwith %}
                             </div>
                         </div>
-                        <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
-                            <div class='p-2 w-50 '>
-                                <h5 class="" style="font-size:.97rem">No data available</h5>
+                        <div class="col-lg-4 col-sm-4 col-md-4">
+                            <div class='p-2'>
+                                <h5 class="" style="font-size:1rem">No data available</h5>
                             </div>
                         </div>
                     </div>
