@@ -9,6 +9,8 @@ from survey.views import get_pagination
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from send_mail.models import *
+from send_mail.views import send_mail
 
 # Create your views here.
 def dashboard(request):
@@ -176,7 +178,6 @@ def monthly_dashboard_list(request):
 @csrf_exempt
 @login_required(login_url="/login/")
 def dashboard_data_approval(request, id):
-    from survey.api_views_version1 import submitted_record_mails
     monthly_data = MonthlyDashboard.objects.get(id=id)
     user_group = list(request.user.groups.all().values_list('id', flat=True))
     role_with_permisson_map = {1:4,2:2}
@@ -201,6 +202,7 @@ def dashboard_data_approval(request, id):
             group = request.user.groups.all()[0]
             remark_text = group.name + " - " + request.POST.get('remark')
             Remarks.objects.create(object_id=id,content_type_id=62,remark=remark_text,user=request.user)
+        send_mail_with_template('Monthly Dashboard',['yuvaraj.kharvi@thesocialbytes.com'])
         return JsonResponse({'message': 'Updated successfully'})
 
     dashboard_data = {"No. of Children Screened":monthly_data.children_covered_count,"No. of Schools Covered":monthly_data.school_covered_count,"No. of Teachers Trained":monthly_data.teachers_train_count,"No. of Children Prescribed Spectacles":monthly_data.children_pres_count,"No. of Children Provided Spectacles":monthly_data.child_prov_spec_count,"No. of Children Advised to Continue with Same Glasses (PGP)":monthly_data.pgp_count,"No. of Children Referred to Hospital for Detailed Examination":monthly_data.children_reffered_count,"No. of Children Provided Spectacles at Hospital":monthly_data.child_prov_hos_count,"No. of Children Advised Surgery":monthly_data.children_adv_count,"No. of Children Provided Surgery":monthly_data.children_prov_sgy_count,"Spectacle Wearing Compliance After 3 Months":monthly_data.swc_count}
@@ -208,4 +210,23 @@ def dashboard_data_approval(request, id):
     month_obj = datetime.strptime(str(monthly_data.month), '%m%Y')
     remarks = Remarks.objects.filter(active=2,content_type_id=62,object_id=id).order_by('created')
     return render(request, "survey_forms/activity_submition_view.html", locals())
+
+
+
+
+# mail passing function for approved/created the activities
+def send_mail_with_template(template_name,to_users):
+
+    # status = 'rejected' if approval_status in ['0',0] else 'approved'
+    mail_template = MailTemplate.objects.get(active=2,template_name=template_name)
+    to_ = ['yuvaraj.kharvi@thesocialbytes.com']
+    # project_name = email_jsonobj[1].survey.get_activity_project()
+    mail_subject = mail_template.subject#.format(email_jsonobj[1].survey.name, project_name.name if project_name else '',email_jsonobj[1].id)
+    html_template = mail_template.content#.format(state_obj.label,email_jsonobj[0],email_jsonobj[1].survey.name,email_jsonobj[1].id,email_jsonobj[1].created.strftime("%Y-%m-%d %H:%M:%S"),email_jsonobj[1].survey.voucher_description or '-',f"{settings.INSTANCE_URL}/configuration/activity/{email_jsonobj[1].id}/",status,email_jsonobj[2])
+    response = send_mail(to_,mail_subject,html_template,cc= ['yuvaraj.kharvi@thesocialbytes.com'])
+    print(response,'response')
+    mail_status = 3 if response['status'] == 200 else 1
+    send_data_obj = MailData.objects.create(subject = mail_subject,content = html_template,mail_to = ';'.join([item for item in to_users if item]),
+                                        priority = 1,mail_status = mail_status, send_attempt = 1,mail_cc="",mail_bcc="",
+                                        template_name = mail_template,error_details = str(response) )
 
