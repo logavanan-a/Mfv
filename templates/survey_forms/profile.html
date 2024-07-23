@@ -29,8 +29,9 @@
     {% for key,item in profile_fields.items %}
     <div class="col-lg-4 col-sm-4 col-md-4  mt-2">
         <div class="d-flex">
-            <p class="fw-bold" style="width: 28%; font-size: 1rem;">{{key}} :</p>
-            <p class='' style="font-size: 1rem">{{item}}</p>
+            <p class="fw-bold" style="width: 30%; font-size: 1rem;">{{key}}</p>
+            <p class="fw-bold text-center" style="width: 10%; font-size: 1rem;">:</p>
+            <p  style="font-size: 1rem" style="width: 60%;">{{item}}</p>
         </div>
     </div>
     {% endfor %}

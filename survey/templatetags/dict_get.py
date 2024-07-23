@@ -144,10 +144,10 @@ def get_answer_text(survey_id,answer,question):
             result=[item for item in survey_heading_boundaries if str(item.get('id') or '') in [state,district]]
             str_res = '{0}'.format(result[0].get('name'))
             if len(result) > 1:
-                str_res='{0}({1})'.format(result[1].get('name'),result[0].get('name'))
+                str_res='{1}({0})'.format(result[1].get('name'),result[0].get('name'))
             return str_res
         elif question.get('qtype') == 'AI':
-            json_name = JsonAnswer.objects.get(creation_key=answer).response.get('235')
+            json_name = JsonAnswer.objects.get(creation_key=answer).response.get('231')
             return json_name
         elif question.get('qtype') == 'C':
             # cache_key_choices = 'survey_listing_page_answer_choices'

@@ -169,7 +169,7 @@ def get_answer(answer,question):
         boundaries = load_data_to_cache_boundary_meta()
         lower_lewel = list(answer.get('1').values())
         district =boundaries.get(lower_lewel[0].get('2'), {})
-        return f'{district.get("parent")}({district.get("name")})'
+        return f'{district.get("name")}({district.get("parent")})'
     elif question.get('qtype') == 'AI':
         json_name = JsonAnswer.objects.get(creation_key=answer).response.get('235')
         return json_name
@@ -494,6 +494,7 @@ class WebResponseListing(View):
                     else:
                         choices_dict={}
                         for item in filter_all_choices:
+
                             if item.get('question_id') == i.get('id'):
                                 choices_dict[item.get('id')]=item.get('text')
                         filter_choices[i.get('id')]=choices_dict
@@ -564,8 +565,8 @@ class WebResponseListing(View):
         #request data for filter
         filter_request=request.META['QUERY_STRING']
         filtered_items = [item for item in filter_request.split('&') if not item.startswith('page=')]
+
         filter_request_data='&'.join(filtered_items)
-        
         return render(request,self.template_name,locals())
 
 def load_data_to_cache_choices():
