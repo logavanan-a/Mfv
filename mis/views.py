@@ -89,6 +89,7 @@ def login_view(request):
                 request.session['user_category_list']=list(user_category_list)
                 request.session['user_parent_boundary_list']=list(user_parent_boundary_list)
                 request.session['user_boundary_list']=list(user_boundary_list)
+                request.session['user_group_list']=list(user.groups.all().values_list('id', flat=True))
                 try:
                     #need to check if used or not and remove 
                     user_partner = UserPartnerMapping.objects.get(user = user)
