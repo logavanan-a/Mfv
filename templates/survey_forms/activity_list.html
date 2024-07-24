@@ -103,7 +103,7 @@
                                 <td>{{obj.month|integer_to_month|date:"M-Y"}}</td>
                                 <td>{{obj.submitted_by}}</td>
                                 <td>{{obj.created|date:'d-m-Y'}}</td>
-                                <td><a  href="{{obj.id}}/">{{ obj.get_current_status_display|default:"-" }}</a></td>
+                                <td><a  href="../{{obj.id}}/">{{ obj.get_current_status_display|default:"-" }}</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>

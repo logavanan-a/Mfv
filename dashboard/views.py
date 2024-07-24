@@ -1,14 +1,18 @@
 from django.shortcuts import render,HttpResponse
 from django.db import connection
-from dashboard.models import DashboardSummaryLog,MonthlyDashboard,Remarks,ACTIVE_CHOICES
+from dashboard.models import DashboardSummaryLog,MonthlyDashboard,Remarks,ACTIVE_CHOICES,ArrayField
 from application_master.models import UserPartnerMapping,UserProjectMapping,PartnerMissionMapping
-from datetime import datetime
+from datetime import datetime,date, timedelta
 from dateutil.relativedelta import relativedelta
 from mis.models import *
-from survey.views import get_pagination
+from survey.views import get_pagination,JsonAnswer
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from django.db.models import Case, Value, When, Q , Sum
+from mfv_mis.settings import DASHBOARD_SUBMISSION_DAY
+from uuid import uuid4
+from survey.api_view import MonthlyDashboardData
 
 # Create your views here.
 def dashboard(request):
@@ -148,13 +152,13 @@ def build_query(request):
 
 @login_required(login_url="/login/")
 def monthly_dashboard_list(request):
-    from survey.api_view import MonthlyDashboardData
     month = request.GET.get('month')
     submitted_on = request.GET.get('submitted_on')
     approval_status_id = request.GET.get('approval_status')
     approval_status = ACTIVE_CHOICES
-    # import ipdb;ipdb.set_trace()
-    user_partner = UserProjectMapping.objects.filter(active=2,user=request.user,project__application_type_id = 511).values_list('project__partner_mission_mapping__partner_id', flat=True)
+
+    # user_partner = UserProjectMapping.objects.filter(active=2,user=request.user,project__application_type_id = 511).values_list('project__partner_mission_mapping__partner_id', flat=True)
+    user_partner = request.session['user_partner_list']
 
     object_list = MonthlyDashboard.objects.filter(active=2,partner__in=user_partner).order_by('-modified').select_related('partner','project_incharge','partner_admin','submitted_by')
     if month:
@@ -172,20 +176,230 @@ def monthly_dashboard_list(request):
 
 
 
+from types import SimpleNamespace
+from django.test import RequestFactory
+from django.http import HttpRequest, JsonResponse
+import json
 
 @csrf_exempt
 @login_required(login_url="/login/")
 def dashboard_data_approval(request, id):
     from survey.api_views_version1 import submitted_record_mails
-    monthly_data = MonthlyDashboard.objects.get(id=id)
-    user_group = list(request.user.groups.all().values_list('id', flat=True))
+    try:
+        monthly_data = MonthlyDashboard.objects.get(id=id)
+        month_obj = datetime.strptime(str(monthly_data.month), '%m%Y')
+    except:
+        current_date = datetime.now()
+        month_obj,end_of_previous_month=get_first_and_last_date_of_month(current_date.year,DASHBOARD_SUBMISSION_DAY)
+        # first_day_of_current_month = current_date.replace(day=1)
+        # first_day_of_current_month = current_date.replace(month=DASHBOARD_SUBMISSION_DAY)
+        # month_obj = first_day_of_current_month - timedelta(days=1)
+        # month_obj = first_day_of_current_month.replace(day=1)
+        # start_of_previous_month = month_obj.replace(day=1)
+        # print(start_of_previous_month.date(),month_obj.date())
+        monthly_data_queryset = JsonAnswer.objects.values(
+            'cluster__BeneficiaryResponse'
+        ).filter(
+            active=2,
+            survey_id__in=[6, 8, 5, 4, 3, 10],
+            created__date__range=[month_obj,end_of_previous_month]
+        ).annotate(
+            primary_screening_done=Sum(
+                Case(
+                    When(
+                        (~Q(response__contains={"407": ""})),
+                        survey_id=3,
+                        response__has_key="407",
+                        then=Value(1)
+                    ),
+                    default=Value(0),
+                )
+            ),
+            secondary_screening_done=Sum(
+                Case(
+                    When(
+                        (~Q(response__contains={"405": ""})),
+                        survey_id=4,
+                        response__has_key="405",
+                        then=Value(1)
+                    ),
+                    default=Value(0),
+                )
+            ),
+            teachers_training_done=Sum(
+                Case(
+                    When(
+                        survey_id=10,
+                        response__contains={"393": "262"},
+                        then=Value(1)
+                    ),
+                    default=Value(0),
+                )
+            ),
+            teachers_training_notdone=Sum(
+                Case(
+                    When(
+                        survey_id=10,
+                        response__contains={"393": "263"},
+                        then=Value(1)
+                    ),
+                    default=Value(0),
+                )
+            ),
+            rx_spec=Sum(
+                Case(
+                    When(
+                        survey_id=4,
+                        response__contains={"282": "176"},
+                        then=Value(1)
+                    ),
+                    default=Value(0),
+                )
+            ),
+            prov_spec=Sum(
+                Case(
+                    When(
+                        (~Q(response__contains={"355": ""})),
+                        survey_id=8,
+                        response__has_key="355",
+                        then=Value(1)
+                    ),
+                    default=Value(0),
+                )
+            ),
+            advc_same_spec=Sum(
+                Case(
+                    When(
+                        survey_id=4,
+                        response__contains={"281": "173"},
+                        then=Value(1)
+                    ),
+                    default=Value(0),
+                )
+            ),
+            ref_hosp_exam=Sum(
+                Case(
+                    When(
+                        survey_id=4,
+                        response__contains={"284": "180"},
+                        then=Value(1)
+                    ),
+                    default=Value(0),
+                )
+            ),
+            prov_spec_hosp=Sum(
+                Case(
+                    When(
+                        survey_id=4,
+                        response__contains={"283": "179"},
+                        then=Value(1)
+                    ),
+                    default=Value(0),
+                )
+            ),
+            advc_surgery=Sum(
+                Case(
+                    When(
+                        survey_id=5,
+                        response__contains={"343": "200"},
+                        then=Value(1)
+                    ),
+                    default=Value(0),
+                )
+            ),
+            prov_surgery=Sum(
+                Case(
+                    When(
+                        survey_id=6,
+                        response__contains={"345": "204"},
+                        then=Value(1)
+                    ),
+                    default=Value(0),
+                )
+            ),
+            swc_3months=Sum(
+                Case(
+                    When(
+                        Q(response__contains={"356": "222"}) | Q(response__contains={"356": "224"}),
+                        survey_id=8,
+                        then=Value(1)
+                    ),
+                    default=Value(0),
+                )
+            ),
+            combined_screening_done=Case(
+                When(
+                    Q(primary_screening_done__gte=1) & Q(secondary_screening_done__gte=1),
+                    then=Value(1)
+                ),
+                default=Value(0),
+            ),
+            is_school=Case(
+                When(survey__config__0__object_id_1='3', then=Value(1)),
+                default=Value(0),
+            ),
+            is_student=Case(
+                When(survey__config__0__object_id_1='2', then=Value(1)),
+                default=Value(0),
+            ),
+            school_covered=Case(
+                When(
+                    Q(is_school=1) & Q(Q(combined_screening_done__gte=1) | Q(teachers_training_done__gte=1) | Q(teachers_training_notdone__gte=1)),
+                    then=Value(1)
+                ),
+                default=Value(0),
+            )
+        )
+        monthly_data_dict = monthly_data_queryset.aggregate(
+            children_covered_count=Sum('combined_screening_done'),
+            # sum_primary_screening_done=Sum('primary_screening_done'),
+            # sum_secondary_screening_done=Sum('secondary_screening_done'),
+            teachers_train_count=Sum('teachers_training_done'),
+            # sum_teachers_training_notdone=Sum('teachers_training_notdone'),
+            children_pres_count=Sum('rx_spec'),
+            child_prov_spec_count=Sum('prov_spec'),
+            pgp_count=Sum('advc_same_spec'),
+            children_reffered_count=Sum('ref_hosp_exam'),
+            child_prov_hos_count=Sum('prov_spec_hosp'),
+            children_adv_count=Sum('advc_surgery'),
+            children_prov_sgy_count=Sum('prov_surgery'),
+            swc_count=Sum('swc_3months'),
+            school_covered_count=Sum('school_covered')
+        )
+
+        # Convert the queryset to a list of SimpleNamespace objects
+        monthly_data = SimpleNamespace(**monthly_data_dict)
+        
+    user_group = request.session['user_group_list']
+    
+    # if record status have the permission of group to action 
     role_with_permisson_map = {1:4,2:2}
+
     if request.method == "POST":
         # 4 = Partner Admin
         # 1 = Partner Data Entry Operator
         # 2 = Project In-charge
         button = request.POST.get('label')
         approval = {'reject':-1,'approve':+1}
+        partner_list = request.session.get('user_partner_list')
+        if id == 'new':
+            array_fields = [
+                field.name for field in MonthlyDashboard._meta.get_fields()
+                if isinstance(field, ArrayField)
+            ]
+            for field in array_fields:
+                monthly_data_dict[field] = []
+
+            month_field = month_obj.strftime('%m%Y')
+
+            # Preprocess the dictionary to replace None with 0
+            preprocessed_dict = {k: (0 if v is None else v) for k, v in monthly_data_dict.items()}
+
+            monthly_data, _ = MonthlyDashboard.objects.update_or_create(month = month_field,creation_key = datetime.now().strftime('%Y%m%d%H%M%S') + str(uuid4()),partner_id=partner_list[0],submitted_by = request.user,defaults=preprocessed_dict)
+            
+            # removing the session true for this month
+            del request.session['show_submission_popup']
+
         monthly_data.current_status += approval.get(button)
         
         if 4 in user_group:
@@ -200,12 +414,30 @@ def dashboard_data_approval(request, id):
         if request.POST.get('remark'):
             group = request.user.groups.all()[0]
             remark_text = group.name + " - " + request.POST.get('remark')
-            Remarks.objects.create(object_id=id,content_type_id=62,remark=remark_text,user=request.user)
+            Remarks.objects.create(object_id=monthly_data.id,content_type_id=62,remark=remark_text,user=request.user)
         return JsonResponse({'message': 'Updated successfully'})
 
     dashboard_data = {"No. of Children Screened":monthly_data.children_covered_count,"No. of Schools Covered":monthly_data.school_covered_count,"No. of Teachers Trained":monthly_data.teachers_train_count,"No. of Children Prescribed Spectacles":monthly_data.children_pres_count,"No. of Children Provided Spectacles":monthly_data.child_prov_spec_count,"No. of Children Advised to Continue with Same Glasses (PGP)":monthly_data.pgp_count,"No. of Children Referred to Hospital for Detailed Examination":monthly_data.children_reffered_count,"No. of Children Provided Spectacles at Hospital":monthly_data.child_prov_hos_count,"No. of Children Advised Surgery":monthly_data.children_adv_count,"No. of Children Provided Surgery":monthly_data.children_prov_sgy_count,"Spectacle Wearing Compliance After 3 Months":monthly_data.swc_count}
 
-    month_obj = datetime.strptime(str(monthly_data.month), '%m%Y')
-    remarks = Remarks.objects.filter(active=2,content_type_id=62,object_id=id).order_by('created')
+    # remarks = Remarks.objects.filter(active=2,content_type_id=62,object_id=id).order_by('created')
     return render(request, "survey_forms/activity_submition_view.html", locals())
 
+def get_first_and_last_date_of_month(year, month):
+    # Ensure month is within the valid range
+    if not (1 <= month <= 12):
+        raise ValueError("Month must be between 1 and 12")
+
+    # First date of the month
+    first_date = datetime(year, month, 1)
+    
+    # Last date of the month
+    # Compute the first day of the next month
+    if month == 12:
+        next_month = datetime(year + 1, 1, 1)
+    else:
+        next_month = datetime(year, month + 1, 1)
+    
+    # Subtract one day from the first day of the next month
+    last_date = next_month - timedelta(days=1)
+
+    return first_date, last_date
