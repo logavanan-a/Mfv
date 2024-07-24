@@ -1,5 +1,5 @@
 from django.template.defaulttags import register
-from survey.models import Question
+from survey.models import Question, Choice
 from datetime import datetime
 from mfv_mis.settings import *
 from cache_configuration.views import *
@@ -93,6 +93,15 @@ def get_inner_questions(q_id):
 def choice_list(q_id):
     choice_cache_dict = load_data_to_cache_choices()
     return choice_cache_dict.get(str(q_id))
+
+@register.simple_tag
+def disabled_list(q_id):
+    disabled_value = 0
+    if q_id:
+        disabled_index = Choice.objects.filter(question_id=q_id,is_other_choice=True)
+        if disabled_index.exists():
+            disabled_value = disabled_index.first().id
+    return disabled_value
 
 @register.simple_tag
 def get_questions(block_id):

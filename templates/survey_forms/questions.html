@@ -308,6 +308,25 @@
                             
                         </div>
                     </div>
+                    {% if question.api_json.other_type_question %}
+                    <script>
+                            $(document).ready(function(){
+                                var choice_value = '{% disabled_list question.api_json.parent_form_qid %}'
+                                $('#{{question.id}}').attr('readonly', true);
+                                var choice = $('#{{question.api_json.parent_form_qid}}');
+                                choice.change(function() {
+                                var choice_id = $(this).val()
+                                    $('#{{question.id}}').val('')
+                                    if (choice_value == choice_id){
+                                        $('#{{question.id}}').attr('readonly', false);
+                                    }else{
+                                        $('#{{question.id}}').attr('readonly', true);
+                                    }
+                                });
+
+                            })
+                    </script>
+                    {% endif %}
                 {% elif question.qtype == 'AF' %}
                         <div class="col-lg-6 AP_Questions" >
                             <div class=" mb-3 ">
