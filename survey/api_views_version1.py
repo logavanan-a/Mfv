@@ -372,6 +372,7 @@ def add_survey_answers_version_1(request, **kwargs):
     response = {'status': status,
                 'message': message,
                 "sync_res": sync_res,
+                "u_uuid": obj.sample_id if obj else "",
                 }
     create_post_log_v2(request,response)
     return JsonResponse(response)
