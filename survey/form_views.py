@@ -1689,6 +1689,7 @@ def edit_survey_form(request,survey_slug,creation_key):
         # response_obj = JsonAnswer.objects.get(creation_key=creation_key)
         # import ipdb;ipdb.set_trace()
         answers=json.loads(request.POST.getlist('all_in_one')[0])
+        print(answers)
         ben_uuid=request.GET.get('ben',request.POST.get('ben','0'))
         responses={
             "u_uuid": request.user.id,
