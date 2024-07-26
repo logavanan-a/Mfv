@@ -4,7 +4,7 @@
 {% if grid_childs|length > 0%}
     <input type="hidden" class='_hidden_grid_question' value='{{question.id}}' id='grid_question_{{question.id}}'>
         <label class="form-label" id="label_{{question.id}}">{{question.form_question_number|default:''}}. {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
-        <div class="row mb-1">
+        <div class="row mb-3">
             <div class="table-responsive" id="skip_{{question.id}}">
                 <table class="table table-bordered table-striped  mb-0" name='{{question.id}}' name='grid_question' id='{{question.id}}'>
                     <thead>
@@ -45,6 +45,12 @@
                                                                 {{choice.choice}}
                                                             </label>
                                                         </div>
+                                                        <!-- <script>
+                                                            $(document).ready(function(){
+                                                                $('#{{question.id}}').val('')
+                                                            })
+
+                                                        </script> -->
                                                     {% endfor %}
                                                     {% if is_grid_question.mandatory %}
                                                     <script>

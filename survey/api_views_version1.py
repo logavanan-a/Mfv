@@ -98,7 +98,7 @@ def add_survey_answers_version_1(request, **kwargs):
     # End time et = datetime.now()
     # Difference diff = et - st
 
-    response, status, error_msg, response_type, message,approved_by,approved_on,submitted_approval = {}, True, '', 0, '',"","",None
+    response, status, error_msg, response_type, message,approved_by,approved_on,submitted_approval,obj = {}, True, '', 0, '',"","",None,None
     # data = json.loads(request.body.decode('utf-8'))
     data = request.POST
     create_post_log_v2(request, data)

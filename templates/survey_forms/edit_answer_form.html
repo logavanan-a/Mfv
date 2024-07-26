@@ -143,7 +143,10 @@
                         var newDate = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
                     }
                     $(element).val(newDate)
-                }else{
+                }else if (element.attr('type') == 'radio' && all_response[ele]){
+                    $("input[value='" + all_response[ele] + "']").prop('checked', true)
+                }
+                else{
                     $(element).val(all_response[ele])
                 }
             }

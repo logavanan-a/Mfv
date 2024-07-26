@@ -19,7 +19,7 @@ class CheckPreviousMonthDataSubmissionMiddleware:
         month_year_need_to_check = str(DASHBOARD_SUBMISSION_DAY)+""+str(validation_date.year)
         # Check if data has been submitted for the previous month
         user = request.user
-        user_group_list = request.session.get('user_group_list')
+        user_group_list = request.session.get('user_group_list',[])
         user_partner = request.session.get('user_partner_list')
 
         # import ipdb;ipdb.set_trace()
