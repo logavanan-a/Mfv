@@ -142,13 +142,13 @@
                     </div> 
             {% elif main_is_skip_question and main_get_inner_questions  %}<!--and not question.parent.qtype == 'In,GD'-->
                 {% if question.qtype == 'C' %}
-                <label class="form-check-label mb-2">{{question.form_question_number|default:''}} {{question.text}}</label>
+                <label class="form-check-label mb-2">{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
                 <div class='row'>
                     {% for choice in main_choice_list %}
                         <div class="col-lg-6" id='skip_{{question.id}}'>
                             <div class="form-check mb-3">
                                 <input class="form-check-input main_checkbox_{{question.id}} main_question C_0_0 {% if question.mandatory %}required{% endif %}" type="checkbox" name="{{question.id}}" id="{{question.id}}" value="{{choice.id}}" {% if question.mandatory %}required{% endif %}>
-                                <label class="form-check-label" for="{{choice.id}}">{% if question.mandatory %}<span class="required-field"></span>{% endif %}
+                                <label class="form-check-label" for="{{choice.id}}">
                                     {{choice.choice}}
                                 </label>
                             </div>
@@ -269,6 +269,27 @@
                         });
                     </script>
                 </div> 
+                {% elif question.qtype == 'R' %}
+                <div class="col-lg-6" id='skip_{{question.id}}'>
+                    <div class=" mb-3 ">
+                        <div class="mb-3">
+                            <label class="form-check-label mb-2">{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                            <div class='row'>
+                                <div class="col-lg-6" id='skip_{{question.id}}'>
+                                    {% for choice in main_choice_list %}
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input main_checkbox_{{question.id}} main_question C_0_0 {% if question.mandatory %}required{% endif %}" type="radio" name="{{question.id}}" id="{{question.id}}" value="{{choice.id}}" {% if question.mandatory %}required{% endif %}>
+                                        <label class="form-check-label" for="{{choice.id}}">
+                                            {{choice.choice}}
+                                        </label>
+                                    </div>
+                                    {% endfor %}  
+                                </div>
+                            </div>  
+                        </div>
+                        
+                    </div>
+                </div>
                 {% endif %}
             {% elif not question.parent %}
                 {% if question.qtype == 'C' %}
@@ -295,6 +316,7 @@
                         </script>
                         {% endif %}
                 </div>
+               
                 {% elif question.qtype == 'T' %}
                     <div class="col-lg-6" id='skip_{{question.id}}'>
                         <div class=" mb-3 ">

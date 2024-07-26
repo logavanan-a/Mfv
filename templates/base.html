@@ -142,7 +142,7 @@
 
             <script src="{% static 'js/app.js' %}"></script>    
             {% endblock javascript %}
-            <script>
+            <!-- <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     const showPopup = "{{ request.session.show_submission_popup|default_if_none:'False'|safe }}";
                     var currentUrl = window.location.pathname;
@@ -162,6 +162,6 @@
                         });
                     }
                 });
-            </script>
+            </script> -->
         </body>
     </html>
