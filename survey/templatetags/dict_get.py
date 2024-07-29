@@ -24,16 +24,25 @@ def get_item(dictionary, key):
 def get_item_ans(json_answer,header):
     json_answer = model_to_dict(json_answer)
     try:
+        # import ipdb; ipdb.set_trace()
         if json_answer.get('response').get(str(header.get('id')),'None') == 'None' and header.get('qtype') != 'AW': 
             return '-'
         elif header.get('qtype') == 'S':
-                cache_key_choices = INSTANCE_CACHE_PREFIX+'survey_listing_page_answer_choices'#_for_'+str(json_answer.get('survey_id'))
-                survey_heading_choices =  cache.get(cache_key_choices)
-                # print(cache_key_question)
-                # choices=survey_heading_choices.get(header.get('id'))
-                choice_answer=json_answer.get('response').get(str(header.get('id')))
-                selected_choice=next(item for item in survey_heading_choices if str(item.get('id') or '') == choice_answer)
-                return selected_choice.get('text')
+            cache_key_choices = INSTANCE_CACHE_PREFIX+'survey_listing_page_answer_choices'#_for_'+str(json_answer.get('survey_id'))
+            survey_heading_choices =  cache.get(cache_key_choices)
+            # print(cache_key_question)
+            # choices=survey_heading_choices.get(header.get('id'))
+            choice_answer=json_answer.get('response').get(str(header.get('id')))
+            selected_choice=next(item for item in survey_heading_choices if str(item.get('id') or '') == choice_answer)
+            return selected_choice.get('text')
+        elif header.get('qtype') == 'R':
+            cache_key_choices = INSTANCE_CACHE_PREFIX+'survey_listing_page_answer_choices'#_for_'+str(json_answer.get('survey_id'))
+            survey_heading_choices =  cache.get(cache_key_choices)
+            # print(cache_key_question)
+            # choices=survey_heading_choices.get(header.get('id'))
+            choice_answer=json_answer.get('response').get(str(header.get('id')))
+            selected_choice=next(item for item in survey_heading_choices if str(item.get('id') or '') == choice_answer)
+            return selected_choice.get('text')
         elif header.get('qtype') == 'SM':
             # import ipdb;ipdb.set_trace()
             cache_key_lookups = INSTANCE_CACHE_PREFIX+'all_master_lookup_caching'
