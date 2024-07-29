@@ -56,11 +56,12 @@ class DashboardChartWidgets(BaseContent):
         return str(self.title) + '-' + str(self.label)
 
 
-ACTIVE_CHOICES = (
+STATUS_CHOICES = (
     (1, 'Submitted for Approval'), # once submitted for approval from app it will goes to parter admin
-    (2, 'submitted for Project In-charge'), # once partner admin reveiwed and submitted to Project In-charge
-    (3, 'Approved'), # once project incharge approved , final status
-    (4, 'Rejected'), # when partner admin rejected the record
+    (2, 'Submitted for Project In-charge'), # once partner admin reveiwed and submitted to Project In-charge
+    (3, 'Submitted for Admin'), # once Project In-charge reveiwed and submitted to MFV admin
+    (4, 'Approved'), # once project incharge approved , final status
+    (5, 'Rejected'), # when partner admin rejected the record
 )
 class MonthlyDashboard(BaseContent):
     creation_key = models.CharField(max_length=75, unique=True)
@@ -87,7 +88,7 @@ class MonthlyDashboard(BaseContent):
     children_prov_sgy_count = models.IntegerField(default=0)
     swc_uuid = ArrayField(models.CharField(max_length=75, blank=True),)
     swc_count = models.IntegerField(default=0)
-    current_status = models.IntegerField(default=0,choices = ACTIVE_CHOICES)
+    current_status = models.IntegerField(default=0,choices = STATUS_CHOICES)
     submitted_by = models.ForeignKey(User, on_delete=models.CASCADE,related_name='data_entry_operator',)
     partner_admin = models.ForeignKey(User, on_delete=models.CASCADE,**OPTIONAL,related_name='partner_admin',)
     partner_submitted = models.DateField(**OPTIONAL)

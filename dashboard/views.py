@@ -1,6 +1,6 @@
 from django.shortcuts import render,HttpResponse
 from django.db import connection
-from dashboard.models import DashboardSummaryLog,MonthlyDashboard,Remarks,ACTIVE_CHOICES,ArrayField
+from dashboard.models import DashboardSummaryLog,MonthlyDashboard,Remarks,STATUS_CHOICES,ArrayField
 from application_master.models import UserPartnerMapping,UserProjectMapping,PartnerMissionMapping
 from datetime import datetime,date, timedelta
 from dateutil.relativedelta import relativedelta
@@ -155,7 +155,7 @@ def monthly_dashboard_list(request):
     month = request.GET.get('month')
     submitted_on = request.GET.get('submitted_on')
     approval_status_id = request.GET.get('approval_status')
-    approval_status = ACTIVE_CHOICES
+    approval_status = STATUS_CHOICES
 
     # user_partner = UserProjectMapping.objects.filter(active=2,user=request.user,project__application_type_id = 511).values_list('project__partner_mission_mapping__partner_id', flat=True)
     user_partner = request.session['user_partner_list']
@@ -372,13 +372,14 @@ def dashboard_data_approval(request, id):
         
     user_group = request.session['user_group_list']
     
-    # if record status have the permission of group to action 
-    role_with_permisson_map = {1:4,2:2}
+    # if record status have the permission of group to action {status:role id (group)}
+    role_with_permisson_map = {1:4,2:2,3:3}
 
     if request.method == "POST":
         # 4 = Partner Admin
         # 1 = Partner Data Entry Operator
         # 2 = Project In-charge
+        # 3 = MFV Admin
         button = request.POST.get('label')
         approval = {'reject':-1,'approve':+1}
         partner_list = request.session.get('user_partner_list')
@@ -403,7 +404,8 @@ def dashboard_data_approval(request, id):
         monthly_data.current_status += approval.get(button)
         
         if 4 in user_group:
-            monthly_data.current_status = 4 if button == 'reject' else monthly_data.current_status
+            # if only partner admin rejected means it will be 5 (rejected)
+            monthly_data.current_status = 5 if button == 'reject' else monthly_data.current_status
             monthly_data.partner_admin = request.user
             monthly_data.partner_submitted = datetime.today()
         elif 2 in user_group:
@@ -413,13 +415,13 @@ def dashboard_data_approval(request, id):
         monthly_data.save()
         if request.POST.get('remark'):
             group = request.user.groups.all()[0]
-            remark_text = group.name + " - " + request.POST.get('remark')
+            remark_text = f"{request.user.username} ({group.name})  -  {request.POST.get('remark')}"
             Remarks.objects.create(object_id=monthly_data.id,content_type_id=62,remark=remark_text,user=request.user)
         return JsonResponse({'message': 'Updated successfully'})
 
     dashboard_data = {"No. of Children Screened":monthly_data.children_covered_count,"No. of Schools Covered":monthly_data.school_covered_count,"No. of Teachers Trained":monthly_data.teachers_train_count,"No. of Children Prescribed Spectacles":monthly_data.children_pres_count,"No. of Children Provided Spectacles":monthly_data.child_prov_spec_count,"No. of Children Advised to Continue with Same Glasses (PGP)":monthly_data.pgp_count,"No. of Children Referred to Hospital for Detailed Examination":monthly_data.children_reffered_count,"No. of Children Provided Spectacles at Hospital":monthly_data.child_prov_hos_count,"No. of Children Advised Surgery":monthly_data.children_adv_count,"No. of Children Provided Surgery":monthly_data.children_prov_sgy_count,"Spectacle Wearing Compliance After 3 Months":monthly_data.swc_count}
 
-    # remarks = Remarks.objects.filter(active=2,content_type_id=62,object_id=id).order_by('created')
+    remarks = Remarks.objects.filter(active=2,content_type_id=62,object_id=monthly_data.id).order_by('created')
     return render(request, "survey_forms/activity_submition_view.html", locals())
 
 def get_first_and_last_date_of_month(year, month):

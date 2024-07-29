@@ -43,7 +43,7 @@
                                 <ul class="details">
                                 {% comment %} <li>Status changed from <strong>{{i.source_state}}</strong> to <strong>{{i.destination_state}}</strong></li> {% endcomment %}
                                 {% if i.remark %}
-                                    <li><strong>Remark: <br>&emsp;</strong> {{i.remark}}</li>
+                                    <li>{{i.remark|safe}}</li>
                                 {% endif %}
                                 </ul>
                             </div>
