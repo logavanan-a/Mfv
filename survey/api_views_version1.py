@@ -98,7 +98,7 @@ def add_survey_answers_version_1(request, **kwargs):
     # End time et = datetime.now()
     # Difference diff = et - st
 
-    response, status, error_msg, response_type, message,approved_by,approved_on,submitted_approval = {}, True, '', 0, '',"","",None
+    response, status, error_msg, response_type, message,approved_by,approved_on,submitted_approval,obj = {}, True, '', 0, '',"","",None,None
     # data = json.loads(request.body.decode('utf-8'))
     data = request.POST
     create_post_log_v2(request, data)
@@ -372,7 +372,7 @@ def add_survey_answers_version_1(request, **kwargs):
     response = {'status': status,
                 'message': message,
                 "sync_res": sync_res,
-                'u_uuid':res.creation_key if res else ''
+                "u_uuid": obj.sample_id if obj else "",
                 }
     create_post_log_v2(request,response)
     return JsonResponse(response)

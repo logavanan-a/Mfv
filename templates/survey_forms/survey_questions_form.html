@@ -6,13 +6,18 @@
 
 <div class="row">
     <div class="col-12">
+        {% if ben_uuid %}
+        <div class="mt-4" style="background-color: #DBD4FE; padding: 10px; ">
+            <h5 class="m-0"><b>School Details</b></h5>
+        </div>
         <div class="card">
             <div class="card-body">
-                {% if ben_uuid %}
-                    <div class="card-header mb-2">
-                        {% include "../survey_forms/profile.html" %}
-                    </div>
-                {% endif %}
+                    {% include "../survey_forms/profile.html" %}
+            </div>
+        </div>
+        {% endif %}
+        <div class="card">
+            <div class="card-body">
                 {% include 'survey_forms/questions.html' %}
             </div>
         </div>

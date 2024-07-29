@@ -5,13 +5,18 @@
 
 <div class="row">
     <div class="col-12">
+        {% if ben_uuid and response_obj.survey.id != 2 %}
+        <div style="background-color: #DBD4FE; padding: 10px; ">
+            <h5 class="m-0"><b>School Details</b></h5>
+        </div>
         <div class="card">
             <div class="card-body">
-                {% if ben_uuid and response_obj.survey.id != 2 %}
-                    <div class="card-header mb-2">
-                        {% include "../survey_forms/profile.html" %}
-                    </div>
-                {% endif %}
+                {% include "../survey_forms/profile.html" %}
+            </div>
+        </div>
+        {% endif %}
+        <div class="card">
+            <div class="card-body">
                 {% include 'survey_forms/questions.html' %}
             </div>
         </div>
@@ -138,7 +143,11 @@
                         var newDate = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
                     }
                     $(element).val(newDate)
-                }else{
+                }else if (element.is(":radio") && all_response[ele]){
+                    $("input[value='" + all_response[ele] + "']").prop('checked', true)
+                    $("input[value='" + all_response[ele] + "']").trigger('change')
+                }
+                else{
                     $(element).val(all_response[ele])
                 }
             }

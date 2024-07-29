@@ -4,7 +4,7 @@
 {% if grid_childs|length > 0%}
     <input type="hidden" class='_hidden_grid_question' value='{{question.id}}' id='grid_question_{{question.id}}'>
         <label class="form-label" id="label_{{question.id}}">{{question.form_question_number|default:''}}. {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
-        <div class="row mb-1">
+        <div class="row mb-3">
             <div class="table-responsive" id="skip_{{question.id}}">
                 <table class="table table-bordered table-striped  mb-0" name='{{question.id}}' name='grid_question' id='{{question.id}}'>
                     <thead>
@@ -29,7 +29,7 @@
                         {% endif %}
                         {% if is_grid_question.is_grid %}
                         <tr>
-                            {% if grid_get_row_questions|length > 1 %}<th class="text-nowrap" scope="row">{{is_grid_question.text}}</th>{% endif %}
+                            {% if grid_get_row_questions|length > 1 %}<td class="text-nowrap" scope="row">{{is_grid_question.text}}</td>{% endif %}
                                 {% for grid_question in grid_get_column_questions %}
                                 {% get_validation_code grid_question.id as grid_validation_code %}
                                 {% choice_list grid_question.id as grid_choice_list %}
@@ -45,6 +45,12 @@
                                                                 {{choice.choice}}
                                                             </label>
                                                         </div>
+                                                        <!-- <script>
+                                                            $(document).ready(function(){
+                                                                $('#{{question.id}}').val('')
+                                                            })
+
+                                                        </script> -->
                                                     {% endfor %}
                                                     {% if is_grid_question.mandatory %}
                                                     <script>
@@ -61,7 +67,7 @@
                                                     </script>
                                                     {% endif %}
                                                 {% elif grid_question.qtype == 'T' %}
-                                                    <div class="mb-3 " id='skip_{{grid_question.id}}'>
+                                                    <div class="mb-3 " id='skip_{{is_grid_question.id}}_{{grid_question.id}}'>
                                                         {% comment %} <label class="form-label" >{{grid_validation_code}}</label> {% endcomment %}
                                                         <input type="{% if grid_validation_code.code == 'N' or grid_validation_code.code == 'D'%}number{% else %}text{% endif %}" id="T_{{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}}" name='{{grid_question.id}}' min='{{grid_validation_code.MinMax.min}}' max='{{grid_validation_code.MinMax.max}}' maxlength='{{grid_validation_code.MinMax.max_length}}' minlength='{{grid_validation_code.MinMax.min_length}}' class="form-control grid_question_{{question.id}} {{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}} {% if grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %}" {% if grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %} {% if creation_key and not grid_question.is_editable and response_obj.response and response_obj.response.616 != '619'   %} disabled {% endif %}>
                                                         <div class="invalid-feedback">
@@ -103,6 +109,7 @@
                                                         $(document).ready(function () {
                                                             //skip logic for dropdown when select item
                                                             $({{grid_get_inner_questions}}).each(function(index, element) {
+                                                                console.log(element,'------------')
                                                                 $("#skip_{{is_grid_question.id}}_"+element).hide();
                                                                 //$('#label_{{is_grid_question.id}}_{{grid_question.id}}').hide();
                                                                 

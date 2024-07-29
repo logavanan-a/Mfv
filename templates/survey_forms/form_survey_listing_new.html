@@ -5,46 +5,19 @@
 {% load urs_tags %}
 {% load static %}
 
-<style>
-    .bx-md {
-        font-size: 1.2rem !important;
-    }
-</style>
+
 <div class="row">
     <div class="col-12">
-        {% if school_creation_key  %}
-        <div style="background-color: #DBD4FE; padding: 10px; ">
-            <h5 class="m-0"><b>School Details</b></h5>
-        </div>
-        <div class="card m-0">
-            <div class="card-body">
-                {% include "../survey_forms/profile.html" %}
-            </div>
-        </div>
-        {% endif %} 
-        {% if creation_key and survey.id != 1 and survey.id != 10 %}
-        <div style="background-color: #DBD4FE; padding: 10px; ">
-            <h5 class="m-0"><b>School Details</b></h5>
-        </div>
-        <div class="card m-0">
-            <div class="card-body">
-                {% include "../survey_forms/profile.html" %}
-            </div>
-        </div>
-        
-        {% endif %}
-        {% if survey.id != 1 %} 
-        <div class="mt-4" style="background-color: #DBD4FE; padding: 10px; ">
-            <h5 class="m-0"><b> {{survey.name}}</b></h5>
-        </div>
-        {% endif %}
         <div class="card">
             <div class="card-body">
+                {% if school_creation_key  %}
+                    {% include "../survey_forms/profile.html" %}
+                {% endif %} 
                 {% if filters and not creation_key %}
                     {% if not school_name %}
                         {% include './survey_listing_filters.html' %}
                     {% else %}
-                    <form method="GET" >
+                    <form method="GET" class="mt-4">
                         <div class='d-flex justify-content-between'>
                             <div class="d-flex">
                                 <div class=" mb-2 me-3">
@@ -58,7 +31,7 @@
                                 {% if not main_add_button and request.user.groups.all.0.id == 1 %}
                                     {% if school_name %}
                                     <div >
-                                        <button type="button" class="btn btn-primary w-md mb-2" id="add_buton_listing" onclick="location.href='/configuration/add-survey-form/{{survey.id}}/?creation_key={{school_creation_key}}&school_name={{school_name}}'"> Add New</button>
+                                        <button type="button" class="btn btn-primary btn-lg waves-effect waves-light p-2 mb-2" id="add_buton_listing" onclick="location.href='/configuration/add-survey-form/{{survey.id}}/?creation_key={{school_creation_key}}&school_name={{school_name}}'"> Add New</button>
                                     </div>
                                     {% endif %}
                                 {% endif %}
@@ -73,7 +46,7 @@
                             {% if not main_add_button and request.user.groups.all.0.id == 1 %}
                                 {% if not school_name %}
                                 <div class='col-auto'>
-                                    <button type="button" class="btn btn-primary w-md mb-2" id="add_buton_listing" onclick="location.href='/configuration/add-survey-form/{{survey.id}}/'"> Add New</button>
+                                    <button type="button" class="btn btn-primary btn-lg waves-effect waves-light p-2 mb-3" id="add_buton_listing" onclick="location.href='/configuration/add-survey-form/{{survey.id}}/'"> Add New</button>
                                 </div>
                                 {% endif %}
                             {% endif %}
@@ -81,21 +54,23 @@
                     </div>
                 {% endif %}
                         
-                
+                {% if creation_key and survey.id != 1 and survey.id != 10 %}
+                    {% include "../survey_forms/profile.html" %}
+                {% endif %} 
                 
                 {% comment %}{% if survey.periodicity == 7 and creation_key and survey_slug %}
                     <!--header of one time activity-->
                     <div class='row mt-4 mb-2'>
                         <div class='col-6'>
                             <div class="d-flex justify-content-start mt-2">
-                                <h5 class=''> <b></b></h5>.
+                                <h5 class='p-2'> <b>{{survey.name}}</b></h5>.
                             </div>
                         </div>
                         <div class='col-6'>
                             <div class="d-flex justify-content-end">
                                 {% with keystrings_edit=profile_obj.survey.slug|default:survey.slug|make_string:"edit" keystrings_add=profile_obj.survey.slug|default:survey.slug|make_string:"add" %}
                                     {% if not main_add_button and request.user.groups.all.0.id == 1 and profile_obj.survey.id|survey_show:"" %}
-                                        <h4 class="m-0 px-2 pt-2" title='Add'><a href="/configuration/add-survey-form/{{survey.id}}/?ben={{creation_key}}"><span class="bx bx-plus-medical bx-md"></span></a></h4>
+                                        <h4 class="p-2 " title='Add'><a href="/configuration/add-survey-form/{{survey.id}}/?ben={{creation_key}}"><span class="bx bx-plus-medical bx-md"></span></a></h4>
                                     {% endif %}
                                 {% endwith %}
                                 {% with profile_obj.survey.slug|default:survey.slug|make_string:"delete" as keystrings %}
@@ -113,20 +88,22 @@
                         {% for item in survey_heading_questions %}
                             {% if item.qtype == 'AW' %}
                                 {% for question_id,answers in profile_obj.response.address.1.items %}
-                                    <div class="col-lg-4 col-sm-4 col-md-4">
-                                        <div class='d-flex'  >
-                                            <p class="fw-bold" style="font-size:1rem;width: 30%;">{{item.id|get_question_text:profile_obj.survey_id}}</p>
-                                            <p class="fw-bold text-center" style="font-size:1rem;width: 10%;">:</p>
-                                            <p style="font-size:1rem" class='text-primary'>{% get_answer_text survey.id object_lists.0.response|get_item_str:item.id item %}</p>
+                                    <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
+                                        <div class='p-2 w-50 '>
+                                            <h5 class="fw-bold " style="font-size:1rem">{{item.id|get_question_text:profile_obj.survey_id}} :</h5>
+                                        </div>
+                                        <div class='p-2 w-50 '>
+                                            <p style="font-size:.97rem" class='text-primary'>{% get_answer_text survey.id object_lists.0.response|get_item_str:item.id item %}</p>
                                         </div>
                                     </div>
                                 {% endfor %}
                             {% else %}
-                                <div class="col-lg-4 col-sm-4 col-md-4">
-                                    <div class='d-flex'>
-                                        <p class="fw-bold" style="font-size:1rem;width: 30%;">{{item.id|get_question_text:survey.id}}</p>
-                                        <p class="fw-bold text-center" style="font-size:1rem;width: 10%;">:</p>
-                                        <p style="font-size:1rem;width: 60%;">{% get_answer_text survey.id object_lists.0.response|get_item_str:item.id item %}</p>
+                                <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
+                                    <div class='p-2 w-50 '>
+                                        <p class="fw-bold " style="font-size:1rem">{{item.id|get_question_text:survey.id}} :</p>
+                                    </div>
+                                    <div class='p-2 w-50 '>
+                                        <p style="font-size:.97rem" class=''>{% get_answer_text survey.id object_lists.0.response|get_item_str:item.id item %}</p>
                                     </div>
                                 </div>
                             {% endif %}
@@ -135,7 +112,7 @@
                 {% if not survey_slug and creation_key and options_dropdown.count > 1 %}
                     <!-- profile page view the data -->
                      
-                    <div class='row '>
+                    <div class='row mt-4'>
                         <div class="d-flex justify-content-end">
                             {% with profile_obj.survey.slug|default:survey.slug|make_string:"edit" as keystrings %}
                                 {% if not main_add_button and request.user.groups.all.0.id == 1 %}
@@ -152,11 +129,13 @@
                             {% if item.id not in fixed_profile_ids %}
                                 {% if item.qtype == 'AW' %}
                                     {% for question_id,answers in profile_obj.response.address.1.items %}
-                                        <div class="col-lg-4 col-sm-4 col-md-4">
-                                            <div class='d-flex' >
-                                                <p class="fw-bold " style="font-size:1rem;width: 30%;">{{item.id|get_question_text:profile_obj.survey_id}}</p>
-                                                <p class="fw-bold text-center" style="font-size:1rem;width: 10%;">:</p>
-                                                <p style="font-size:1rem;width: 60%;">{% get_answer_text profile_obj.survey_id answers item %}</p>
+                                        <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
+                                            <div class='p-2 w-50 '>
+                                                <p class="fw-bold " style="font-size:1rem">{{item.id|get_question_text:profile_obj.survey_id}} :</p>
+                                            </div>
+                                            <div class='p-2 w-50 '>
+
+                                                <p style="font-size:.97rem" class=''>{% get_answer_text profile_obj.survey_id answers item %}</p>
                                             </div>
                                         </div>
                                     {% endfor %}
@@ -185,20 +164,22 @@
                                             </div>
                                         </div>
                                     {% else %}
-                                        <div class="col-lg-4 col-sm-4 col-md-4">
-                                            <div class='p-2' style="width: 30%;">
-                                                <p class="fw-bold" style="font-size:1rem;width: 30%;">{{question_id|get_question_text:profile_obj.survey_id}} :</p>
-                                                <p class="fw-bold text-center" style="font-size:1rem;width: 10%;">:</p>
-                                                <p style="font-size:1rem;width: 60%;">-</p>
+                                        <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
+                                            <div class='p-2 w-50 '>
+                                                <p class="fw-bold " style="font-size:1rem">{{question_id|get_question_text:profile_obj.survey_id}}</p>
+                                            </div>
+                                            <div class='p-2 w-50 '>
+                                                <p style="font-size:.97rem" class=''>-</p>
                                             </div>
                                         </div>
                                     {% endif %}
                                 {% else %}
-                                    <div class="col-lg-4 col-sm-4 col-md-4">
-                                        <div class='d-flex p-2' >
-                                            <p class="fw-bold " style="font-size:1rem;width: 30%;">{{item.id|get_question_text:profile_obj.survey_id}}</p>
-                                            <p class="fw-bold text-center" style="font-size:1rem;width: 10%;">:</p>
-                                            <p style="font-size:1rem;width: 60%;">{% get_answer_text profile_obj.survey_id profile_obj.response|get_item_str:item.id item %}</p>
+                                    <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
+                                        <div class='p-2 w-50 '>
+                                            <p class="fw-bold " style="font-size:1rem">{{item.id|get_question_text:profile_obj.survey_id}} :</p>
+                                        </div>
+                                        <div class='p-2 w-50 '>
+                                            <p style="font-size:.97rem" class=''>{% get_answer_text profile_obj.survey_id profile_obj.response|get_item_str:item.id item %}</p>
                                         </div>
                                     </div>
                                 {% endif %}
@@ -226,47 +207,47 @@
                     <div class='row'>
                         <div class='col-6'>
                             <div class="d-flex justify-content-start mt-2">
-                                <h5 class=''> <b></b></h5>
+                                <h5 class='p-2'> <b>{{survey.name}}</b></h5>.
                             </div>
                         </div>
                         <div class='col-6'>
                             <div class="d-flex justify-content-end">
                                 {% with profile_obj.survey.slug|default:survey.slug|make_string:"add" as keystrings %}
-                                    {% if request.user.groups.all.0.id == 1 and survey.id|survey_show:creation_key %}
-                                    <h4 class="m-0 px-2 pt-2" title='Add'><a href="/configuration/{% if survey.id == 20 %}custom_weekly_data_form{% else %}add-survey-form/{{survey.id}}{% endif %}/?ben={{creation_key}}"><span class="bx bx-plus-medical bx-md"></span></a></h4>
+                                {% if request.user.groups.all.0.id == 1 and survey.id|survey_show:creation_key %}
+                                <h4 class="p-2 " title='Add'><a href="/configuration/{% if survey.id == 20 %}custom_weekly_data_form{% else %}add-survey-form/{{survey.id}}{% endif %}/?ben={{creation_key}}"><span class="bx bx-plus-medical bx-md"></span></a></h4>
                                     {% endif %}
                                 {% endwith %}
                             </div>
                         </div>
-                        <div class="col-lg-4 col-sm-4 col-md-4">
-                            <div class='p-2'>
-                                <h5 class="" style="font-size:1rem">No data available</h5>
+                        <div class="col-lg-4 col-sm-4 col-md-4 d-flex justify-content-start ">
+                            <div class='p-2 w-50 '>
+                                <h5 class="" style="font-size:.97rem">No data available</h5>
                             </div>
                         </div>
                     </div>
                 {% else %}
                     <!-- listing page with table  -->
-                    <div class="table-responsive mb-2" >
+                    <div class="table-responsive mb-0" data-pattern="priority-columns" >
                         {% if creation_key %}
                             <div class='row'>
                                 <div class='col-6'>
                                     <div class="d-flex justify-content-start mt-2">
-                                        <h5 class=''> <b></b></h5>
+                                        <h5 class='p-2'> <b>{{survey.name}}</b></h5>.
                                     </div>
                                 </div>                                                          
                                 {% with profile_obj.survey.slug|default:survey.slug|make_string:"add" as keystrings %}
                                     {% if not hide_button and request.user.groups.all.0.id == 1 and survey.id|survey_show:creation_key %}
                                         <div class='col-6'>
                                             <div class="d-flex justify-content-end">
-                                                <h4 class="m-0 px-2 pt-2" title='Add'><a href="/configuration/{% if survey.id == 20 %}custom_weekly_data_form{% else %}add-survey-form/{{survey.id}}{% endif %}/?ben={{creation_key}}"><span class="bx bx-plus-medical bx-md"></span></a></h4>
+                                                <h4 class="p-2 " title='Add'><a href="/configuration/{% if survey.id == 20 %}custom_weekly_data_form{% else %}add-survey-form/{{survey.id}}{% endif %}/?ben={{creation_key}}"><span class="bx bx-plus-medical bx-md"></span></a></h4>
                                             </div>
                                         </div>
                                     {% endif %}
                                 {% endwith %}
                             </div>
                         {% endif %}
-                        <table class="table mb-0">
-                            <thead class="table-light">
+                        <table id="" class="table table-bordered table-hover">
+                            <thead>
                                 <tr class='bg-warning ' style='font-size:medium'>
                                     {% for header in survey_heading_questions %}
                                         <th>{{header.text}}</th>
@@ -296,7 +277,9 @@
                                                         {% if object_lists|length and creation_key and request.user.groups.all.0.id == 1 %}
                                                             <div class="col-auto mb-2">
                                                                 <a href="/configuration/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/?ben={{creation_key}}" >
-                                                                    <span class="bx bxs-edit-alt bx-md"></span>
+                                                                    <button class="btn btn-sm btn-just-icon btn-info" style="float:right" title="Edit">
+                                                                        <span class="bx bx-edit bx-sm"></span>
+                                                                    </button>
                                                                 </a>
                                                             </div>
                                                         {% endif %}
@@ -307,7 +290,7 @@
                                                                 <div class="dropdown">                                                                    
                                                                     {% with profile_obj.survey.slug|default:survey.slug|make_string:"edit" as keystrings %}
                                                                     {% if not main_add_button and request.user.groups.all.0.id == 1 %}
-                                                                        <a href='/configuration/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/'><span class="bx bxs-edit-alt bx-md"></span></a>
+                                                                        <button type="button" class="btn btn-primary btn-lg waves-effect waves-light p-2 mb-3" onclick="location.href='/configuration/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/'">Edit</button>
                                                                         {% endif %}
                                                                         {% endwith %}
                                                                         
@@ -340,7 +323,7 @@
                                             </td>
                                         {% else %}
                                         <td>
-                                            <a  href='/configuration/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/'><span class="bx bxs-edit-alt bx-md"></span></a>
+                                            <button type="button" class="btn btn-primary btn-lg waves-effect waves-light p-2 mb-3" onclick="location.href='/configuration/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/'">Edit</button>
                                         </td>
                                         {% endif%}   
                                     </tr>
