@@ -35,7 +35,7 @@ class BlockAdmin(ImportExportModelAdmin, ImportExportFormat):
 
 @admin.register(Question)
 class QuestionAdmin(ImportExportModelAdmin, ImportExportFormat):
-    pass
+    list_filter = ['block']
 
 @admin.register(Choice)
 class ChoiceAdmin(ImportExportModelAdmin, ImportExportFormat):
