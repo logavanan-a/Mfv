@@ -55,7 +55,7 @@
         .modal-footer {
             border-top: 0px;
         }
-        .table th {background-color: #DBD4FE};
+        .table thead th {background-color: #DBD4FE};
         * {
   
             font-family: "Poppins", sans-serif;
@@ -142,7 +142,7 @@
 
             <script src="{% static 'js/app.js' %}"></script>    
             {% endblock javascript %}
-            <script>
+            <!-- <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     const showPopup = "{{ request.session.show_submission_popup|default_if_none:'False'|safe }}";
                     var currentUrl = window.location.pathname;
@@ -162,6 +162,6 @@
                         });
                     }
                 });
-            </script>
+            </script> -->
         </body>
     </html>

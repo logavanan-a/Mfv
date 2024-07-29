@@ -1,24 +1,65 @@
 <form method="GET">
     <div class='row'>
+        
         {% for filter in filter_questions %}
-            
             {% if filter.qtype == 'AW' %}
-                {% for bondary in next_level_boundries %}
-                    <div class="col-3" >
-                        <div class="mb-2">
-                            <label class="form-label" >{{bondary.name}}</label>
-                            <select class=" form-select address_widget"  name="{{filter.id}}" id='boundary_{{bondary.id}}' 
-                                aria-label="Floating label select example" data-placeholder=" " >
-                                <option selected value=""> </option>
-                                {% if forloop.counter == 1 %}
-                                    {% for b in boundarys %}
-                                        <option value='{{b.id}}'>{{b.name}}</option>
-                                    {% endfor %}
-                                {% endif %}
-                            </select>
-                        </div>
+                <div class="col-3" >
+                    <div class="mb-2">
+                        <label class="form-label" >Donor</label>
+                        <select class="form-select address_widget"  name="donor" id='donor' 
+                            aria-label="Floating label select example" data-placeholder=" " >
+                            <option selected value=""> </option>
+                            {% for i in donor_obj %}
+                            <option value="{{i.id}}" {% if donor == i.id|slugify %}selected{% endif %}>{{i.name}} </option>
+                            {% endfor %}
+                        </select>
                     </div>
-                {% endfor %}
+                </div>
+                <div class="col-3" >
+                    <div class="mb-2">
+                        <label class="form-label" >District</label>
+                        <select class=" form-select address_widget"  name="district" id='district' 
+                            aria-label="Floating label select example" data-placeholder=" " >
+                            <option selected value=""> </option>
+                            {% if donor %}
+                            {% for i in  district_obj %}
+                            <option value="{{i.id}}" {% if district == i.id|slugify %}selected{% endif %}>{{i.name}} </option>
+                            {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                    
+                    document.addEventListener('DOMContentLoaded', function() {                          
+                        $('#donor').change(function () {
+                            var optionSelected = $(this).find("option:selected");
+                            var valueSelected  = optionSelected.val();
+                            $.ajax({
+                                type:"GET",
+                                url: '/configuration/ajax/district/'+valueSelected+'/',
+                                success:function(result){
+                                    $("#district option").remove();
+                                    a = '<option selected value="">Choose District Name</option>';
+                                    $("#district").append(a);
+                                    if(JSON.parse(result) == 0){
+                                        $("#district option").remove();
+                                        a = '<option selected value="">No District is mapped to this Donor Name</option>';
+                                        $("#district").append(a);
+                                    }
+                                    else{
+                                        $.each(JSON.parse(result),function(key, value)
+                                        {
+                                            a = '<option value=' + value['id']+'>' + value['name']+'</option>';
+                                            $("#district").append(a);
+                                        });
+                                    }
+                                }
+                            });
+                        });
+                    });
+                </script>
+                
             {% elif filter.qtype == 'S' %}
                 <div class='col-3'>
                     <div class=" mb-2">

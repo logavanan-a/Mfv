@@ -327,7 +327,14 @@ class WebResponseListing(View):
         survey_questions={}
         facilities=''
         request_data=request.GET.dict()
-        
+        donor_obj = Donor.objects.filter(active=2)
+        project_list = UserProjectMapping.objects.filter()
+        donor_list = ProjectDonorMapping.objects.filter()
+        if request.user.groups.all()[0].id == 1:
+            project_list = project_list.filter(user_id=request.user.id)
+            donor_list = donor_list.filter(project__id__in=project_list.values_list('project_id',flat=True))
+            donor_obj = Donor.objects.filter(id__in=donor_list.values_list('donor',flat=True), active=2)
+            
         #load_data_to_cache call for if cache cleared
         load_data_to_cache()
         
@@ -411,21 +418,40 @@ class WebResponseListing(View):
                 # object_lists = JsonAnswer.objects.filter(id__in=ben_responses_ids,survey__slug=survey_slug,active=2).values('survey_id','response','survey__slug','creation_key','created','modified','active').order_by(*listing_order)
             # else:
             user_district = list(UserProjectMapping.objects.filter(user_id=request.user.id).values_list('project__district__id',flat=True))
-            district=Boundary.objects.filter(active=2,code__in=list(map(str,user_district))).values_list('id',flat=True)
-
-            creation_key_wise_district = "','".join(list(BeneficiaryResponse.objects.filter(address_2__in=district).values_list('creation_key',flat=True)))
-            query='select js.id,survey_id,response,s.slug,creation_key,js.created,js.modified,js.active from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} {1}  @@creation_key @@filters  order by @@order_by'.format(survey.id,facilities,creation_key_wise_district)#@@filters
-            if survey.id == 1 and request.user.groups.all()[0].id == 1:
-                query='select js.id,survey_id,response,s.slug,creation_key,js.created,js.modified,js.active from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} {1} and creation_key in (\'{2}\')  @@creation_key @@filters  order by @@order_by'.format(survey.id,facilities,creation_key_wise_district)#@@filters
+            district_id=Boundary.objects.filter(active=2,code__in=list(map(str,user_district))).values_list('id',flat=True)
+            creation_key_wise_district = "','".join(list(BeneficiaryResponse.objects.filter(address_2__in=district_id).values_list('creation_key',flat=True)))
+            donor=request.GET.get('donor','')
+            district=request.GET.get('district','')
+            if donor:
+                project_list = project_list.values_list('project__district__id',flat=True)
+                district_obj = Boundary.objects.filter(active=2,code__in=list(map(str,project_list)),boundary_level_type_id=2)
+            if district:
+                # district_name = Boundary.objects.get(active=2,code=district,boundary_level_type_id=2).name
+                creation_key_wise_district = "','".join(list(BeneficiaryResponse.objects.filter(address_2=district).values_list('creation_key',flat=True)))
+            query='select js.id,survey_id,response,s.slug,creation_key,js.created,js.modified,js.active, pd.donor_id from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id left join application_master_userprojectmapping up on up.user_id = js.user_id left join application_master_projectdonormapping pd on pd.project_id = up.project_id where js.active != 0 and s.id = {0} {1}  @@creation_key @@creation_key_wise_district @@filters @@school_creation_key @@donor order by @@order_by'.format(survey.id,facilities)#@@filters
+            if survey.id == 1 and request.user.groups.all()[0].id == 1:\
+                query=query.replace("@@creation_key_wise_district"," and creation_key in (\'{0}\')".format(creation_key_wise_district))
+            else:
+                query=query.replace("@@creation_key_wise_district","")
+                # query='select js.id,survey_id,response,s.slug,creation_key,js.created,js.modified,js.active from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} {1} and creation_key in (\'{2}\')  @@creation_key @@filters @@donor order by @@order_by'.format(survey.id,facilities,creation_key_wise_district)#@@filters
             if school_creation_key:
-                query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} {1} and js.response->>\'237\'=\'{2}\'  @@creation_key @@filters order by @@order_by'.format(survey.id,facilities,school_creation_key)#@@filters
+                query=query.replace("@@school_creation_key"," and js.response->>\'237\'=\'{0}\'".format(school_creation_key))
+                # query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} {1} and js.response->>\'237\'=\'{2}\'  @@creation_key @@filters @@donor order by @@order_by'.format(survey.id,facilities,school_creation_key)#@@filters
                 # object_lists = JsonAnswer.objects.filter(facility_id__in=request.session.get('facility_list'),survey__slug=survey_slug,active=2).values('survey_id','response','survey__slug','creation_key','created','modified','active').order_by(*listing_order)
+            else:
+                query=query.replace("@@school_creation_key","")
 
             if creation_key:
                 query=query.replace("@@creation_key"," and js.cluster->>'BeneficiaryResponse' = '{0}'".format(creation_key))
             else:
                 query=query.replace("@@creation_key","")
-            
+            if donor:
+                query=query.replace("@@donor"," and pd.donor_id= {0}".format(int(donor)))
+            else:
+                query=query.replace("@@donor","")
+
+
+
                 # object_lists=object_lists.filter(cluster__BeneficiaryResponse=creation_key).order_by('-created')                
             survey_key_question = INSTANCE_CACHE_PREFIX+'survey_heading_questions_for_'+str(survey.id)
             cache_survey_id.update({survey_key_question:survey.id})
@@ -535,7 +561,7 @@ class WebResponseListing(View):
         # heading='Student Details'
         # partner_creation_key = request.session.get('partner_key')
         # responses = BeneficiaryResponse.objects.none()
-
+        
         if survey_slug :#and not creation_key:
             #########Pagination##########
             object_lists=web_pagination(request,object_lists)
@@ -1759,4 +1785,17 @@ def get_location_boundry(request):
         for boundary in boundarys:
             result_set.append({'id':boundary.get('id'), 'name': boundary.get('name'), })
         return HttpResponse(json.dumps(result_set))
-    
+
+@login_required(login_url='/')
+def get_donor_district(request, donor_id):
+    if request.method == 'GET':
+        result_set = []
+        project_donor_obj = ProjectDonorMapping.objects.filter(active=2, donor_id=donor_id)
+        if request.user.groups.all()[0].id == 1:
+            project_obj = UserProjectMapping.objects.filter(user_id=request.user.id).values_list('project_id',flat=True)
+            project_donor_obj = project_donor_obj.filter(project_id__in=project_obj)
+        district_obj = Boundary.objects.filter(active=2,code__in=list(map(str,project_donor_obj.values_list('project__district__id',flat=True))),boundary_level_type_id=2)
+        for district in district_obj:
+            result_set.append(
+                {'id': district.id, 'name': district.name,})
+        return HttpResponse(json.dumps(result_set))

@@ -13,5 +13,6 @@ urlpatterns = [
     #Ajax call
     path('survey/location/', get_boundry_based_on_parentboundry),
     path('ajax/get_location/', get_location_boundry),
+    path('ajax/district/<donor_id>/', get_donor_district),
 
 ]
