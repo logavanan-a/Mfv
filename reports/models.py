@@ -37,3 +37,17 @@ class ReportMeta(BaseContent):
 
     def __str__(self):
         return self.report_slug
+    
+
+class QuietlyReport(BaseContent):
+    project =  models.ForeignKey('application_master.Project', on_delete = models.DO_NOTHING, blank=True, null=True)
+    indicator =  models.ForeignKey('application_master.MasterLookup',on_delete = models.DO_NOTHING, blank=True, null=True)
+    academic_year = models.IntegerField()
+    annual_direct = models.IntegerField()
+    q1_direct = models.IntegerField(default=0)
+    q2_direct = models.IntegerField(default=0)
+    q3_direct = models.IntegerField(default=0)
+    q4_direct = models.IntegerField(default=0)
+
+    class Meta:
+	    unique_together = [['project', 'indicator','annual_direct']]

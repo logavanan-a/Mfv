@@ -303,6 +303,7 @@
                                     </div>
                                     <script>
                                         $(document).ready(function(){
+
                                             {% if question.mandatory %}
                                             var checkboxes = $('#{{question.id}}');
                                             var checkboxes = $('.main_checkbox_{{question.id}}');
@@ -321,11 +322,14 @@
                                             
                                             $(document).on('change', "input[value='{{choice.id}}']", function (event) {
                                                 if ($(this).prop('checked')){
+
                                                     skip_question_list = []
                                                     {% for choice_list in main_choice_list %}
                                                         if (parseInt({{question.id}}) == 246){
                                                             skip_question_list.push(parseInt({{choice_list.skip_question_ids}}))
                                                         }else if (parseInt({{question.id}}) == 254){
+                                                            skip_question_list.push(parseInt({{choice_list.skip_question_ids}}))
+                                                        }else{
                                                             skip_question_list.push(parseInt({{choice_list.skip_question_ids}}))
                                                         }
                                                     {% endfor %}
