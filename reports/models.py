@@ -43,11 +43,11 @@ class QuietlyReport(BaseContent):
     project =  models.ForeignKey('application_master.Project', on_delete = models.DO_NOTHING, blank=True, null=True)
     indicator =  models.ForeignKey('application_master.MasterLookup',on_delete = models.DO_NOTHING, blank=True, null=True)
     academic_year = models.IntegerField()
-    annual_direct = models.IntegerField()
-    q1_direct = models.IntegerField(default=0)
-    q2_direct = models.IntegerField(default=0)
-    q3_direct = models.IntegerField(default=0)
-    q4_direct = models.IntegerField(default=0)
+    annual_target = models.IntegerField()
+    q1_target = models.IntegerField(default=0)
+    q2_target = models.IntegerField(default=0)
+    q3_target = models.IntegerField(default=0)
+    q4_target = models.IntegerField(default=0)
 
     class Meta:
-	    unique_together = [['project', 'indicator','annual_direct']]
+	    unique_together = [['project', 'indicator','academic_year']]
