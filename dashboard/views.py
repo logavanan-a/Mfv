@@ -453,13 +453,13 @@ def send_mail_with_template(request,monthly_data,dashboard_data):
     button = request.POST.get('label')
     # key is from role id , if role rejected means which role need to go if approved then which role need to go
     role_with_mail = {
-        4:{'reject':1,'approve':2},
-        2:{'reject':4,'approve':3},
-        3:{'reject':2},
+        4:{'reject':[1],'approve':[2]},
+        2:{'reject':[4],'approve':[1,4]},
+        # 3:{'reject':2},
     }
     to_role = role_with_mail.get(user_group).get(button)
     if to_role:
-        template_name = f"{user_group}->{to_role}"
+        template_name = f"{user_group}->{','.join(map(str,to_role))}"
         mail_template = MailTemplate.objects.get(active=2,template_name=template_name)
         to_email_username = get_next_role_user(partner_list,to_role)
 
@@ -469,20 +469,22 @@ def send_mail_with_template(request,monthly_data,dashboard_data):
             if user[0] or user[1]:
                 name = f"{user[0] or ''} {user[1] or ''} ({user[2]})"
             to_users_and_email[name] = user[3]
-            
+        # import ipdb;ipdb.set_trace()
         users_name, to_users_emails = zip(*to_users_and_email.items())
         from_username = f"{request.user.get_full_name()} ({request.user.username})" if request.user.get_full_name() else request.user.username
 
         if users_name and to_users_emails:
             table_html = render_to_string('mailer/table_for_dashboard_data.html', {'dashboard_data': dashboard_data})
-
+            join_usersname = ' and '.join(users_name) if len(users_name) > 1 else users_name[0]
+            
             month_obj = datetime.strptime(str(monthly_data.month), '%m%Y')
-            mail_subject = mail_template.subject.format(from_username=from_username, month_year=month_obj.strftime('%B %Y'))
-            html_template = mail_template.content.format(partner_name=monthly_data.partner.name,month_year=month_obj.strftime('%B %Y'),to_username=users_name[0],from_username=from_username)
-            # import ipdb;ipdb.set_trace()
+            partner_name = monthly_data.partner.name
+            mail_subject = mail_template.subject.format(partner_name=partner_name, month_year=month_obj.strftime('%B %Y'))
+            html_template = mail_template.content.format(partner_name=partner_name,month_year=month_obj.strftime('%B %Y'),to_username=join_usersname,from_username=from_username)
             table_html = convert_safe_text(table_html)
             html_template = html_template.replace('@@dashboard_content',table_html)
-            response = send_mail(to_users_emails,mail_subject,html_template)
+            html_template = html_template.replace('@@remark',request.POST.get('remark',''))
+            response = send_mail(set(to_users_emails),mail_subject,html_template)
             print(response,'response')
             mail_status = 3 if response['status'] == 200 else 1
             send_data_obj = MailData.objects.create(subject = mail_subject,content = html_template,mail_to = ';'.join([item for item in to_users_emails if item]),
@@ -490,7 +492,7 @@ def send_mail_with_template(request,monthly_data,dashboard_data):
                                                 template_name = mail_template,error_details = str(response) )
 
 def get_next_role_user(partner,to_role):
-    email_username = list(UserProjectMapping.objects.filter(active=2,project__partner_mission_mapping__partner_id__in=partner,project__application_type_id=511,user__groups__id=to_role).values_list('user__first_name','user__last_name','user__username','user__email').exclude(user__email__isnull=True).exclude(user__email__exact='').distinct())
+    email_username = list(UserProjectMapping.objects.filter(active=2,project__partner_mission_mapping__partner_id__in=partner,project__application_type_id=511,user__groups__id__in=to_role).values_list('user__first_name','user__last_name','user__username','user__email').exclude(user__email__isnull=True).exclude(user__email__exact='').distinct())
     return email_username
 
 def convert_safe_text(content):
