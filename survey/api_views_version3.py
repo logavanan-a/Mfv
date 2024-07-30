@@ -55,7 +55,7 @@ def new_responses_list_v3(request):
             # user_boundary = list(user_role.get_poject_based_location())
             # loc_list = [str(i) for i in user_boundary]
             # loc_list=[]
-            district_loc_list = list(UserProjectMapping.objects.filter(active=2, user_id=user_id).values_list('project__district_id', flat=True).distinct())
+            district_loc_list = list(UserProjectMapping.objects.filter(active=2, user_id=user_id,project__application_type_id=511).values_list('project__district_id', flat=True).distinct())
             loc_list_str = list(map(str,district_loc_list))
             loc_list = Boundary.objects.filter(active=2,code__in = loc_list_str,boundary_level_type_id=2).values_list('id',flat=True)
             cache_set_with_namespace('RESPONSE_SURVEY_V3', loc_list_cache_key, loc_list, 14400)

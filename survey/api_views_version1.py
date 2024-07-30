@@ -426,11 +426,11 @@ def send_mail_with_template(template_name,email_jsonobj,to_users,state_obj,appro
     #8 - Approved or created user role
     status = 'rejected' if approval_status in ['0',0] else 'approved'
     mail_template = MailTemplate.objects.filter(active=2,template_name=template_name).first()
-    # to_ = ['yuvaraj.kharvi@thesocialbytes.com']
+    to_ = ['yuvaraj.kharvi@thesocialbytes.com']
     project_name = email_jsonobj[1].survey.get_activity_project()
     mail_subject = mail_template.subject.format(email_jsonobj[1].survey.name, project_name.name if project_name else '',email_jsonobj[1].id)
     html_template = mail_template.content.format(state_obj.label,email_jsonobj[0],email_jsonobj[1].survey.name,email_jsonobj[1].id,email_jsonobj[1].created.strftime("%Y-%m-%d %H:%M:%S"),email_jsonobj[1].survey.voucher_description or '-',f"{settings.INSTANCE_URL}/configuration/activity/{email_jsonobj[1].id}/",status,email_jsonobj[2])
-    response = s_mail(to_users,mail_subject,html_template,)
+    response = s_mail(to_,mail_subject,html_template,)
     mail_status = 3 if response['status'] == 200 else 1
     send_data_obj = MailData.objects.create(subject = mail_subject,content = html_template,mail_to = ';'.join([item for item in to_users if item]),
                                         priority = 1,mail_status = mail_status, send_attempt = 1,mail_cc="",mail_bcc="",

@@ -9,10 +9,16 @@ from survey.views import get_pagination,JsonAnswer
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from send_mail.models import *
+from send_mail.views import send_mail
 from django.db.models import Case, Value, When, Q , Sum
 from mfv_mis.settings import DASHBOARD_SUBMISSION_DAY
 from uuid import uuid4
 from survey.api_view import MonthlyDashboardData
+import sys, traceback
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 def dashboard(request):
@@ -158,7 +164,7 @@ def monthly_dashboard_list(request):
     approval_status = STATUS_CHOICES
 
     # user_partner = UserProjectMapping.objects.filter(active=2,user=request.user,project__application_type_id = 511).values_list('project__partner_mission_mapping__partner_id', flat=True)
-    user_partner = request.session['user_partner_list']
+    user_partner = request.session['user_partner_list_roshni']
 
     object_list = MonthlyDashboard.objects.filter(active=2,partner__in=user_partner).order_by('-modified').select_related('partner','project_incharge','partner_admin','submitted_by')
     if month:
@@ -180,6 +186,8 @@ from types import SimpleNamespace
 from django.test import RequestFactory
 from django.http import HttpRequest, JsonResponse
 import json
+from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 
 @csrf_exempt
 @login_required(login_url="/login/")
@@ -370,6 +378,11 @@ def dashboard_data_approval(request, id):
         # Convert the queryset to a list of SimpleNamespace objects
         monthly_data = SimpleNamespace(**monthly_data_dict)
         
+    
+    # mapping for table of indicator counts
+    dashboard_data = {"No. of Children Screened":monthly_data.children_covered_count,"No. of Schools Covered":monthly_data.school_covered_count,"No. of Teachers Trained":monthly_data.teachers_train_count,"No. of Children Prescribed Spectacles":monthly_data.children_pres_count,"No. of Children Provided Spectacles":monthly_data.child_prov_spec_count,"No. of Children Advised to Continue with Same Glasses (PGP)":monthly_data.pgp_count,"No. of Children Referred to Hospital for Detailed Examination":monthly_data.children_reffered_count,"No. of Children Provided Spectacles at Hospital":monthly_data.child_prov_hos_count,"No. of Children Advised Surgery":monthly_data.children_adv_count,"No. of Children Provided Surgery":monthly_data.children_prov_sgy_count,"Spectacle Wearing Compliance After 3 Months":monthly_data.swc_count}
+
+
     user_group = request.session['user_group_list']
     
     # if record status have the permission of group to action {status:role id (group)}
@@ -417,12 +430,79 @@ def dashboard_data_approval(request, id):
             group = request.user.groups.all()[0]
             remark_text = f"{request.user.username} ({group.name})  -  {request.POST.get('remark')}"
             Remarks.objects.create(object_id=monthly_data.id,content_type_id=62,remark=remark_text,user=request.user)
-        return JsonResponse({'message': 'Updated successfully'})
 
-    dashboard_data = {"No. of Children Screened":monthly_data.children_covered_count,"No. of Schools Covered":monthly_data.school_covered_count,"No. of Teachers Trained":monthly_data.teachers_train_count,"No. of Children Prescribed Spectacles":monthly_data.children_pres_count,"No. of Children Provided Spectacles":monthly_data.child_prov_spec_count,"No. of Children Advised to Continue with Same Glasses (PGP)":monthly_data.pgp_count,"No. of Children Referred to Hospital for Detailed Examination":monthly_data.children_reffered_count,"No. of Children Provided Spectacles at Hospital":monthly_data.child_prov_hos_count,"No. of Children Advised Surgery":monthly_data.children_adv_count,"No. of Children Provided Surgery":monthly_data.children_prov_sgy_count,"Spectacle Wearing Compliance After 3 Months":monthly_data.swc_count}
+        # sending email for respected role users
+        try:
+            send_mail_with_template(request,monthly_data,dashboard_data)
+            message = 'Updated successfully'
+        except Exception as e:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            error_stack = repr(traceback.format_exception(exc_type, exc_value, exc_traceback))
+            logger.error(error_stack)
+            message = f"Error while sending mail. Please contact your system administrator. {str(e)}"
+        return JsonResponse({'message': message})
 
+    
     remarks = Remarks.objects.filter(active=2,content_type_id=62,object_id=monthly_data.id).order_by('created')
     return render(request, "survey_forms/activity_submition_view.html", locals())
+
+# mail passing function for approved/created the activities
+def send_mail_with_template(request,monthly_data,dashboard_data):
+    user_group = request.session['user_group_list'][0]
+    partner_list = request.session['user_partner_list_roshni']
+    button = request.POST.get('label')
+    # key is from role id , if role rejected means which role need to go if approved then which role need to go
+    role_with_mail = {
+        4:{'reject':1,'approve':2},
+        2:{'reject':4,'approve':3},
+        3:{'reject':2},
+    }
+    to_role = role_with_mail.get(user_group).get(button)
+    if to_role:
+        template_name = f"{user_group}->{to_role}"
+        mail_template = MailTemplate.objects.get(active=2,template_name=template_name)
+        to_email_username = get_next_role_user(partner_list,to_role)
+
+        to_users_and_email = {}
+        for user in to_email_username:
+            name = user[2]
+            if user[0] or user[1]:
+                name = f"{user[0] or ''} {user[1] or ''} ({user[2]})"
+            to_users_and_email[name] = user[3]
+            
+        users_name, to_users_emails = zip(*to_users_and_email.items())
+        from_username = f"{request.user.get_full_name()} ({request.user.username})" if request.user.get_full_name() else request.user.username
+
+        if users_name and to_users_emails:
+            table_html = render_to_string('mailer/table_for_dashboard_data.html', {'dashboard_data': dashboard_data})
+
+            month_obj = datetime.strptime(str(monthly_data.month), '%m%Y')
+            mail_subject = mail_template.subject.format(from_username=from_username, month_year=month_obj.strftime('%B %Y'))
+            html_template = mail_template.content.format(partner_name=monthly_data.partner.name,month_year=month_obj.strftime('%B %Y'),to_username=users_name[0],from_username=from_username)
+            # import ipdb;ipdb.set_trace()
+            table_html = convert_safe_text(table_html)
+            html_template = html_template.replace('@@dashboard_content',table_html)
+            response = send_mail(to_users_emails,mail_subject,html_template)
+            print(response,'response')
+            mail_status = 3 if response['status'] == 200 else 1
+            send_data_obj = MailData.objects.create(subject = mail_subject,content = html_template,mail_to = ';'.join([item for item in to_users_emails if item]),
+                                                priority = 1,mail_status = mail_status, send_attempt = 1,mail_cc="",mail_bcc="",
+                                                template_name = mail_template,error_details = str(response) )
+
+def get_next_role_user(partner,to_role):
+    email_username = list(UserProjectMapping.objects.filter(active=2,project__partner_mission_mapping__partner_id__in=partner,project__application_type_id=511,user__groups__id=to_role).values_list('user__first_name','user__last_name','user__username','user__email').exclude(user__email__isnull=True).exclude(user__email__exact='').distinct())
+    return email_username
+
+def convert_safe_text(content):
+	try:
+		if type(content) != str:
+			content = str(content)
+	except:
+		content = str(content.encode("utf8"))
+	return content
+
+
+
 
 def get_first_and_last_date_of_month(year, month):
     # Ensure month is within the valid range

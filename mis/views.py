@@ -85,6 +85,7 @@ def login_view(request):
                 request.session['user_mission_list']=list(user_mission_id)
                 request.session['user_project_list']=list(user_project_ids)
                 request.session['user_partner_list']=list(user_partner_id)
+                request.session['user_partner_list_roshni']=list(user_project.filter(project__application_type_id=511).values_list('project__partner_mission_mapping__partner_id',flat=True))
                 request.session['user_donor_list']=list(user_donor_id)
                 request.session['user_category_list']=list(user_category_list)
                 request.session['user_parent_boundary_list']=list(user_parent_boundary_list)
