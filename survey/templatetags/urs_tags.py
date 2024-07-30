@@ -115,82 +115,38 @@ def make_string(val1, val2):
 
 @register.filter
 def survey_show(survey_id, creation_key):
-
-    from django.db import connection
-    from datetime import datetime
     start_date, end_date = get_financial_year_dates()
     value = False
-    query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@financial_year'.format(survey_id,creation_key)#
-    periodicity= list(Survey.objects.filter(periodicity=7).values_list('periodicity',flat=True))
+    periodicity= list(Survey.objects.filter(periodicity=7).values_list('id',flat=True))
+    periodicity.append(3)
+    query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and js.cluster->>\'BeneficiaryResponse\' = \'{0}\' @@financial_year @@survey_id'.format(creation_key)#
     if survey_id in periodicity: 
         query=query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
     else:
         query=query.replace("@@financial_year","")
-    if not survey_id in [9,5,6,7,8,11]:
-        secondary_query= query
-    object_lists=JsonAnswer.objects.raw(query)
-    primary_query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@financial_year'.format(3,creation_key)#
-    primary_query=primary_query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
-    
-    if object_lists:
-        obj=1
-        for obj in object_lists:
-            datas = json.loads(obj.extra_config)
-            keys = datas["rule_engine"][0] if "rule_engine" in datas else ''
-            if keys:
-                if survey_id in [3,4]:
-                    survey_key = keys['survey_id'] if keys['survey_id'] is not None and keys['survey_id'] !=0  else survey_id
-                else:
-                    survey_key = survey_id
-                    
-                query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@financial_year'.format(survey_key,creation_key)#
-                
-                if survey_key in periodicity:
-                    query=query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
-                else:
-                    query=query.replace("@@financial_year","")
-    else:
-        items = {'4':3,'7':4,'5':4,'6':4,'8':4,'9':4,'3':3,'10':10,'11':4}    
-        survey_key = items[str(survey_id)]
-        
-        query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} and js.cluster->>\'BeneficiaryResponse\' = \'{1}\' @@financial_year'.format(survey_key,creation_key)#
-        if survey_key in [3,4,5]:
-            query=query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
-        else:
-            query=query.replace("@@financial_year","")
-    primary_result = get_result_query(primary_query)
-    results = get_result_query(query)
-    primary=0
-    secondary=0
-    if survey_id in [9,5,6,7,8,11]:
-        secondary_query= query
-    if len(primary_result) == 1:
-        if survey_id !=3:
-            query="""with a as ("""+query+""") select coalesce(sum(case when response->>'250' in ('154','155') or a.response->>'252' in ('162','163') then 1 else 0 end),0) as ht from a"""
-            results = get_result_query(query)
-            primary = results[0][0]
-        if primary == 0 and survey_id !=3 and len(results) == 1:
-            secondary_result = get_result_query(secondary_query)
-            secondary = len(secondary_result)
-            referred_to_hospital="""with a as ("""+secondary_query+""") select coalesce(sum(case when response->>'284'='180' then 1 else 0 end),0) as ht from a"""
-            referred_to_hospital_result = get_result_query(referred_to_hospital)
-            all_result = referred_to_hospital_result[0][0]
-        if len(results) == 0 and survey_id == 3:
-            value = True
-        elif primary == 0 and secondary !=0 and len(results) == 1 and survey_id == 4:
-            value = False
-        elif primary == 0 and secondary == 0 and survey_id == 4 and len(results) == 1:
-            value = True
-        elif primary == 0 and survey_id == 4:
-            value = False
-        elif survey_id in [9,5,6,7,8,11]:
-            if all_result == 1 and survey_id in [9,5,6,7,8,11]:
+    primary_vlu=query.replace("@@survey_id","and s.id = '{0}'".format(3))
+    primary_query="""with a as ("""+primary_vlu+""") select coalesce(sum(case when response->>'250' in ('154','155') or a.response->>'252' in ('162','163') then 1 else 0 end),0) as ht from a"""
+    primary = len(get_result_query(primary_vlu)) 
+    primary_result = get_result_query(primary_query)[0][0] if primary != 0 else 1
+    if primary_result == 0:
+        value = True if survey_id == 4 else False
+        secondary_vlu=query.replace("@@survey_id","and s.id = '{0}'".format(4))
+        secondary = len(get_result_query(secondary_vlu))
+        if secondary == 1: 
+            secondary_query="""with a as ("""+secondary_vlu+""") select coalesce(sum(case when response->>'284'='180' then 1 else 0 end),0) as ht from a"""
+            secondary_result = get_result_query(secondary_query)[0][0]
+            value = True if survey_id == 5 else False 
+            if secondary_result == 1 and survey_id in [9,11]:
                 value = True
-            elif all_result == 0 and survey_id in [9,11,8]:
-                value = True
-        elif len(results) == 1 and survey_id == 3:
-            value = False
-    elif len(primary_result) == 0 and survey_id == 3:
+                refferal_vlu=query.replace("@@survey_id","and s.id = '{0}'".format(5))
+                refferal = get_result_query(refferal_vlu)
+                if refferal == 1:
+                    refferal_query="""with a as ("""+refferal_vlu+""") select coalesce(sum(case when response->>'344'='272' then 1 else 0 end),0) as ht from a"""
+                    refferal_result = get_result_query(refferal_query)[0][0]
+                    value = True if survey_id in [9,11] else False
+                    if refferal_result == 1 and survey_id in [6,7,8]:
+                        value = True
+    elif survey_id == 3 and primary == 0:
         value = True
     elif survey_id == 10:
         value = True
