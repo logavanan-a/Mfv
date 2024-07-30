@@ -2121,12 +2121,12 @@ def display_inline_question(ques, json_obj, one_response):
                 one_response[str(ques.text)] = ', '.join(master_list)
             elif ques.api_qtype in ['S', 'R'] and ques.master_question:
                 one_response[str(ques.text)] = MasterLookUp.objects.get(id=json_obj.response.get(str(ques.id))).name
-        elif ques.api_qtype == "RO":
-            user = json_obj.user
-            display_question = Question.objects.get(id=ques.api_json["display_question"])
-            location = OrganizationLocation.objects.get_or_none(user__user=user).location.all()[0]
-            question_options = JsonAnswer.objects.get(survey=display_question.block.survey, cluster__Boundary=str(location.id)).response.get(str(display_question.id))
-            one_response[str(ques.text)] = question_options
+        # elif ques.api_qtype == "RO":
+        #     user = json_obj.user
+        #     display_question = Question.objects.get(id=ques.api_json["display_question"])
+        #     location = OrganizationLocation.objects.get_or_none(user__user=user).location.all()[0]
+        #     question_options = JsonAnswer.objects.get(survey=display_question.block.survey, cluster__Boundary=str(location.id)).response.get(str(display_question.id))
+        #     one_response[str(ques.text)] = question_options
     except:
         pass
     return one_response
