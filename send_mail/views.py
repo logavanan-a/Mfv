@@ -117,11 +117,11 @@ def send_mail(mail_to, mail_subject, mail_content, html_template = None,reply_to
         html_message = convert_safe_text(html_message)
     # message = MIMEMultipart()
     # import ipdb;ipdb.set_trace()
-    message = MIMEMultipart()
+    message = MIMEMultipart('alternative')
     message['From'] = settings.EMAIL_HOST_USER
     message['To'] = ', '.join(to_emails)
     message['Subject'] = str(mail_subject)
-    message.attach(MIMEText(html_message, 'plain'))
+    message.attach(MIMEText(html_message, 'html'))
     # message.attach_alternative(html_message, "text/html")
         
     if reply_to:

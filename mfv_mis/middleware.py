@@ -20,7 +20,7 @@ class CheckPreviousMonthDataSubmissionMiddleware:
         # Check if data has been submitted for the previous month
         user = request.user
         user_group_list = request.session.get('user_group_list',[])
-        user_partner = request.session.get('user_partner_list')
+        user_partner = request.session.get('user_partner_list_roshni',[])
 
         # import ipdb;ipdb.set_trace()
         if user.is_authenticated :

@@ -1,5 +1,7 @@
 from django.contrib import admin
 from .models import *
+from import_export.admin import ImportExportActionModelAdmin,ImportExportModelAdmin, ImportExportMixin
+
 
 # Register your models here.
 
@@ -7,7 +9,7 @@ from .models import *
 admin.site.register(MailData)
 
 @admin.register(MailTemplate)
-class MailTemplateAdmin(admin.ModelAdmin):
+class MailTemplateAdmin(ImportExportActionModelAdmin, admin.ModelAdmin):
     list_display = ['template_name','description','subject','content','created','html_template']
     # fields = ['created','template_name','description','subject','content','html_template']
     # list_filter = ('created_by',)
