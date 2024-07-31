@@ -1460,51 +1460,51 @@ def archive_deleted_dic(obj):
 
 
 from rest_framework import status
+from dashboard.views import send_mail_with_template
 
 class MonthlyDashboardData(g.GenericAPIView):
     queryset = MonthlyDashboard.objects.filter(active=2)
     serializer_class = MonthlyDashboardSerializer
 
     def get_partner(self,user_id):
-        user_with_project = UserProjectMapping.objects.filter(
-            active=2,
-            user_id=user_id,
-            user__groups__id__in=[1],
-            project__application_type_id = 511
-        ).select_related('project__partner_mission_mapping__partner').first()
-        if user_with_project:
-            return user_with_project.project.partner_mission_mapping.partner.id
-        return None
         try:
-            user_id = self.context.get('request').data.get('user_id')
-            return User.objects.get(active=2,user_id = user_id)
-        except User.DoesNotExist:
-            raise serializers.ValidationError("Partner does not exist for the given user_id.")
+            user_with_project = UserProjectMapping.objects.filter(
+                active=2,
+                user_id=user_id,
+                user__groups__id__in=[1],
+                project__application_type_id = 511
+            ).select_related('project__partner_mission_mapping__partner')
+            return list(user_with_project.values_list('project__partner_mission_mapping__partner',flat=True))
+        except:
+            return None
+        # try:
+        #     user_id = self.context.get('request').data.get('user_id')
+        #     return User.objects.get(active=2,user_id = user_id)
+        # except User.DoesNotExist:
+        #     raise serializers.ValidationError("Partner does not exist for the given user_id.")
 
-    def post_request(self, request):
+    def post_request(self, request,user_partner):
         user_id = request.data.get('user_id')
         creation_key = request.data.get('uuid')
         submitted_by = request.user if request.user.is_authenticated else None
-        user_partner = self.get_partner(user_id)
-        if not user_partner:
-            response['status'] = 0
-            response['error'] = {}
-            response['message'] = "Partner does not exist for the given user_id."
+        # if not user_partner:
+        #     response['status'] = 0
+        #     response['error'] = {}
+        #     response['message'] = "Partner does not exist for the given user_id."
         try:
             instance = MonthlyDashboard.objects.get(creation_key=creation_key)
-            serializer = self.get_serializer(instance, data=request.data,context = {'submitted_by':request.data.get('user_id'),'partner':user_partner}, partial=True)
+            serializer = self.get_serializer(instance, data=request.data,context = {'submitted_by':request.data.get('user_id'),'partner':user_partner[0]}, partial=True)
         except:
-            serializer = self.get_serializer(data=request.data,context = {'submitted_by':request.data.get('user_id'),'partner':user_partner})
+            serializer = self.get_serializer(data=request.data,context = {'submitted_by':request.data.get('user_id'),'partner':user_partner[0]})
         
         return serializer
     
-    def pull_request(self, request):
+    def pull_request(self, request,user_partner):
         user_id = request.data.get('user_id')
         remark_modified = request.data.get('r_modified')
         dashboard_modified = request.data.get('d_modified')
         print(remark_modified,dashboard_modified)
-        user_partner = self.get_partner(user_id)
-        dashboard_data = MonthlyDashboard.objects.filter(submitted_by_id = user_id,partner = user_partner,active=2).order_by('modified')
+        dashboard_data = MonthlyDashboard.objects.filter(submitted_by_id = user_id,partner_id__in = user_partner,active=2).order_by('modified')
         remarks = Remarks.objects.filter(active=2,content_type_id = 62,object_id__in=dashboard_data).order_by('modified') #62 is common content type for monthly dashboard in all instance
         if dashboard_modified:
             dashboard_data = dashboard_data.filter(modified__gt=dashboard_modified)
@@ -1518,15 +1518,24 @@ class MonthlyDashboardData(g.GenericAPIView):
 
     def post(self, request, method, *args, **kwargs):
         response = {"status":2,"message":"Success"}
+        user_id = request.data.get('user_id')
+        user_partner = self.get_partner(user_id)
         if method == "pull":
-            serializer, remarks_serializer = self.pull_request(request)
+            serializer, remarks_serializer = self.pull_request(request,user_partner)
             response['data'] = serializer.data
             response['remarks'] = remarks_serializer.data
         elif method == "push":
-            serializer = self.post_request(request)
+            serializer = self.post_request(request,user_partner)
             if serializer.is_valid():
                 serializer.save()
                 response['data'] = serializer.data
+
+                # email trigger for partner admin to get notification
+                # import ipdb;ipdb.set_trace()
+                # dashboard_data
+                # mapping for table of indicator counts
+                dashboard_data = {"No. of Children Screened":serializer.instance.children_covered_count,"No. of Schools Covered":serializer.instance.school_covered_count,"No. of Teachers Trained":serializer.instance.teachers_train_count,"No. of Children Prescribed Spectacles":serializer.instance.children_pres_count,"No. of Children Provided Spectacles":serializer.instance.child_prov_spec_count,"No. of Children Advised to Continue with Same Glasses (PGP)":serializer.instance.pgp_count,"No. of Children Referred to Hospital for Detailed Examination":serializer.instance.children_reffered_count,"No. of Children Provided Spectacles at Hospital":serializer.instance.child_prov_hos_count,"No. of Children Advised Surgery":serializer.instance.children_adv_count,"No. of Children Provided Surgery":serializer.instance.children_prov_sgy_count,"Spectacle Wearing Compliance After 3 Months":serializer.instance.swc_count}
+                send_mail_with_template(request,serializer.instance,dashboard_data,{'user_partner':user_partner,'label':'approve'})
             else:
                 response['status'] = 0
                 response['message'] = f"Please check these fields - {','.join(list(serializer.errors.keys()))}"
