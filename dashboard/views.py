@@ -14,7 +14,6 @@ from send_mail.views import send_mail
 from django.db.models import Case, Value, When, Q , Sum
 from mfv_mis.settings import DASHBOARD_SUBMISSION_DAY
 from uuid import uuid4
-from survey.api_view import MonthlyDashboardData
 import sys, traceback
 import logging
 
@@ -188,6 +187,7 @@ from django.http import HttpRequest, JsonResponse
 import json
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+from rest_framework.request import Request as DRFRequest
 
 @csrf_exempt
 @login_required(login_url="/login/")
@@ -447,12 +447,22 @@ def dashboard_data_approval(request, id):
     return render(request, "survey_forms/activity_submition_view.html", locals())
 
 # mail passing function for approved/created the activities
-def send_mail_with_template(request,monthly_data,dashboard_data):
-    user_group = request.session['user_group_list'][0]
-    partner_list = request.session['user_partner_list_roshni']
-    button = request.POST.get('label')
+def send_mail_with_template(request,monthly_data,dashboard_data,kwargs):
+    if isinstance(request, DRFRequest):
+        user_id = request.data.get('user_id')
+        user_obj = User.objects.get(id=user_id)
+        user_group = list(user_obj.groups.all().values_list('id', flat=True))[0]
+        partner_list = kwargs.get('user_partner')
+        button = kwargs.get('label')
+    else:
+        user_group = request.session['user_group_list'][0]
+        partner_list = request.session['user_partner_list_roshni']
+        button = request.POST.get('label')
+        user_obj = request.user
+
     # key is from role id , if role rejected means which role need to go if approved then which role need to go
     role_with_mail = {
+        1:{'approve':[4]},
         4:{'reject':[1],'approve':[2]},
         2:{'reject':[4],'approve':[1,4]},
         # 3:{'reject':2},
@@ -460,6 +470,7 @@ def send_mail_with_template(request,monthly_data,dashboard_data):
     to_role = role_with_mail.get(user_group).get(button)
     if to_role:
         template_name = f"{user_group}->{','.join(map(str,to_role))}"
+        # import ipdb;ipdb.set_trace()
         mail_template = MailTemplate.objects.get(active=2,template_name=template_name)
         to_email_username = get_next_role_user(partner_list,to_role)
 
@@ -471,7 +482,7 @@ def send_mail_with_template(request,monthly_data,dashboard_data):
             to_users_and_email[name] = user[3]
         # import ipdb;ipdb.set_trace()
         users_name, to_users_emails = zip(*to_users_and_email.items())
-        from_username = f"{request.user.get_full_name()} ({request.user.username})" if request.user.get_full_name() else request.user.username
+        from_username = f"{user_obj.get_full_name()} ({user_obj.username})" if user_obj.get_full_name() else user_obj.username
 
         if users_name and to_users_emails:
             table_html = render_to_string('mailer/table_for_dashboard_data.html', {'dashboard_data': dashboard_data})
