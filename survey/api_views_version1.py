@@ -250,79 +250,6 @@ def add_survey_answers_version_1(request, **kwargs):
                     if response_id or duplicate_status == "0":
                         status, res = create_answers_version1(
                             user, response, **ans_params)
-                        # if not response_id:
-                        #     create_user_for_mediacontent(
-                        #         val, survey_ids, res.id)
-
-                        # ######### condition for work flow module ############
-                        # # 58 is the json answer content type
-                        # role_type = UserRoles.objects.get(user=user).role_type.first()
-                        # role_workflow_linkage = WrokflowStateRoleRelation.objects.filter(
-                        #     content_type_id=58, active=2).values('state_id', 'role_id')
-                        # role_workflow_dict = { item['state_id']: item['role_id'] for item in role_workflow_linkage}
-                        # role_based_states = [item['state_id'] for item in role_workflow_linkage if item['role_id'] == role_type.id]
-                        # wf = Workflow.objects.get_or_none(content_type_id=58,initial_state_id__in=role_based_states,active=2)
-                        # #,initial_state_id__in=role_based_states,file_flow=Question.objects.filter(block__survey=survy,qtype__in=['I','F'],active=2).exists()
-                        # file_flow = bool(Question.objects.filter(block__survey=survy,qtype__in=['I','F'],active=2))
-                        # survy = Survey.objects.get(id=int(survey_ids))
-                        # if wf and bool(survy.survey_type):
-                        #     meta_query = {"source_state":wf.initial_state,"workflow":wf, "active":2}
-                        #     if submitted_approval:
-                        #         meta_query.pop('source_state')
-                        #         updated_record_email_ids.update({res.id:[user.email,res,role_type.name]})
-                                
-                        #     meta = TransitionMeta.objects.filter(**meta_query).order_by('source_state__order')
-
-                        #     #not including the file questions in the survey
-                        #     if not file_flow:
-                        #         meta = meta.exclude(destination_state_id=6).exclude(source_state_id=6) # 6= account officer state
-                        #     #included the file with submitted for approval
-                        #     elif file_flow :
-                        #         meta = meta.exclude(source_state_id__in=[1,3],destination_state_id__in=[1,3]) # regional role state
-                        #     # elif file_flow and submitted_approval :
-                        #     #     meta = meta.exclude(destination_state_id=1)
-                        #     current_status = wf.initial_state
-                        #     for mt in meta:
-                        #         status = 0
-
-                        #         if wf.initial_state == mt.source_state and submitted_approval:
-                        #             status = 2
-                        #             current_status = mt.destination_state
-                        #         obj,created = TransitionCollection.objects.update_or_create(source_state=mt.source_state, destination_state=mt.destination_state,
-                        #                                                     content_type_id=58, object_id=res.id, 
-                        #                                                     defaults={
-                        #                                                     "current_state":current_status,
-                        #                                                     "status":status ,})
-                        #         if created:
-                        #             obj.user = user
-                        #             obj.role_id = role_workflow_dict.get(mt.source_state.id)
-                        #             obj.save()
-
-                        #         response_current_status.update({res.id:current_status})
-                        # # if submitted_approval:
-                        #     # role_type = user_role.
-                        #     # role_based_states = WrokflowStateRoleRelation.objects.filter(role_id__in=role_type).values_list('state_id', flat=True)
-                        #     # transition_collection = TransitionCollection.objects.filter(object_id=res_id,current_state_id__in=role_based_states).update(status=2)
-                        
-                        # # If village level user created the beneficiaries need to get approval from the cluster level user
-                        # if not bool(survy.survey_type):# and val.get('approved_status',1) == 2
-                        #     # 18 - Village Volunteer
-                        #     # 17 - Programme officer
-                        #     # 27 - Cluster Incharge
-                        #     beneficiary_resp = BeneficiaryResponse.objects.get_or_none(creation_key=res.creation_key)
-                        #     # if cluster level user created record it should auto approve
-                        #     if beneficiary_resp and role_type.id in [17, 27]:
-                        #         beneficiary_resp.approval_status = 2
-                        #         beneficiary_resp.approved_by = user
-                        #         beneficiary_resp.approved_on = datetime.now()
-                        #     elif beneficiary_resp and role_type.id in [18]:
-                        #         beneficiary_resp.approval_status = val.get('approved_status',1)
-                        #     beneficiary_resp.save()
-                        #     res.save()
-                        #     approved_by = beneficiary_resp.approved_by.username if beneficiary_resp.approved_by else ''
-                        #     approved_on = beneficiary_resp.approved_on.strftime("%Y-%m-%d %H:%M:%S") if beneficiary_resp.approved_on else ''
-                        #     # import ipdb;ipdb.set_trace()
-                        # ####################################################
 
                         # json_obj = JsonAnswer.objects.get(id=res_id)
                         if files_info:
@@ -575,9 +502,8 @@ def create_answers_version1(user, response_obj, **ans_params):
             ben_answer = BeneficiaryResponse.objects.create(
                 creation_key=app_answer_obj.sample_id, survey=survey)
             ben_answer.beneficiary_type = survey.content_object
-            # from projectmanagement.project_views import get_user_partner
-            partner_obj = None#get_user_partner(user)
-            ben_answer.partner = partner_obj
+            partner_obj = get_user_partner_roshni(user)
+            ben_answer.partner_id = partner_obj
             ben_answer.json_answer_id = int(ansobj.id)
             address = ansobj.response.get('address')
             if address:
@@ -603,9 +529,8 @@ def create_answers_version1(user, response_obj, **ans_params):
                     '8') and address_data.get('8') != '' else 0
             ben_answer.save()
             if partner_obj:
-                cluster_dict = {'partner_creation_key':
-                                partner_obj.creation_key,
-                                'partner_id': partner_obj.id,
+                cluster_dict = {
+                                'partner_id': partner_obj,
                                 'beneficiary_type_id': survey.object_id,
                                 'child_reference_id': child_reference_id}
                 if child_reference_id:
@@ -2078,12 +2003,6 @@ def get_address_question(survey):
         address_question = survey.get_parent_beneficiary_address()
     return address_question
 
-def get_user_partner(user_role):
-    if user_role:
-        partner = user_role.partner
-    else:
-        partner = None
-    return partner
 
 def get_content_language_text(content_object, language):
     text = ''

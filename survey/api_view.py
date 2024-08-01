@@ -31,6 +31,7 @@ from collections import defaultdict
 from cache_configuration.views import *
 import logging
 from dashboard.models import MonthlyDashboard,Remarks
+from dashboard.views import get_dashboard_data
 
 logger = logging.getLogger(__name__)
 
@@ -1503,7 +1504,6 @@ class MonthlyDashboardData(g.GenericAPIView):
         user_id = request.data.get('user_id')
         remark_modified = request.data.get('r_modified')
         dashboard_modified = request.data.get('d_modified')
-        print(remark_modified,dashboard_modified)
         dashboard_data = MonthlyDashboard.objects.filter(submitted_by_id = user_id,partner_id__in = user_partner,active=2).order_by('modified')
         remarks = Remarks.objects.filter(active=2,content_type_id = 62,object_id__in=dashboard_data).order_by('modified') #62 is common content type for monthly dashboard in all instance
         if dashboard_modified:
@@ -1534,7 +1534,8 @@ class MonthlyDashboardData(g.GenericAPIView):
                 # import ipdb;ipdb.set_trace()
                 # dashboard_data
                 # mapping for table of indicator counts
-                dashboard_data = {"No. of Children Screened":serializer.instance.children_covered_count,"No. of Schools Covered":serializer.instance.school_covered_count,"No. of Teachers Trained":serializer.instance.teachers_train_count,"No. of Children Prescribed Spectacles":serializer.instance.children_pres_count,"No. of Children Provided Spectacles":serializer.instance.child_prov_spec_count,"No. of Children Advised to Continue with Same Glasses (PGP)":serializer.instance.pgp_count,"No. of Children Referred to Hospital for Detailed Examination":serializer.instance.children_reffered_count,"No. of Children Provided Spectacles at Hospital":serializer.instance.child_prov_hos_count,"No. of Children Advised Surgery":serializer.instance.children_adv_count,"No. of Children Provided Surgery":serializer.instance.children_prov_sgy_count,"Spectacle Wearing Compliance After 3 Months":serializer.instance.swc_count}
+                dashboard_data = get_dashboard_data(serializer.instance)
+
                 send_mail_with_template(request,serializer.instance,dashboard_data,{'user_partner':user_partner,'label':'approve'})
             else:
                 response['status'] = 0
