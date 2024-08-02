@@ -69,7 +69,7 @@
                                                 {% elif grid_question.qtype == 'T' %}
                                                     <div class="mb-3 " id='skip_{{is_grid_question.id}}_{{grid_question.id}}'>
                                                         {% comment %} <label class="form-label" >{{grid_validation_code}}</label> {% endcomment %}
-                                                        <input type="{% if grid_validation_code.code == 'N' or grid_validation_code.code == 'D'%}number{% else %}text{% endif %}" id="T_{{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}}" name='{{grid_question.id}}' min='{{grid_validation_code.MinMax.min}}' max='{{grid_validation_code.MinMax.max}}' maxlength='{{grid_validation_code.MinMax.max_length}}' minlength='{{grid_validation_code.MinMax.min_length}}' class="form-control grid_question_{{question.id}} {{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}} {% if grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %}" {% if grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %} {% if creation_key and not grid_question.is_editable and response_obj.response and response_obj.response.616 != '619'   %} disabled {% endif %}>
+                                                        <input type="{% if grid_validation_code.code == 'N' or grid_validation_code.code == 'D'%}number{% else %}text{% endif %}" id="T_{{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}}" name='{{grid_question.id}}' min='{{grid_validation_code.MinMax.min}}' max='{{grid_validation_code.MinMax.max}}'    maxlength='{{grid_validation_code.MinMax.max_length}}' minlength='{{grid_validation_code.MinMax.min_length}}' class="form-control grid_question_{{question.id}} {{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}} {% if grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %}" {% if grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %} {% if creation_key and not grid_question.is_editable and response_obj.response and response_obj.response.616 != '619'   %} disabled {% endif %}>
                                                         <div class="invalid-feedback">
                                                             {% if grid_validation_code.message %}{{grid_validation_code.message}}{% else %}Please enter a valid {{grid_question.text}}{% endif %}
                                                         </div>
@@ -111,7 +111,7 @@
                                                             $({{grid_get_inner_questions}}).each(function(index, element) {
                                                                 $("#skip_{{is_grid_question.id}}_"+element).hide();
                                                                 //$('#label_{{is_grid_question.id}}_{{grid_question.id}}').hide();
-                                                                
+                                                                $('#T_{{is_grid_question.id}}_'+element).removeAttr('required');
                                                                 $('#'+element).removeAttr('required');
                                                             });
                                                             $(document).on('change', ".{{is_grid_question.id}}_{{grid_question.id}}", function (event) {
@@ -131,6 +131,7 @@
                                                                     $.each(JSON.parse(ids_for_hide[0]),function(i){
                                                                         $('#S_{{is_grid_question.id}}_'+JSON.parse(ids_for_hide[0])[i]).val(null)
                                                                         required_field=$('#skip_{{is_grid_question.id}}_'+JSON.parse(ids_for_hide[0])[i]).find('.required')
+                                                                        
                                                                         if (required_field.length > 0){
                                                                             required_field.attr('required', 'required')
                                                                         }

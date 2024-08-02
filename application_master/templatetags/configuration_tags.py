@@ -4,6 +4,7 @@ import django
 # import requests
 import urllib3
 from application_master.models import *
+from reports.models import QuietlyReport
 import base64
 from dateutil.relativedelta import relativedelta
 from django import template
@@ -50,6 +51,17 @@ def disply_indicator_values(res_id, ind_id, keys):
     """
     mission_response = MissionIndicatorAchievement.objects.get(id = res_id)
     return mission_response.response.get(keys + str(ind_id))
+
+@register.simple_tag
+def disply_quietly_indicator_values(ind_id,pro_id=None,academic_year=None):
+    """
+    Return the indicator value.
+    """
+    try:
+        quietly_report = QuietlyReport.objects.get(project = pro_id,indicator_id=ind_id,academic_year=academic_year)
+    except:
+        quietly_report = [{'annual_target':0,'q1_target':0,'q2_target':0,'q3_target':0,'q4_target':0,}]
+    return quietly_report
 
 @register.simple_tag
 def disply_indicator_target_values(task_id, ind_id):

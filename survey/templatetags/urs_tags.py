@@ -128,7 +128,7 @@ def survey_show(survey_id, creation_key):
     primary_query="""with a as ("""+primary_vlu+""") select coalesce(sum(case when response->>'250' in ('154','155') or a.response->>'252' in ('162','163') then 1 else 0 end),0) as ht from a"""
     primary = len(get_result_query(primary_vlu)) 
     primary_result = get_result_query(primary_query)[0][0] if primary != 0 else 1
-    # import ipdb; ipdb.set_tnrace()
+    # import ipdb; ipdb.scet_trace()
     if primary_result == 0:
         value = True if survey_id == 4 else False
         secondary_vlu=query.replace("@@survey_id","and s.id = '{0}'".format(4))
@@ -137,16 +137,34 @@ def survey_show(survey_id, creation_key):
             secondary_query="""with a as ("""+secondary_vlu+""") select coalesce(sum(case when response->>'284'='180' then 1 else 0 end),0) as ht from a"""
             secondary_result = get_result_query(secondary_query)[0][0]
             value = False 
-            if secondary_result == 1 and survey_id in [9,11,5]:
-                value = True
+            if secondary_result == 1:
                 refferal_vlu=query.replace("@@survey_id","and s.id = '{0}'".format(5))
                 refferal = len(get_result_query(refferal_vlu))
+                value = True if survey_id in [9,11] else False
                 if refferal == 1:
                     refferal_query="""with a as ("""+refferal_vlu+""") select coalesce(sum(case when response->>'344'='272' then 1 else 0 end),0) as ht from a"""
                     refferal_result = get_result_query(refferal_query)[0][0]
-                    value = True if survey_id in [9,11] else False
-                    if refferal_result == 1 and survey_id in [6,7,8]:
+                    value = False 
+                    if refferal == 1 and survey_id == 5:
+                        value = False 
+                    elif survey_id in [9,11]:
                         value = True
+                    if refferal_result == 1 and survey_id in [6,7,8]:
+                        value = False if refferal == 1 and survey_id == 5 else True
+                        if survey_id == 7:
+                            query=query.replace("@@survey_id","and s.id = '{0}'".format(int(survey_id)))
+                            followup_query="""with a as ("""+query+""") select coalesce(sum(case when response->>'506'='54682' then 1 else 0 end),0) as ht from a"""
+                            followup_result = get_result_query(followup_query)[0][0]
+                            value = True if followup_result == 0 else False
+                        elif survey_id == 8:
+                            query=query.replace("@@survey_id","and s.id = '{0}' order by js.response->>'445'".format(11))
+                            check_to_spectacle_dispensing = json.loads(get_result_query(query)[-1][2]).get('445')
+                            date1 = datetime.strptime(check_to_spectacle_dispensing, '%d-%m-%Y')
+                            current_date = datetime.today()
+                            date_difference = current_date - date1
+                            value = False
+                            if date_difference.days <= 90:
+                                value = True
     elif survey_id == 3 and primary == 0:
         value = True
     elif survey_id == 10:

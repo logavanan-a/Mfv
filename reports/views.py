@@ -4,10 +4,10 @@ import pandas as pd
 import traceback
 import sys
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render, get_list_or_404
+from django.shortcuts import render, redirect,get_list_or_404
 from django.contrib.auth.decorators import login_required
 from django.db import connection
-from .models import ReportMeta
+from .models import ReportMeta, QuietlyReport
 from dashboard.models import DashboardSummaryLog
 from django.contrib.contenttypes.models import ContentType
 from django.template.loader import render_to_string
@@ -116,6 +116,44 @@ def reports_listing(request):
     return render(request, 'reports/reports.html', locals())
     
 
+@ login_required(login_url='/login/')
+def quietly_report(request):
+    heading = 'Quietly Report'
+    from datetime import datetime
+    current_year = datetime.now().year+1
+    academic_year_list = [year for year in range(2022,current_year)]
+    indicator_obj = MasterLookUp.objects.filter(parent_id=512,active=2)
+    district_obj = District.objects.filter(active=2,id__in= Project.objects.filter(active=2).values_list('district_id',flat=True))
+    district_id = request.GET.get('district','')
+    project_id = None
+    if district_id:
+        projetc_obj = Project.objects.filter(active=2,district_id=district_id)
+        project_id = projetc_obj.first().id if projetc_obj.exists() else ''
+    academic_year = request.GET.get('academic_year','')
+    if request.method == "POST":
+        for indicator in indicator_obj:
+            annual_target = request.POST.get('annual_target_'+str(indicator.id),0)
+            q1_target = request.POST.get('q1_target_'+str(indicator.id),0)
+            q2_target = request.POST.get('q2_target_'+str(indicator.id),0)
+            q3_target = request.POST.get('q3_target_'+str(indicator.id),0)
+            q4_target = request.POST.get('q4_target_'+str(indicator.id),0)
+            obj, created=QuietlyReport.objects.update_or_create(
+                    project_id=project_id,
+                    indicator_id=indicator.id,
+                    academic_year=academic_year,
+                    defaults={
+                        "annual_target":annual_target or 0,
+                        "q1_target":q1_target or 0,
+                        "q2_target":q2_target  or 0,
+                        "q3_target":q3_target  or 0,
+                        "q4_target":q4_target or 0
+                    }
+                )
+            obj.save()
+        return redirect('/quietly-report/?district='+str(district_id)+'&academic_year='+str(academic_year))
+
+    return render(request, 'reports/quietly_report.html', locals())
+    
 @ login_required(login_url='/login/')
 def custom_report(request, page_slug):
     rows_per_page = 10

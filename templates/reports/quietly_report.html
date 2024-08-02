@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load report_tags %}
+{% load configuration_tags   %}
+
+
+{% block contents %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form class="dt_adv_search" method="POST"  autocomplete="off">
+                    {% csrf_token %}
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                            <label for="district">District:</label>
+                                <select {%if district_id and academic_year %} disabled {% endif %} class="form-select select2 district" id="district" name="district">
+                                    <option value="" selected>Select</option> 
+                                    {% for district in district_obj %}
+                                        <option value="{{district.id}}"{% if district.id|slugify == district_id %}selected{% endif%}>{{district.name}}</option> 
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                            <label for="academic_year">Academic Year :</label>
+                                <select {% if district_id and academic_year %} disabled {% endif %} class="form-select  academic_year" id="academic_year" name="academic_year">
+                                    <option value="" selected>Select</option> 
+                                    {% for year in academic_year_list %}
+                                        <option value="{{year}}"{% if year|slugify == academic_year %}selected{% endif%}>{{year}}</option> 
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    {% if district_id and academic_year %}
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Indicator</th>
+                                    <th>Annual Target</th>
+                                    <th>Q1 Target</th>
+                                    <th>Q2 Target</th>
+                                    <th>Q3 Target</th>
+                                    <th>Q4 Target</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    {% for indicator in indicator_obj %}
+                                        <tr>
+                                            {% disply_quietly_indicator_values indicator.id project_id academic_year as obj %}                                  
+                                            <td>
+                                                {{indicator.name}}
+                                                <input type="hidden" name="indicator_{{indicator.id}}" value="{{indicator.id}}" onkeypress="return /[0-9]/i.test(event.key)" size="8" maxlength="8" class="form-control" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
+                                            </td>
+                                            <td>
+                                                <input type="number" name="annual_target_{{indicator.id}}" value="{{obj.annual_target|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="8" maxlength="8" class="form-control" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
+                                            </td>
+                                            <td>
+                                                <input type="number" name="q1_target_{{indicator.id}}" value="{{obj.q1_target|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="8" maxlength="8" class="form-control" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
+                                            </td> 
+                                            <td>
+                                                <input type="number" name="q2_target_{{indicator.id}}" value="{{obj.q2_target|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="8" maxlength="8" class="form-control" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
+                                            </td> 
+                                            <td>
+                                                <input type="number" name="q3_target_{{indicator.id}}" value="{{obj.q3_target|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="8" maxlength="8" class="form-control" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
+                                            </td> 
+                                            <td>
+                                                <input type="number" name="q4_target_{{indicator.id}}" value="{{obj.q4_target|default_if_none:''}}" onkeypress="return /[0-9]/i.test(event.key)" size="8" maxlength="8" class="form-control" {% if sub_category.indicator_type == 3 %} readonly {% endif %}>
+                                            </td> 
+                                           
+                                        </tr>
+                                    {% endfor %}  
+                                
+                                </tbody>
+                        </table><br>
+                    </div>
+                    <div class="d-flex justify-content-end gap-3">
+                        <button type="reset" onclick="location.href='/quietly-report/'" class="btn btn-success mr-1 waves-effect waves-float waves-light" tabindex="5">Clear</button>
+                        <button type="submit" class="btn btn-primary mr-1 waves-effect waves-float waves-light" tabindex="5">Save</button>
+                    </div> 
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+$( document ).ready(function() {
+    $('#academic_year, #district').select2().on('select2:select', function() {
+        var district = $('#district').val();               // Get the selected value of the district dropdown
+        var academic_year = $('#academic_year').val();   // Get the selected value of the academic_year dropdown
+        if (district && academic_year) {
+            window.location.href = `/quietly-report/?district=${district}&academic_year=${academic_year}`;
+        }
+    });
+});
+</script>
+{% endblock %}
