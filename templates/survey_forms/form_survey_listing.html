@@ -95,7 +95,7 @@
                             <div class="d-flex justify-content-end">
                                 {% with keystrings_edit=profile_obj.survey.slug|default:survey.slug|make_string:"edit" keystrings_add=profile_obj.survey.slug|default:survey.slug|make_string:"add" %}
                                     {% if not main_add_button and request.user.groups.all.0.id == 1 and profile_obj.survey.id|survey_show:"" %}
-                                        <h4 class="m-0 px-2 pt-2" title='Add'><a href="/configuration/add-survey-form/{{survey.id}}/?ben={{creation_key}}"><span class="bx bx-plus-medical bx-md"></span></a></h4>
+                                        <h4 class="m-0 px-2 pt-2" title='Add'><a {% if survey.id|validation_popup:creation_key != 0 %}onclick="Confirm('{{survey.id|validation_popup:creation_key}}', 'Activate')"{% else %}href="/configuration/add-survey-form/{{survey.id}}/?ben={{creation_key}}"{% endif %}><span class="bx bx-plus-medical bx-md"></span></a></h4>
                                     {% endif %}
                                 {% endwith %}
                                 {% with profile_obj.survey.slug|default:survey.slug|make_string:"delete" as keystrings %}
@@ -233,7 +233,7 @@
                             <div class="d-flex justify-content-end">
                                 {% with profile_obj.survey.slug|default:survey.slug|make_string:"add" as keystrings %}
                                     {% if request.user.groups.all.0.id == 1 and survey.id|survey_show:creation_key %}
-                                    <h4 class="m-0 px-2 pt-2" title='Add'><a href="/configuration/{% if survey.id == 20 %}custom_weekly_data_form{% else %}add-survey-form/{{survey.id}}{% endif %}/?ben={{creation_key}}"><span class="bx bx-plus-medical bx-md"></span></a></h4>
+                                    <h4 class="m-0 px-2 pt-2" title='Add'><a {% if survey.id|validation_popup:creation_key != 0 %}onclick="Confirm('{{survey.id|validation_popup:creation_key}}', 'Activate')"{% else %}href="/configuration/{% if survey.id == 20 %}custom_weekly_data_form{% else %}add-survey-form/{{survey.id}}{% endif %}/?ben={{creation_key}}"{% endif%}><span class="bx bx-plus-medical bx-md"></span></a></h4>
                                     {% endif %}
                                 {% endwith %}
                             </div>
@@ -258,7 +258,7 @@
                                     {% if not hide_button and request.user.groups.all.0.id == 1 and survey.id|survey_show:creation_key %}
                                         <div class='col-6'>
                                             <div class="d-flex justify-content-end">
-                                                <h4 class="m-0 px-2 pt-2" title='Add'><a href="/configuration/{% if survey.id == 20 %}custom_weekly_data_form{% else %}add-survey-form/{{survey.id}}{% endif %}/?ben={{creation_key}}"><span class="bx bx-plus-medical bx-md"></span></a></h4>
+                                                <h4 class="m-0 px-2 pt-2" title='Add'><a {% if survey.id|validation_popup:creation_key != 0  %}onclick="Confirm('{{survey.id|validation_popup:creation_key}}', 'Activate')"{% else %}href="/configuration/{% if survey.id == 20 %}custom_weekly_data_form{% else %}add-survey-form/{{survey.id}}{% endif %}/?ben={{creation_key}}"{% endif %}><span class="bx bx-plus-medical bx-md"></span></a></h4>
                                             </div>
                                         </div>
                                     {% endif %}
@@ -461,4 +461,21 @@
     <!-- Responsive examples -->
     <script src="{% static 'libs/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
     <script src="{% static 'libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
+    <script type="text/javascript" >
+        function Confirm(value, title) {
+            if(parseInt(value) == 3){
+                msg = "Please add Referral Management and try again"
+            }else if(parseInt(value) == 2){
+                msg = "Please add Spectacle Dispensing and try again"
+            }else{
+                msg = "Unable to add this activity"
+            }
+            Swal.fire({
+                title: "Alert!",
+                text: msg,
+                icon: "warning",
+            });
+        }
+
+    </script>
 {% endblock %}
