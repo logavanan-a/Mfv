@@ -28,9 +28,26 @@ def get_menu_list(request):
     """
     Return a list of menus.
     """
-    # import ipdb; ipdb.set_trace()
     group =request.user.groups.all()[0].id
-    return Menus.objects.filter(active = 2, parent=None,group=group).order_by("menu_order")
+    application_type_id=request.session.get('application_type_id')
+    if application_type_id == 510:
+        menus = Menus.objects.filter(active = 2,parent=None,group=group).exclude(id=18).order_by("menu_order")
+    elif application_type_id == 511:
+        menus = Menus.objects.filter(active = 2,parent=None,group=group).exclude(id=1).order_by("menu_order")
+    else:
+        menus = Menus.objects.filter(active = 2, parent=None,group=group).order_by("menu_order")
+    return menus
+
+# @register.simple_tag
+# def get_sub_menus(request):
+#     group =request.user.groups.all()[0].id
+#     application_type_id=request.session.get('application_type_id')
+#     if application_type_id == 510:
+#         menus = Menus.objects.filter(active = 2,group=group).exclude(id=18).order_by("menu_order")
+#     elif application_type_id == 511:
+#         menus = Menus.objects.filter(active = 2,group=group).exclude(id=1).order_by("menu_order")
+#     else:
+#     return Menus.objects.filter(parent=self).order_by('menu_order')
 
 @register.simple_tag
 def disply_financial_year(start_date):
