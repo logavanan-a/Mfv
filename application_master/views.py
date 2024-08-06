@@ -99,6 +99,8 @@ def master_add_form(request, model):
                     'boundary_level_type_id': 1, 
                     'code': instance.id,
                 }
+                boundary_obj = Boundary.objects.create(**boundary_data)
+                boundary_obj.save()
             elif model == 'district':
                 boundary_data = {
                     'name': instance.name,
@@ -106,8 +108,8 @@ def master_add_form(request, model):
                     'parent': Boundary.objects.get(code=instance.state.id, parent__isnull=True),
                     'code': instance.id,
                 }
-            Boundary.objects.create(**boundary_data)
-
+                boundary_obj = Boundary.objects.create(**boundary_data)
+                boundary_obj.save()
             if model == 'project':
                 donor = request.POST.get('donor')
                 ProjectDonorMapping.objects.update_or_create(
