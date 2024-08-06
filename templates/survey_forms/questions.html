@@ -82,7 +82,7 @@
                                     var valueSelected = optionSelected.attr('value');
                                     $.ajax({
                                         type: "GET",
-                                        url: '/manage/ajax/get_master_lookups/',
+                                        url: '/configuration/ajax/get_master_lookups/',
                                         data: {'selected_master':valueSelected,'sm_question':true,'multiple':true},
                                         success: function (result) {
                                             selected_val=$("#{{question.id}}_hidden").val() || ''
