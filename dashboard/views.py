@@ -498,7 +498,7 @@ def send_mail_with_template(request,monthly_data,dashboard_data,kwargs={}):
             cognizant_table_html = ""
             if 14 in donor_list:
                 start_date, end_date = get_financial_year_dates()
-                cognizant_yearly_data = get_count_data(request.user,start_date, end_date)
+                cognizant_yearly_data = get_count_data(user_obj,start_date, end_date)
                 dashboard_yearly_data = get_dashboard_data(cognizant_yearly_data)
                 cognizant_table_html = render_to_string('mailer/table_for_dashboard_data.html', {'dashboard_data': dashboard_yearly_data})
                 cognizant_table_html = convert_safe_text(cognizant_table_html)
