@@ -1799,3 +1799,20 @@ def get_donor_district(request, donor_id):
             result_set.append(
                 {'id': district.id, 'name': district.name,})
         return HttpResponse(json.dumps(result_set))
+
+
+@login_required(login_url='/')
+def get_master_lookups(request):
+    if request.method == 'GET':
+        result_set=[]
+        selected_master = request.GET.get('selected_master')
+        multiple = request.GET.get('multiple', '')
+        sm_question = request.GET.get('sm_question', '')
+        if selected_master:
+            masters=MasterLookUp.objects.filter(skip_question__contains={"multiple_choice_id":[selected_master]}).order_by('name')
+            if not masters:
+                masters=MasterLookUp.objects.filter(choice_id=selected_master).order_by('name')
+            for master in masters:
+                result_set.append({'id':master.id, 'name': master.name,'skip_qid':master.skip_question.get('skip_qid'),'show_qid':master.skip_question.get('show_qid'),'question_id':master.code })
+
+        return HttpResponse(json.dumps(result_set))
