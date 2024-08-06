@@ -60,6 +60,13 @@
   
             font-family: "Poppins", sans-serif;
             }
+            /* Style all input elements of type text */
+            input[type="text"] {
+                text-transform: capitalize;
+            }
+            #username{
+                text-transform: none;
+            }
         </style>
 </head>
 
@@ -138,6 +145,10 @@
             <script src="{% static 'js/pages/form-advanced.init.js'%}"></script>
             <script src="{% static 'libs/sweetalert2/dist/sweetalert2.min.js' %}"></script>
             <script src="{% static 'js/pages/sweet-alerts.init.js' %}"></script>
+            <script src="{% static 'libs/jquery.repeater/jquery.repeater.min.js' %}"></script>
+            <script src="{% static 'js/pages/form-repeater.int.js' %}"></script>
+
+            {% comment %} <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script> {% endcomment %}
 
             {% block extra_javascript %}
             {% endblock %}

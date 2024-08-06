@@ -200,6 +200,7 @@ class Project(BaseContent):
             get_project_donor_mapping_obj = None
         return get_project_donor_mapping_obj
 
+
 class ProjectDonorMapping(BaseContent):
     #-------------------#
     # ProjectDonorMapping model represents a project and donor relationship.

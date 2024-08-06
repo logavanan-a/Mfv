@@ -106,6 +106,24 @@ function name_return_fun(type, group = null) {
     }
 }
 
+
+function enableDateField(field) {
+    if (field.type == "text") {
+        var dateValue = $(field).val();
+        var dateArray = dateValue.split('-');
+        var year = parseInt(dateArray[2], 10);
+        var month = String(parseInt(dateArray[1], 10)).padStart(2, '0');
+        var day = String(parseInt(dateArray[0], 10)).padStart(2, '0');
+        // Create a new Date object with the selected date
+        // var selectedDate = new Date(year, month - 1, day);
+        // Set the input type to "date"
+        field.type = "date";
+
+        // Set the value of the date field to the selected date
+        field.value = year + "-" + month + "-" + day;
+    }
+}
+
 function formating_main_questions(questions, main_ans) {
     $(questions).each(function () {
         inner_ans = {}

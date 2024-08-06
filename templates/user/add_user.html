@@ -12,7 +12,7 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control {% if user_exist_error %} border border-danger {% endif %}" name='username' id="floatingnameInput" {% if username %}value="{{username}}"{% endif %} placeholder="Enter Username" required=""  >
+                                <input type="text" class="form-control {% if user_exist_error %} border border-danger {% endif %}" name='username' id="username" {% if username %}value="{{username}}"{% endif %} placeholder="Enter Username" required=""  >
                                 <label for="floatingnameInput">Enter Username<span class="required-field"></span></label>
                                 <div class="invalid-feedback">
                                     Please enter the username.

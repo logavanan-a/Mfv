@@ -82,7 +82,7 @@
                                     var valueSelected = optionSelected.attr('value');
                                     $.ajax({
                                         type: "GET",
-                                        url: '/manage/ajax/get_master_lookups/',
+                                        url: '/configuration/ajax/get_master_lookups/',
                                         data: {'selected_master':valueSelected,'sm_question':true,'multiple':true},
                                         success: function (result) {
                                             selected_val=$("#{{question.id}}_hidden").val() || ''
@@ -660,6 +660,32 @@
         <button type="submit" id="submitting" name="submitting" class="btn btn-primary w-md">Submit</button>
     </div>
 </form>
+<script>
+    if (parseInt({{survey.id}}) == 8){
+        var data = {{request|get_auto_fill:survey.id|safe}}
+        var date_spectacles_given = data['445'] || '';
+        var glass_power_re_sphere = data['273']?.['275']?.['277'] || '';
+        var glass_power_re_cyl = data['273']?.['275']?.['278'] || '';
+        var glass_power_re_axis = data['273']?.['275']?.['279'] || '';
+        var glass_power_le_sphere = data['273']?.['276']?.['277'] || '';
+        var glass_power_le_cyl = data['273']?.['276']?.['278'] || '';
+        var glass_power_le_axis = data['273']?.['276']?.['279'] || '';
+        $('#355').val(date_spectacles_given)
+        $('#355').prop('readonly',true)
+        $('#T_370_372').val(glass_power_re_sphere)
+        $('#T_370_372').prop('readonly',true)
+        $('#T_370_373').val(glass_power_re_cyl)
+        $('#T_370_373').prop('readonly',true)
+        $('#T_370_374').val(glass_power_re_axis)
+        $('#T_370_374').prop('readonly',true)
+        $('#T_371_372').val(glass_power_le_sphere)
+        $('#T_371_372').prop('readonly',true)
+        $('#T_371_373').val(glass_power_le_cyl)
+        $('#T_371_373').prop('readonly',true)
+        $('#T_371_374').val(glass_power_le_axis)
+        $('#T_371_374').prop('readonly',true)
+    }
+</script>
 <script>
     // function ansLoadFunction() {onsubmit="return ansLoadFunction()"
     $("#survey").submit(function(e) {

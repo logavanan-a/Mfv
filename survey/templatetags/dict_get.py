@@ -6,6 +6,7 @@ from datetime import datetime,date
 from survey.models import JsonAnswer
 # imported register
 import json
+from survey.form_views import get_result_query
 from django.forms.models import model_to_dict
 from mfv_mis.settings import DATE_DISPLAY_FORMAT,MONTH_DISPLAY_FORMAT,INSTANCE_CACHE_PREFIX
 
@@ -232,6 +233,31 @@ def get_dict_header(dictionary):
         return first_value
     except:
         return '-'
+    
+@register.filter
+def get_auto_fill(request,survey_id):
+    ben=request.GET.get('ben','')
+    val=''
+    transformed_dict = {}
+    query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id =11 and js.cluster->>\'BeneficiaryResponse\' = \'{0}\' order by js.response->>\'445\''.format(ben)
+    result = get_result_query(query)
+    if ben:
+        formatted_date = ''
+        if len(result) != 0:
+            date = json.loads(result[-1][2]).get('445')
+            date_obj = datetime.strptime(date, '%d-%m-%Y')
+            formatted_date = date_obj.strftime('%Y-%m-%d')
+        secondary_query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id=4 and js.cluster->>\'BeneficiaryResponse\' = \'{0}\' order by js.response->>\'405\''.format(ben)
+        auto_fill_result = get_result_query(secondary_query)
+        auto_fill_data = {}
+        if len(auto_fill_result) != 0:
+            auto_fill_data = json.loads(auto_fill_result[-1][2]).get('273')
+        transformed_dict = {
+            '445': formatted_date,
+            '273': auto_fill_data
+        }
+    return transformed_dict
+
 
 @register.filter
 def index(lists,idx):
