@@ -60,6 +60,13 @@
   
             font-family: "Poppins", sans-serif;
             }
+            /* Style all input elements of type text */
+            input[type="text"] {
+                text-transform: capitalize;
+            }
+            #username{
+                text-transform: none;
+            }
         </style>
 </head>
 
@@ -79,12 +86,7 @@
         {% block sidebar %}
         {% include 'partials/sidebar.html' %}
         {% endblock %}
-        <style>
-            /* Style all input elements of type text */
-            input[type="text"] {
-                text-transform: capitalize;
-            }
-        </style>
+        
         <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
