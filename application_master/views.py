@@ -556,6 +556,7 @@ def adding_project(request,id):
     districts = District.objects.filter(active=2).order_by('name')
     donors = Donor.objects.filter(active=2)
     partner = Partner.objects.filter(id=id).values_list('id', flat=True)
+    application_type_obj = MasterLookUp.objects.filter(parent_id=509)
     partner_mission = PartnerMissionMapping.objects.filter(partner_id__in=partner)
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -567,6 +568,7 @@ def adding_project(request,id):
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date')
         additional_info = request.POST.get('additional_info')
+        application_type = request.POST.get('application_type')
         
         pro_details = Project.objects.create(
             name=name,
@@ -576,7 +578,7 @@ def adding_project(request,id):
             additional_info=additional_info,
             start_date=start_date,
             end_date=end_date,    
-            application_type_id=510,        
+            application_type_id=application_type,        
         )
         pro_details.save()
         ProjectDonorMapping.objects.update_or_create(

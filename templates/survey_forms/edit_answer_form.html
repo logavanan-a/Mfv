@@ -82,6 +82,15 @@
                     })
                     rep=$('#'+ele).repeater()
                     rep.setList(all_response[ele] || {'':''})
+                    $.each(all_response[ele], function(index, innerObj) {
+                    // Check if the key 352 exists in the inner object
+                        if (innerObj.hasOwnProperty(352)) {
+                            // Push the value associated with key 352 to the array
+                            $('#'+ele).find("[name='group-509["+index+"][352]']").attr('type','date')
+                            const date = `${innerObj[352].split('-')[2]}-${innerObj[352].split('-')[1]}-${innerObj[352].split('-')[0]}`;
+                            $('#'+ele).find("[name='group-509["+index+"][352]']").val(date)
+                        }
+                    });
                 }else{
                     grid_question_ids=Object.keys(all_response[ele] || [])
                     for(var j = 0; j < grid_question_ids.length; j++){
@@ -210,6 +219,6 @@
             })
         });
     })
-        
+   
 </script>
 {% endblock  %}
