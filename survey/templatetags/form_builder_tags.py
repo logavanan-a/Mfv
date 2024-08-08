@@ -1,11 +1,12 @@
 from django.template.defaulttags import register
 from survey.models import Question, Choice
-from datetime import datetime
+from datetime import datetime, timedelta
 from mfv_mis.settings import *
 from cache_configuration.views import *
 from django.db import connection
 import json
 from survey.form_views import load_data_to_cache_choices
+from survey.form_views import get_result_query
 
 
 
@@ -43,6 +44,24 @@ def get_validation_code(q_id):
     return validation_dict
 
 
+@register.filter
+def display_last_date(request, key):
+    ben=request.GET.get('ben','')
+    query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id=7 and js.cluster->>\'BeneficiaryResponse\' = \'{0}\''.format(ben)
+    result = get_result_query(query)
+    latest_date = ''
+    if ben:
+        dates = []
+        for val in result:
+            data = json.loads(val[2]).get('509')
+            values = [sub_dict['352'] for sub_dict in data.values()]
+            dates.extend(values)
+        if len(dates) != 0:
+            date_objects = [datetime.strptime(date, '%d-%m-%Y') for date in dates]
+            latest_date_max_value = max(date_objects)
+            new_date_obj = latest_date_max_value + timedelta(days=1)
+            latest_date = new_date_obj.strftime('%Y-%m-%d')
+    return latest_date
 
 @register.simple_tag
 def get_childs(q_id):

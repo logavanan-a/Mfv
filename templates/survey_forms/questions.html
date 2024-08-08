@@ -6,7 +6,7 @@
     {% for block in blocks %}
         {% get_questions block.id as get_questions %}
         {% if get_questions|length > 0 %}
-            {% if blocks|length > 1 and survey.id != 20 %}
+            {% if blocks|length > 1 and survey.id != 7 %}
                 <div class="row">
                     <div class="col-10">
                         <h3 class='mb-3 mt-1'>{{block.name}}</h3 class='mt-3'>
