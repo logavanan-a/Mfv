@@ -495,7 +495,7 @@ def user_listing(request):
     heading = "User Management"
     search = request.GET.get('search', '')
     user_role_location_config = UserProfile.objects.filter(
-        active=2).order_by('user__username')
+        active=2).order_by('-id')
     groups = Group.objects.all().exclude(id=11)
     if search:
         user_role_location_config = user_role_location_config.filter(user__username__icontains = search, active=2)
