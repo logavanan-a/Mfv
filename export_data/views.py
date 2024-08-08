@@ -64,8 +64,8 @@ def download_file(request):
     school_id = [str(i) for i in request.GET.getlist('schools_id[]') if i != '' ]
     district_ids , school_cluster_benresponse_ids = '',''
     user_details = load_user_details(request)
-    if 'user_partner_list' in request.session:
-        partner_id = request.session['user_partner_list']
+    if 'user_partner_list_roshni' in request.session:
+        partner_id = request.session['user_partner_list_roshni']
     # partnerlist = Partner.objects.filter(id__in=partner_ids).values("id","name")
     if 'user_district_list' in request.session:
         district_ids = request.session['user_district_list']

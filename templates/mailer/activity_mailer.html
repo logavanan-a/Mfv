@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BAJAJ MIS form Responses</title>
+     <style>
+    th, td{padding: 8px;}
+    </style>
+</head>
+<body>
+<p>Dear Admin Team,</p></b>
+<p>The following are the details on the form responses:</p></b>
+{{ content|safe }}
+{% comment %} <div class="table-responsive">
+<table border=1 style="border-collapse: collapse;" class="table">
+    <thead>
+        <tr>
+            <th rowspan="2">Form</th>
+            <th colspan="2">Yesterday's Responses</th>
+            <th colspan="2">Current Week Response</th>
+            <th colspan="2">Current Month Response</th>
+            <th rowspan="2">Total Responses</th>
+        </tr>
+        <tr>  
+            <th>Created</th>  
+            <th>Modified</th> 
+            <th>Created</th>  
+            <th>Modified</th> 
+            <th>Created</th>  
+            <th>Modified</th> 
+        <tr>
+    </thead>
+            <tbody>
+              {{ content|safe }}
+            </tbody>
+                
+           
+    
+</table>
+</div> {% endcomment %}
+</body>
+</html>

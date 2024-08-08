@@ -7,6 +7,7 @@ from survey.models import Survey
 from application_master.models import BoundaryLevel 
 from django.db import connection,transaction
 import json
+from application_master.models import UserProjectMapping
 # Create your views here.
 
 
@@ -118,3 +119,14 @@ def load_data_to_cache_boundary_level():
         boundary_level = list(BoundaryLevel.objects.filter(active=2).order_by('code').values_list('id','code','name'))
         cache_set_with_namespace('RESPONSE_SURVEY_V3', cache_key_boundary_level, boundary_level,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
     return boundary_level
+    
+def get_user_partner_roshni(user):
+    cache_key = 'user_partner_for_'+str(user.id)
+    partner = None#cache.get(settings.INSTANCE_CACHE_PREFIX + cache_key)
+    if not partner:
+        partner = list(set(UserProjectMapping.objects.filter(active=2,user=user,project__application_type_id=511).values_list('project__partner_mission_mapping__partner_id',flat=True).distinct()))
+        if partner:
+            partner = partner[0]
+            cache_set_with_namespace('RESPONSE_SURVEY_V3',cache_key,partner,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
+
+    return partner

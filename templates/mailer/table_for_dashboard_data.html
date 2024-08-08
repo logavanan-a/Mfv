@@ -1,0 +1,18 @@
+<div class="table-responsive width_section">
+    {% comment %} <p class="card-title text-center text-uppercase p-1 mb-1 text-white" style="background-color:#13437e;">Dashboard Data</p> {% endcomment %}
+    <h5 class="card-title groove bg-warning">  </h5>
+    <table id="datatables" class="table table-striped" cellspacing="0" width="100%" style="width:100%;border-collapse: collapse;">
+        <thead class="table-light" >
+            <th>Name</th>
+            <th>Count</th>
+        </thead>
+        <tbody style="vertical-align: middle;">
+            {% for label,value in dashboard_data.items %}
+            <tr>
+                <td>{{label}}</td>
+                <td>{{value|default:"0"}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

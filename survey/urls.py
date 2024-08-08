@@ -2,7 +2,6 @@ from django.urls import path
 from survey.views import *
 from survey.form_views import *
 
-app_name = "survey"
 urlpatterns = [
     path('survey/', Surveys.as_view()),
     path('survey/add/', SurveyAdd.as_view()),
