@@ -35,4 +35,8 @@ urlpatterns = [
     path('project/configuration/details/',ProjectConfigurationDetails.as_view()),
     path('archivedresponses-list/',archive_responses_list,name='archive_api'),
 
+
+    #Monthly dashboard data pull request
+    path('<method>/monthly-dashboard/',MonthlyDashboardData.as_view(),name='Monthly Dashboard'),
+
 ]

@@ -8,6 +8,8 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
 
+from django.contrib.auth.models import AbstractUser
+
 
 # BaseContent model represents a base class for content-related models.
 class BaseContent(models.Model):
@@ -27,7 +29,7 @@ class Menus(BaseContent):
     # slug field is used
     #--------------------#
     name = models.CharField(max_length=100)
-    group = models.ForeignKey(Group, on_delete=models.DO_NOTHING, blank=False, null=False)
+    group = models.ManyToManyField(Group, blank=True)
     slug = models.SlugField(
         "SEO friendly url, use only aplhabets and hyphen", max_length=60,unique=True)
     parent = models.ForeignKey('self',on_delete=models.DO_NOTHING, blank=True, null=True)
@@ -168,6 +170,7 @@ class PartnerMissionMapping(BaseContent):
     def __str__(self):
         return f"{self.partner.name} - {self.mission.name}"
 
+
 class Project(BaseContent):
     #-------------------#
     # Project model represents a project with its name, slug, and additional attributes.
@@ -196,6 +199,7 @@ class Project(BaseContent):
         except:
             get_project_donor_mapping_obj = None
         return get_project_donor_mapping_obj
+
 
 class ProjectDonorMapping(BaseContent):
     #-------------------#
@@ -425,3 +429,11 @@ class MasterLookUp(BaseContent):
     #     else:
     #         locations= ','.join(str(i) for i in locations)
     #     return locations
+LOGIN_CHOICES  = ((1, 'WEB'),(2,"APP"))
+
+class UserProfile(BaseContent):
+    user = models.OneToOneField(User, on_delete = models.CASCADE)
+    phone_no  = models.CharField(max_length=10, blank=True, null=True)
+    login_type  = models.PositiveIntegerField(choices = LOGIN_CHOICES)
+
+    

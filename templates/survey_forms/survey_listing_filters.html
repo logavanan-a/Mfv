@@ -1,0 +1,129 @@
+<form method="GET">
+    <div class='row'>
+        
+        {% for filter in filter_questions %}
+            {% if filter.qtype == 'AW' %}
+                <div class="col-3" >
+                    <div class="mb-2">
+                        <label class="form-label" >Donor</label>
+                        <select class="form-select address_widget"  name="donor" id='donor' 
+                            aria-label="Floating label select example" data-placeholder=" " >
+                            <option selected value=""> </option>
+                            {% for i in donor_obj %}
+                            <option value="{{i.id}}" {% if donor == i.id|slugify %}selected{% endif %}>{{i.name}} </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3" >
+                    <div class="mb-2">
+                        <label class="form-label" >District</label>
+                        <select class=" form-select address_widget"  name="district" id='district' 
+                            aria-label="Floating label select example" data-placeholder=" " >
+                            <option selected value=""> </option>
+                            {% if donor %}
+                            {% for i in  district_obj %}
+                            <option value="{{i.id}}" {% if district == i.id|slugify %}selected{% endif %}>{{i.name}} </option>
+                            {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                    
+                    document.addEventListener('DOMContentLoaded', function() {                          
+                        $('#donor').change(function () {
+                            var optionSelected = $(this).find("option:selected");
+                            var valueSelected  = optionSelected.val();
+                            $.ajax({
+                                type:"GET",
+                                url: '/configuration/ajax/district/'+valueSelected+'/',
+                                success:function(result){
+                                    $("#district option").remove();
+                                    a = '<option selected value="">Choose District Name</option>';
+                                    $("#district").append(a);
+                                    if(JSON.parse(result) == 0){
+                                        $("#district option").remove();
+                                        a = '<option selected value="">No District is mapped to this Donor Name</option>';
+                                        $("#district").append(a);
+                                    }
+                                    else{
+                                        $.each(JSON.parse(result),function(key, value)
+                                        {
+                                            a = '<option value=' + value['id']+'>' + value['name']+'</option>';
+                                            $("#district").append(a);
+                                        });
+                                    }
+                                }
+                            });
+                        });
+                    });
+                </script>
+                
+            {% elif filter.qtype == 'S' %}
+                <div class='col-3'>
+                    <div class=" mb-2">
+                        <label class="form-label" >{{filter.text}}</label>
+                        <select  class="form-select main_filter S_0_0 "  name='{{filter.id}}' id='{{filter.id}}' aria-label="Floating label select example" >
+                            <option selected value=""></option>
+                            {% for choice in filter_choices|get_item:filter.id %}
+                                <option value="{{choice}}" {% if choice|slugify == request_data|get_item_str:filter.id %}selected{% endif %} >{{choice.choice}}{{filter_choices|get_item:filter.id|get_item:choice}}</option>
+                            {% endfor %}
+                        </select>
+                    </div> 
+                </div>
+            {% elif filter.qtype == 'D' %}
+                <div class='col-3'>
+                    <div class=" mb-2">
+                        <label class="form-label" >{{filter.text}}</label>
+                        <input  id='' type="{% if filter.training_config.month %}month{% else %}date{% endif %}" name="{{filter.id}}" class="form-control" value="{{request_data|get_item_str:filter.id}}">
+                    </div> 
+                </div>
+            {% endif %}
+        {% endfor %}
+        <div class='col-3'>
+            <div class="mb-2">
+                <label class="form-label" for="">Search</label>
+                <input  id='' type="search" name="search" class="form-control" value="{{request_data|get_item:'search'|default:''}}" >
+            </div>
+        </div>
+        <div class='col-auto'>
+            <label class="form-label" for=""></label>
+            <div class="mt-2">
+                <input type='submit' class="btn btn-success btn-lg waves-effect waves-light fs-6" value="Go"></input>
+            </div>
+            {% comment %} <div class="col-auto mt-3 ">
+                <button type="reset" id="filter_reset"  class="form-control btn btn-primary waves-effect btn-lg float-right" value="True">Reset</button>
+            </div> {% endcomment %}
+        </div>
+    </div>
+</form>
+<script>
+    $(document).ready(function(){
+        $("select#boundary_1").on("change", function (event) {
+            var optionSelected = $(this).find("option:selected");
+            var valueSelected = optionSelected.attr('value');
+            {% with address_widget_filter|index:0 as qid %} 
+                adres_widget_1(valueSelected,"{{request_data|get_item_str:qid|index:1|safe}}")
+            {% endwith %}
+        })
+        {% for filter in filter_questions %}
+            {% if filter.qtype == 'AW' %}
+                {% for bondary in next_level_boundries %}
+                    options=$("#boundary_{{bondary.id}} > option")
+                    if (options.length == 2){
+                        $('#boundary_{{bondary.id}}').prop("selectedIndex",1).trigger('change')
+                    }else{
+                        options.each(function() {
+
+                            if($(this).val() == '{{request_data|get_item_str:filter.id|index:forloop.counter0 }}'){
+                                $('#boundary_{{bondary.id}}').val($(this).val()).trigger('change')
+                                return false
+                            }
+                        })
+                    }
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    })
+</script>

@@ -8,9 +8,8 @@ from application_master.models import (District, Donor, Menus, Mission,
                                        MissionIndicatorTarget, Partner,
                                        PartnerMissionMapping, Project,
                                        ProjectDonorMapping, ProjectFiles,
-                                       State, UserPartnerMapping,
-                                       UserProjectMapping,MasterLookUp,
-                                       Boundary, BoundaryLevel)
+                                       State, UserPartnerMapping,UserProfile,
+                                       UserProjectMapping,MasterLookUp,Boundary,BoundaryLevel)
 
 # @admin.register(BoundaryLevel)
 # @admin.register(Boundary)
@@ -35,7 +34,7 @@ class AdminBoundary(ImportExportActionModelAdmin, admin.ModelAdmin):
     Custom admin configuration for the 'Partner' model.
     """
     search_fields = ['name', 'slug']
-    list_filter = ['active']
+    list_filter = ['active','boundary_level_type']
 
     def get_list_display(self, request):
         """
@@ -264,7 +263,15 @@ class AdminMenus(ImportExportActionModelAdmin, admin.ModelAdmin):
 
 @admin.register(MasterLookUp)    
 class MasterLookUpAdmin(ImportExportModelAdmin, ImportExportFormat):
-    pass
+    def get_list_display(self, request):
+        """
+        Customize the list display for the admin page.
+        """
+        return [field.name for field in self.model._meta.concrete_fields]
+
+@admin.register(UserProfile)    
+class UserProfileAdmin(ImportExportModelAdmin, ImportExportFormat):
+    list_display = ['user']
     
 # from django.apps import apps
 
@@ -277,11 +284,3 @@ class MasterLookUpAdmin(ImportExportModelAdmin, ImportExportFormat):
 #         admin.site.register(model)
 #     except admin.sites.AlreadyRegistered:
 #         pass
-
-# @admin.register(BoundaryLevel)
-# class AdminBoundaryLevel(ImportExportActionModelAdmin, admin.ModelAdmin):
-#     search_fields = ['name',]
-
-# @admin.register(Boundary)
-# class AdminBoundary(ImportExportActionModelAdmin, admin.ModelAdmin):
-#     search_fields = ['name',]

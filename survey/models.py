@@ -1303,7 +1303,7 @@ class Choice(BaseContent):
     skip_question = models.ManyToManyField(Question, related_name='skip_question')
     language_code = models.JSONField(default=dict,**OPTIONAL)
     is_other_choice = models.BooleanField(default=False)
-    config = models.JSONField('Configurations', default=dict, **OPTIONAL)
+    config = models.JSONField('Configurations', default=list, **OPTIONAL)
     code_display = models.IntegerField(default=0,null=True, blank=True)
     score = models.FloatField(default=0,null=True, blank=True)
     # boundary=models.ManyToManyField(Boundary)

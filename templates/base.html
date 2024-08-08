@@ -39,6 +39,9 @@
     <link href="{% static 'css/app.min.css' %}" id="app-style" rel="stylesheet" type="text/css" />
     {% endblock css %}
     <style>
+        .logo-light {
+            display: block;
+        }
         table, th, td {
           border: 1px solid rgba(0, 0, 0, 0.87);
           border-collapse: collapse;
@@ -52,11 +55,23 @@
         .modal-footer {
             border-top: 0px;
         }
+        .table thead th {background-color: #DBD4FE};
+        * {
+  
+            font-family: "Poppins", sans-serif;
+            }
+            /* Style all input elements of type text */
+            input[type="text"] {
+                text-transform: capitalize;
+            }
+            #username, #password{
+                text-transform: none;
+            }
         </style>
 </head>
 
 
-<body data-sidebar="dark">
+<body >
 
     <!-- Begin page -->
     
@@ -82,8 +97,17 @@
                     <div class="row">   
                         <div class="col-12">
                             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h2 class="mb-sm-0 font-size-17"><b>&nbsp;{{heading}} </b><span class="mb-sm-0 font-size-16">{% if mission_obj.short_description %}: &nbsp;{{mission_obj.short_description}}{% endif %}</span></h2>
-                            </div>
+                                {% if heading in 'Student Details' %}
+                                <div>
+                                    <h2 class="mb-sm-0 font-size-20"><b>&nbsp;{{heading}} </b><span class="mb-sm-0 font-size-16">{% if mission_obj.short_description %}: &nbsp;{{mission_obj.short_description}}{% endif %}</span></h2>
+                                </div>
+                                <div style="width: 30%;">
+                                    {% include "survey_forms/activity_dropdown.html" %}
+                                </div>
+                                {% else %}
+                                <h2 class="mb-sm-0 font-size-20"><b>&nbsp;{{heading}} </b><span class="mb-sm-0 font-size-16">{% if mission_obj.short_description %}: &nbsp;{{mission_obj.short_description}}{% endif %}</span></h2>
+                                {% endif %}
+                            </div>  
                         </div>              
                     </div>
     {% endif %}  
@@ -119,12 +143,36 @@
             <script src="{% static 'js/pages/form-validation.init.js' %}"></script>
             <script src="{% static 'libs/parsleyjs/dist/parsley.min.js' %}"></script>
             <script src="{% static 'js/pages/form-advanced.init.js'%}"></script>
+            <script src="{% static 'libs/jquery.repeater/jquery.repeater.min.js' %}"></script>
+            <script src="{% static 'js/pages/form-repeater.int.js' %}"></script>
+
+            <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
             {% block extra_javascript %}
             {% endblock %}
 
             <script src="{% static 'js/app.js' %}"></script>    
             {% endblock javascript %}
-    
+            <!-- <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const showPopup = "{{ request.session.show_submission_popup|default_if_none:'False'|safe }}";
+                    var currentUrl = window.location.pathname;
+                    var urlSegments = currentUrl.split('/');
+                    console.log(showPopup)
+                    if (showPopup && (urlSegments.includes("add-survey-form") || urlSegments.includes("edit-survey-form")) ) {
+                        Swal.fire({
+                            title: 'Attention!',
+                            text: 'You need to submit data for the previous month. Click OK to proceed.',
+                            icon: 'warning',
+                            confirmButtonText: 'OK',
+                            allowOutsideClick: false,
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = "/dashboard/monthly-dashboard/new/";
+                            }
+                        });
+                    }
+                });
+            </script> -->
         </body>
-
     </html>

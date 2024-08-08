@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from django.core.exceptions import ObjectDoesNotExist
 
 # import requests
 from application_master.models import (District, Donor, Menus, Mission,
@@ -8,7 +9,7 @@ from application_master.models import (District, Donor, Menus, Mission,
                                        MissionIndicatorTarget, Partner,
                                        PartnerMissionMapping, Project,
                                        ProjectDonorMapping, ProjectFiles,
-                                       State, UserPartnerMapping, UserProjectMapping)
+                                       State, UserPartnerMapping, UserProjectMapping,UserProfile)
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user, login, logout
@@ -61,50 +62,52 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            if user.groups.filter(name__in = ['Partner Data Entry Operator','Partner Admin','Project In-charge']).exists():# project incharge
-                user_project=UserProjectMapping.objects.filter(user=request.user,active=2)
-                user_project_ids = user_project.values_list('project__id',flat=True)
-                user_partner_id = user_project.values_list('project__partner_mission_mapping__partner_id',flat=True)
-                user_mission_id = user_project.values_list('project__partner_mission_mapping__mission_id',flat=True)
-                # partner_mission_mapping=PartnerMissionMapping.objects.filter(partner__id__in=user_partner_id,active=2)
-                # usr -> project -> partner --> mission
-                # partner_mission_mapping_ids=partner_mission_mapping.values_list('id',flat=True)
-                # user_mission_id=partner_mission_mapping.values_list('mission_id',flat=True)
-                # user_project_ids=Project.objects.filter(partner_mission_mapping_id__in=partner_mission_mapping_ids,active=2).values_list('id',flat=True)
-                user_donor_id=ProjectDonorMapping.objects.filter(project__id__in=user_project_ids,active=2).values_list('donor__id',flat=True).distinct()
-                user_category_list=MissionIndicatorCategory.objects.filter(mission__id__in=user_mission_id,active=2).values_list('id',flat=True)
+            if UserProfile.objects.filter(user=user,login_type=1).exists():
+                if user.groups.filter(name__in = ['Partner Data Entry Operator','Partner Admin','Project In-charge']).exists():# project incharge
+                    user_project=UserProjectMapping.objects.filter(user=request.user,active=2).select_related('project','project__partner_mission_mapping','project__partner_mission_mapping__partner','project__partner_mission_mapping__mission','project__district','project__district__state')
+                    application_type_id = user_project.first().project.application_type_id
+                    user_project_ids = user_project.values_list('project__id',flat=True)
+                    user_partner_list_roshni = user_project.filter(project__application_type_id=511).values_list('project__partner_mission_mapping__partner_id',flat=True)
+                    user_partner_id = user_project.values_list('project__partner_mission_mapping__partner_id',flat=True)
+                    user_mission_id = user_project.values_list('project__partner_mission_mapping__mission_id',flat=True)
 
-            # elif user.groups.filter(name__in = ['M & E']).exists():
-            #     user_project_ids=UserProjectMapping.objects.filter(user=request.user,active=2).values_list('project_id',flat=True)
-            #     user_partner_id=UserPartnerMapping.objects.filter(user=request.user,active=2).values_list('partner__id',flat=True)
-            #     partner_mission_ids=Project.objects.filter(id__in=user_project_ids,active=2).values_list('partner_mission_mapping_id',flat=True)
-            #     user_mission_id=PartnerMissionMapping.objects.filter(id__in=partner_mission_ids,active=2).values_list('mission_id',flat=True)
-            #     user_donor_id=ProjectDonorMapping.objects.filter(project__id__in=user_project_ids,active=2).values_list('donor__id',flat=True).distinct()
-            #     user_category_list=MissionIndicatorCategory.objects.filter(mission__id__in=user_mission_id,active=2).values_list('id',flat=True)
-
-            elif user.is_superuser:
-                user_mission_id=Mission.objects.filter(active=2).values_list('id',flat=True)
-                user_project_ids=Project.objects.filter(active=2).values_list('id',flat=True)
-                user_partner_id=Partner.objects.filter(active=2).values_list('id',flat=True)
-                user_donor_id=Donor.objects.filter(active=2).values_list('id',flat=True).distinct()
-                user_category_list=MissionIndicatorCategory.objects.filter(active=2).values_list('id',flat=True)
-            
-            request.session['user_mission_list']=list(user_mission_id)
-            request.session['user_project_list']=list(user_project_ids)
-            request.session['user_partner_list']=list(user_partner_id)
-            request.session['user_donor_list']=list(user_donor_id)
-            request.session['user_category_list']=list(user_category_list)
-
-            try:
-                #need to check if used or not and remove 
-                user_partner = UserPartnerMapping.objects.get(user = user)
-                partner_mission_mapping_id = PartnerMissionMapping.objects.filter(mission__id__in= [1,2],partner=user_partner.partner).values_list('id', flat = True)
-                request.session['user_partner'] = user_partner.partner.name
-                request.session['partner_mission_mapping_id'] = list(partner_mission_mapping_id)
+                    user_donor_id=ProjectDonorMapping.objects.filter(project__id__in=user_project_ids,active=2).values_list('donor__id',flat=True).distinct()
+                    user_category_list=MissionIndicatorCategory.objects.filter(mission__id__in=user_mission_id,active=2).values_list('id',flat=True)
+                    user_parent_boundary_list = user_project.values_list('project__district__state_id',flat=True)
+                    user_boundary_list = user_project.values_list('project__district_id',flat=True)
+                elif user.is_superuser:
+                    user_mission_id=Mission.objects.filter(active=2).values_list('id',flat=True)
+                    user_project_ids=Project.objects.filter(active=2).values_list('id',flat=True)
+                    application_type_id = 0
+                    user_partner_list_roshni = user_project_ids.filter(application_type_id=511).values_list('partner_mission_mapping__partner_id',flat=True)
+                    user_partner_id=Partner.objects.filter(active=2).values_list('id',flat=True)
+                    user_donor_id=Donor.objects.filter(active=2).values_list('id',flat=True).distinct()
+                    user_category_list=MissionIndicatorCategory.objects.filter(active=2).values_list('id',flat=True)
+                    user_parent_boundary_list = State.objects.filter(active=2).values_list('id',flat=True)
+                    user_boundary_list = District.objects.filter(active=2).values_list('id',flat=True)
                 
-            except:
-                user_partner = ''              
-            return redirect('/task-list/')
+                request.session['application_type_id']=application_type_id
+                request.session['user_mission_list']=list(user_mission_id)
+                request.session['user_project_list']=list(user_project_ids)
+                request.session['user_partner_list']=list(user_partner_id)
+                request.session['user_partner_list_roshni']=list(user_partner_list_roshni)
+                request.session['user_donor_list']=list(user_donor_id)
+                request.session['user_category_list']=list(user_category_list)
+                request.session['user_parent_boundary_list']=list(user_parent_boundary_list)
+                request.session['user_boundary_list']=list(user_boundary_list)
+                request.session['user_group_list']=list(user.groups.all().values_list('id', flat=True))
+                try:
+                    #need to check if used or not and remove 
+                    user_partner = UserPartnerMapping.objects.get(user = user)
+                    partner_mission_mapping_id = PartnerMissionMapping.objects.filter(mission__id__in= [1,2],partner=user_partner.partner).values_list('id', flat = True)
+                    request.session['user_partner'] = user_partner.partner.name
+                    request.session['partner_mission_mapping_id'] = list(partner_mission_mapping_id)
+                    
+                except:
+                    user_partner = ''              
+                return redirect('/task-list/')
+            else:
+                error_message = "Please contact administrator."
         else:
             error_message = "Invalid Username and Password"
     return render(request, 'login.html', locals())
@@ -491,8 +494,8 @@ def user_listing(request):
     """
     heading = "User Management"
     search = request.GET.get('search', '')
-    user_role_location_config = UserPartnerMapping.objects.filter(
-        active=2).order_by('user__username')
+    user_role_location_config = UserProfile.objects.filter(
+        active=2).order_by('-id')
     groups = Group.objects.all().exclude(id=11)
     if search:
         user_role_location_config = user_role_location_config.filter(user__username__icontains = search, active=2)
@@ -513,40 +516,11 @@ def add_user(request, user_location=None):
     Renders the add user page and handles the creation of a new user.
     """
     heading = "Add User"
-    groups = Group.objects.filter(id__in=[2,3])
+    groups = Group.objects.filter()
     partners = Partner.objects.all()
 
-    if True:
-        if request.method == 'POST':
-            try:
-                data = request.POST
-                username = data.get('username')
-                password = data.get('password1')
-                partner = data.get('partner')
-                user_role = data.get('user_role')
-                first_name = data.get('first_name')
-                last_name = data.get('last_name')
-                email = data.get('email')
-
-                user = User.objects.create_user(username, password)
-
-                user.email =  email
-                user.first_name = first_name
-                user.last_name = last_name
-                user.groups.add(Group.objects.get(id = user_role ))
-                user.save()
-
-                user_role_config = UserPartnerMapping.objects.create(
-                    user=user, partner = Partner.objects.get(id = partner)
-                )
-
-                return redirect('mis:user_listing')
-            except ObjectDoesNotExist:
-                return redirect('mis:add_user')
-            return redirect('mis:user_listing')
-        return render(request, 'user/add_user.html', locals())
-    else:
-        if request.method == 'POST':
+    if request.method == 'POST':
+        try:
             data = request.POST
             username = data.get('username')
             password = data.get('password1')
@@ -555,26 +529,65 @@ def add_user(request, user_location=None):
             first_name = data.get('first_name')
             last_name = data.get('last_name')
             email = data.get('email')
-
+            login_type = data.get('login_type')
+            mobile_no = data.get('mobile_no')
             if User.objects.filter(username__iexact=username).exists():
-                user_location = None
                 user_exist_error = 'Username already exist'
-            else:
-                selected_role_model = user_group_dict.get(
-                    user_role)._meta.model_name
-                states = State.objects.filter(active=2)
-                heading = username  # + ' - '+selected_group.name
-            return render(request, 'user/add_user.html', locals())
-        return render(request, 'user/add_user.html', locals())
+                return render(request, 'user/add_user.html', locals())
+            if email and User.objects.filter(email__iexact=email).exists():
+                email_error = 'Email already exist'
+                return render(request, 'user/add_user.html', locals())
+            if UserProfile.objects.filter(phone_no__iexact=mobile_no).exists():
+                mobile_no_error = 'Mobile no already exist'
+                return render(request, 'user/add_user.html', locals())
+            user = User.objects.create_user(username=username, password=password)
+            user.email =  email or None
+            user.first_name = first_name or None
+            user.last_name = last_name or None
+            user.groups.add(Group.objects.get(id = user_role ))
+            user.save()
 
+            user_profile=UserProfile.objects.create(user=user, phone_no=mobile_no or None, login_type=login_type)
+            user_profile.save()
+            return redirect('mis:user_listing')
+        except:
+            user.delete()
+            return redirect('mis:add_user')
+    return render(request, 'user/add_user.html', locals())
+    
 @ login_required(login_url='/')
-def user_profile(request, id):
+def user_profile(request, user_id):
     """
     Renders the user profile page.
     """
-    user = User.objects.get(id=id)
-    print(user.last_login,'-----------------------')
+    user = User.objects.get(id=user_id)
+    user_profile_obj = UserProjectMapping.objects.filter(user=user)
+
     return render(request, 'user/user_profile.html', locals())
+
+    
+
+@ login_required(login_url='/')
+def add_map_project(request, user_id):
+    heading = "Add User Project Mapping"
+    partner = Partner.objects.filter()
+    user_profile = UserProjectMapping.objects.filter(user_id=user_id,active=2)
+    vlu=''
+    if user_profile.exists():
+        vlu = user_profile.first().project.partner_mission_mapping.partner.id
+        project = Project.objects.filter(partner_mission_mapping__partner__id=vlu)
+    if request.method == 'POST':
+        project = request.POST.get('project')
+        if not UserProjectMapping.objects.filter(project_id=project,user_id=user_id).exists():
+            user_project_mapping= UserProjectMapping.objects.create(
+                project_id=project,
+                user_id=user_id
+            )
+            user_project_mapping.save()
+            return redirect('/user-profile/'+ str(user_id) + '/')
+        else:
+            error = "Already exist this project"
+    return render(request, 'user/map_project.html', locals())
 
 @ login_required(login_url='/')
 def edit_user(request, id):
@@ -585,8 +598,9 @@ def edit_user(request, id):
     partners = Partner.objects.all()
 
     user = User.objects.get(id=id)
-    user_partner_config = UserPartnerMapping.objects.get(
-        user=user)
+    user_profile = UserProfile.objects.get(user=user)
+    # user_partner_config = UserPartnerMapping.objects.get(
+    #     user=user)
     if request.method == 'POST':
         data = request.POST
         username = data.get('username')
@@ -595,18 +609,35 @@ def edit_user(request, id):
         email = data.get('email')
         user_role = data.get('user_role')
         partner = data.get('partner')
+        login_type = data.get('login_type')
+        mobile_no = data.get('mobile_no')
+        if User.objects.filter(username__iexact=username).exclude(id=user.id).exists():
+            user_location = None
+            user_exist_error = 'Username already exist'
+            return render(request, 'user/add_user.html', locals())
+        if User.objects.filter(email__iexact=email).exclude(id=user.id).exists():
+                user_location = None
+                user_exist_error = 'Email already exist'
+                return render(request, 'user/add_user.html', locals())
+        if UserProfile.objects.filter(phone_no__iexact=mobile_no).exclude(id=user_profile.id).exists():
+            user_location = None
+            user_exist_error = 'Mobile no already exist'
+            return render(request, 'user/add_user.html', locals())
         user.username = username
         user.first_name = first_name
         user.last_name = last_name
         user.email = email
+
         if user_role:
             user.groups.clear()
             user.groups.add( Group.objects.get(id = user_role))
         user.save()
-        
-        if partner:
-            user_partner_config.partner = Partner.objects.get(id = partner)
-        user_partner_config.save()
+        user_profile.phone_no = mobile_no
+        user_profile.login_type = login_type
+        user_profile.save()
+        # if partner:
+        #     user_partner_config.partner = Partner.objects.get(id = partner)
+        # user_partner_config.save()
 
         return redirect('mis:user_profile', id = id)
     

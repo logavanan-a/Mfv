@@ -1,0 +1,178 @@
+{% get_childs question.id as grid_childs %}
+{% get_row_questions question.id as grid_get_row_questions %}
+{% get_column_questions question.id as grid_get_column_questions %}
+{% if grid_childs|length > 0%}
+    <input type="hidden" class='_hidden_grid_question' value='{{question.id}}' id='grid_question_{{question.id}}'>
+        <label class="form-label" id="label_{{question.id}}">{{question.form_question_number|default:''}}. {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+        <div class="row mb-3">
+            <div class="table-responsive" id="skip_{{question.id}}">
+                <table class="table table-bordered table-striped  mb-0" name='{{question.id}}' name='grid_question' id='{{question.id}}'>
+                    <thead>
+                        <tr>
+                            {% if grid_get_row_questions|length > 1 %}<th scope="col"></th>{% endif %}
+                            {% for grid_question in grid_get_column_questions %}
+                                {% if grid_question.id not in skip_questions %}
+                                    <th scope="col" class="text-center">{{grid_question.text}} {% if grid_question.mandatory %}<span class="required-field"></span>{% endif %}</th>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for is_grid_question in grid_childs %}
+                        {% if forloop.counter == 1 and question.mandatory %}
+                            <script>
+                                $(document).ready(function() {
+                                    $('#{{question.id}} tr:eq(1) input').attr('required', true)
+                                    $('#{{question.id}} tr:eq(1) select').attr('required', true)
+                                });
+                            </script>   
+                        {% endif %}
+                        {% if is_grid_question.is_grid %}
+                        <tr>
+                            {% if grid_get_row_questions|length > 1 %}<td class="text-nowrap" scope="row">{{is_grid_question.text}}</td>{% endif %}
+                                {% for grid_question in grid_get_column_questions %}
+                                {% get_validation_code grid_question.id as grid_validation_code %}
+                                {% choice_list grid_question.id as grid_choice_list %}
+                                {% get_inner_questions grid_question.id as grid_get_inner_questions %}
+
+                                    {% if grid_question.id not in skip_questions %}
+                                            <td>
+                                                {% if grid_question.qtype == 'C' %}
+                                                    {% for choice in grid_choice_list %}
+                                                        <div class="form-check mb-3" id='skip_{{grid_question.id}}'>
+                                                            <input class="form-check-input checkbox_C_{{is_grid_question.id}} grid_question_{{question.id}} {{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}} {% if  grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %}" type="checkbox" id="C_{{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}}" value="{{choice.id}}" name='{{grid_question.id}}' {% if grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %}>
+                                                            <label class="form-check-label" for="C_{{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}}">
+                                                                {{choice.choice}}
+                                                            </label>
+                                                        </div>
+                                                        <!-- <script>
+                                                            $(document).ready(function(){
+                                                                $('#{{question.id}}').val('')
+                                                            })
+
+                                                        </script> -->
+                                                    {% endfor %}
+                                                    {% if is_grid_question.mandatory %}
+                                                    <script>
+                                                        $(document).ready(function(){
+                                                            var checkboxes = $('.checkbox_C_{{is_grid_question.id}}');
+                                                            checkboxes.change(function(){
+                                                                if($('.checkbox_C_{{is_grid_question.id}}:checked').length>0) {
+                                                                    checkboxes.removeAttr('required');
+                                                                } else {
+                                                                    checkboxes.attr('required', 'required');
+                                                                }
+                                                            });
+                                                        });                                                        
+                                                    </script>
+                                                    {% endif %}
+                                                {% elif grid_question.qtype == 'T' %}
+                                                    <div class="mb-3 " id='skip_{{is_grid_question.id}}_{{grid_question.id}}'>
+                                                        {% comment %} <label class="form-label" >{{grid_validation_code}} </label> {% endcomment %}
+                                                        <input type="{% if grid_validation_code.code == 'N' or grid_validation_code.code == 'D'%}number{% else %}text{% endif %}" id="T_{{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}}" {% if grid_question.api_json.pattern %} pattern="{{grid_question.api_json.pattern}}" {% endif%} name='{{grid_question.id}}' min='{{grid_validation_code.MinMax.min}}' max='{{grid_validation_code.MinMax.max}}'    maxlength='{{grid_validation_code.MinMax.max_length}}' minlength='{{grid_validation_code.MinMax.min_length}}' class="form-control grid_question_{{question.id}} {{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}} {% if grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %}" {% if grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %} {% if creation_key and not grid_question.is_editable and response_obj.response and response_obj.response.616 != '619'   %} disabled {% endif %}>
+                                                        <div class="invalid-feedback">
+                                                            {% if grid_validation_code.message %}{{grid_validation_code.message}}{% else %}Please enter a valid {{grid_question.text}}{% endif %}
+                                                        </div>
+                                                    </div>
+                                                    {% if grid_question.api_json.auto_calculation_question_ids %}
+                                                        <script>
+                                                            $(document).ready(function(){
+                                                                ids="{{grid_question.api_json.auto_calculation_question_ids}}".split(",")
+                                                                exp="{{grid_question.api_json.exp}}".split(",")
+                                                                var total_field=$('input[name="{{grid_question.api_json.reference_id}}"]')
+                                                                total_field.attr('readonly', 'readonly')
+                                                                $.each(ids, function(index, fieldId){
+                                                                    $('input[name="'+fieldId+'"]').on("keyup", function() {
+                                                                        {% comment %} $('input[name="'+fieldId+'"]').attr('type', 'number') {% endcomment %}
+                                                                        total=auto_calc("{{grid_question.api_json.auto_calculation_question_ids}}".split(","))
+                                                                        total_field.val(total)
+                                                                    })
+                                                                })
+                                                            })
+                                                        </script>
+                                                    {% endif %}
+
+                                                {% elif grid_question.qtype == 'S' %}
+                                                    <div class="mb-3" id='skip_{{is_grid_question.id}}_{{grid_question.id}}'>
+                                                        <select class="form-select grid_question_{{question.id}} {{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}} {% if  grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %}"  name='{{grid_question.id}}' id="S_{{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}}"
+                                                            aria-label="Floating label select example" data-placeholder="" {% if  grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %} {% if creation_key and not grid_question.is_editable and response_obj.response and response_obj.response.616 != '619'   %} disabled {% endif %}>
+                                                            <option selected {% if grid_question.mandatory %}disabled{% endif %} value=""> </option>
+                                                            {% for choice in grid_choice_list %}
+                                                            <option value="{{choice.id}}" class='{{choice.skip_question_ids}}-{{grid_get_inner_questions}}'>{{choice.choice}}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        <div class="invalid-feedback">
+                                                            {% if grid_validation_code.message %}{{grid_validation_code.message}}{% else %}Please enter a valid {{grid_question.text}}{% endif %}
+                                                        </div>
+                                                    </div> 
+                                                    <script>
+                                                        $(document).ready(function () {
+                                                            //skip logic for dropdown when select item
+                                                            $({{grid_get_inner_questions}}).each(function(index, element) {
+                                                                $("#skip_{{is_grid_question.id}}_"+element).hide();
+                                                                //$('#label_{{is_grid_question.id}}_{{grid_question.id}}').hide();
+                                                                $('#T_{{is_grid_question.id}}_'+element).removeAttr('required');
+                                                                $('#'+element).removeAttr('required');
+                                                            });
+                                                            $(document).on('change', ".{{is_grid_question.id}}_{{grid_question.id}}", function (event) {
+                                                                {% comment %} debugger {% endcomment %}
+                                                                if ($(this).val() != '' && $(this).val() != null) {
+                                                                    ids_for_hide=$(this).children("option:selected").attr('class').split("-")
+                                                                    $.each(JSON.parse(ids_for_hide[1]),function(i){
+                                                                        $('#S_{{is_grid_question.id}}_'+JSON.parse(ids_for_hide[1])[i]).val(null)
+                                                                        $('#skip_{{is_grid_question.id}}_'+JSON.parse(ids_for_hide[1])[i]).hide()
+                                                                        //$('#label_'+JSON.parse(ids_for_hide[1])[i]).hide()
+                                                                        //$('table #skip_'+JSON.parse(ids_for_hide[1])[i]).hide()
+                                                                        required_field=$('#skip_{{is_grid_question.id}}_'+JSON.parse(ids_for_hide[1])[i]).find('.required')
+                                                                        if (required_field.length > 0){
+                                                                            required_field.removeAttr('required')
+                                                                        }
+                                                                    })
+                                                                    $.each(JSON.parse(ids_for_hide[0]),function(i){
+                                                                        $('#S_{{is_grid_question.id}}_'+JSON.parse(ids_for_hide[0])[i]).val(null)
+                                                                        required_field=$('#skip_{{is_grid_question.id}}_'+JSON.parse(ids_for_hide[0])[i]).find('.required')
+                                                                        
+                                                                        if (required_field.length > 0){
+                                                                            required_field.attr('required', 'required')
+                                                                        }
+                                
+                                                                        $('#skip_{{is_grid_question.id}}_'+JSON.parse(ids_for_hide[0])[i]).show()
+                                                                        if ($('#skip_{{is_grid_question.id}}_'+JSON.parse(ids_for_hide[0])[i]+' option').filter(':selected').attr('class') != undefined){
+                                                                            show_id=$('#skip_{{is_grid_question.id}}_'+JSON.parse(ids_for_hide[0])[i]+' option').filter(':selected').attr('class').split("-")
+                                                                            $('#skip_{{is_grid_question.id}}_'+JSON.parse(show_id[0])).show()
+                                                                        }
+                                                                    })
+                                                                }
+                                                            })
+                                                        });
+                                                    </script>
+                                                {% elif grid_question.qtype == 'D' %}
+                                                    <div class="mb-3" id='skip_{{grid_question.id}}'>
+                                                        {% comment %} <label class="form-label" >{{grid_question.text}} {% if grid_question.mandatory %}<span class="required-field"></span>{% endif %}</label> {% endcomment %}
+                                                        <input type="date" class="form-control grid_question_{{question.id}} {{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}} {% if  grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %}" pattern="DD/MM/YYYY" name='{{grid_question.id}}' min='{{child_details.child_admission_date|date:"Y-m-d"}}' id="D_{{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}}"  {% if  grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %} {% if creation_key and not grid_question.is_editable and response_obj.response and response_obj.response.616 != '619'   %} disabled {% endif %}>
+                                                        <div class="invalid-feedback">
+                                                            {% if grid_validation_code.message %}{{grid_validation_code.message}}{% else %}Please enter a valid {{grid_question.text}}{% endif %}
+                                                        </div>
+                                                    </div>                                        
+                                                {% elif grid_question.qtype == 'AF' %}
+                                                    <input type="hidden" id='auto_populate' name='auto_populate' value='{{temp_code}}_{{grid_question.id}}'>
+                                                    <div class="col-lg-6 AP_Questions" >
+                                                        <div class=" mb-3 ">
+                                                            {% comment %} <label class="form-label" >{{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label> {% endcomment %}
+                                                            <input id='{{grid_question.id}}' type="text" name="{{grid_question.id}}" class="form-control main_question T_0_0 {% if grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %}" {% if grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %} readonly >
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </td>
+                                    {% endif %}
+                                {% endfor %}
+                        </tr>
+                        {% endif %}
+
+                    {% endfor %}
+                    
+                    </tbody>
+                </table>
+            </div>
+        </div>
+{% endif %}

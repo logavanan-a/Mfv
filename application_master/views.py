@@ -92,35 +92,24 @@ def master_add_form(request, model):
         fields = user_form(request.POST, request.FILES)
         if fields.is_valid():
             instance = fields.save()
-            # instance.code = instance.name
-            # instance.save()
+            
             if model == 'state':
                 boundary_data = {
                     'name': instance.name,
-                    'boundary_level': 1, 
-                    'parent': None,
-                    'content_object': instance,
+                    'boundary_level_type_id': 1, 
+                    'code': instance.id,
                 }
+                boundary_obj = Boundary.objects.create(**boundary_data)
+                boundary_obj.save()
             elif model == 'district':
-                state_id = request.POST.get('state')
-                state_instance = State.objects.get(id=state_id)
-                state_boundary, created = Boundary.objects.get_or_create(
-                    object_id=state_instance.id,
-                    defaults={
-                        'name': state_instance.name,
-                        'boundary_level': 1, 
-                        'udf1': 0,
-                    }
-                )
-
                 boundary_data = {
                     'name': instance.name,
-                    'boundary_level': 2,
-                    'parent': state_boundary,
-                    'content_object': instance,
+                    'boundary_level_type_id': 2,
+                    'parent': Boundary.objects.get(code=instance.state.id, parent__isnull=True),
+                    'code': instance.id,
                 }
-            Boundary.objects.create(**boundary_data)
-
+                boundary_obj = Boundary.objects.create(**boundary_data)
+                boundary_obj.save()
             if model == 'project':
                 donor = request.POST.get('donor')
                 ProjectDonorMapping.objects.update_or_create(
@@ -161,37 +150,14 @@ def master_edit_form(request,model,id):
         instance = forms.save()
 
         if model == 'state':
-            boundary_data = {
-                'name': instance.name,
-                'boundary_level': 1,
-                'parent': None,
-            }
-            boundary_data['content_type'] = ContentType.objects.get_for_model(instance)
-            boundary_data['object_id'] = instance.id
-            Boundary.objects.update_or_create(object_id=instance.id, defaults=boundary_data)
-
-        elif model == 'district':
-            state_id = request.POST.get('state')
-            state_instance = State.objects.get(id=state_id)
-            state_boundary, created = Boundary.objects.get_or_create(
-                object_id=state_instance.id,
-                content_type=ContentType.objects.get_for_model(state_instance),
-                defaults={
-                    'name': state_instance.name,
-                    'boundary_level': 1,
-                    'udf1': 0,
-                }
-            )
-
-            boundary_data = {
-                'name': instance.name,
-                'boundary_level': 2,
-                'parent': state_boundary,
-            }
-            boundary_data['content_type'] = ContentType.objects.get_for_model(instance)
-            boundary_data['object_id'] = instance.id
-            Boundary.objects.update_or_create(object_id=instance.id, defaults=boundary_data)
-            
+            boundary_obj = Boundary.objects.get(code=instance.id,parent__isnull=True)
+            boundary_obj.name = instance.name
+            boundary_obj.save()
+        if model == 'district':
+            boundary_obj = Boundary.objects.get(code=instance.id,parent__isnull=False)
+            boundary_obj.name = instance.name
+            boundary_obj.parent =  Boundary.objects.get(code=instance.state.id, parent__isnull=True)
+            boundary_obj.save()
         if model == 'project':
             donor = request.POST.get('donor')
             proj_donor = ProjectDonorMapping.objects.update_or_create(
@@ -230,6 +196,16 @@ def partner_mission_status_update(request, dpl_id):
     return redirect('/application_master/details/partner/'+str(dpl_data.partner.id)+'/')      
 
 
+def user_project_status_update(request, id, user_id):
+    dpl_data=UserProjectMapping.objects.get(id=id)
+    if dpl_data.active == 2:
+        dpl_data.active = 1
+    else:
+        dpl_data.active = 2
+    dpl_data.save()
+    return redirect('/user-profile/'+str(user_id)+'/')      
+
+
 def master_details_form(request,model,id):
     heading=model
     if model == 'partner':
@@ -238,7 +214,9 @@ def master_details_form(request,model,id):
         user_obj = User.objects.filter(id__in=user_mapping)
         groups_obj = Group.objects.filter(user__in=user_obj).distinct()
         part=Partner.objects.filter(id=id, active=2)
+        missions = Mission.objects.filter(active=2).count()
         parner_mission_obj = PartnerMissionMapping.objects.filter(partner_id__in=part,active=2).order_by('-id')
+        total = parner_mission_obj.count()
         project_map = Project.objects.filter(partner_mission_mapping_id__in = parner_mission_obj,application_type_id=510).order_by('-id')
     elif model == 'project':
         heading="Project"
@@ -247,10 +225,7 @@ def master_details_form(request,model,id):
         groups_obj = Group.objects.filter(user__in=user_obj).distinct()
         project_donor_obj = ProjectDonorMapping.objects.filter(project_id=id).values_list('donor_id', flat=True)
         project_obj = Donor.objects.filter(id__in=project_donor_obj)
-        try:
-            user_mapping = UserPartnerMapping.objects.get(partner_id=model_name).user.id
-        except:
-            user_mapping = ''
+        
     listing_model = apps.get_model(app_label= 'application_master', model_name=model)
     obj=listing_model.objects.get(id=id)
     return render(request, 'user/details_list.html', locals())
@@ -258,39 +233,23 @@ def master_details_form(request,model,id):
 
 def vendor_partner_user_mapping(request,vendor_partner_id,model):
     # heading = 'user profile'
-    if model == 'partner':
-        partner_name=Partner.objects.filter(id=vendor_partner_id)
-        heading = 'User Partner Mapping'
-        try:
-            user_mapping = UserPartnerMapping.objects.filter(partner_id=vendor_partner_id).values_list('user_id', flat=True)
-            user_obj = User.objects.filter(id=vendor_partner_id)
-            groups_obj = Group.objects.filter(user__in=user_obj).distinct()
-            user_group = User.objects.filter(id__in=user_mapping).values_list('groups__id', flat=True)
-            groups = Group.objects.filter(id__in = [1,4]).exclude(id__in=user_group)
-        except:
-            user_mapping = None
-            user_obj = None
-            groups_obj = None
-        
-    if model == 'project':
-        vendor_name=Project.objects.filter(id=vendor_partner_id)
-        heading = 'User Project Mapping'
-        try:
-            user_mapping = UserProjectMapping.objects.filter(project_id=vendor_partner_id).values_list('user_id', flat=True)
-            user_obj = User.objects.filter(id__in=user_mapping)
-            groups_obj = Group.objects.filter(user__in=user_obj).distinct()
-            user_group = User.objects.filter(id__in=user_mapping).values_list('groups__id', flat=True)
-            groups = Group.objects.filter(id = 2).exclude(id__in=user_group)
-        except:
-            user_mapping = None
-            user_obj = None
-            groups_obj = None
+    vendor_name=Project.objects.filter(id=vendor_partner_id)
+    heading = 'User Project Mapping'
+    try:
+        user_mapping = UserProjectMapping.objects.filter(project_id=vendor_partner_id).values_list('user_id', flat=True)
+        user_obj = User.objects.filter(id__in=user_mapping)
+        groups_obj = Group.objects.filter(user__in=user_obj).distinct()
+        user_group = User.objects.filter(id__in=user_mapping).values_list('groups__id', flat=True)
+        groups = Group.objects.filter(id = 2).exclude(id__in=user_group)
+    except:
+        user_mapping = None
+        user_obj = None
+        groups_obj = None
     # if  model == 'partner':
     #     groups = Group.objects.filter(id__in = [1,4])
     # if  model == 'project':
     #     groups = Group.objects.filter(id = 2)
     
-    partners = Partner.objects.all()    
 
     if request.method == 'POST':
         try:
@@ -301,18 +260,24 @@ def vendor_partner_user_mapping(request,vendor_partner_id,model):
             first_name = data.get('first_name')
             last_name = data.get('last_name')
             email = data.get('email')
-
+            login_type = data.get('login_type')
+            mobile_no = data.get('mobile_no')
+            if User.objects.filter(username__iexact=username).exists():
+                user_location = None
+                user_exist_error = 'Username already exist'
+                return render(request, 'user/add_user.html', locals())
+            if UserProfile.objects.filter(phone_no__iexact=mobile_no).exists():
+                user_location = None
+                user_exist_error = 'Mobile no already exist'
+                return render(request, 'user/add_user.html', locals())
             user = User.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name)
             user.groups.add(Group.objects.get(id=user_role))
             user.save()
-            if model == 'partner':
-                user_role_config = UserPartnerMapping.objects.create(user=user, partner_id=vendor_partner_id)
-                user_role_config.save()
-            elif model == 'project':
-                user_role_config = UserProjectMapping.objects.create(user=user, project_id=vendor_partner_id)
-                user_role_config.save()
-
-            return redirect('/application_master/details/'+ str(model) + '/'+ str(vendor_partner_id) + '/')
+            user_role_config = UserProjectMapping.objects.create(user=user, project_id=vendor_partner_id)
+            user_role_config.save()
+            user_profile=UserProfile.objects.create(user=user, phone_no=mobile_no, login_type=login_type)
+            user_profile.save()
+            return redirect('/application_master/details/'+str(model)+'/'+ str(vendor_partner_id) + '/')
         except Exception as e:
             error = f"User is not created. Please try again. Error: {str(e)}"
     return render(request, 'user/add_user_link_to_role.html', locals())
@@ -338,13 +303,14 @@ def partner_mission_mapping(request, partner_id):
     
     if request.method == "POST":
         selected_missions = request.POST.getlist('missions')  
-        for mission_id in selected_missions:
-            part_mission=PartnerMissionMapping.objects.create(
-                partner_id=partner_id,
-                mission_id=mission_id,
-            )
-            part_mission.save()
-        return redirect('/application_master/details/partner/' + str(partner_id) + '/')
+        if selected_missions:
+            for mission_id in selected_missions:
+                part_mission=PartnerMissionMapping.objects.create(
+                    partner_id=partner_id,
+                    mission_id=mission_id,
+                )
+                part_mission.save()
+            return redirect('/application_master/details/partner/' + str(partner_id) + '/')
     
     return render(request, 'user/user_partner_mapping.html',locals())
 
@@ -390,15 +356,11 @@ def edit_user_partner_project(request, id, model):
     partners = Partner.objects.all()
 
     user = User.objects.get(id=id)
-    if model == 'partner':
-        vendor_id = UserPartnerMapping.objects.filter(user_id=user).values_list('partner_id', flat=True)
-        vendor_partner_id = Partner.objects.filter(id__in = vendor_id).first()
-        user_partner_config = UserPartnerMapping.objects.get(user=user)
-    elif model == 'project':
-        vendor_id = UserProjectMapping.objects.filter(user_id=user).values_list('project_id', flat=True)
-        vendor_partner_id = Project.objects.filter(id__in = vendor_id,application_type_id=510).first()
-        user_partner_config = UserProjectMapping.objects.get(user=user)
-
+   
+    vendor_id = UserProjectMapping.objects.filter(user_id=user).values_list('project_id', flat=True)
+    vendor_partner_id = Project.objects.filter(id__in = vendor_id,application_type_id=510).first()
+    user_partner_config = UserProjectMapping.objects.get(user=user)
+    user_profile = UserProfile.objects.get(user=user)
     if request.method == 'POST':
         data = request.POST
         username = data.get('username')
@@ -407,6 +369,20 @@ def edit_user_partner_project(request, id, model):
         email = data.get('email')
         user_role = data.get('user_role')
         partner = data.get('partner')
+        login_type = data.get('login_type')
+        mobile_no = data.get('mobile_no')
+        if User.objects.filter(username__iexact=username).exclude(id=user.id).exists():
+            user_location = None
+            user_exist_error = 'Username already exist'
+            return render(request, 'user/add_user.html', locals())
+        if User.objects.filter(email__iexact=email).exclude(id=user.id).exists():
+                user_location = None
+                user_exist_error = 'Email already exist'
+                return render(request, 'user/add_user.html', locals())
+        if UserProfile.objects.filter(phone_no__iexact=mobile_no).exclude(id=user_profile.id).exists():
+            user_location = None
+            user_exist_error = 'Mobile no already exist'
+            return render(request, 'user/add_user.html', locals())
         user.username = username
         user.first_name = first_name
         user.last_name = last_name
@@ -415,7 +391,9 @@ def edit_user_partner_project(request, id, model):
             user.groups.clear()
             user.groups.add( Group.objects.get(id = user_role))
         user.save()
-       
+        user_profile.phone_no = mobile_no
+        user_profile.login_type = login_type
+        user_profile.save()
         return redirect('/application_master/details/'+ str(model) + '/'+ str(vendor_partner_id.id) + '/')
     return render(request, 'user/edit_user_link_to_role.html', locals())
 
@@ -429,6 +407,14 @@ def get_district(request, state_id):
             result_set.append({'id': district.id, 'name': district.name})
         return JsonResponse(result_set, safe=False)
 
+def get_project(request, partner_id):
+    if request.method == 'GET':
+        result_set = []
+        partner_list =PartnerMissionMapping.objects.filter(partner_id=partner_id,active=2).values_list('id',flat=True)
+        project_obj = Project.objects.filter(partner_mission_mapping_id__in=partner_list, active=2).order_by('name')
+        for project in project_obj:
+            result_set.append({'id': project.id, 'name': project.name})
+        return HttpResponse(json.dumps(result_set))
 
 class LoginAndroidView(APIView):
     serializer_class = LoginAndroidSerializer
@@ -570,6 +556,7 @@ def adding_project(request,id):
     districts = District.objects.filter(active=2).order_by('name')
     donors = Donor.objects.filter(active=2)
     partner = Partner.objects.filter(id=id).values_list('id', flat=True)
+    application_type_obj = MasterLookUp.objects.filter(parent_id=509)
     partner_mission = PartnerMissionMapping.objects.filter(partner_id__in=partner)
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -581,6 +568,7 @@ def adding_project(request,id):
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date')
         additional_info = request.POST.get('additional_info')
+        application_type = request.POST.get('application_type')
         
         pro_details = Project.objects.create(
             name=name,
@@ -590,7 +578,7 @@ def adding_project(request,id):
             additional_info=additional_info,
             start_date=start_date,
             end_date=end_date,    
-            application_type_id=510,        
+            application_type_id=application_type,        
         )
         pro_details.save()
         ProjectDonorMapping.objects.update_or_create(

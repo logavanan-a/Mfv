@@ -20,6 +20,7 @@ from django.db import connection
 from django.utils import timezone
 from collections import defaultdict
 from datetime import datetime
+from dashboard.models import MonthlyDashboard,ArrayField
 # from .new_apis import file_respone_details_v3
 # from configuration_settings.user_location_views import get_higher_level_locations
 # from .serializers import RemarksSerializer,Remarks,ActivityExpensesSerializer
@@ -54,8 +55,9 @@ def new_responses_list_v3(request):
             # user_boundary = list(user_role.get_poject_based_location())
             # loc_list = [str(i) for i in user_boundary]
             # loc_list=[]
-            loc_list = list(UserProjectMapping.objects.filter(active=2, user_id=user_id).values_list('project__district_id', flat=True).distinct())
-            loc_list = list(map(str,loc_list))
+            district_loc_list = list(UserProjectMapping.objects.filter(active=2, user_id=user_id).values_list('project__district_id', flat=True).distinct())
+            loc_list_str = list(map(str,district_loc_list))
+            loc_list = Boundary.objects.filter(active=2,code__in = loc_list_str,boundary_level_type_id=2).values_list('id',flat=True)
             cache_set_with_namespace('RESPONSE_SURVEY_V3', loc_list_cache_key, loc_list, 14400)
             logger.info("## TIME-TRACKER UserID-loc_list::" + str(user_id) + " : " + str(loc_list))
         if len(loc_list) > 0:
@@ -165,7 +167,21 @@ def common_responses_details_v3(responses, user_id,user_role):
         has_activities = True
     if len(ben_survey_in_output) > 0:
         has_beneficiaries = True
-    flag = ""
+
+    # get the status of each record by checking the creation key exists in any of array fields
+    array_fields = [
+        field.name for field in MonthlyDashboard._meta.get_fields()
+        if isinstance(field, ArrayField)
+    ]
+    query = Q()
+    for field in array_fields:
+        query |= Q(**{f"{field}__overlap": responses.values_list('creation_key',flat=True)})
+    filtered_dashboards = MonthlyDashboard.objects.filter(query)
+
+    for i in filtered_dashboards:
+        activity_status_dict.update(i.get_all_array_fields())
+    
+    # flag = ""
     # if has_activities == True:
         # transitions = TransitionCollection.objects.filter(object_id__in=list(responses.values_list('id',flat=True))).values('object_id','current_state_id')
         # activity_approval = {i['object_id']:i['current_state_id'] for i in transitions}
@@ -216,12 +232,12 @@ def common_responses_details_v3(responses, user_id,user_role):
             response_info, ben_aw_meta, ben_survey_in_output)
 
         # beneficiary approval records 
-        ben_records = BeneficiaryResponse.objects.filter(json_answer_id__in = responses)
-        ben_approved_users = dict(ben_records.values_list('json_answer_id','approved_by__username'))
-        for i in ben_records:
-            approved_status_dict.update({i.json_answer_id:i.approval_status})
+        # ben_records = BeneficiaryResponse.objects.filter(json_answer_id__in = responses)
+        # ben_approved_users = dict(ben_records.values_list('json_answer_id','approved_by__username'))
+        # for i in ben_records:
+        #     approved_status_dict.update({i.json_answer_id:i.approval_status})
             # ben_approved_users.update({i.json_answer_id:i.approved_by})
-            ben_approved_on.update({i.json_answer_id:i.approved_on})
+            # ben_approved_on.update({i.json_answer_id:i.approved_on})
     ai_ben_creationkey_dict = {}
     if len(response_info.get("ai_ben_ques")) > 0:
         ai_ben_creationkey_dict = get_beneficiary_creation_keys(
@@ -343,9 +359,9 @@ def common_responses_details_v3(responses, user_id,user_role):
                          'project_id': res.cluster.get('project_id', 0),
                          # approved_status is used for if the activity is only submited or submitted for approved
                          # based on the logged in user , the record current state is same as role type 
-                         'approved_status':approved_status_dict.get(res.id),
+                         'approved_status':approved_status_dict.get(res.creation_key),
                          # activity_status will return the id of record current which state(role)
-                         'activity_status':activity_status_dict.get(res.id,''),
+                         'activity_status':multi_key_dict_get(activity_status_dict,res.creation_key) or 0,
                          # rejected key will return 1 if the record is rejected 
                          'rejected':1 if res.id in rejected_activities else 0,
                          'expenses':{"cash":"","kind":""},#{"cash":json.dumps(cash),"kind":json.dumps(kind)},
@@ -357,6 +373,11 @@ def common_responses_details_v3(responses, user_id,user_role):
 # loop through the resposnes list and group responses based on beneficiaries and activities and
 # identify the surveys ids in the responses for further use to fetch related details
 
+def multi_key_dict_get(d, k):
+    for keys, v in d.items():
+        if k in keys:
+            return v
+    return None
 
 def prepare_responses_info(responses):
     st = datetime.now()
@@ -609,7 +630,7 @@ def get_beneficiary_cluster_info(response_info, ben_aw_meta, ben_survey_in_outpu
             b1.response #>> ('{ address, 1,' || '"""+str(aw_meta.get("aw_qid"))+"""' || ',' ||'""" + str(aw_meta.get("location_level")) + """'|| '}' )::text[] as cluster_id,
             mbd.name as cluster_name
             from survey_jsonanswer b1
-            inner join application_master_district mbd on mbd.id::text = b1.response #>> ('{ address, 1,' ||'"""+str(aw_meta.get("aw_qid"))+"""'|| ',' ||'""" + str(aw_meta.get("location_level"))+"""' || '}')::text[]
+            inner join application_master_boundary mbd on mbd.id::text = b1.response #>> ('{ address, 1,' ||'"""+str(aw_meta.get("aw_qid"))+"""'|| ',' ||'""" + str(aw_meta.get("location_level"))+"""' || '}')::text[]
             where b1.survey_id = """ + str(survey_id) + """ and b1.id in (""" + ','.join(response_info.get(str(survey_id))) + """)"""
             # select b1.id as response_id,
             # b1.response #>> '{ address, 1, 940, 7}' as cluster_id, mbd.name as cluster_name

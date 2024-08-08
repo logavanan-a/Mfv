@@ -13,7 +13,7 @@ import os,re
 from datetime import datetime, timedelta
 from django.db.models import Q
 from django.apps import apps
-from survey.serializers import LabelLanguageTranslationSerializer
+from survey.serializers import LabelLanguageTranslationSerializer,MonthlyDashboardSerializer,RemarksSerializer
 from survey.capture_sur_levels import convert_string_to_date
 import pytz
 # from configuration_settings.user_location_views import user_responses
@@ -30,6 +30,7 @@ from django.conf import settings
 from collections import defaultdict
 from cache_configuration.views import *
 import logging
+from dashboard.models import MonthlyDashboard,Remarks
 
 logger = logging.getLogger(__name__)
 
@@ -78,8 +79,8 @@ def applogin(request, **kwargs):
                                          version_number=request.POST.get('version_number'))
         appdetails_obj.save()
         # userrole_obj = UserRoles.objects.get(user=user)
-        # role_typ = userrole_obj.role_type.all()[0].id
-        # role_nme = userrole_obj.role_type.all()[0].name
+        role_typ = user.groups.all()[0].id
+        role_nme = user.groups.all()[0].name
 #        role_names = [i.name.lower() for i in userrole_obj.role_type.all()]
 #        app_roles = ['community organizer','data entry operator','ceo','vertical specialist', 'field staff', 'master trainer', 'field level officer','development officer','case worker','team lead','director','issac']
 
@@ -89,16 +90,18 @@ def applogin(request, **kwargs):
                      "appVersion": 0,
                      "updateMessage": "New update available, download from playstore",
                      "link": ""}
-        # if userrole_obj.role_type.filter(app_login=True).exists():
+        user_list = UserProjectMapping.objects.filter(user=user,project__application_type__id=511)
+        user_profile = UserProfile.objects.filter(user=user)
+        if role_typ == 1 and user_profile.exists() and user_list.exists():
 
-        response = {
-            'message': "Logged in successfully",
-            'uId': user.id,
-            'first_name': '{} {}'.format(user.first_name, user.last_name),
-            'role_type': 0,
-            'role_name': "",
-            'partner_id': 0,
-        }
+            response = {
+                'message': "Logged in successfully",
+                'uId': user.id,
+                'first_name': '{} {}'.format(user.first_name, user.last_name),
+                'role_type': role_typ,
+                'role_name': role_nme,
+                'partner_id': 0,
+            }
         # elif [i.name.lower() for i in userrole_obj.role_type.all()] in ['data center cordinator', 'admin']:
         #     message = "District Coordinator or admin Logged in"
         # response = {
@@ -108,16 +111,16 @@ def applogin(request, **kwargs):
         #     'role_name': "",
         #     'partner_id': 0,
         # }
-        # else:
-        # response = {
-        #     'message': 'Please contact administrator.',
-        #     'status': 0,
-        #     'uId': 0,
-        #     'role_type': 0,
-        #     'role_name': "",
-        #     'partner_id': 0,
-        #     'response_type': 0,
-        # }
+        else:
+            response = {
+                'message': 'Please contact administrator.',
+                'status': 0,
+                'uId': 0,
+                'role_type': 0,
+                'role_name': "",
+                'partner_id': 0,
+                'response_type': 0,
+            }
         response.update(
             {'updateAPK': updateapk, 'activeStatus': 2, 'forceLogout': 0, })
     else:
@@ -241,8 +244,8 @@ def choicelist(request):
                             'extra_column1': "",
                             'extra_column2': 0,
                             'assessment_pid': int(ch.question.id),
-                            'is_correct_choice':ch.config.get('is_correct_choice') if ch.config.get('is_correct_choice') else 0,
-                            'Rule_engine': ch.get_text_choices_rule_engine(),
+                            'is_correct_choice':0,
+                            'Rule_engine': ch.config,#ch.get_text_choices_rule_engine(),
                             'other_choice': ch.is_other_choice,
                             'code_display': str(ch.code_display) if ch.code_display  else '0',
                             'score':float(ch.score) if ch.score else 0,
@@ -422,7 +425,7 @@ def get_latest_survey_versions(user_id):
                                     "child_datacollection_ids": ','.join(map(str, child_survey)) if child_survey else '',
                                     "survey_categories": [{'id': i.categories.id, 'name': i.categories.name}] if i.categories else [],
                                     "search_filter":search_filter,
-                                    "survey_json":survey_json ,
+                                    "survey_json":[i.extra_config] ,
                                     "add": status,
                                     "is_activist_group": 1 if i.survey_module == 2 else 0,
                                     "activity_expenses":i.extra_config.get('activity_expenses',True) if i.extra_config else True,
@@ -1243,7 +1246,7 @@ def get_levels(request, level):
         user = User.objects.get(id=request.POST.get('uid'))
         boundary_level = {1:State,2:District}
         # tagged_locations = UserProjectMapping.objects.filter(user=user,active=2).select_related('project','project__district','project__district__state')
-        project_mapped_locations = list(UserProjectMapping.objects.filter(user=user,active=2).select_related('project__district').values_list('project__district',flat=True))
+        project_mapped_locations = list(UserProjectMapping.objects.filter(user=user,active=2,project__application_type_id = 511).select_related('project__district').values_list('project__district',flat=True))
         # level_obj = BoundaryLevel.objects.get(code=int(url_level))
         # user_locations = user_projects_locations(user, level_obj)
         tagged_locations = Boundary.objects.filter(boundary_level_type_id=2,code__in=list(map(str,project_mapped_locations))).order_by('modified').select_related('parent','boundary_level_type','parent__boundary_level_type')
@@ -1456,3 +1459,79 @@ def archive_deleted_dic(obj):
     data['active']= 11 
     data['modified']= ''
     return data
+
+
+from rest_framework import status
+
+class MonthlyDashboardData(g.GenericAPIView):
+    queryset = MonthlyDashboard.objects.filter(active=2)
+    serializer_class = MonthlyDashboardSerializer
+
+    def get_partner(self,user_id):
+        user_with_project = UserProjectMapping.objects.filter(
+            active=2,
+            user_id=user_id,
+            user__groups__id__in=[1],
+            project__application_type_id = 511
+        ).select_related('project__partner_mission_mapping__partner').first()
+        if user_with_project:
+            return user_with_project.project.partner_mission_mapping.partner.id
+        return None
+        try:
+            user_id = self.context.get('request').data.get('user_id')
+            return User.objects.get(active=2,user_id = user_id)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("Partner does not exist for the given user_id.")
+
+    def post_request(self, request):
+        user_id = request.data.get('user_id')
+        creation_key = request.data.get('uuid')
+        submitted_by = request.user if request.user.is_authenticated else None
+        user_partner = self.get_partner(user_id)
+        if not user_partner:
+            response['status'] = 0
+            response['error'] = {}
+            response['message'] = "Partner does not exist for the given user_id."
+        try:
+            instance = MonthlyDashboard.objects.get(creation_key=creation_key)
+            serializer = self.get_serializer(instance, data=request.data,context = {'submitted_by':request.data.get('user_id'),'partner':user_partner}, partial=True)
+        except:
+            serializer = self.get_serializer(data=request.data,context = {'submitted_by':request.data.get('user_id'),'partner':user_partner})
+        
+        return serializer
+    
+    def pull_request(self, request):
+        user_id = request.data.get('user_id')
+        remark_modified = request.data.get('r_modified')
+        dashboard_modified = request.data.get('d_modified')
+        print(remark_modified,dashboard_modified)
+        user_partner = self.get_partner(user_id)
+        dashboard_data = MonthlyDashboard.objects.filter(submitted_by_id = user_id,partner = user_partner,active=2).order_by('modified')
+        remarks = Remarks.objects.filter(active=2,content_type_id = 62,object_id__in=dashboard_data).order_by('modified') #62 is common content type for monthly dashboard in all instance
+        if dashboard_modified:
+            dashboard_data = dashboard_data.filter(modified__gt=dashboard_modified)
+        
+        if remark_modified:
+            remarks = remarks.filter(modified__gt=remark_modified)
+        
+        serializer = self.get_serializer(dashboard_data,many=True)
+        remarks_serializer = RemarksSerializer(remarks,many=True)
+        return serializer , remarks_serializer
+
+    def post(self, request, method, *args, **kwargs):
+        response = {"status":2,"message":"Success"}
+        if method == "pull":
+            serializer, remarks_serializer = self.pull_request(request)
+            response['data'] = serializer.data
+            response['remarks'] = remarks_serializer.data
+        elif method == "push":
+            serializer = self.post_request(request)
+            if serializer.is_valid():
+                serializer.save()
+                response['data'] = serializer.data
+            else:
+                response['status'] = 0
+                response['message'] = f"Please check these fields - {','.join(list(serializer.errors.keys()))}"
+                response['data'] = {}
+        return Response(response, status=status.HTTP_201_CREATED)
+

@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block contents %}
+<!-- <option value="{{i.id}}" {% if i.id|slugify == fossil_ah_session_category %}selected{% elif i.id == health_sessions.fossil_ah_session.fossil_ah_session_category.id %}selected{% endif %}>{{i.id}}{{i.session_category}}</option> -->
+{% load orderq %}
+{% load form_builder_tags %}
+
+<div class="row">
+    <div class="col-12">
+        {% if ben_uuid %}
+        <div class="mt-4" style="background-color: #DBD4FE; padding: 10px; ">
+            <h5 class="m-0"><b>School Details</b></h5>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                    {% include "../survey_forms/profile.html" %}
+            </div>
+        </div>
+        {% endif %}
+        <div class="card">
+            <div class="card-body">
+                {% include 'survey_forms/questions.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        //added static code in hiv form(8) for Registered as HIV Positive question , 
+        //based on profile question choice will update yes/no option 
+        $('[name="563"]').val('{{value}}').trigger('change').attr('disabled', true)
+        //static validation for hiv form hide the question (In Case of PPW inmate Linked with PPTCT) 
+        if('{{gender_male}}' == 'True'){
+            $('#skip_139').remove()
+        }
+        var json_data={{json_response|safe}}
+
+        if (json_data['5'] == '273' && '{{count_of_hiv_records}}' == 0 ){
+            $('#666').find('option[value="650"]').remove()
+        }
+
+        var previous_form_data=[{{previous_form_data|safe}}]
+        var disable_fields={{survey.extra_config.custom_page.questions}}
+        $(disable_fields).each(function(index) {
+            $('<input>').attr('type','hidden').attr('name','ben').val(previous_form_data[0]['ben']).appendTo('#survey')
+            $('#'+disable_fields[index]).val(previous_form_data[0][disable_fields[index]]).attr('disabled', true)
+        })
+
+        // auto fill the field based on the get value from url
+        var queryString = window.location.search;
+        queryString = queryString.substring(1);
+        var paramsArray = queryString.split("&");
+        var params = {};
+        var pattern = /^\d{2}-\d{4}$/;
+        // Loop through the parameters array and parse key-value pairs into the object
+        for (var i = 0; i < paramsArray.length; i++) {
+            var param = paramsArray[i].split("=");
+            var isMatch = pattern.test(param[1]);
+            if(param[0] != 'ben' && isMatch){
+                var parts = param[1].split('-');
+                var month = parts[0];
+                var year = parts[1];
+                $('#'+param[0]).val(year + '-' + month)
+            }else if(param[0] != 'ben' && param[0] != ''){
+                $('#'+param[0]).val(param[1])
+            }
+            
+        }
+
+        // added validations Type of Inmate choices based on facility type 
+        //72 = Type of Facility
+        //368 = Prison
+        //369 = OCS
+        //61 = Type of Inmate
+        //356 = CV
+        //357 = UT
+        //358 = CSR
+        if (json_data['72'] == '368'){
+            $('#61').val('')
+            $('#61 option[value="358"]').prop('disabled', true);
+            $('#61 option[value="356"]').prop('disabled', false);
+            $('#61 option[value="357"]').prop('disabled', false);
+        }else if(json_data['72'] == '369'){
+            $('#61').val('')
+            $('#61 option[value="358"]').prop('disabled', false);
+            $('#61 option[value="356"]').prop('disabled', true);
+            $('#61 option[value="357"]').prop('disabled', true);
+        }
+    })
+</script>
+
+
+{% endblock  %}

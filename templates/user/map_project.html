@@ -1,0 +1,88 @@
+map_project{% extends 'base.html' %}
+{% load static %}
+
+{% block contents %}
+<div class="row align-items-center">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <!-- <form method='POST' class="needs-validation" autocomplete="off" oninput='password2.setCustomValidity(password2.value != password.value ? "Passwords do not match." : "")'> -->
+                <form id="myForm" method='POST' class="needs-validation" autocomplete="off"  novalidate>
+                    {% csrf_token %}
+                    <div class='text-danger'>
+                        {{error}}
+                    </div> 
+                    
+                    <div class="row mb-4">
+                        <label class="col-md-2 col-form-label">Partner<span class="required-field"></span></label>
+                        <div class="col-md-4">
+                            <select name="partner" id="id_partner" class="form-select select2" required {% if vlu %} disabled {% endif%}>
+                                <option value="" disabled selected>Select Partner</option>
+                                {% for pnt in partner %}
+                                    <option value="{{pnt.id}}" {% if vlu == pnt.id %}selected{% endif %}>{{ pnt.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select Partner.
+                            </div>
+                        </div> 
+                        <label class="col-md-2 col-form-label">Project<span class="required-field"></span></label>
+                        <div class="col-md-4">
+                            <select name="project" id="id_project" class="form-select select2" required>
+                                <option value="" disabled selected>Select Project</option>
+                                {% if vlu %}
+                                {% for i in project %}
+                                <option value="{{i.id}}" >{{i.name}}</option>
+                                {% endfor %}
+                                {% endif %}
+                            </select> 
+                            <div class="invalid-feedback">
+                                Please select donor.
+                            </div>                       
+                        </div> 
+                    </div>  
+                    
+                    <div class="gap-2" style="float:right;">
+                        <button type="reset"  onclick="history.back()" class="btn btn-secondary waves-effect">
+                            Cancel
+                        </button>
+                        <button type="submit" id="submitting" style="margin-left: 5px;" class="btn btn-primary w-md">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'libs/jquery/dist/jquery.min.js' %}"></script>
+<script src="{% static 'js/pages/form-validation.init.js' %}"></script> 
+
+<script>
+    $(document).ready(function() {
+        $('#id_partner').change(function () {
+            var optionSelected = $(this).find("option:selected");
+            var valueSelected  = optionSelected.val();
+            $.ajax({
+                type:"GET",
+                url: '/application_master/ajax/project/'+valueSelected+'/',
+                success:function(result){
+                    $("#id_project option").remove();
+                    a = '<option selected value="">Choose Project Name</option>';
+                    $("#id_project").append(a);
+                    if(JSON.parse(result) == 0){
+                        $("#id_project option").remove();
+                        a = '<option selected value="">No Project is mapped to this Partner</option>';
+                        $("#id_project").append(a);
+                    }
+                    else{
+                        $.each(JSON.parse(result),function(key, value)
+                        {
+                            a = '<option value=' + value['id']+'>' + value['name']+'</option>';
+                            $("#id_project").append(a);
+                        });
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

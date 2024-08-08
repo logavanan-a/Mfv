@@ -1,0 +1,794 @@
+
+
+<form method="POST" class="needs-validation" id="survey" enctype="multipart/form-data" novalidate=""   >
+    {% csrf_token %}
+    <input type="hidden" id='__survey_id' value='{{survey.id}}'>
+    {% for block in blocks %}
+        {% get_questions block.id as get_questions %}
+        {% if get_questions|length > 0 %}
+            {% if blocks|length > 1 and survey.id != 20 %}
+                <div class="row">
+                    <div class="col-10">
+                        <h3 class='mb-3 mt-1'>{{block.name}}</h3 class='mt-3'>
+                    </div>
+                </div>
+            {% endif %}
+
+        <div class="row">
+        
+        {% for question in get_questions %}
+            {% is_skip_question question.id as main_is_skip_question %}
+            {% choice_list question.id as main_choice_list %}
+            {% get_inner_questions question.id as main_get_inner_questions %}
+            {% get_validation_code question.id as validation_code %}
+            {% if question.qtype == 'GD' %}
+                {% include '../survey_forms/grid_questions.html' %}
+            {% elif question.qtype == 'In' %}
+                {% include '../survey_forms/inline_grid.html' %}
+            {% elif question.qtype == 'SM' %}
+                    <div class="col-lg-6" id='skip_{{question.id}}'>
+                        <div class=" mb-3">
+                            <label class="form-label" >{{question.form_question_number|default:''}} {{question.text}}{% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                            <select {% if question.api_json.select_multiple %}multiple{% endif %}  class="{% if question.api_json.select_multiple %}select2{% endif %} form-select main_question S_0_0 {% if question.mandatory %}required{% endif %}"  name='{{question.id}}' id='{{question.id}}' 
+                                aria-label="Floating label select example"  {% if question.mandatory %}required{% endif %}  {% if creation_key and not question.is_editable and response_obj.response and response_obj.response.616 != '619'   %} disabled {% endif %}>
+                                {% comment %} <option selected disabled value=""></option> {% endcomment %}
+                                {% comment %} {% for choice in question.choice_list %}
+                                <option value="{{choice.id}}" >{{choice.choice}}</option>
+                                {% endfor %} {% endcomment %}
+        
+                            </select>
+                            <div class="invalid-feedback">
+                                {% if validation_code.message %}{{validation_code.message}}{% else %}Please select atleast one option from the list{% endif %}
+                            </div>
+                        </div> 
+                        <script>
+                            $(document).ready(function () {
+                                $({{main_get_inner_questions}}).each(function(index, element) {
+                                    $('#skip_'+element).hide();
+                                    $('#'+element).removeAttr('required');
+                                });
+                                $(document).on('change', "#{{question.id}}", function (event) {
+                                    if ($(this).val() != '' && $(this).val() != null){
+                                        hide_ids=[]
+                                        show_ids=[]
+                                        $.each($('#skip_'+this.id+' option').filter(':selected'),function(i){
+                                            option_class=$(this).attr('class').split("-")
+                                            $.extend(hide_ids,JSON.parse(option_class[1]))
+                                            $.extend(show_ids,JSON.parse(option_class[0]))
+                                        })  
+                                        ids_for_hide=$(this).children("option:selected").attr('class').split("-")
+                                        $.each(hide_ids,function(i){
+                                            //if (event.originalEvent != undefined) {
+                                            $("[name='"+hide_ids[i]+"']").val(null)
+                                            //}
+                                            $('#skip_'+hide_ids[i]).hide()
+                                            required_field=$('#skip_'+hide_ids[i]).find('.required')
+                                            if (required_field.length > 0){
+                                                required_field.removeAttr('required')
+                                            }
+                                        })
+                                        $.each(show_ids,function(i){
+                                            //$("[name='"+show_ids[i]+"']").val(null)
+                                            required_field=$('#skip_'+show_ids[i]).find('.required')
+                                            if (required_field.length > 0){
+                                                required_field.attr('required', 'required')
+                                            }
+                                            $('#skip_'+show_ids[i]).show()
+                                        })
+                                    }
+                                })
+                                $('select#{{question.api_json.sm_parent_id}}').change(function () {
+                                    var optionSelected = $(this).find("option:selected");
+                                    var valueSelected = optionSelected.attr('value');
+                                    $.ajax({
+                                        type: "GET",
+                                        url: '/configuration/ajax/get_master_lookups/',
+                                        data: {'selected_master':valueSelected,'sm_question':true,'multiple':true},
+                                        success: function (result) {
+                                            selected_val=$("#{{question.id}}_hidden").val() || ''
+                                            $("#{{question.id}} option").remove();
+                                            selected = $("#{{question.id}}").prop("multiple") ? "" : "selected"
+                                            b = '<option  {% if question.mandatory %}disabled{% endif %} '+selected+' value=""></option>';
+                                            $("#{{question.id}}").append(b);
+                                            if (JSON.parse(result) != 0) {
+                                                $.each(JSON.parse(result), function (key, value) {
+                                                    if (selected_val.includes(value['id'].toString())) {
+                                                        a = '<option value=' + value['id'] + ' class="'+JSON.stringify(value['show_qid'])+'-'+JSON.stringify(value['skip_qid'])+'" selected>' +value['name'] + '</option>';
+                                                    }else{
+                                                        a = '<option value=' + value['id'] + ' class="'+JSON.stringify(value['show_qid'])+'-'+JSON.stringify(value['skip_qid'])+'">' +value['name'] + '</option>';
+                                                    }
+                                                    question = value['question_id'] != 0 ? value['question_id'] : "{{question.id}}"
+                                                    if (question.toString() == "{{question.id}}"){
+                                                        $("#"+question).append(a);
+                                                    }
+                                                })
+                                                if('{{question.api_json.parent_is_sm}}' == 'True'){
+                                                    $('select#{{question.id}}').change()
+                                                }
+                                            }
+                                            //debugger
+                                            if ($('#skip_{{question.id}} option').filter(':selected').length > 0){
+                                                show_ids=[]
+                                                $.each($('#skip_{{question.id}} option').filter(':selected'),function(i){
+                                                    if ($(this).attr('class') != undefined){
+                                                        option_class=$(this).attr('class').split("-")
+                                                        $.extend(show_ids,JSON.parse(option_class[0]))
+                                                    }
+                                                })
+                                                //show_id=$('#skip_{{question.id}} option').filter(':selected').attr('class').split("-")
+                                                //$('#skip_'+JSON.parse(show_id[0])).show()
+                                                $.each(show_ids,function(i){
+                                                    required_field=$('#skip_'+show_ids[i]).find('.required')
+                                                    if (required_field.length > 0){
+                                                        required_field.attr('required', 'required')
+                                                    }
+                                                    $('#skip_'+show_ids[i]).show()
+                                                    
+                                                })
+                                            }
+                                        }
+                                    })
+                                });
+                            });
+                        </script>
+                        <style>
+                            {% if question.mandatory %}
+                            .select2-container .select2-selection--single #select2-{{question.id}}-container:after {
+                                content: " *";
+                                color: red;
+                            }
+                            {% endif %}
+                        </style>
+                    </div> 
+                
+            {% elif main_is_skip_question and main_get_inner_questions  %}<!--and not question.parent.qtype == 'In,GD'-->
+                {% if question.qtype == 'C' %}
+                <label class="form-check-label mb-2">{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                <div class='row'>
+                    {% for choice in main_choice_list %}
+                        <div class="col-lg-6" id='skip_{{question.id}}'>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input main_checkbox_{{question.id}} checkbox_{{choice.id}} main_question C_0_0 {% if question.mandatory %}required{% endif %}" type="checkbox" name="{{question.id}}" id="{{question.id}}" value="{{choice.id}}" {% if question.mandatory %}required{% endif %}>
+                                <label class="form-check-label" for="{{choice.id}}">
+                                    {{choice.choice}}
+                                </label>
+                            </div>
+                        </div>
+                        <script>
+                            $(document).ready(function(){
+                                {% if question.mandatory %}
+                                    var checkboxes = $('#{{question.id}}');
+                                    var checkboxes = $('.main_checkbox_{{question.id}}');
+                                    checkboxes.change(function() {
+                                        checkboxes.attr('required', !$('.main_checkbox_{{question.id}}:checked').length);
+                                    });
+                                {% endif %}
+                                {% if choice.skip_question_ids %}
+                                    $.each({{choice.skip_question_ids|safe}}, function(index, name) {   
+                                        $('input[name="'+name+'"]').removeAttr('required')             
+                                        $('#skip_'+name).hide()  
+                                    })
+                                {% endif %}
+                                    //skip logic for dropdown when select item
+                                    $(document).on('change', "input[value='{{choice.id}}']", function (event) {
+                                        //console.log('name="{{choice.skip_question_ids}}"')
+                                        if ($(this).prop('checked')){
+                                             if(parseInt($(this).val()) == 149){
+                                                $('#245').val('')
+                                            }
+                                            if (parseInt('{{choice.id}}') == 265){  
+                                                    $('.main_checkbox_{{question.id}}').prop('disabled',true);
+                                                    $('.checkbox_{{choice.id}}').prop('disabled',false);
+                                                    $('.main_checkbox_{{question.id}}').prop('checked',false);
+                                                    $('.checkbox_{{choice.id}}').prop('checked',true);
+                                                    $('#skip_245').hide() 
+                                                }
+                                        }else{
+
+                                        $('.main_checkbox_{{question.id}}').prop('disabled',false);
+                                        }
+                                        {% if choice.skip_question_ids %}
+                                        if ($(this).prop('checked')){
+                                          
+                                            $.each({{choice.skip_question_ids|safe}}, function(index, name) {
+                                                if ($('#skip_'+name).find('.required').length > 0){
+                                                    $('input[name="'+name+'"]').attr('required', 'required')
+                                                }                          
+                                                $('#skip_'+name).show()  
+                                            })
+                                        }else{
+                                            $.each({{choice.skip_question_ids|safe}}, function(index, name) {
+                                                if ($('#skip_'+name).find('.required').length > 0){
+                                                    $('input[name="'+name+'"]').removeAttr('required').val(null)
+                                                }    
+                                                $('#skip_'+name).hide()                                     
+                                            })
+                                            
+                                        }
+                                        {% endif %}
+                                    })
+                            });
+                        </script>
+                    {% endfor %}
+                </div>
+                {% elif question.qtype == 'S' %}
+                <div class="col-lg-6" id='skip_{{question.id}}'>
+                    <div class=" mb-3">
+                        <label class="form-label" >{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                        <select class=" form-select {{question.id}} main_question S_0_0 {% if question.mandatory %}required{% endif %}"  name='{{question.id}}' id='{{question.id}}'
+                            aria-label="Floating label select example" data-placeholder=" "  {% if question.mandatory %}required{% endif %} {% if question.id|slugify in conditional_disable or not question.is_editable and response_obj.response and response_obj.response.616 != '619'   and creation_key  %}disabled{% endif %}>
+                            <option selected {% if question.mandatory %}disabled{% endif %} value=""></option>
+                            {% for question_id in main_choice_list %}
+                            <option value="{{question_id.id}}" class='{{question_id.skip_question_ids}}-{{main_get_inner_questions}}'>{{question_id.choice}}</option>{% comment %}{% question_ids question_id %}{% endcomment %}
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">
+                            {% if validation_code.message %}{{validation_code.message}}{% else %}Please select atleast one option from the list{% endif %}
+                        </div>
+                    </div> 
+                    <script>
+                        $(document).ready(function () {
+                            //skip logic for dropdown when select item
+                            $({{main_get_inner_questions}}).each(function(index, element) {
+                                $('#skip_'+element).hide();
+                                $('#label_'+element).hide();
+                                $('#'+element).removeAttr('required');
+                            });
+                            $(document).on('change', ".{{question.id}}", function (event) {
+                                if ($(this).val() != '' && $(this).val() != null){
+                                    //TODO:need to update based on class
+                                    ids_for_hide=$(this).children("option:selected").attr('class').split("-")
+                                    var sub_data=JSON.parse(ids_for_hide[1]).filter(item => JSON.parse(ids_for_hide[0]).includes(item))
+                                    var question_loop=JSON.parse(ids_for_hide[1]).filter(item => !sub_data.includes(item))
+                                    $.each(question_loop,function(i,item){
+                                        //handling the while editing the form
+
+                                        if (event.originalEvent != undefined) {
+                                            if($("#"+item).is('table')){
+                                                $("#"+item).find("input").not(':input[type=button], :input[type=submit], :input[type=reset]').val(null)
+                                                $("#"+item).find("select").val(null)
+                                            }else{
+                                                $("[name='"+item+"']").val(null)
+                                            }
+                                        }
+                                        $('#skip_'+item).hide()
+                                        $('#label_'+item).hide()
+                                        //$('table #skip_'+item).hide()
+                                        required_field=$('#skip_'+item).find('.required')
+                                        if (required_field.length > 0){
+                                            required_field.removeAttr('required')
+                                        }
+                                    })
+                                    $.each(JSON.parse(ids_for_hide[0]),function(i){
+                                        //$("[name='"+JSON.parse(ids_for_hide[0])[i]+"']").val(null)
+                                        required_field=$('#skip_'+JSON.parse(ids_for_hide[0])[i]).find('.required')
+                                        if (required_field.length > 0){
+                                            required_field.attr('required', 'required')
+                                        }
+
+                                        $('#skip_'+JSON.parse(ids_for_hide[0])[i]).show()
+                                        $('#label_'+JSON.parse(ids_for_hide[0])[i]).show()
+                                        //$('table #skip_'+JSON.parse(ids_for_hide[0])[i]).show()
+                                        //console.log($('#skip_'+JSON.parse(ids_for_hide[0])[i]+' option').filter(':selected').attr('class'))
+                                        if ($('#skip_'+JSON.parse(ids_for_hide[0])[i]+' option').filter(':selected').attr('class') != undefined){
+                                            show_id=$('#skip_'+JSON.parse(ids_for_hide[0])[i]+' option').filter(':selected').attr('class').split("-")
+                                            $('#skip_'+JSON.parse(show_id[0])).show()
+                                        }
+                                    })
+                                }
+                                // added static code for question: 6. Current status of the facility 
+                                // is non mandatory , if not selected any option will handle the skip logic
+                                if($(this).val() == '600'){
+                                    var fieldIds = ['232', '233', '562', '231'];
+                                    fieldIds.forEach(function(id) {
+                                        $("#skip_"+id).show(); // Show the field
+                                    });
+                                }
+                            })
+                        });
+                    </script>
+                </div> 
+                {% elif question.qtype == 'R' %}
+                <div class="col-lg-6" id='skip_{{question.id}}'>
+                    <div class=" mb-3 ">
+                        <div class="mb-3">
+                            <label class="form-check-label mb-2">{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                            <div class='row'>
+                                <div class="col-lg-6" id='skip_{{question.id}}'>
+                                    {% for choice in main_choice_list %}
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input main_checkbox_{{question.id}} main_question C_0_0 {% if question.mandatory %}required{% endif %}" type="radio" name="{{question.id}}" id="{{question.id}}" value="{{choice.id}}" {% if question.mandatory %}required{% endif %}>
+                                        <label class="form-check-label" for="{{choice.id}}">
+                                            {{choice.choice}}
+                                        </label>
+                                    </div>
+                                    <script>
+                                        $(document).ready(function(){
+                                            
+                                            {% if question.mandatory %}
+                                            var checkboxes = $('#{{question.id}}');
+                                            var checkboxes = $('.main_checkbox_{{question.id}}');
+                                            checkboxes.change(function() {
+                                                checkboxes.attr('required', !$('.main_checkbox_{{question.id}}:checked').length);
+                                            });
+                                            {% endif %}
+                                            {% if choice.skip_question_ids %}
+                                            
+                                            $.each({{choice.skip_question_ids|safe}}, function(index, name) {   
+                                                $('input[name="'+name+'"]').removeAttr('required')             
+                                                $('#skip_'+name).hide()  
+                                            })
+                                            {% endif %}
+                                            
+                                            
+                                            $(document).on('change', "input[value='{{choice.id}}']", function (event) {
+                                                if ($(this).prop('checked')){
+                                                    skip_question_list = []
+                                                    {% for choice_list in main_choice_list %}
+                                                        if (parseInt({{question.id}}) == 246){
+                                                            skip_question_list.push({{choice_list.skip_question_ids}})
+                                                        }else if (parseInt({{question.id}}) == 254){
+                                                            
+                                                            console.log({{choice_list.skip_question_ids}})
+                                                            skip_question_list.push({{choice_list.skip_question_ids}})
+                                                        }else if (parseInt({{question.id}}) == 356){
+                                                            skip_question_list.push({{choice_list.skip_question_ids}})
+                                                        }
+                                                    {% endfor %}
+                                                    $.each(skip_question_list, function(index_2, value) {
+                                                        {% if choice.skip_question_ids %}
+                                                        $.each({{choice.skip_question_ids|safe}}, function(index, name) {
+                                                            if (value.includes(parseInt(name))){
+                                                                $.each(value, function(index_3, skip_id) {
+                                                                    $('#'+skip_id.toString()).val('') 
+                                                                    $('#skip_'+skip_id.toString()).show() 
+                                                                    $('.main_checkbox_'+skip_id.toString()).prop('checked',false);
+                                                                    if ($('#skip_'+skip_id.toString()).find('.required').length > 0){
+                                                                            $('input[name="'+skip_id.toString()+'"]').attr('required', 'required')
+                                                                        }                          
+                                                                        $('#skip_'+skip_id.toString()).show() 
+                                                                    })
+                                                            }else{
+                                                                $.each(value, function(index_3, skip_id) {
+                                                                    $('.main_checkbox_'+skip_id.toString()).prop('checked',false);
+                                                                    $('#'+skip_id.toString()).val('') 
+                                                                    $('#skip_'+skip_id.toString()).hide() 
+                                                                    if ($('#skip_'+skip_id.toString()).find('.required').length > 0){
+                                                                        $('input[name="'+skip_id.toString()+'"]').removeAttr('required').val(null)
+                                                                    } 
+                                                                    $('#skip_'+skip_id.toString()).hide()                                     
+                                                                })
+                                                            } 
+                                                        })
+                                                        {% else %}
+
+                                                            if ($('#skip_'+value.toString()).find('.required').length > 0){
+                                                                $('input[name="'+value.toString()+'"]').removeAttr('required').val(null)
+                                                            }    
+                                                            $('#skip_'+value.toString()).hide() 
+                                                        {% endif %}
+                                                    })
+                                                }
+                                            })
+                                            
+                                        })
+                                    </script>
+                                    {% endfor %}  
+                                </div>
+                            </div>  
+                        </div>
+                        
+                    </div>
+                </div>
+                {% endif %}
+            {% elif not question.parent %}
+                {% if question.qtype == 'C' %}
+                <div class='row' id='skip_{{question.id}}'>
+                    <label class="form-check-label mb-2">{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                    {% for choice in main_choice_list %}
+                        <div class="col-lg-6" >
+                            <div class="form-check mb-3">
+                                <input class="form-check-input main_checkbox_{{question.id}} main_question C_0_0 {% if question.mandatory %}required{% endif %}" type="checkbox" name="{{question.id}}" id="{{question.id}}" value="{{choice.id}}" {% if question.mandatory %}required{% endif %}>
+                                <label class="form-check-label" for="{{choice.id}}">
+                                    {{choice.choice}}
+                                </label>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% if question.mandatory %}
+                        <script>
+                            $(document).ready(function(){
+                                var checkboxes = $('.main_checkbox_{{question.id}}');
+                                checkboxes.change(function() {
+                                    checkboxes.attr('required', !$('.main_checkbox_{{question.id}}:checked').length);
+                                });
+                            }); 
+                        </script>
+                        {% endif %}
+                </div>
+                {% elif question.qtype == 'R' %}
+                <div class="col-lg-6" id='skip_{{question.id}}'>
+                    <div class=" mb-3 ">
+                        <div class="mb-3">
+                            <label class="form-check-label mb-2">{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                            <div class='row'>
+                                <div class="col-lg-6" id='skip_{{question.id}}'>
+                                    {% for choice in main_choice_list %}
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input main_checkbox_{{question.id}} main_question C_0_0 {% if question.mandatory %}required{% endif %}" type="radio" name="{{question.id}}" id="{{question.id}}" value="{{choice.id}}" {% if question.mandatory %}required{% endif %} >
+                                        <label class="form-check-label" for="{{choice.id}}">
+                                            {{choice.choice}}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                    <script>
+                                        $(document).ready(function(){
+                                            $('.main_question').change(function() {
+                                                var questionId = '{{question.id}}'
+                                                var checkedCheckboxes = $('.main_question:checked');
+                                                var checkedValues = checkedCheckboxes.map(function() {
+                                                    return $(this).val();
+                                                }).get();
+                                                $('#388').val(checkedValues.length);
+                                            })
+                                        })
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% elif question.qtype == 'T' %}
+                    <div class="col-lg-6" id='skip_{{question.id}}'>
+                        <div class=" mb-3 ">
+                            <div class="mb-3">
+                                <label class="form-label" for="{{question.id}}">{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                                <input  id='{{question.id}}' {% if question.training_config.custom_pattern %} pattern="{{question.training_config.value}}" {% endif %}{% if validation_code.code == 'AN' %} pattern="[a-zA-Z0-9\s]+" {% elif validation_code.code == 'A' %}  pattern="[a-zA-Z\s]+" {% endif %} type="{% if validation_code.code == 'N' or validation_code.code == 'D'%}number{% else %}text{% endif %}" min='{{validation_code.MinMax.min}}'  max='{{validation_code.MinMax.max}}' name="{{question.id}}" maxlength='{{validation_code.MinMax.max_length}}' minlength='{{validation_code.MinMax.min_length}}' class="form-control main_question T_0_0 {% if question.mandatory %}required{% endif %}"  {% if question.mandatory %}required{% endif %} {% if not question.is_editable and response_obj.response and response_obj.response.616 != '619'   and creation_key %}readonly{% elif question.id == 388 %}readonly{% endif %}>
+                                <div class="invalid-feedback">
+                                    {% if validation_code.message %}{{validation_code.message}}{% else %}Please enter a valid {{question.text}}{% endif %}
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    {% if question.api_json.other_type_question %}
+                    <script>
+                            $(document).ready(function(){
+                                var choice_value = '{% disabled_list question.api_json.parent_form_qid %}'
+                                $('#{{question.id}}').attr('readonly', true);
+                                var choice = $('#{{question.api_json.parent_form_qid}}');
+                                choice.change(function() {
+                                var choice_id = $(this).val()
+                                    $('#{{question.id}}').val('')
+                                    if (choice_value == choice_id){
+                                        $('#{{question.id}}').attr('readonly', false);
+                                    }else{
+                                        $('#{{question.id}}').attr('readonly', true);
+                                    }
+                                });
+
+                            })
+                    </script>
+                    {% endif %}
+                {% elif question.qtype == 'AF' %}
+                        <div class="col-lg-6 AP_Questions" >
+                            <div class=" mb-3 ">
+                                <label class="form-label" >{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                                <input id='{{question.id}}' value='' type="text" name="{{question.id}}" class="form-control main_question T_0_0 {% if question.mandatory %}required{% endif %}" {% if question.mandatory %}required{% endif %} readonly>
+                            </div>
+                        </div>
+                {% elif question.qtype == 'AP' %}
+                        <input type="hidden" id='auto_populate' name='auto_populate' value='{{temp_code}}_{{question.id}}'>
+                        <div class="col-lg-6 AP_Questions" id='skip_{{question.id}}'>
+                            <div class=" mb-3 ">
+                                <label class="form-label" >{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                                <input id='{{question.id}}' type="text" name="{{question.id}}" class="form-control main_question T_0_0 {% if question.mandatory %}required{% endif %}" {% if question.mandatory %}required{% endif %} readonly {% if question.training_config.current_user %}value="{{request.user.username}}"{% endif %}>
+                            </div>
+                        </div>
+                {% elif question.qtype == 'S' %}
+                    <div class="col-lg-6" id='skip_{{question.id}}'>
+                        <div class=" mb-3">
+                            <label class="form-label" >{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                            <select {% if question.api_json.select_multiple %}multiple{% endif %} class=" {% if question.api_json.select_multiple %}select2{% endif %} form-select main_question S_0_0 {% if question.mandatory %}required{% endif %}"  name='{{question.id}}' id='{{question.id}}' 
+                                aria-label="Floating label select example" data-placeholder=""  {% if question.mandatory %}required{% endif %} {% if question.id|slugify in conditional_disable or not question.is_editable and response_obj.response and response_obj.response.616 != '619'   and creation_key %}disabled{% endif %}>
+                                <option selected {% if question.mandatory %} disabled {% endif %} value=""></option>
+                                {% for choice in main_choice_list %}
+                                <option value="{{choice.id}}" {% if choice.disabled %}disabled{% endif %}>{{choice.choice}}</option>
+                                {% endfor %}
+
+                            </select>
+                            <div class="invalid-feedback">
+                                {% if validation_code.message %}{{validation_code.message}}{% else %}Please select atleast one option from the list{% endif %}
+                            </div>
+                        </div> 
+                    </div> 
+                {% elif question.qtype == 'D' %}
+                    <div class="col-lg-6" id='skip_{{question.id}}'>
+                        <div class=" mb-3">
+                            <label class="form-label" for="floatingnameInput">{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                            <input type="{% if question.training_config.month %}month{% else %}date{% endif %}" class="form-control main_question D_0_0 {% if question.mandatory %}required{% endif %}" {% if question.training_config.dob %}onchange="getAge(this,{{question.id}},{{question.training_config.minor|default:'false'}})"{% endif %} pattern="DD/MM/YYYY" name="{{question.id}}" min='{% if question.training_config.month %}{{validation_code.MinMax.min|slice:":-"|slice:"-3"}}{% else %}{{validation_code.MinMax.min}}{% endif%}' max='{% if question.training_config.month %}{{validation_code.MinMax.max|slice:":-"|slice:"-3"}}{% else %}{{validation_code.MinMax.max}}{% endif %}' id="{{question.id}}" {% if question.mandatory %}required{% endif %} {% if not question.is_editable and response_obj.response and response_obj.response.616 != '619'   and creation_key %}readonly{% endif %}>
+                            <div class="invalid-feedback">
+                                {% if validation_code.message %}{{validation_code.message}}{% else %}Please enter a valid {{question.text}}{% endif %}
+                            </div>
+                            {% if question.training_config.dob %}
+                                <label class="form-label opacity-75 mt-2 dob_field" id='dob_{{question.id}}' for=""></label>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                    {% elif question.qtype == 'H' %}
+                    {% comment %} {{response_obj.response|get_item_str:question.id}}----------- {% endcomment %}
+                    <input type="hidden" class='main_question' value='{{response_obj.response|get_item_str:question.id}}' name='{{question.id}}' id="{{question.id}}">
+                {% elif question.qtype == 'AI' %}
+                {% if question.api_qtype == 'S' %}
+                
+                {% if question.api_json.prison_child_dropdown and not response_obj %}
+                {% else %}
+                        <script>
+                            $(document).ready(function(){
+                                $("select#{{question.api_json.prison_parent_level.onclick_event_id|default:0}}").on("change", function(event, informationObj) {
+                                    var optionSelected = $(this).find("option:selected")
+                                    var valueSelected = optionSelected.val()
+                                    if (valueSelected === undefined){
+                                        valueSelected = informationObj
+                                    }
+                                    data = {
+                                        'selected_boundry': valueSelected,
+                                        'user_id':'{{request.user.id}}',
+
+                                    }
+                                    $.ajax({
+                                        type: "{{question.api_json.method}}",
+                                        url: '{{question.api_json.api}}',
+                                        data: data,
+                                        success: function (result) {
+                                            selected_val=$('#{{question.id}}_hidden').val()
+                                            $("[name='{{question.api_json.prison_parent_level.qid}}'] option").remove();
+                                            b = '<option   value=""></option>';
+                                            $("[name='{{question.api_json.prison_parent_level.qid}}']").append(b);
+                                            if (JSON.parse(result) != 0) {
+                                                $.each(JSON.parse(result), function (key, value) {
+                                                    if(value['value'] == selected_val){
+                                                        a = '<option value="' + value['value'] +'"'+ 'selected class ="'+value['id']+'" id ="'+value['facility_type']+'">' +
+                                                            value['name'] + '</option>';
+                                                            $("[name='{{question.api_json.prison_parent_level.qid}}']").append(a);
+                                                        {% comment %} if('{{question.api_json.linked_auto_populate}}' != ''){
+                                                            $('#{{question.api_json.linked_auto_populate}}').val(value['id'])
+                                                        } {% endcomment %}
+                                                    }else{
+                                                        a = '<option value="' + value['value'] + '" class ="'+value['id']+'" id_1 ="'+value['facility_type']+'">' +
+                                                            value['name'] + '</option>';
+                                                        $("[name='{{question.api_json.prison_parent_level.qid}}']").append(a);
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    })
+                                    
+                                    
+                                })
+                            });
+                        </script>
+                    {% endif %}
+                    {% comment %}{% if question.api_json.is_beneficiary_ques == 2 and not creation_key %}
+                        {% for key,bondary in next_level_boundries.items %}
+                            <div class="col-lg-6" >
+                                <div class="mb-2">
+                                    <label class="form-label" > {{bondary.name}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                                    <select class=" form-select address_widget"  id='boundary_{{bondary.id}}' 
+                                        aria-label="Floating label select example" data-placeholder=" " {% if question.mandatory %}required {% endif %} {% if creation_key and not question.is_editable and response_obj.response and response_obj.response.616 != '619'   %} disabled {% endif %} >
+                                        <option selected {% if question.mandatory %}disabled{% endif %} value=""> </option>
+                                        {% if forloop.counter == 1 %}
+                                            {% for b in boundarys %}
+                                            <option value='{{b.id}}' >{{b.name}}</option>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        {% if validation_code.message %}{{validation_code.message}}{% else %}Please select atleast one option from the list{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <style>
+                                .select2-container .select2-selection--single #select2-boundary_{{bondary.id}}-container:after {
+                                    content: " *";
+                                    color: red;
+                                }
+                            </style> 
+                        {% endfor %}
+                    {% endif %}{% endcomment %}
+                    <div class="col-lg-6" id='skip_{{question.id}}'>
+                        <div class=" mb-3">
+                            <label class="form-label" >{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                            <select class=" form-select select2 main_question S_0_0 {% if question.mandatory %}required{% endif %} api_question"  name='{{question.id}}' id='{{question.id}}' 
+                                aria-label="Floating label select example"   {% if question.mandatory %}required{% endif %} {% if not question.is_editable and response_obj.response and response_obj.response.616 != '619'   and creation_key %}disabled{% endif %}>
+                                {% if school_creation_key %}
+                                    <option value="{{school_creation_key}}" >{{school_name}}</option>
+                                {% else %}
+                                    <option value="{{benificiary.creation_key}}" >{{json_response.231}}</option>
+                                {% endif %}
+                            </select>
+                            <div class="invalid-feedback">
+                                {% if validation_code.message %}{{validation_code.message}}{% else %}Please select atleast one option from the list{% endif %}
+                            </div>
+                        </div> 
+                    </div> 
+                    {% endif %}
+                {% elif question.qtype == 'AW' %}
+                    {% for key,bondary in next_level_boundries.items %}
+                        <div class="col-lg-6" >
+                            <div class="mb-2">
+                                <label class="form-label" >{% if question.form_question_number|add:forloop.counter0 > 0 %}{{question.form_question_number|add:forloop.counter0}}. {% endif %}{{bondary.name}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                                <select class=" form-select address_widget"   name="{{question.id}}" id='boundary_{{bondary.id}}' 
+                                    aria-label="Floating label select example" data-placeholder=" " {% if question.mandatory %}required {% endif %} {% if creation_key and not question.is_editable and response_obj.response and response_obj.response.616 != '619'   %} disabled {% endif %} >
+                                    <option selected  {% if question.mandatory %}disabled{% endif %} value=""> </option>
+                                    {% if forloop.counter == 1 %}
+                                        {% for b in boundarys %}
+                                        <option value='{{b.id}}' >{{b.name}}</option>
+                                        {% endfor %}
+                                    {% endif %}
+                                </select>
+                                <div class="invalid-feedback">
+                                    {% if validation_code.message %}{{validation_code.message}}{% else %}Please select atleast one option from the list{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <style>
+                            .select2-container .select2-selection--single #select2-boundary_{{bondary.id}}-container:after {
+                                content: " *";
+                                color: red;
+                            }
+                        </style> 
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
+            {% if not question.is_editable and response_obj.response and response_obj.response.616 != '619'   %}
+                <script>
+                    $("[name='{{question.id}}']").addClass("disabled");
+                </script>
+            {% endif %}
+        {% endfor %}
+        <input type="hidden" id='all_in_one' name='all_in_one'>
+        </div> 
+        {% endif %}
+    {% endfor %}
+    <div>
+        <button type="reset" onclick="location.href = '{{request.META.HTTP_REFERER}}';"
+            class="btn btn-secondary waves-effect">
+            Cancel
+        </button>
+        <button type="submit" id="submitting" name="submitting" class="btn btn-primary w-md">Submit</button>
+    </div>
+</form>
+<script>
+    if (parseInt({{survey.id}}) == 8){
+        var data = {{request|get_auto_fill:survey.id|safe}}
+        var date_spectacles_given = data['445'] || '';
+        var glass_power_re_sphere = data['273']?.['275']?.['277'] || '';
+        var glass_power_re_cyl = data['273']?.['275']?.['278'] || '';
+        var glass_power_re_axis = data['273']?.['275']?.['279'] || '';
+        var glass_power_le_sphere = data['273']?.['276']?.['277'] || '';
+        var glass_power_le_cyl = data['273']?.['276']?.['278'] || '';
+        var glass_power_le_axis = data['273']?.['276']?.['279'] || '';
+        $('#355').val(date_spectacles_given)
+        $('#355').prop('readonly',true)
+        $('#T_370_372').val(glass_power_re_sphere)
+        $('#T_370_372').prop('readonly',true)
+        $('#T_370_373').val(glass_power_re_cyl)
+        $('#T_370_373').prop('readonly',true)
+        $('#T_370_374').val(glass_power_re_axis)
+        $('#T_370_374').prop('readonly',true)
+        $('#T_371_372').val(glass_power_le_sphere)
+        $('#T_371_372').prop('readonly',true)
+        $('#T_371_373').val(glass_power_le_cyl)
+        $('#T_371_373').prop('readonly',true)
+        $('#T_371_374').val(glass_power_le_axis)
+        $('#T_371_374').prop('readonly',true)
+    }
+</script>
+<script>
+    // function ansLoadFunction() {onsubmit="return ansLoadFunction()"
+    $("#survey").submit(function(e) {
+        main_ans={}
+        const hid = document.getElementById('all_in_one')
+        main_ans=formating_main_questions($('.main_question'),main_ans)
+        //loop for each grid questions field valu'Re and store in main_ans
+        $('._hidden_grid_question').each(function(){
+            grid_block=$(this)
+            grid_items=grid_block.attr('id')
+            grid_all_ans=[]
+            $('.'+ grid_items).each(function(){
+                grid_question=$(this)
+                field_id=grid_question.attr('id')
+                val=grid_question.val()
+                if (val != null){
+                    temp={}
+                    temp[field_id]=val
+                    grid_all_ans.push(temp)
+                }
+            })
+            main_ans[grid_block.val()]=grid_all_ans
+        })
+
+        //loop for each inline questions field value and store in main_ans
+        repeator_data=$("[name='inline_question']")
+        var datePattern = /^\d{4}-\d{2}-\d{2}$/;
+        $.each(repeator_data, function(idx,item) {
+            inline=[]
+            $('.'+ $(item).attr('id')).each(function(i,val){
+                type=name_return_fun($(val),'inline')
+                //index=$(val).attr('name')
+                values=$(val).attr('name').split('-')[1]
+                lists=values.split(/\[(.*?)]/).filter(Boolean)
+                loc={}
+                var entered_value = $(val).val()
+                //if condition for checking the date is in YYYY-MM-DD and convert it to DD-MM-YYYY
+                if (datePattern.test($(val).val())){
+                    var parts = $(val).val().split('-');
+                    entered_value = parts[2] + '-' + parts[1] + '-' + parts[0];
+                }
+                loc[type+"_"+lists[1]+"_"+lists[2]]=$.trim(entered_value)
+                inline.push(loc)
+                //}
+            })
+            main_ans[$(item).attr('id')]=inline
+        })
+
+        //loop for each address questions field value and store in main_ans
+        var addrs = {}
+        $('.address_widget').each(function () {
+            id=$(this).attr('id').split('_')
+            addrs[id[1]]=$(this).val()
+        })
+        $('<input>').attr('type','hidden').attr('name','cluster_id').val(addrs[Object.keys(addrs).length]).appendTo('#survey')
+
+        $('.address_widget').attr('name')
+        main_ans[$('.address_widget').attr('name')]=[addrs]
+
+        //console.log(JSON.stringify(main_ans))
+        hid.setAttribute('value', JSON.stringify(main_ans))
+
+        //ajax call for check custom validations
+        var form = $("#survey")
+        if($('#error_prevent').val() == 'true'){
+            e.preventDefault()
+        }else{
+            if (form[0].checkValidity() == true){
+                e.preventDefault()
+                $.ajax({
+                    url: '/survey/ajax/get_custom_validation/',
+                    type: 'GET',
+                    data: {
+                        'survey_id': '{{survey.id}}',
+                        'ans':JSON.stringify(main_ans),
+                        'json_id':{{response_obj.id|default:0}},
+                        'ben':'{{ben_uuid}}',
+                    },
+                    success: function(result){
+                        if (result['success'] == false){
+                            $('.error').remove()
+                            $.each(result,function(id,value){
+                                if(value['inline']==true){
+                                    var e = $('<div class="text-danger error">'+value['message']+'</div>')
+                                    $('[name="'+id+'"]').parents(':eq(1)').append(e)
+                                }else{
+                                    console.log(id,value)
+
+                                    var e = $('<div class="text-danger error">'+value+'</div>')
+                                    $('#skip_'+id).append(e)
+                                }
+                            })
+                        }else{
+                            //$("#submitting").attr("disabled", true)
+                            form[0].submit()
+                        }
+                    },
+                    error: function(jqxhr, status, exception) {
+                        alert('Exception:', exception);
+                    }
+                })
+            }
+        }
+    })
+</script>
+        

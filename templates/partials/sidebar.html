@@ -40,76 +40,18 @@
                 <span key="t-file-manager">{{i.name}}</span>
               </a>
             </li>
+            {% else %}
+            <li>
+              <a href="{{i.app_link}}" class="waves-effect">
+                <i class="{{i.icon}}"></i>
+                <span key="t-file-manager">{{i.name}}</span>
+              </a>
+            </li>
             {% endif %}
             {% endif %}
             {% endfor %}
-          {% if request.user.groups.all.0.id != 1 %}
-          <li>
-            <a href="/dashboard/" class="waves-effect">
-              <i class="bx bxs-dashboard"></i>
-              <span key="t-file-manager">Dashboards</span>
-            </a>
-          </li>
-          {% endif %}
-          <li>
-            <a href="/reports/" class="waves-effect">
-              <i class="bx bx-tone"></i>
-              <span key="t-file-manager">Reports</span>
-            </a>
-          </li>
-        {% if request.user.is_superuser %}
-        <li class=''>
-            <a href="javascript: void(0);" class="has-arrow waves-effect ">
-             <i class="bx bx-cog"></i>
-             <span key="t-ui-elements">Settings</span>
-            </a>
-        <ul class="sub-menu" aria-expanded="false">
-        <li>
-            <a href="/user_listing/" class="waves-effect" >
-              <i class="fas fa-user-cog"></i>
-             <span key="t-dashboards ">User Management</span>
-            </a>
-        </li>
-        <li>
-          <a href="/application_master/list/state/" class="waves-effect" >
-            <i class="bx bx-cog"></i>
-           <span key="t-dashboards ">State</span>
-          </a>
-      </li>
-      <li>
-        <a href="/application_master/list/district/" class="waves-effect" >
-          <i class="bx bx-cog"></i>
-         <span key="t-dashboards ">District</span>
-        </a>
-      </li>
-      {% comment %} <li>
-        <a href="/application_master/list/mission/" class="waves-effect" >
-          <i class="bx bx-cog"></i>
-         <span key="t-dashboards ">Mission</span>
-        </a>
-      </li> {% endcomment %}
-      <li>
-        <a href="/application_master/list/donor/" class="waves-effect" >
-          <i class="bx bx-cog"></i>
-         <span key="t-dashboards ">Donor</span>
-        </a>
-      </li>
-      <li>
-        <a href="/application_master/list/partner/" class="waves-effect" >
-          <i class="bx bx-cog"></i>
-         <span key="t-dashboards ">Partner</span>
-        </a>
-      </li>
-      <li>
-        <a href="/application_master/list/project/" class="waves-effect" >
-          <i class="bx bx-cog"></i>
-         <span key="t-dashboards ">Project</span>
-        </a>
-      </li>     
-      </ul>
-      </li>
-        {% endif %}
 
+        
         
       </ul>
     </div>
@@ -118,6 +60,11 @@
 </div>
 <!-- Left Sidebar End -->
 <script type="text/javascript">
+    $(document).ready(function() {
+        $('#side-menu').on('hidden.metisMenu', function(event) {
+            $(event.target).prev().removeClass('mm-active');
+        });
+    });
   function CurrentMonth(slug)
   {
       var today = new Date();
@@ -125,6 +72,6 @@
       var url = slug+'?month_year='+date
       window.location.href = url
   };
-  </script>
+</script>
 {% endblock %}
 

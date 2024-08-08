@@ -4,10 +4,10 @@ import pandas as pd
 import traceback
 import sys
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render, get_list_or_404
+from django.shortcuts import render, redirect,get_list_or_404
 from django.contrib.auth.decorators import login_required
 from django.db import connection
-from .models import ReportMeta
+from .models import ReportMeta, QuietlyReport
 from dashboard.models import DashboardSummaryLog
 from django.contrib.contenttypes.models import ContentType
 from django.template.loader import render_to_string
@@ -19,6 +19,7 @@ import json
 import re
 import csv
 import logging
+from survey.models import BeneficiaryResponse
 from django.contrib.auth.models import User
 from datetime import datetime as dt
 from dashboard.models import *
@@ -115,6 +116,44 @@ def reports_listing(request):
     return render(request, 'reports/reports.html', locals())
     
 
+@ login_required(login_url='/login/')
+def quietly_report(request):
+    heading = 'Quietly Report'
+    from datetime import datetime
+    current_year = datetime.now().year+1
+    academic_year_list = [year for year in range(2022,current_year)]
+    indicator_obj = MasterLookUp.objects.filter(parent_id=512,active=2)
+    district_obj = District.objects.filter(active=2,id__in= Project.objects.filter(active=2).values_list('district_id',flat=True))
+    district_id = request.GET.get('district','')
+    project_id = None
+    if district_id:
+        projetc_obj = Project.objects.filter(active=2,district_id=district_id)
+        project_id = projetc_obj.first().id if projetc_obj.exists() else ''
+    academic_year = request.GET.get('academic_year','')
+    if request.method == "POST":
+        for indicator in indicator_obj:
+            annual_target = request.POST.get('annual_target_'+str(indicator.id),0)
+            q1_target = request.POST.get('q1_target_'+str(indicator.id),0)
+            q2_target = request.POST.get('q2_target_'+str(indicator.id),0)
+            q3_target = request.POST.get('q3_target_'+str(indicator.id),0)
+            q4_target = request.POST.get('q4_target_'+str(indicator.id),0)
+            obj, created=QuietlyReport.objects.update_or_create(
+                    project_id=project_id,
+                    indicator_id=indicator.id,
+                    academic_year=academic_year,
+                    defaults={
+                        "annual_target":annual_target or 0,
+                        "q1_target":q1_target or 0,
+                        "q2_target":q2_target  or 0,
+                        "q3_target":q3_target  or 0,
+                        "q4_target":q4_target or 0
+                    }
+                )
+            obj.save()
+        return redirect('/quietly-report/?district='+str(district_id)+'&academic_year='+str(academic_year))
+
+    return render(request, 'reports/quietly_report.html', locals())
+    
 @ login_required(login_url='/login/')
 def custom_report(request, page_slug):
     rows_per_page = 10
@@ -794,7 +833,6 @@ def load_user_details_to_sessions(request):
 
 @ login_required(login_url='/login/')
 def get_indicator(request):
-    import ipdb;ipdb.set_trace()
     if request.method == 'GET' and request.is_ajax():
         selected_category = request.GET.get('selected_category', '')
         user_location_data = request.session['user_location_data'] if 'user_location_data' in request.session else None
@@ -816,7 +854,6 @@ from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 @ login_required(login_url='/login/')
 def get_district(request):
-    import ipdb;ipdb.set_trace()
     if request.method == 'POST':
         selected_projects = request.POST.get('selected_projects[]', '')
         district_ids = Project.objects.filter(id = int(selected_projects),active=2).values_list('district_id',flat=True) 
@@ -832,7 +869,7 @@ import json
 from django.http import JsonResponse, HttpResponse
 
 def get_project(request):
-    if request.method == 'GET' and request.is_ajax():
+    if request.method == 'POST' and request.is_ajax():
         selected_partner = request.GET.get('selected_partner', '')
         if not selected_partner:
             return JsonResponse([], safe=False)
@@ -853,6 +890,27 @@ def get_project(request):
             projects = Project.objects.filter(partner_mission_mapping_id__in=pmm_ids, active=2)
             for project in projects:
                 result_set.append({'id': project.id, 'name': project.name})
+        return JsonResponse(result_set, safe=False)
+    return HttpResponse(status=400)
+
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def get_school(request):
+    if request.method == 'POST':
+        selected_partner = request.POST.get('partner_id[]', '')
+        if selected_partner == '':
+            return JsonResponse([], safe=False)
+        else:  
+            result_set = []
+            pmm_ids = PartnerMissionMapping.objects.filter(partner_id = selected_partner).values_list('id', flat=True)
+            district_ids = Project.objects.filter(partner_mission_mapping_id__in=pmm_ids, active=2).values_list('district_id',flat=True)
+            boundary_ids = Boundary.objects.filter(code__in=[str(dist) for dist in district_ids],boundary_level_type_id =2).values_list('id',flat=True)
+            district_id_list = [i for i in boundary_ids]
+            school_list = return_sql_results(f"""select creation_key,profile_view->'data'->>'School name' from survey_beneficiaryresponse where survey_id = 1 and address_2 in ({str(district_id_list)[1:-1]})""")
+            print(school_list,'----------------------ajax')
+            for school in school_list:
+                result_set.append({'id': school[0], 'name': school[1]})
         return JsonResponse(result_set, safe=False)
     return HttpResponse(status=400)
 
@@ -944,48 +1002,54 @@ def get_report_query(request, widget_obj, page_id,rows_per_page, locations_list,
     # config_x_days = user_setup().get('config_x_days')
     filter_from_date_where,query, filter_to_date_where = '', '',''
     # date format - 'yyyy-mm-dd'
-    if filter_to_date and filter_from_date:
-        filter_from_date_where = " and filter_date >= '" + filter_from_date + "' "
-        filter_to_date_where = " and filter_date <= '" + filter_to_date + "' "
-    sql_query = sql_query.replace("@@filter_from_date", filter_from_date_where);
-    sql_query = sql_query.replace("@@filter_to_date", filter_to_date_where);
-    village_id = locations_list[4] if len(locations_list)>=5 else 0
-    cluster_id = locations_list[3]  if len(locations_list)>=4 else 0
-    taluka_id = locations_list[2] if len(locations_list)>=3 else 0
-    district_id = locations_list[1] if len(locations_list)>=2 else 0
-    state_id = locations_list[0] if len(locations_list)>=1 else 0
-    village_filter,cluster_filter,taluka_filter,district_filter,state_filter = "","","","",""
-    if village_id:
-        village_filter = ' and filter_village_id = ' + str(village_id) + ' '
-    sql_query = sql_query.replace("@@village_filter", village_filter)
-    if cluster_id:
-        cluster_filter = ' and filter_cluster_id = ' + str(cluster_id) + ' '
-    sql_query = sql_query.replace("@@cluster_filter", cluster_filter)
-    if taluka_id:
-        taluka_filter = ' and filter_taluka_id = ' + str(taluka_id) + ' '
-    sql_query = sql_query.replace("@@taluka_filter", taluka_filter)
-    if district_id:
-        district_filter = ' and filter_district_id = ' + str(district_id) + ' '
-    sql_query = sql_query.replace("@@district_filter", district_filter)
-    if state_id:
-        state_filter = ' and filter_state_id = ' + str(state_id) + ' '
-    sql_query = sql_query.replace("@@state_filter", state_filter)
-
+    # if filter_to_date and filter_from_date:
+    #     filter_from_date_where = " and filter_date >= '" + filter_from_date + "' "
+    #     filter_to_date_where = " and filter_date <= '" + filter_to_date + "' "
+    # sql_query = sql_query.replace("@@filter_from_date", filter_from_date_where);
+    # sql_query = sql_query.replace("@@filter_to_date", filter_to_date_where);
+    district_ids = locations_list
+    # village_id = locations_list[4] if len(locations_list)>=5 else 0
+    # cluster_id = locations_list[3]  if len(locations_list)>=4 else 0
+    # taluka_id = locations_list[2] if len(locations_list)>=3 else 0
+    # district_id = locations_list[1] if len(locations_list)>=2 else 0
+    # state_id = locations_list[0] if len(locations_list)>=1 else 0
+    # village_filter,cluster_filter,taluka_filter,district_filter,state_filter = "","","","",""
+    district_filter = ''
+    if district_ids:
+        district_filter = f" and address_2 in ({str(district_ids)[1:-1]})"
+    sql_query = sql_query.replace("@@location_filter", district_filter)
     return sql_query
 
 def load_user_details(request):
     user = request.user
-    if user is not None:
-        if user.groups.filter(name__in = ['Partner Data Entry Operator','Partner Admin','Project In-charge']).exists():# project incharge
-            user_project=UserProjectMapping.objects.filter(user=request.user,active=2)
-            user_project_ids = user_project.values_list('project__id',flat=True)
-        elif user.is_superuser:
-            user_mission_id=Mission.objects.filter(active=2).values_list('id',flat=True)
-            user_project_ids=Project.objects.filter(active=2).values_list('id',flat=True)
-        user_district_ids = Project.objects.filter(id__in = user_project_ids).values_list('district_id',flat=True)
-        request.session['user_mission_list']=list(user_mission_id)
-        request.session['user_project_list']=list(user_project_ids)
-        request.session['user_district_list']=list(user_district_ids)
+    partner_ids = request.GET.getlist('partner','')
+    school_ids = request.GET.getlist('school','')
+    if user.groups.filter(name__in = ['Partner Data Entry Operator','Partner Admin','Project In-charge']).exists():# project incharge
+        user_project=UserProjectMapping.objects.filter(user=request.user,active=2)
+        user_project_ids = user_project.values_list('project__id',flat=True)
+        user_partner_id = user_project.values_list('project__partner_mission_mapping__partner_id',flat=True)
+        user_mission_id = user_project.values_list('project__partner_mission_mapping__mission_id',flat=True)
+        user_donor_id=ProjectDonorMapping.objects.filter(project__id__in=user_project_ids,active=2).values_list('donor__id',flat=True).distinct()
+        user_category_list=MissionIndicatorCategory.objects.filter(mission__id__in=user_mission_id,active=2).values_list('id',flat=True)
+    elif user.is_superuser:
+        user_mission_id=Mission.objects.filter(active=2).values_list('id',flat=True)
+        user_project_ids=Project.objects.filter(active=2).values_list('id',flat=True)
+        if partner_ids != '':
+            user_project_ids=Project.objects.filter(active=2,partner_mission_mapping__partner_id__in = partner_ids).values_list('id',flat=True)
+        user_partner_id=Partner.objects.filter(active=2).values_list('id',flat=True)
+        user_donor_id=Donor.objects.filter(active=2).values_list('id',flat=True).distinct()
+        user_category_list=MissionIndicatorCategory.objects.filter(active=2).values_list('id',flat=True)
+    user_district_ids = Project.objects.filter(id__in = user_project_ids).values_list('district_id',flat=True)
+    district_id_list = Boundary.objects.filter(code__in = [str(dist) for dist in user_district_ids],active=2,boundary_level_type_id=2).values_list('id',flat=True)
+    request.session['user_mission_list']=list(user_mission_id)
+    request.session['user_project_list']=list(user_project_ids)
+    request.session['user_partner_list']=list(user_partner_id)
+    request.session['user_donor_list']=list(user_donor_id)
+    request.session['user_category_list']=list(user_category_list)
+    request.session['user_district_list']=list(district_id_list)
+    if school_ids != '':
+        district_id_list = return_sql_results(f"""select address_2 from survey_beneficiaryresponse where creation_key in ({str(school_ids)[1:-1]}) and survey_id = 1 """)
+        request.session['user_district_list']=[dist[0] for dist in district_id_list]
     return request
 
 
@@ -1004,23 +1068,22 @@ def export_reportcsv(request,slug):
     today_year = today.year
     filters_cond = False
     user_details = load_user_details(request)
-    # if 'user_project_list' in request.session:
-    #     project_ids = request.session['user_project_list']
-    # projectlist = Project.objects.filter(id__in=project_ids).values("id","name")
+    if 'user_partner_list' in request.session:
+        partner_ids = request.session['user_partner_list']
+    partnerlist = Partner.objects.filter(id__in=partner_ids).values("id","name")
+    if 'user_district_list' in request.session:
+        district_ids = request.session['user_district_list']
     # levels_to_filter = BoundaryLevel.objects.filter(code__gte=2, code__lte=2).order_by('code')
-    # import ipdb;ipdb.set_trace()
     location_id, from_date, to_date, frm, to = None, None, None, None, None
     filter_from_date = request.GET.get('from_date','') 
     filter_to_date = request.GET.get('to_date','')
     #frontend purpose we are adding one more varaibale
-    search_filter = request.GET.get('search_box','')
-    # filter_locations = get_location_filters(request)
+    search_filter_value = request.GET.get('search_box','')
+    filter_locations = district_ids
     export_request = False
     media_url = settings.EXPORT_MEDIA_URL
-    filter_locations = {}
     page_id, rows_per_page = 0, 10
     page_id = int(request.GET.get('page',0))
-
     if page_id <= 0:
         page_id = 1
     report_slug = slug
@@ -1037,38 +1100,29 @@ def export_reportcsv(request,slug):
         else:
             if export_request == True:
                 page_id = None
-            
             sql_query = get_report_query(request , widget_obj ,page_id,rows_per_page, filter_locations, filter_from_date, filter_to_date,location_id)
             # get the count query and execute it to get the total records
             # This is executed every time so we dont pass the count in the query string and also
             # any additional records getting added can be included in the count
-            if request.GET.get('Project'):
-                project_list_str = request.GET.getlist('Project')
-                project_list_id = (str([eval(i) for i in project_list_str]))[1:-1]
+            if request.GET.get('partner'):
+                partner_list_str = request.GET.getlist('partner')
+                school_list_str = request.GET.getlist('school')
+                partner_list_id = (str([eval(i) for i in partner_list_str]))[1:-1]
                 filter_from_date = filter_to_date = ''
-                sql_query = get_report_query(request , widget_obj ,page_id,rows_per_page, filter_locations, filter_from_date, filter_to_date,location_id)
-                sql_query = sql_query.replace('@@searchfilter',f"and pp.id in ({project_list_id}) and 1=1")
+                # sql_query = get_report_query(request , widget_obj ,page_id,rows_per_page, filter_locations, filter_from_date, filter_to_date,location_id)
+                # sql_query = sql_query.replace('@@searchfilter',f"and pp.id in ({partner_list_id}) and 1=1")
                 url_filter_params = ""
-                if 'user_district_list' in request.session:
-                    district_ids = request.session['user_district_list']
-                level_2 = Boundary.objects.filter(active=2,code__in=district_ids)
-                level_options = {"District":level_2}
-            if request.GET.get('search_box'):
-                sql_query = sql_query.replace('@@searchfilter',"and upper(ss.name) like \'%"+request.GET.get('search_box').upper()+"%\' and 1=1")
+                pmm_ids = PartnerMissionMapping.objects.filter(partner_id__in = [eval(i) for i in partner_list_str]).values_list('id', flat=True)
+                district_ids = Project.objects.filter(partner_mission_mapping_id__in=pmm_ids, active=2).values_list('district_id',flat=True)
+                boundary_ids = Boundary.objects.filter(code__in=[str(dist) for dist in district_ids],boundary_level_type_id =2).values_list('id',flat=True)
+                district_id_list = [i for i in boundary_ids]
+                school_list = return_sql_results(f"""select creation_key,profile_view->'data'->>'School name' from survey_beneficiaryresponse where survey_id = 1 and address_2 in ({str(district_id_list)[1:-1]}) """)
+            search_filter_value = request.GET.get('search_box','')
+            if search_filter_value != '':
+                sql_query = sql_query.replace('@@searchfilter',"and upper(ss.name) like \'%"+search_filter_value.upper()+"%\' and 1=1")
             else:
                 sql_query = sql_query.replace('@@searchfilter','and 1=1 ')
-
-
             count_sql_query = f'select count(*) from ({sql_query}) as x1'
-            
-            # survey_list = request.session.get('survey_list')
-            # if survey_list:
-            #     survey_list.extend([70,71,73,181])
-            # count_sql_query = f'select count(*) from survey_survey where active != 0 and 1=1'
-            # if survey_list:
-            #     filter_condition = '"id" in (' + ','.join([str(i) for i in survey_list]) + ') '
-            #     sql_query = sql_query.replace('1=1', filter_condition)
-            #     count_sql_query = count_sql_query.replace('1=1', filter_condition)
             count_sql_query = re.sub(r'(LIMIT .*?$)',r') as x1',count_sql_query,1)
             total_no_of_records = execute_query(connection, count_sql_query,3)[0][0]
             total_pages =  (total_no_of_records//rows_per_page)+ 1 if total_no_of_records%rows_per_page != 0 else total_no_of_records/rows_per_page
@@ -1076,11 +1130,6 @@ def export_reportcsv(request,slug):
                 object_list = execute_query(connection, sql_query,3)
             else:
                 object_list = execute_query(connection, sql_query,3)
-            
-            # for index, loc in enumerate(filter_locations):
-            #     if loc[0] != 0:
-            #         url_filter_params = url_filter_params + "&address_" + str(index+1) + "=" + str(loc[0])
-            #         print(object_list)
     object_list = list(map(lambda x : ['-' if i == None or i == '' else i for i in x], object_list))
     # skip pagination for stored procedure -- until the out param issue is fixed
     if total_no_of_records == -1:
@@ -1094,7 +1143,6 @@ def export_reportcsv(request,slug):
         previous_page = page_id - 1
         next_page = page_id + 1
         total_pages =  (total_no_of_records//rows_per_page)+ 1 if total_no_of_records%rows_per_page != 0 else round(total_no_of_records/rows_per_page)
-    print(object_list,'------------')
     return render(request,'reports/export_reportcsv.html',locals())
 
 

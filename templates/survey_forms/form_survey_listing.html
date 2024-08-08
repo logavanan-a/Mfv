@@ -1,0 +1,481 @@
+{% extends 'base.html' %}
+{% block contents %}
+{% comment %} {% load configuration_tags %} {% endcomment %}
+{% load dict_get %}
+{% load urs_tags %}
+{% load static %}
+
+<style>
+    .bx-md {
+        font-size: 1.2rem !important;
+    }
+</style>
+<div class="row">
+    <div class="col-12">
+        {% if school_creation_key  %}
+        <div style="background-color: #DBD4FE; padding: 10px; ">
+            <h5 class="m-0"><b>School Details</b></h5>
+        </div>
+        <div class="card m-0">
+            <div class="card-body">
+                {% include "../survey_forms/profile.html" %}
+            </div>
+        </div>
+        {% endif %} 
+        {% if creation_key and survey.id != 1 and survey.id != 10 %}
+        <div style="background-color: #DBD4FE; padding: 10px; ">
+            <h5 class="m-0"><b>School Details</b></h5>
+        </div>
+        <div class="card m-0">
+            <div class="card-body">
+                {% include "../survey_forms/profile.html" %}
+            </div>
+        </div>
+        
+        {% endif %}
+        {% if survey.id != 1 %} 
+        <div class="mt-4" style="background-color: #DBD4FE; padding: 10px; ">
+            <h5 class="m-0"><b> {{survey.name}}</b></h5>
+        </div>
+        {% endif %}
+        <div class="card">
+            <div class="card-body">
+                {% if filters and not creation_key %}
+                    {% if not school_name %}
+                        {% include './survey_listing_filters.html' %}
+                    {% else %}
+                    <form method="GET" >
+                        <div class='d-flex justify-content-between'>
+                            <div class="d-flex">
+                                <div class=" mb-2 me-3">
+                                    <input  id='' type="search" name="search" class="form-control" value="{{request_data|get_item:'search'|default:''}}" placeholder="search...">
+                                </div>
+                                <div class="">
+                                    <input type='submit' class="btn btn-success btn-lg waves-effect waves-light mb-2 fs-6" value="Go"></input>
+                                </div>
+                            </div>
+                            {% with profile_obj.survey.slug|default:survey.slug|make_string:"add" as keystrings %}
+                                {% if not main_add_button and request.user.groups.all.0.id == 1 %}
+                                    {% if school_name %}
+                                    <div >
+                                        <button type="button" class="btn btn-primary w-md mb-2" id="add_buton_listing" onclick="location.href='/configuration/add-survey-form/{{survey.id}}/?creation_key={{school_creation_key}}&school_name={{school_name}}'"> Add New</button>
+                                    </div>
+                                    {% endif %}
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+                
+                {% if survey_slug and not creation_key %}
+                <div class='d-flex justify-content-end'>
+                        {% with profile_obj.survey.slug|default:survey.slug|make_string:"add" as keystrings %}
+                            {% if not main_add_button and request.user.groups.all.0.id == 1 %}
+                                {% if not school_name %}
+                                <div class='col-auto'>
+                                    <button type="button" class="btn btn-primary w-md mb-2" id="add_buton_listing" onclick="location.href='/configuration/add-survey-form/{{survey.id}}/'"> Add New</button>
+                                </div>
+                                {% endif %}
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                {% endif %}
+                        
+                
+                
+                {% comment %}{% if survey.periodicity == 7 and creation_key and survey_slug %}
+                    <!--header of one time activity-->
+                    <div class='row mt-4 mb-2'>
+                        <div class='col-6'>
+                            <div class="d-flex justify-content-start mt-2">
+                                <h5 class=''> <b></b></h5>.
+                            </div>
+                        </div>
+                        <div class='col-6'>
+                            <div class="d-flex justify-content-end">
+                                {% with keystrings_edit=profile_obj.survey.slug|default:survey.slug|make_string:"edit" keystrings_add=profile_obj.survey.slug|default:survey.slug|make_string:"add" %}
+                                    {% if not main_add_button and request.user.groups.all.0.id == 1 and profile_obj.survey.id|survey_show:"" %}
+                                        <h4 class="m-0 px-2 pt-2" title='Add'><a {% if survey.id|validation_popup:creation_key != 0 %}onclick="Confirm('{{survey.id|validation_popup:creation_key}}', 'Activate')"{% else %}href="/configuration/add-survey-form/{{survey.id}}/?ben={{creation_key}}"{% endif %}><span class="bx bx-plus-medical bx-md"></span></a></h4>
+                                    {% endif %}
+                                {% endwith %}
+                                {% with profile_obj.survey.slug|default:survey.slug|make_string:"delete" as keystrings %}
+                                    {% if request.user.groups.all.0.id == 1 and object_lists %}
+                                        <h4 class="p-2" ><a id='{{object_lists.0.creation_key}}' class='delete_button'>
+                                            <button class="btn btn-sm btn-just-icon text-danger" style="float:right" title="delete">
+                                                <span class="bx bx-trash bx-sm"></span>
+                                            </button>
+                                        </a></h4>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                        </div>
+                        <!--Body of one time activity-->
+                        {% for item in survey_heading_questions %}
+                            {% if item.qtype == 'AW' %}
+                                {% for question_id,answers in profile_obj.response.address.1.items %}
+                                    <div class="col-lg-4 col-sm-4 col-md-4">
+                                        <div class='d-flex'  >
+                                            <p class="fw-bold" style="font-size:1rem;width: 30%;">{{item.id|get_question_text:profile_obj.survey_id}}</p>
+                                            <p class="fw-bold text-center" style="font-size:1rem;width: 10%;">:</p>
+                                            <p style="font-size:1rem" class='text-primary'>{% get_answer_text survey.id object_lists.0.response|get_item_str:item.id item %}</p>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="col-lg-4 col-sm-4 col-md-4">
+                                    <div class='d-flex'>
+                                        <p class="fw-bold" style="font-size:1rem;width: 30%;">{{item.id|get_question_text:survey.id}}</p>
+                                        <p class="fw-bold text-center" style="font-size:1rem;width: 10%;">:</p>
+                                        <p style="font-size:1rem;width: 60%;">{% get_answer_text survey.id object_lists.0.response|get_item_str:item.id item %}</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>{% endcomment %}
+                {% if not survey_slug and creation_key and options_dropdown.count > 1 %}
+                    <!-- profile page view the data -->
+                     
+                    <div class='row '>
+                        <div class="d-flex justify-content-end">
+                            {% with profile_obj.survey.slug|default:survey.slug|make_string:"edit" as keystrings %}
+                                {% if not main_add_button and request.user.groups.all.0.id == 1 %}
+                                        <h4 class="p-2"><a href="/configuration/edit-survey-form/{{survey.slug}}/{{creation_key}}/"><span class="bx bxs-edit-alt bx-md"></span></a></h4>
+                                        {% comment %} <a id='{{creation_key}}' class='delete_button'>
+                                            <button class="btn btn-sm btn-just-icon text-danger" style="float:right" title="Edit">
+                                                <span class="bx bx-trash bx-md"></span>
+                                            </button>
+                                        </a> {% endcomment %}
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                        {% for item in fixed_questions %}
+                            {% if item.id not in fixed_profile_ids %}
+                                {% if item.qtype == 'AW' %}
+                                    {% for question_id,answers in profile_obj.response.address.1.items %}
+                                        <div class="col-lg-4 col-sm-4 col-md-4">
+                                            <div class='d-flex' >
+                                                <p class="fw-bold " style="font-size:1rem;width: 30%;">{{item.id|get_question_text:profile_obj.survey_id}}</p>
+                                                <p class="fw-bold text-center" style="font-size:1rem;width: 10%;">:</p>
+                                                <p style="font-size:1rem;width: 60%;">{% get_answer_text profile_obj.survey_id answers item %}</p>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% elif item.qtype == 'GD' %}
+                                    <h5 class="fw-bold " style="font-size:1rem">{{item.text}} :</h5>
+                                    {% if profile_obj.response|get_item_str:item.id %}
+                                        <div class="col-lg-12 col-sm-12 col-md-12 d-flex justify-content-start ">
+                                            
+                                            <div class="container border">
+                                                    <div class="row fw-bolder border-bottom mb-2">
+                                                        <div class="col"></div>
+                                                        {% for i in profile_obj.response|get_item_str:item.id|get_dict_header %}
+                                                            <div class="col">{{i|get_question_text:profile_obj.survey_id}}</div>
+                                                        {% endfor %}
+                                                    </div>
+                                                {% for q_id in profile_obj.response|get_item_str:item.id %}
+                                                    <div class="row mb-2 mt-2">
+                                                        <div class="col">{{q_id|get_question_text:profile_obj.survey_id}}</div>
+                                                        {% get_answer_text profile_obj.survey_id profile_obj.response|get_item_str:item.id|get_item_str:q_id item as result %}
+                                                        {% for key,g_text in result.items %}
+                                                            <div class="col">{{g_text}}</div>
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endfor %}
+
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="col-lg-4 col-sm-4 col-md-4">
+                                            <div class='p-2' style="width: 30%;">
+                                                <p class="fw-bold" style="font-size:1rem;width: 30%;">{{question_id|get_question_text:profile_obj.survey_id}} :</p>
+                                                <p class="fw-bold text-center" style="font-size:1rem;width: 10%;">:</p>
+                                                <p style="font-size:1rem;width: 60%;">-</p>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <div class="col-lg-4 col-sm-4 col-md-4">
+                                        <div class='d-flex p-2' >
+                                            <p class="fw-bold " style="font-size:1rem;width: 30%;">{{item.id|get_question_text:profile_obj.survey_id}}</p>
+                                            <p class="fw-bold text-center" style="font-size:1rem;width: 10%;">:</p>
+                                            <p style="font-size:1rem;width: 60%;">{% get_answer_text profile_obj.survey_id profile_obj.response|get_item_str:item.id item %}</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% with profile_obj.survey.slug|default:survey.slug|make_string:"approve" as keystrings %}
+                        {% if request.user.groups.all.0.id == 1 and profile_obj.response.616 == '618' %}
+                            <form method='POST' action="/configuration/facility/approve_reject/{{profile_obj.creation_key}}/" id="facility_approve_reject">
+                                {% csrf_token %}
+                                <div class='row'>
+                                    <div class=' d-flex justify-content-end '>
+                                        <div>
+                                            <button type="button" id="reject" value="619" name="rejected" class="btn btn-primary w-md btn-danger">Reject</button>
+                                            <button type="button" id="approve" value="620" name="approved" class="btn btn-primary w-md btn-success">Approve</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        {% endif %}
+                    {% endwith %}
+
+                {% elif object_lists|length == 0 and creation_key %}
+                    <!-- activity listing page with no data -->
+                    <div class='row'>
+                        <div class='col-6'>
+                            <div class="d-flex justify-content-start mt-2">
+                                <h5 class=''> <b></b></h5>
+                            </div>
+                        </div>
+                        <div class='col-6'>
+                            <div class="d-flex justify-content-end">
+                                {% with profile_obj.survey.slug|default:survey.slug|make_string:"add" as keystrings %}
+                                    {% if request.user.groups.all.0.id == 1 and survey.id|survey_show:creation_key %}
+                                    <h4 class="m-0 px-2 pt-2" title='Add'><a {% if survey.id|validation_popup:creation_key != 0 %}onclick="Confirm('{{survey.id|validation_popup:creation_key}}', 'Activate')"{% else %}href="/configuration/{% if survey.id == 20 %}custom_weekly_data_form{% else %}add-survey-form/{{survey.id}}{% endif %}/?ben={{creation_key}}"{% endif%}><span class="bx bx-plus-medical bx-md"></span></a></h4>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-sm-4 col-md-4">
+                            <div class='p-2'>
+                                <h5 class="" style="font-size:1rem">No data available</h5>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- listing page with table  -->
+                    <div class="table-responsive my-2" >
+                        {% if creation_key %}
+                            <div class='row'>
+                                <div class='col-6'>
+                                    <div class="d-flex justify-content-start mt-2">
+                                        <h5 class=''> <b></b></h5>
+                                    </div>
+                                </div>                                                          
+                                {% with profile_obj.survey.slug|default:survey.slug|make_string:"add" as keystrings %}
+                                    {% if not hide_button and request.user.groups.all.0.id == 1 and survey.id|survey_show:creation_key %}
+                                        <div class='col-6'>
+                                            <div class="d-flex justify-content-end">
+                                                <h4 class="m-0 px-2 pt-2" title='Add'><a {% if survey.id|validation_popup:creation_key != 0  %}onclick="Confirm('{{survey.id|validation_popup:creation_key}}', 'Activate')"{% else %}href="/configuration/{% if survey.id == 20 %}custom_weekly_data_form{% else %}add-survey-form/{{survey.id}}{% endif %}/?ben={{creation_key}}"{% endif %}><span class="bx bx-plus-medical bx-md"></span></a></h4>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                        {% endif %}
+                        <table class="table mb-0">
+                            <thead class="table-light">
+                                <tr class='bg-warning ' style='font-size:medium'>
+                                    {% for header in survey_heading_questions %}
+                                        <th>{{header.text}}</th>
+                                    {% endfor %}
+                                    {% if profile_obj or not main_add_button and options_dropdown.count > 0  %}
+                                    {% endif %}
+                                        <th width='15%'>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for json_answer in object_lists %}
+                                    <tr class="odd font-size-16">
+                                        {% for header_id in survey_heading_questions %}
+                                        <!-- options_dropdown.count > 0 -->
+                                            {% if forloop.counter == 1 and not profile_obj and not main_add_button and options_dropdown and survey.id == 2 %}
+                                            <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}><a href="/configuration/profile/{{json_answer.creation_key}}/"><b>{{json_answer|get_item_ans:header_id|safe}}</b></a></td>
+                                            {% elif forloop.counter == 1 and not profile_obj and not main_add_button and options_dropdown %}
+                                            <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}><a href="/configuration/list/student-details-3004/{{json_answer.creation_key}}/{{json_answer|get_item_ans:header_id|safe}}/"><b>{{json_answer|get_item_ans:header_id|safe}}</b></a></td>
+                                            {% else %}
+                                            <td {% if header_id.qtype in 'D,AW' %}nowrap{% endif %}>{{json_answer|get_item_ans:header_id|safe}}</td>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if profile_obj or not main_add_button and survey.id != 1 and options_dropdown.count > 0  %}
+                                            <td>
+                                                <div class="row">
+                                                    {% with profile_obj.survey.slug|default:survey.slug|make_string:"edit" as keystrings %}
+                                                        {% if object_lists|length and creation_key and request.user.groups.all.0.id == 1 %}
+                                                            <div class="col-auto mb-2">
+                                                                <a href="/configuration/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/?ben={{creation_key}}" >
+                                                                    <span class="bx bxs-edit-alt bx-md"></span>
+                                                                </a>
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                    {% if not profile_obj %}
+                                                        <div class="col-auto">
+                                                            <div class="col-sm-6">
+                                                                <div class="dropdown">                                                                    
+                                                                    {% with profile_obj.survey.slug|default:survey.slug|make_string:"edit" as keystrings %}
+                                                                    {% if not main_add_button and request.user.groups.all.0.id == 1 %}
+                                                                        <a href='/configuration/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/'><span class="bx bxs-edit-alt bx-md"></span></a>
+                                                                        {% endif %}
+                                                                        {% endwith %}
+                                                                        
+                                                                </div>
+                                                            </div>
+                                                            {% with profile_obj.survey.slug|default:survey.slug|make_string:"approve" as keystrings %}
+                                                                {% comment %}{% transfer_check json_answer.creation_key as transfer_status %}{% endcomment %}
+                                                                {% if survey.id == 1 and request.user.groups.all.0.id == 1 %}
+                                                                    <a href="/configuration/transfer/add/{{json_answer.creation_key}}/" >
+                                                                        <button type="button" class="btn btn-info mt-2">
+                                                                    <i class="bx bx-transfer-alt d-block font-size-16"></i> 
+                                                                        </button>
+                                                                    </a>
+                                                                {% endif %}
+                                                            {% endwith %}
+                                                        </div>
+                                                    {% endif %}
+                                                    {% comment %}{% with profile_obj.survey.slug|default:survey.slug|make_string:"delete" as keystrings %}
+                                                        {% if request.user.groups.all.0.id == 1 %}
+                                                            <div class="col-auto ">
+                                                                <a id='{{json_answer.creation_key}}' class='delete_button' uid='{{json_answer.response.6}}'>
+                                                                    <button class="btn btn-sm btn-just-icon text-danger" style="float:right" title="delete">
+                                                                        <span class="bx bx-trash bx-sm"></span>
+                                                                    </button>
+                                                                </a>
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endwith %}{% endcomment %}
+                                                </div>
+                                            </td>
+                                        {% else %}
+                                        <td>
+                                            <a  href='/configuration/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/'><span class="bx bxs-edit-alt bx-md"></span></a>
+                                        </td>
+                                        {% endif%}   
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+                {% if object_lists %}
+                    {% include 'survey_forms/web_pagination.html' %}
+                {% endif %}
+            </div>
+        </div>
+        
+    </div> <!-- end col -->
+</div>
+<script>
+    $(document).ready(function(){
+        var seq_status = {{seq_status|safe|default:'{}'}};
+        if (Object.keys(seq_status).length > 0){
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: Object.values(seq_status)[0],
+            }).then(function (t) {
+                var previousPageURL = document.referrer;
+                var url = new URL(previousPageURL);
+                var previousPath = url.pathname;
+                window.location.href = previousPath
+            })
+        }
+    })
+
+
+    $('#approve,#reject').on('click', function() {
+        $('<input>').attr('type','hidden').attr('name','status').val(this.value).appendTo('#facility_approve_reject')
+        Swal.fire({
+            title: "Are you absolutely sure?",
+            text: "Please enter the remark.",
+            input: 'textarea',
+            showCancelButton: true ,
+            showCloseButton: true ,
+            confirmButtonColor: "#34c38f",
+            cancelButtonColor: "#f46a6a",
+            confirmButtonText: "Yes, update it!",
+        }).then(function (t) {
+            if (t.isConfirmed){
+                $('<input>').attr('type','hidden').attr('name','remark').val(t.value).appendTo('#facility_approve_reject')
+                document.getElementById("facility_approve_reject").submit();
+                Swal.fire("Updated!", "Facility status updated.", "success")
+            }
+        })
+    })
+
+    $('.delete_button').on('click', function() {
+        var id=$(this).attr('id')
+        var uid=$(this).attr('uid')
+        $.get('/masterdata/delete/'+id+'/?list=true', function(data){
+            var htmlContent = "<ul class='list-unstyled'>";
+            for (var i = 0; i < data['list'].length; i++) {
+                htmlContent += "<li>" + data['list'][i]['survey__name'] + ": " + data['list'][i]['record_count'] + "</li>";
+            }
+            htmlContent += "</ul>";
+            Swal.fire({
+                title: "Are you sure you want to delete "+uid+" ? <br> You won't be able to revert this!",
+                //text: "You won't be able to revert this!",
+                icon: 'warning',
+                html: htmlContent,  
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    $.get('/masterdata/delete/'+id+'/?uid={{request.user.id}}&delete=true', function(data){
+                        if (data['status'] == 0){
+                            Swal.fire({icon: 'error',title: 'Oops...',text: data['message']})
+                        }else{
+                            Swal.fire('Deleted!',data['message'],'success')
+                            window.location.href = data['redirect']
+                        }
+                        
+                    });
+                    
+
+                }
+            })
+        });
+    })
+</script>
+<style>
+    @media (min-width: 768px) and @media (min-width: 992px) and @media (min-width: 576px){
+        .table-responsive {
+            overflow: visible;
+        }
+    }
+    table.table-hover tbody tr td:hover {
+        background-color: #fb9692 !important; 
+    }
+</style>
+{% endblock  %}
+{% block extra_javascript %}
+    <script src="{% static 'js/pages/datatables.init.js' %}"></script>
+    <!-- Required datatable js -->
+    <script src="{% static 'libs/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+    <!-- Buttons examples -->
+    <script src="{% static 'libs/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'libs/jszip/dist/jszip.min.js' %}"></script>
+    <script src="{% static 'libs/pdfmake/build/pdfmake.min.js' %}"></script>
+    <script src="{% static 'libs/pdfmake/build/vfs_fonts.js' %}"></script>
+    <script src="{% static 'libs/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'libs/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
+    <script src="{% static 'libs/datatables.net-buttons/js/buttons.colVis.min.js' %}"></script>
+
+    <!-- Responsive examples -->
+    <script src="{% static 'libs/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
+    <script type="text/javascript" >
+        function Confirm(value, title) {
+            if(parseInt(value) == 3){
+                msg = "Please add Referral Management and try again"
+            }else if(parseInt(value) == 2){
+                msg = "Please add Spectacle Dispensing and try again"
+            }else{
+                msg = "Unable to add this activity"
+            }
+            Swal.fire({
+                title: "Alert!",
+                text: msg,
+                icon: "warning",
+            });
+        }
+
+    </script>
+{% endblock %}

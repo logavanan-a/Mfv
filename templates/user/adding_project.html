@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+map_project{% extends 'base.html' %}
 {% load static %}
 
 {% block contents %}
@@ -98,13 +98,25 @@
                     </div>
                       
                     <div class="row mb-4">
+                        <label class="col-md-2 col-form-label">Application Type<span class="required-field"></span></label>
+                        <div class="col-md-4">
+                            <select name="application_type" class="form-select select2" required>
+                                <option value="" disabled selected>Select application type</option>
+                                {% for application_type in application_type_obj %}
+                                    <option value="{{ application_type.id }}">{{ application_type.name }}</option>
+                                {% endfor %}
+                            </select> 
+                            <div class="invalid-feedback">
+                                Please select application type.
+                            </div>                       
+                        </div>
                         <label class="col-md-2 col-form-label">Additional Info<span ></span></label>
                         <div class="col-md-4">
                             <textarea type="text" class="form-control" id="" name='additional_info' placeholder="Enter Additional info"  rows="5" cols="50"> </textarea>
                         </div>
                     </div>
                     <div class="gap-2" style="float:right;">
-                        <button type="reset"  onclick="location.href='javascript:history.back()'" class="btn btn-secondary waves-effect">
+                        <button type="reset"  onclick="history.back()" class="btn btn-secondary waves-effect">
                             Cancel
                         </button>
                         <button type="submit" id="submitting" style="margin-left: 5px;" class="btn btn-primary w-md">Submit</button>

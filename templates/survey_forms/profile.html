@@ -1,0 +1,43 @@
+{% load static %}
+
+
+{% comment %}<div class="mb-2">
+    <ul class="nav  nav-ul " role="tablist">
+        {% if options_dropdown.count > 0 %}
+        <li class="nav-item dropdown mt-2" style='margin-right:2px'>
+            <a class="btn nav-link dropdown-toggle nav_label {% if not survey_slug or school_name %}bg-warning text-dark{% else %}bg-primary text-white{% endif %}"
+                href='{% if school_creation_key  %}/configuration/list/student-details-3004/{{school_creation_key}}/{{school_name}}/{% else %}/configuration/profile/{{creation_key}}/{% endif %}'
+                id="dropdownMenuButton" style='font-size:1.1rem'>
+                Profile
+            </a>
+        </li>
+        {% for survey_tags in options_dropdown %}
+        <li class="nav-item dropdown mt-2" style='margin-right:2px'>
+            <a 
+                class="btn nav-link dropdown-toggle  nav_label {% if survey_tags.id == survey.id %}bg-warning text-dark{% elif survey_tags.id in profile_obj.survey.extra_config.reject_hidefields and profile_obj.response.616 != '620' %}bg-secondary{% else %}bg-primary text-white{% endif %}"
+                href='/configuration/profile/{{survey_tags.slug}}/{% if school_creation_key %}{{school_creation_key}}{% else %}{{creation_key}}{% endif %}/'
+                id="dropdownMenuButton" style='font-size:1.1rem'>
+                {{survey_tags.short_name|default:survey_tags.name}}
+            </a>
+        </li>
+        {% endfor %}
+        {% endif %}
+    </ul>
+</div>{% endcomment %}
+
+<div class="row  " >
+    {% for key,item in profile_fields.items %}
+    <div class="col-lg-4 col-sm-4 col-md-4  mt-2">
+        <div class="d-flex">
+            <p class="fw-bold" style="width: 30%; font-size: 1rem;">{{key}}</p>
+            <p class="fw-bold text-center" style="width: 10%; font-size: 1rem;">:</p>
+            <p  style="font-size: 1rem" style="width: 60%;">{{item}}</p>
+        </div>
+    </div>
+    {% endfor %}
+    <!-- <div class="col-lg-12 col-sm-12 col-md-12 d-flex justify-content-start ">
+        <div class='p-2'>
+            <p style="font-size:.95rem" class='text-primary'>{{status_text}}</p>
+        </div>
+    </div> -->
+</div>

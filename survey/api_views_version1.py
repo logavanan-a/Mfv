@@ -98,10 +98,12 @@ def add_survey_answers_version_1(request, **kwargs):
     # End time et = datetime.now()
     # Difference diff = et - st
 
-    response, status, error_msg, response_type, message,approved_by,approved_on,submitted_approval = {}, True, '', 0, '',"","",None
+    response, status, error_msg, response_type, message,approved_by,approved_on,submitted_approval,obj = {}, True, '', 0, '',"","",None,None
     # data = json.loads(request.body.decode('utf-8'))
     data = request.POST
     create_post_log_v2(request, data)
+    if kwargs:
+        data=kwargs
     user_id = int(data['u_uuid'])
     sync_res = []
     message = "Success"
@@ -141,7 +143,10 @@ def add_survey_answers_version_1(request, **kwargs):
         #     'SYNC_SURVEY_INFO', survey_boundary_key, activities, 14400)
     resp_ids = {level: [] for level in activity_queries.keys()}
     try:
-        pushinput = json.loads(data['pushInput'])
+        if kwargs:
+            pushinput = data['pushInput']
+        else:
+            pushinput = json.loads(data['pushInput'])
         all_input_ben_uuid = [p.get('beneficiary_id','') for p in pushinput if p.get('beneficiary_id') != '0']
         all_input_ben_list =list(JsonAnswer.objects.filter(active=2,creation_key__in =all_input_ben_uuid).values_list('creation_key',flat=True))
         for val in pushinput:
@@ -353,19 +358,11 @@ def add_survey_answers_version_1(request, **kwargs):
                     exc_type, exc_value, exc_traceback))
                 logging.error(error_stack)
             finally:
-                sync_res.append({"r_uuid": val['r_uuid'], "sync_status": sync_status,
-                            "s_created": server_created_date, 'error_msg':error_msg, 'duplicate_status': duplicate_status,"approved_by":approved_by,"approved_on":approved_on})
-        for key, value in resp_ids.items():
-            if value and activity_queries.get(key):
-                with connection.cursor() as cursor:
-                    cursor.execute(activity_queries.get(key).format(', '.join(map(str, value))))
-        # email configuration for sending respected role users 
-        status_of_submission = 1 if submitted_approval else 0
-        # submitted_record_mails(updated_record_email_ids,response_current_status,role_workflow_dict,status_of_submission)  
-
+                sync_res.append({"r_uuid": val['r_uuid'], "sync_status": sync_status,"s_created": server_created_date, 'error_msg':error_msg, 'duplicate_status': duplicate_status,"approved_by":approved_by,"approved_on":approved_on,})
     except Exception as ex:
         status = False
         message = "Failed"
+        obj=None
         error_msg = ex.args[0]
         logging.error(error_msg)
         exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -374,7 +371,8 @@ def add_survey_answers_version_1(request, **kwargs):
         logging.error(error_stack)
     response = {'status': status,
                 'message': message,
-                "sync_res": sync_res
+                "sync_res": sync_res,
+                "u_uuid": obj.sample_id if obj else "",
                 }
     create_post_log_v2(request,response)
     return JsonResponse(response)
@@ -2102,6 +2100,36 @@ def get_content_language_text(content_object, language):
 def get_choice_text(choice):
     return smart_str(choice.text) if choice else smart_str(choice)
 
+def display_inline_question(ques, json_obj, one_response):
+    try:
+        if json_obj.response.get(str(ques.id)):
+            if ques.api_qtype in ['S', 'R'] and not ques.master_question:
+#...............api question of masterlookup with api_json then if or else( is old one)
+                if ques.api_json and ques.api_json.get('display_datatype') == 'MasterLookUp':
+                    one_response[str(ques.text)]=MasterLookUp.objects.get(id=json_obj.response.get(str(ques.id))).name
+                else:
+                    one_response[str(ques.text)] = BeneficiaryResponse.objects.get(id=json_obj.response.get(str(ques.id))).get_response_name()
+            elif ques.api_qtype in ['C'] and not ques.master_question:
+                ben_nam_list = []
+                for mlist in json_obj.response.get(str(ques.id)):
+                    ben_nam_list.append(BeneficiaryResponse.objects.get(id=mlist).get_response_name())
+                one_response[str(ques.text)] = ', '.join(ben_nam_list)
+            elif ques.api_qtype == 'C' and ques.master_question:
+                master_list = []
+                for mlist in json_obj.response.get(str(ques.id)):
+                    master_list.append(MasterLookUp.objects.get(id=mlist).name)
+                one_response[str(ques.text)] = ', '.join(master_list)
+            elif ques.api_qtype in ['S', 'R'] and ques.master_question:
+                one_response[str(ques.text)] = MasterLookUp.objects.get(id=json_obj.response.get(str(ques.id))).name
+        # elif ques.api_qtype == "RO":
+        #     user = json_obj.user
+        #     display_question = Question.objects.get(id=ques.api_json["display_question"])
+        #     location = OrganizationLocation.objects.get_or_none(user__user=user).location.all()[0]
+        #     question_options = JsonAnswer.objects.get(survey=display_question.block.survey, cluster__Boundary=str(location.id)).response.get(str(display_question.id))
+        #     one_response[str(ques.text)] = question_options
+    except:
+        pass
+    return one_response
 
 def update_question_answers(questions, json_obj, one_response):
     # from configuration_settings.templatetags.configuration_tags import get_content_language_text
