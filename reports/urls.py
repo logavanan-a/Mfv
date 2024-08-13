@@ -1,5 +1,5 @@
 from django.urls import path
-from reports.views import custom_report, custom_report_reload, get_indicator,reports_listing, get_project,export_reportcsv,custom_report_csv,get_district,get_school, quietly_report,get_donor_district
+from reports.views import custom_report, custom_report_reload, get_indicator,reports_listing, get_project,export_reportcsv,custom_report_csv,get_district,get_school, quietly_report,get_donor_district,custom_report_donor
 
 app_name = "reports"
 urlpatterns = [
