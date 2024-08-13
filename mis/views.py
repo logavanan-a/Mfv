@@ -65,7 +65,9 @@ def login_view(request):
             if UserProfile.objects.filter(user=user,login_type=1).exists():
                 if user.groups.filter(name__in = ['Partner Data Entry Operator','Partner Admin','Project In-charge']).exists():# project incharge
                     user_project=UserProjectMapping.objects.filter(user=request.user,active=2).select_related('project','project__partner_mission_mapping','project__partner_mission_mapping__partner','project__partner_mission_mapping__mission','project__district','project__district__state')
+                    application_type_id = user_project.first().project.application_type_id
                     user_project_ids = user_project.values_list('project__id',flat=True)
+                    user_partner_list_roshni = user_project.filter(project__application_type_id=511).values_list('project__partner_mission_mapping__partner_id',flat=True)
                     user_partner_id = user_project.values_list('project__partner_mission_mapping__partner_id',flat=True)
                     user_mission_id = user_project.values_list('project__partner_mission_mapping__mission_id',flat=True)
 
@@ -76,15 +78,19 @@ def login_view(request):
                 elif user.is_superuser:
                     user_mission_id=Mission.objects.filter(active=2).values_list('id',flat=True)
                     user_project_ids=Project.objects.filter(active=2).values_list('id',flat=True)
+                    application_type_id = 0
+                    user_partner_list_roshni = user_project_ids.filter(application_type_id=511).values_list('partner_mission_mapping__partner_id',flat=True)
                     user_partner_id=Partner.objects.filter(active=2).values_list('id',flat=True)
                     user_donor_id=Donor.objects.filter(active=2).values_list('id',flat=True).distinct()
                     user_category_list=MissionIndicatorCategory.objects.filter(active=2).values_list('id',flat=True)
                     user_parent_boundary_list = State.objects.filter(active=2).values_list('id',flat=True)
                     user_boundary_list = District.objects.filter(active=2).values_list('id',flat=True)
                 
+                request.session['application_type_id']=application_type_id
                 request.session['user_mission_list']=list(user_mission_id)
                 request.session['user_project_list']=list(user_project_ids)
                 request.session['user_partner_list']=list(user_partner_id)
+                request.session['user_partner_list_roshni']=list(user_partner_list_roshni)
                 request.session['user_donor_list']=list(user_donor_id)
                 request.session['user_category_list']=list(user_category_list)
                 request.session['user_parent_boundary_list']=list(user_parent_boundary_list)
@@ -489,7 +495,7 @@ def user_listing(request):
     heading = "User Management"
     search = request.GET.get('search', '')
     user_role_location_config = UserProfile.objects.filter(
-        active=2).order_by('user__username')
+        active=2).order_by('-id')
     groups = Group.objects.all().exclude(id=11)
     if search:
         user_role_location_config = user_role_location_config.filter(user__username__icontains = search, active=2)
@@ -528,20 +534,20 @@ def add_user(request, user_location=None):
             if User.objects.filter(username__iexact=username).exists():
                 user_exist_error = 'Username already exist'
                 return render(request, 'user/add_user.html', locals())
-            if User.objects.filter(email__iexact=email).exists():
+            if email and User.objects.filter(email__iexact=email).exists():
                 email_error = 'Email already exist'
                 return render(request, 'user/add_user.html', locals())
             if UserProfile.objects.filter(phone_no__iexact=mobile_no).exists():
                 mobile_no_error = 'Mobile no already exist'
                 return render(request, 'user/add_user.html', locals())
             user = User.objects.create_user(username=username, password=password)
-            user.email =  email
-            user.first_name = first_name
-            user.last_name = last_name
+            user.email =  email or None
+            user.first_name = first_name or None
+            user.last_name = last_name or None
             user.groups.add(Group.objects.get(id = user_role ))
             user.save()
 
-            user_profile=UserProfile.objects.create(user=user, phone_no=mobile_no, login_type=login_type)
+            user_profile=UserProfile.objects.create(user=user, phone_no=mobile_no or None, login_type=login_type)
             user_profile.save()
             return redirect('mis:user_listing')
         except:
@@ -633,7 +639,7 @@ def edit_user(request, id):
         #     user_partner_config.partner = Partner.objects.get(id = partner)
         # user_partner_config.save()
 
-        return redirect('mis:user_profile', id = id)
+        return redirect('/user-profile/'+str(id)+'/')
     
     return render(request, 'user/edit_user.html', locals())
 

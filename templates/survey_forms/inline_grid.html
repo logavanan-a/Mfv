@@ -1,0 +1,319 @@
+{% comment %} {% load static %} {% endcomment %}
+{% get_childs question.id as inline_childs %}
+{% if inline_childs|length > 0%}
+    <div class="table-responsive" id="skip_{{question.id}}">
+        <div class="repeater">
+            <input data-repeater-create type="button" class="btn btn-success mb-3 float-end add" value="Add"/>
+            <label class="form-label" >{{question.form_question_number|default:'' }}. {{question.text}} {% if inline_questions.mandatory %}<span class="required-field"></span>{% endif %}</label>
+            <table class="table table-bordered " name='inline_question' id='{{question.id}}'>
+                <thead>
+                    <tr>
+                        {% for inline_questions in inline_childs %}
+                        <th class='col_{{inline_questions.id}}' nowrap>{{inline_questions.text}}</th>
+                        {% endfor %}
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody data-repeater-list="group-{{question.id}}">
+                    <tr data-repeater-item>
+                        {% for inline_questions in inline_childs %}
+                        {% is_skip_question inline_questions.id as inline_is_skip_question %}
+                        {% choice_list inline_questions.id as inline_choice_list %}
+                        {% get_inner_questions inline_questions.id as inline_get_inner_questions %}
+                        {% get_validation_code inline_questions.id as inline_validation_code %}
+                        
+                        <td class='col_{{inline_questions.id}}'>
+                            <input type="hidden" id='index_length' >
+                            {% if inline_is_skip_question and inline_get_inner_questions %}
+                                <div class="col-lg-6" id='skip_{{inline_questions.id}}'>
+                                    <div class=" mb-3">
+                                        {% comment %} <label class="form-label" >{{inline_questions.text}} {% if inline_questions.mandatory %}<span class="required-field"></span>{% endif %}</label> {% endcomment %}
+                                        <select onchange='onchange_for_skip(this)' class=" form-select {{question.id}}  S_0_0 {% if inline_questions.qtype == 'SM' %}sm_question{% endif %} {% if inline_questions.mandatory %}required{% endif %}"  name='{{inline_questions.id}}' id='{{inline_questions.id}}'
+                                            aria-label="Floating label select example" data-placeholder=" "  {% if inline_questions.mandatory %}required{% endif %}>
+                                            <option selected {% if inline_questions.mandatory %}disabled{% endif %} value=""></option>
+                                            {% for question_id in inline_choice_list %}
+                                            <option value="{{question_id.id}}" class='{{question_id.skip_question_ids}}-{{inline_get_inner_questions}}'>{{question_id.choice}}</option>{% comment %}{% question_ids question_id %}{% endcomment %}
+                                            {% endfor %}
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            {% if inline_validation_code.message %}{{inline_validation_code.message}}{% else %}Please select atleast one option from the list{% endif %}
+                                        </div>
+                                    </div> 
+                                    <style>
+                                        
+                                        {% if inline_questions.mandatory %}
+                                        .select2-container .select2-selection--single #select2-{{inline_questions.id}}-container:after {
+                                            content: " *";
+                                            color: red;
+                                        }
+                                        
+                                        {% endif %}
+                                    </style>
+                                    <script>
+                                        $(document).ready(function () {
+                                            //skip logic for dropdown when select item
+                                            $({{inline_get_inner_questions}}).each(function(index, element) {
+                                                $('#skip_'+element).hide();
+                                                //$('table .col_'+element).hide();
+                                                $('#'+element).removeAttr('required');
+                                            })
+                                            if ('{{inline_questions.qtype}}' == 'SM'){
+                                                $('select#{{inline_questions.api_json.sm_parent_id}}').change(function () {
+                                                    var optionSelected = $(this).find("option:selected")
+                                                    var valueSelected = optionSelected.attr('value')
+                                                    
+                                                    $.ajax({
+                                                        type: "GET",
+                                                        url: '/configuration/ajax/get_master_lookups/',
+                                                        data: {'selected_master':valueSelected,'inline':true},
+                                                        success: function (result) {
+                                                            var hidden_value = {}
+                                                            already_val=$('#100').repeaterVal()
+                                                            {% comment %} $('[id=101_hidden]').each(function(index,val){ 
+                                                                hidden_value[index]={101:($(this).val()),102:already_val['group-100'][index][1]}
+                                                            }) {% endcomment %}
+                                                            
+                                                            already_val['group-100']
+                                                            $("[id={{inline_questions.id}}] option").remove();
+                                                            b = '<option value=""></option>';
+                                                            $("[id={{inline_questions.id}}]").append(b);
+                                                            if (JSON.parse(result) != 0) {
+                                                                $.each(JSON.parse(result), function (key, value) {
+                                                                    if(hidden_value == value['id']){
+                                                                        a = '<option value=' + value['id'] + ' class="'+JSON.stringify(value['show_qid'])+'-'+JSON.stringify(value['skip_qid'])+'" selected>' +value['name'] + '</option>';
+                                                                    }else{
+                                                                        a = '<option value=' + value['id'] + ' class="'+JSON.stringify(value['show_qid'])+'-'+JSON.stringify(value['skip_qid'])+'">' +value['name'] + '</option>';
+                                                                    }
+                                                                    $("[id={{inline_questions.id}}]").append(a);
+                                                                })
+                                                            }
+                                                            if(!$.isEmptyObject(hidden_value)){
+                                                                //hardcoded the ids for the reason of 101 question have sm,skip and inline question types 
+                                                                rep=$('#100').repeater()
+                                                                rep.setList(hidden_value)
+                                                            }
+                                                        }
+                                                    })
+                                                })
+                                            }
+                                        });
+
+                                            //$('.{{inline_questions.id}}').change(function () {
+                                            function onchange_for_skip(val){
+                                                //console.log($("[name='"+val.name+"']").closest('td').next('td').find('#skip_'+JSON.parse(ids_for_hide[1])[i]))//.find('input').attr('name'))//.show()
+                                                if ($("[name='"+val.name+"']").children("option:selected").length != 0){
+                                                    //debugger
+                                                    ids_for_hide=$("[name='"+val.name+"']").children("option:selected").attr('class').split("-")
+                                                    $.each(JSON.parse(ids_for_hide[1]),function(i){
+                                                        $("[name='"+val.name+"']").closest('td').next('td').find('#skip_'+JSON.parse(ids_for_hide[1])[i]).hide()
+                                                        $("[name='"+val.name+"']").closest('td').next('td').find('table .col_'+JSON.parse(ids_for_hide[1])[i]).hide()
+                                                        //$("[name='"+val.name+"']").val(null)
+                                                        $("[name='"+val.name+"']").closest('td').next('td').find('#'+JSON.parse(ids_for_hide[1])[i]).val(null)
+                                                        //$('#skip_'+JSON.parse(ids_for_hide[1])[i]).hide()
+                                                        //$('table .col_'+JSON.parse(ids_for_hide[1])[i]).hide();
+                                                        //required_field=$('#skip_'+JSON.parse(ids_for_hide[0])[i]).find('.required')
+                                                        required_field=$("[name='"+val.name+"']").find('#skip_'+JSON.parse(ids_for_hide[1])[i]).find('.required')
+                                                        if (required_field.length > 0){
+                                                            required_field.removeAttr('required')
+                                                        }
+                                                    })
+                                                    $.each(JSON.parse(ids_for_hide[0]),function(i){
+                                                        required_field=$("[name='"+val.name+"']").find('#skip_'+JSON.parse(ids_for_hide[0])[i]).find('.required')
+                                                        //required_field=$('#skip_'+JSON.parse(ids_for_hide[0])[i]).find('.required')
+                                                        if (required_field.length > 0){
+                                                            required_field.attr('required', 'required')
+                                                        }
+                                                        //$('#skip_'+JSON.parse(ids_for_hide[0])[i]).show()
+                                                        //$('table .col_'+JSON.parse(ids_for_hide[0])[i]).show();
+                                                        $("[name='"+val.name+"']").closest('td').next('td').find('#skip_'+JSON.parse(ids_for_hide[0])[i]).show()
+                                                        $("[name='"+val.name+"']").closest('td').next('td').find('table .col_'+JSON.parse(ids_for_hide[0])[i]).show()
+                                                    })
+                                                }
+                                            }
+                                        
+                                    </script>
+                                </div> 
+                                {% elif inline_questions.qtype == 'SM' %}
+                                    <div class="col-lg-6" id='skip_{{inline_questions.id}}'>
+                                        <div class=" mb-3">
+                                            <label class="form-label" >{{inline_questions.text}} {{inline_questions.api_json.sm_parent_id}}{% if inline_questions.mandatory %}<span class="required-field"></span>{% endif %}</label>
+                                            <select class=" form-select main_question S_0_0 {% if inline_questions.mandatory %}required{% endif %}"  name='{{inline_questions.id}}' id='{{inline_questions.id}}' 
+                                                aria-label="Floating label select example" data-placeholder=" {{inline_questions.text}}"  {% if inline_questions.mandatory %}required{% endif %}  {% if creation_key and not inline_questions.is_editable and response_obj.response and response_obj.response.616 != '619'   %} disabled {% endif %}>
+                                                <option selected {% if inline_questions.mandatory %}disabled{% endif %} value=""></option>
+                                                {% for choice in inline_choice_list %}
+                                                <option value="{{choice.id}}" >{{choice.choice}}</option>
+                                                {% endfor %}
+
+                                            </select>
+                                            <div class="invalid-feedback">
+                                                {% if inline_validation_code.message %}{{inline_validation_code.message}}{% else %}Please select atleast one option from the list{% endif %}
+                                            </div>
+                                        </div> 
+                                        <script>
+                                            $(document).ready(function () {
+                                                $('select#{{inline_questions.api_json.sm_parent_id}}').change(function () {
+                                                    var optionSelected = $(this).find("option:selected");
+                                                    var valueSelected = optionSelected.attr('value');
+                                                    $.ajax({
+                                                        type: "GET",
+                                                        url: '/configuration/ajax/get_master_lookups/',
+                                                        data: {'selected_master':valueSelected},
+                                                        success: function (result) {
+                                                            $("#{{inline_questions.id}} option").remove();
+                                                            b = '<option   value=""></option>';
+                                                            $("#{{inline_questions.id}}").append(b);
+                                                            if (JSON.parse(result) != 0) {
+                                                                $.each(JSON.parse(result), function (key, value) {
+                                                                        a = '<option value=' + value['id'] + '>' +
+                                                                            value['name'] + '</option>';
+                                                                        $("#{{inline_questions.id}}").append(a);
+                                                                })
+                                                            }
+                                                        }
+                                                    })
+                                                });
+                                                
+                                            });
+                                        </script>
+                                        <style>
+                                            {% if inline_questions.mandatory %}
+                                            .select2-container .select2-selection--single #select2-{{inline_questions.id}}-container:after {
+                                                content: " *";
+                                                color: red;
+                                            }
+                                            {% endif %}
+                                        </style>
+                                    </div> 
+                                {% elif inline_questions.qtype == 'C' %}
+                                <label class="form-check-label mb-2">{{inline_questions.text}}</label>
+                                    {% for choice in inline_choice_list %}
+                                        <div class="col-lg-6" id='skip_{{inline_questions.id}}'>
+                                            <div class="form-check mb-3">
+                                                <input class="form-check-input main_checkbox_{{inline_questions.id}} {{question.id}}  C_0_0 {% if inline_questions.mandatory %}required{% endif %}" type="checkbox" name="{{inline_questions.id}}" id="{{inline_questions.id}}" value="{{choice.id}}" {% if inline_questions.mandatory %}required{% endif %}>
+                                                {% comment %} <label class="form-check-label" for="{{choice.id}}">{% if inline_questions.mandatory %}<span class="required-field"></span>{% endif %}
+                                                    {{choice.choice}}
+                                                </label> {% endcomment %}
+                                            </div>
+                                        </div>
+                                        {% if inline_questions.mandatory %}
+                                        <script>
+                                            $(document).ready(function(){
+                                                var checkboxes = $('.checkbox_C_{{is_grid_question.id}}');
+                                                checkboxes.change(function(){
+                                                    if($('.checkbox_C_{{is_grid_question.id}}:checked').length>0) {
+                                                        checkboxes.removeAttr('required');
+                                                    } else {
+                                                        checkboxes.attr('required', 'required');
+                                                    }
+                                                });
+                                            }); 
+                                        </script>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif inline_questions.qtype == 'T' %}
+                                    <div class="col-lg-6" style="width: 100%;" id='skip_{{inline_questions.id}}'>
+                                        <div class=" mb-3 ">
+                                            <div class="mb-3">
+                                                <!-- In type used for all types like number because of if we used type=number set method of inline package is not work 
+                                                error : VM416 jquery.min.js:2 Uncaught TypeError: Cannot read properties of undefined (reading 'set')
+                                                -->
+                                                <input  id='{{inline_questions.id}}' style="width: 100%;" {% if inline_questions.api_json.pattern %} pattern="{{inline_questions.api_json.pattern}}" {% elif inline_validation_code.code == 'AN' %} pattern="[a-zA-Z0-9\s]+" {% elif inline_validation_code.code == 'A' %}  pattern="[a-zA-Z\s]+" {% endif %} type="text" {% if inline_validation_code.code == 'N' or inline_validation_code.code == 'D'%}pattern="^({{inline_validation_code.MinMax.min|add:0|length}}|[1-9]\d{{ '{' }}{{inline_validation_code.MinMax.min|add:0|length}},{{inline_validation_code.MinMax.max|length|add:-1}}{{ '}' }}|{{inline_validation_code.MinMax.max}})$"{% endif %} min='{{inline_validation_code.MinMax.min}}'  max='{{inline_validation_code.MinMax.max}}' name="{{inline_questions.id}}" maxlength='{{inline_validation_code.MinMax.max_length}}' minlength='{{inline_validation_code.MinMax.min_length}}' class="form-control {{question.id}}  T_0_0 {% if inline_questions.mandatory %}required{% endif %}"  {% if inline_questions.mandatory %}required{% endif %}>
+                                                <div class="invalid-feedback">
+                                                    {% if inline_validation_code.message %}{{inline_validation_code.message}}{% else %}Please enter a valid {{inline_questions.text}}{% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% elif inline_questions.qtype == 'AF' %}
+                                        <div class="col-lg-6" >
+                                            <div class=" mb-3 ">
+                                                {% comment %} <label class="form-label" >{{inline_questions.text}} {% if inline_questions.mandatory %}<span class="required-field"></span>{% endif %}</label> {% endcomment %}
+                                                <input id='{{inline_questions.id}}' value='' type="text" name="{{inline_questions.id}}" class="form-control {{question.id}}  T_0_0 {% if inline_questions.mandatory %}required{% endif %}" {% if inline_questions.mandatory %}required{% endif %} readonly>
+                                            </div>
+                                        </div>
+                                {% elif inline_questions.qtype == 'AP' %}
+                                        <input type="hidden" id='auto_populate' name='auto_populate' value='{{temp_code}}_{{inline_questions.id}}'>
+                                        <div class="col-lg-6 AP_Questions">
+                                            <div class=" mb-3 ">
+                                                {% comment %} <label class="form-label" >{{inline_questions.text}} {% if inline_questions.mandatory %}<span class="required-field"></span>{% endif %}</label> {% endcomment %}
+                                                <input id='{{inline_questions.id}}' type="text" name="{{inline_questions.id}}" class="form-control {{question.id}}  T_0_0 {% if inline_questions.mandatory %}required{% endif %}" {% if inline_questions.mandatory %}required{% endif %} readonly >
+                                            </div>
+                                        </div>
+                                        <script>
+                                            {% comment %} $('#{{inline_questions.id}}').val(makeid(5))
+                                            
+                                            function makeid(length) {
+                                                var result           = '';
+                                                var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                                                var charactersLength = characters.length;
+                                                for ( var i = 0; i < length; i++ ) {
+                                                    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+                                                }
+                                                return result;
+                                            }                  {% endcomment %}
+                                        </script>
+                                {% elif inline_questions.qtype == 'S' %}
+                                    <div class="col-lg-6" id='skip_{{inline_questions.id}}'>
+                                        <div class=" mb-3">
+                                            {% comment %} <label class="form-label" >{{inline_questions.text}} {% if inline_questions.mandatory %}<span class="required-field"></span>{% endif %}</label> {% endcomment %}
+                                            <select class=" {{question.id}} form-select  S_0_0 {% if inline_questions.mandatory %}required{% endif %}"  name='{{inline_questions.id}}' id='{{inline_questions.id}}' 
+                                                aria-label="Floating label select example" data-placeholder=" {{inline_questions.text}}"  {% if inline_questions.mandatory %}required{% endif %} {% if creation_key and not inline_questions.is_editable and response_obj.response and response_obj.response.616 != '619'   %} disabled {% endif %}>
+                                                <option selected {% if inline_questions.mandatory %}disabled{% endif %} value=""></option>
+                                                {% for choice in inline_choice_list %}
+                                                <option value="{{choice.id}}" >{{choice.choice}}</option>
+                                                {% endfor %}
+
+                                            </select>
+                                            <div class="invalid-feedback">
+                                                {% if inline_validation_code.message %}{{inline_validation_code.message}}{% else %}Please select atleast one option from the list{% endif %}
+                                            </div>
+                                        </div> 
+                                        <style>
+                                            {% if inline_questions.mandatory %}
+                                            .select2-container .select2-selection--single #select2-{{inline_questions.id}}-container:after {
+                                                content: " *";
+                                                color: red;
+                                            }
+                                            {% endif %}
+                                        </style>
+                                    </div> 
+                                {% elif inline_questions.qtype == 'D' %}
+                                    <div class="col-lg-6"  style="width: 100%;" id='skip_{{inline_questions.id}}'>
+                                        <div class=" mb-3">
+                                            {% comment %} <label class="form-label" for="floatingnameInput">{{inline_questions.text}} {% if inline_questions.mandatory %}<span class="required-field"></span>{% endif %}</label> {% endcomment %}
+                                            <input type="date" style="width: 100;" onclick="enableDateField(this)" oninput="enableDateField(this)"   {% if inline_questions.training_config.dob %} onchange="getAge(this,{{inline_questions.id}},{{inline_questions.training_config.minor|default:'false'}})"{% endif %}  class="{{question.id}} form-control  D_0_0 {% if inline_questions.mandatory %}required{% endif %}"  name="{{inline_questions.id}}"  max='{{inline_validation_code.MinMax.max}}' id="{{inline_questions.id}}" {% if inline_questions.mandatory %}required{% endif %} {% if creation_key and not inline_questions.is_editable and response_obj.response and response_obj.response.616 != '619'   %} disabled {% endif %}>
+                                            <div class="invalid-feedback">
+                                                {% if inline_validation_code.message %}{{inline_validation_code.message}}{% else %}Please enter a valid {{inline_questions.text}}{% endif %}
+                                            </div>
+                                            {% if inline_questions.training_config.dob %}
+                                                <label class="form-label opacity-75 mt-2 dob_field" id='dob_{{inline_questions.id}}' for=""></label>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                            </td>
+                        {% endfor %}
+                            <td>
+                                <div class="d-grid">
+                                    <input data-repeater-delete type="button" class="btn btn-primary" value="Delete"/>
+                                </div>
+                            </td>
+                        </tr>
+                </tbody>
+                <style>
+                    table[name="inline_question"] input ,table[name="inline_question"] select {
+                        width: 100%;
+                    }
+                    
+                    #datepicker1 input {
+                        width: 100%;
+                    }
+                    {% comment %} .table-responsive {
+                        overflow-x: inherit;
+                    }  {% endcomment %}
+                </style>
+            </table>
+        </div>
+    </div>
+{% endif %}

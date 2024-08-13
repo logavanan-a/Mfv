@@ -60,6 +60,13 @@
   
             font-family: "Poppins", sans-serif;
             }
+            /* Style all input elements of type text */
+            input[type="text"] {
+                text-transform: capitalize;
+            }
+            #username, #password{
+                text-transform: none;
+            }
         </style>
 </head>
 
@@ -136,7 +143,11 @@
             <script src="{% static 'js/pages/form-validation.init.js' %}"></script>
             <script src="{% static 'libs/parsleyjs/dist/parsley.min.js' %}"></script>
             <script src="{% static 'js/pages/form-advanced.init.js'%}"></script>
+            <script src="{% static 'libs/jquery.repeater/jquery.repeater.min.js' %}"></script>
+            <script src="{% static 'js/pages/form-repeater.int.js' %}"></script>
+
             <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
             {% block extra_javascript %}
             {% endblock %}
 

@@ -6,7 +6,7 @@
     {% for block in blocks %}
         {% get_questions block.id as get_questions %}
         {% if get_questions|length > 0 %}
-            {% if blocks|length > 1 and survey.id != 20 %}
+            {% if blocks|length > 1 and survey.id != 7 %}
                 <div class="row">
                     <div class="col-10">
                         <h3 class='mb-3 mt-1'>{{block.name}}</h3 class='mt-3'>
@@ -82,7 +82,7 @@
                                     var valueSelected = optionSelected.attr('value');
                                     $.ajax({
                                         type: "GET",
-                                        url: '/manage/ajax/get_master_lookups/',
+                                        url: '/configuration/ajax/get_master_lookups/',
                                         data: {'selected_master':valueSelected,'sm_question':true,'multiple':true},
                                         success: function (result) {
                                             selected_val=$("#{{question.id}}_hidden").val() || ''
@@ -323,63 +323,50 @@
                                             
                                             $(document).on('change', "input[value='{{choice.id}}']", function (event) {
                                                 if ($(this).prop('checked')){
-                                                    $(this).val()
-                                                    
                                                     skip_question_list = []
                                                     {% for choice_list in main_choice_list %}
                                                         if (parseInt({{question.id}}) == 246){
-                                                            skip_question_list.push(parseInt({{choice_list.skip_question_ids}}))
+                                                            skip_question_list.push({{choice_list.skip_question_ids}})
                                                         }else if (parseInt({{question.id}}) == 254){
-                                                            skip_question_list.push(parseInt({{choice_list.skip_question_ids}}))
+                                                            
+                                                            console.log({{choice_list.skip_question_ids}})
+                                                            skip_question_list.push({{choice_list.skip_question_ids}})
                                                         }else if (parseInt({{question.id}}) == 356){
                                                             skip_question_list.push({{choice_list.skip_question_ids}})
                                                         }
                                                     {% endfor %}
                                                     $.each(skip_question_list, function(index_2, value) {
-                                                        if (parseInt({{question.id}}) != 356){
-                                                            $('#'+value.toString()).val('') 
-                                                            {% if choice.skip_question_ids %}
-                                                            $.each({{choice.skip_question_ids|safe}}, function(index, name) {
-                                                                    console.log(value,name,'ppp')
-                                                                    if (parseInt(value) == parseInt(name)) {
-                                                                        if ($('#skip_'+value.toString()).find('.required').length > 0){
-                                                                            $('input[name="'+value.toString()+'"]').attr('required', 'required')
+                                                        {% if choice.skip_question_ids %}
+                                                        $.each({{choice.skip_question_ids|safe}}, function(index, name) {
+                                                            if (value.includes(parseInt(name))){
+                                                                $.each(value, function(index_3, skip_id) {
+                                                                    $('#'+skip_id.toString()).val('') 
+                                                                    $('#skip_'+skip_id.toString()).show() 
+                                                                    $('.main_checkbox_'+skip_id.toString()).prop('checked',false);
+                                                                    if ($('#skip_'+skip_id.toString()).find('.required').length > 0){
+                                                                            $('input[name="'+skip_id.toString()+'"]').attr('required', 'required')
                                                                         }                          
-                                                                        $('#skip_'+value.toString()).show() 
-                                                                    }else{
-                                                                        if ($('#skip_'+value.toString()).find('.required').length > 0){
-                                                                            $('input[name="'+value.toString()+'"]').removeAttr('required').val(null)
-                                                                        } 
-                                                                        $('#skip_'+value.toString()).hide()                                     
-
-                                                                    } 
-                                                                })
-                                                            {% else %}
-
-                                                                if ($('#skip_'+value.toString()).find('.required').length > 0){
-                                                                    $('input[name="'+value.toString()+'"]').removeAttr('required').val(null)
-                                                                }    
-                                                                $('#skip_'+value.toString()).hide() 
-                                                            {% endif %}
-                                                        }else{
-                                                            $.each({{choice.skip_question_ids|safe}}, function(index, name) {
-                                                                if (value.includes(parseInt(name))){
-                                                                    $.each(value, function(index_3, skip_id) {
-                                                                        $('#'+skip_id.toString()).val('') 
                                                                         $('#skip_'+skip_id.toString()).show() 
-                                                                        $('.main_checkbox_'+skip_id.toString()).prop('checked',false);
-                                                                        
                                                                     })
-                                                                }else{
-                                                                    $.each(value, function(index_3, skip_id) {
-                                                                        $('.main_checkbox_'+skip_id.toString()).prop('checked',false);
-                                                                        $('#'+skip_id.toString()).val('') 
-                                                                        $('#skip_'+skip_id.toString()).hide() 
-                                                                    })
-                                                                }
-    
-                                                            })
-                                                        }
+                                                            }else{
+                                                                $.each(value, function(index_3, skip_id) {
+                                                                    $('.main_checkbox_'+skip_id.toString()).prop('checked',false);
+                                                                    $('#'+skip_id.toString()).val('') 
+                                                                    $('#skip_'+skip_id.toString()).hide() 
+                                                                    if ($('#skip_'+skip_id.toString()).find('.required').length > 0){
+                                                                        $('input[name="'+skip_id.toString()+'"]').removeAttr('required').val(null)
+                                                                    } 
+                                                                    $('#skip_'+skip_id.toString()).hide()                                     
+                                                                })
+                                                            } 
+                                                        })
+                                                        {% else %}
+
+                                                            if ($('#skip_'+value.toString()).find('.required').length > 0){
+                                                                $('input[name="'+value.toString()+'"]').removeAttr('required').val(null)
+                                                            }    
+                                                            $('#skip_'+value.toString()).hide() 
+                                                        {% endif %}
                                                     })
                                                 }
                                             })
@@ -428,12 +415,24 @@
                                 <div class="col-lg-6" id='skip_{{question.id}}'>
                                     {% for choice in main_choice_list %}
                                     <div class="form-check mb-3">
-                                        <input class="form-check-input main_checkbox_{{question.id}} main_question C_0_0 {% if question.mandatory %}required{% endif %}" type="radio" name="{{question.id}}" id="{{question.id}}" value="{{choice.id}}" {% if question.mandatory %}required{% endif %}>
+                                        <input class="form-check-input main_checkbox_{{question.id}} main_question C_0_0 {% if question.mandatory %}required{% endif %}" type="radio" name="{{question.id}}" id="{{question.id}}" value="{{choice.id}}" {% if question.mandatory %}required{% endif %} >
                                         <label class="form-check-label" for="{{choice.id}}">
                                             {{choice.choice}}
                                         </label>
                                     </div>
                                     {% endfor %}
+                                    <script>
+                                        $(document).ready(function(){
+                                            $('.main_question').change(function() {
+                                                var questionId = '{{question.id}}'
+                                                var checkedCheckboxes = $('.main_question:checked');
+                                                var checkedValues = checkedCheckboxes.map(function() {
+                                                    return $(this).val();
+                                                }).get();
+                                                $('#388').val(checkedValues.length);
+                                            })
+                                        })
+                                    </script>
                                 </div>
                             </div>
                         </div>
@@ -444,7 +443,7 @@
                         <div class=" mb-3 ">
                             <div class="mb-3">
                                 <label class="form-label" for="{{question.id}}">{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
-                                <input  id='{{question.id}}' {% if question.training_config.custom_pattern %} pattern="{{question.training_config.value}}" {% endif %}{% if validation_code.code == 'AN' %} pattern="[a-zA-Z0-9\s]+" {% elif validation_code.code == 'A' %}  pattern="[a-zA-Z\s]+" {% endif %} type="{% if validation_code.code == 'N' or validation_code.code == 'D'%}number{% else %}text{% endif %}" min='{{validation_code.MinMax.min}}'  max='{{validation_code.MinMax.max}}' name="{{question.id}}" maxlength='{{validation_code.MinMax.max_length}}' minlength='{{validation_code.MinMax.min_length}}' class="form-control main_question T_0_0 {% if question.mandatory %}required{% endif %}"  {% if question.mandatory %}required{% endif %} {% if not question.is_editable and response_obj.response and response_obj.response.616 != '619'   and creation_key %}readonly{% endif %}>
+                                <input  id='{{question.id}}' {% if question.training_config.custom_pattern %} pattern="{{question.training_config.value}}" {% endif %}{% if validation_code.code == 'AN' %} pattern="[a-zA-Z0-9\s]+" {% elif validation_code.code == 'A' %}  pattern="[a-zA-Z\s]+" {% endif %} type="{% if validation_code.code == 'N' or validation_code.code == 'D'%}number{% else %}text{% endif %}" min='{{validation_code.MinMax.min}}'  max='{{validation_code.MinMax.max}}' name="{{question.id}}" maxlength='{{validation_code.MinMax.max_length}}' minlength='{{validation_code.MinMax.min_length}}' class="form-control main_question T_0_0 {% if question.mandatory %}required{% endif %}"  {% if question.mandatory %}required{% endif %} {% if not question.is_editable and response_obj.response and response_obj.response.616 != '619'   and creation_key %}readonly{% elif question.id == 388 %}readonly{% endif %}>
                                 <div class="invalid-feedback">
                                     {% if validation_code.message %}{{validation_code.message}}{% else %}Please enter a valid {{question.text}}{% endif %}
                                 </div>
@@ -661,6 +660,32 @@
         <button type="submit" id="submitting" name="submitting" class="btn btn-primary w-md">Submit</button>
     </div>
 </form>
+<script>
+    if (parseInt({{survey.id}}) == 8){
+        var data = {{request|get_auto_fill:survey.id|safe}}
+        var date_spectacles_given = data['445'] || '';
+        var glass_power_re_sphere = data['273']?.['275']?.['277'] || '';
+        var glass_power_re_cyl = data['273']?.['275']?.['278'] || '';
+        var glass_power_re_axis = data['273']?.['275']?.['279'] || '';
+        var glass_power_le_sphere = data['273']?.['276']?.['277'] || '';
+        var glass_power_le_cyl = data['273']?.['276']?.['278'] || '';
+        var glass_power_le_axis = data['273']?.['276']?.['279'] || '';
+        $('#355').val(date_spectacles_given)
+        $('#355').prop('readonly',true)
+        $('#T_370_372').val(glass_power_re_sphere)
+        $('#T_370_372').prop('readonly',true)
+        $('#T_370_373').val(glass_power_re_cyl)
+        $('#T_370_373').prop('readonly',true)
+        $('#T_370_374').val(glass_power_re_axis)
+        $('#T_370_374').prop('readonly',true)
+        $('#T_371_372').val(glass_power_le_sphere)
+        $('#T_371_372').prop('readonly',true)
+        $('#T_371_373').val(glass_power_le_cyl)
+        $('#T_371_373').prop('readonly',true)
+        $('#T_371_374').val(glass_power_le_axis)
+        $('#T_371_374').prop('readonly',true)
+    }
+</script>
 <script>
     // function ansLoadFunction() {onsubmit="return ansLoadFunction()"
     $("#survey").submit(function(e) {

@@ -4,10 +4,10 @@ import pandas as pd
 import traceback
 import sys
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render, get_list_or_404
+from django.shortcuts import render, redirect,get_list_or_404
 from django.contrib.auth.decorators import login_required
 from django.db import connection
-from .models import ReportMeta
+from .models import ReportMeta, QuietlyReport
 from dashboard.models import DashboardSummaryLog
 from django.contrib.contenttypes.models import ContentType
 from django.template.loader import render_to_string
@@ -213,6 +213,119 @@ def reports_listing(request):
 #             header_col_count += colspan if colspan > 0 else 1
 
 #         data_query_list.append(data_query)
+@ login_required(login_url='/login/')
+def quietly_report(request):
+    heading = 'Quietly Report'
+    from datetime import datetime
+    current_year = datetime.now().year+1
+    academic_year_list = [year for year in range(2022,current_year)]
+    indicator_obj = MasterLookUp.objects.filter(parent_id=512,active=2)
+    district_obj = District.objects.filter(active=2,id__in= Project.objects.filter(active=2).values_list('district_id',flat=True))
+    district_id = request.GET.get('district','')
+    project_id = None
+    if district_id:
+        projetc_obj = Project.objects.filter(active=2,district_id=district_id)
+        project_id = projetc_obj.first().id if projetc_obj.exists() else ''
+    academic_year = request.GET.get('academic_year','')
+    if request.method == "POST":
+        for indicator in indicator_obj:
+            annual_target = request.POST.get('annual_target_'+str(indicator.id),0)
+            q1_target = request.POST.get('q1_target_'+str(indicator.id),0)
+            q2_target = request.POST.get('q2_target_'+str(indicator.id),0)
+            q3_target = request.POST.get('q3_target_'+str(indicator.id),0)
+            q4_target = request.POST.get('q4_target_'+str(indicator.id),0)
+            obj, created=QuietlyReport.objects.update_or_create(
+                    project_id=project_id,
+                    indicator_id=indicator.id,
+                    academic_year=academic_year,
+                    defaults={
+                        "annual_target":annual_target or 0,
+                        "q1_target":q1_target or 0,
+                        "q2_target":q2_target  or 0,
+                        "q3_target":q3_target  or 0,
+                        "q4_target":q4_target or 0
+                    }
+                )
+            obj.save()
+        return redirect('/quietly-report/?district='+str(district_id)+'&academic_year='+str(academic_year))
+
+    return render(request, 'reports/quietly_report.html', locals())
+    
+@ login_required(login_url='/login/')
+def custom_report(request, page_slug):
+    rows_per_page = 10
+    if request.method == "POST":
+        req_data = request.POST
+    elif request.method == "GET":
+        req_data = request.GET
+    mat_view_last_updated = DashboardSummaryLog.objects.get(
+        active=2, log_key='mat_partner_mission_meta_view').last_successful_update
+    export_flag = True if req_data.get('export') and req_data.get(
+        'export').lower() == 'true' else False
+    # order of reports is specified in the ReportMeta default ordering
+    # page_reports = get_list_or_404(ReportMeta, page_slug=page_slug, active=2)
+    page_reports = ReportMeta.objects.filter(
+        page_slug=page_slug, active=2).order_by('display_order')
+    # temp veriable
+    data_query_list = []
+    #report_tabs = []
+    section_title = []
+    table_header = []
+    custom_export_headers = []
+    total_header_cols = []
+    report_slug_list = []
+    data = []
+    nowrap_cols = []
+    user_sort_field = []
+    user_sort_order = []
+    page_info = []
+    sorting_field = []
+    user_location_data = None
+    filter_values = None
+
+    # get user selected filter data and merge with the user configured location heirarcy
+    for idx, report in enumerate(page_reports):
+        r_slug = report.report_slug
+        s_title = report.report_title
+        f_info = report.filter_info
+        s_info = report.sort_info
+        r_query = report.report_query
+        d_query = r_query['sql_query']
+        c_query = r_query['count_query'] if r_query['count_query'] else ''
+        nw_cols = r_query['nowrap_cols']
+        mission_id = r_query['mission_id']
+        headers = report.report_header
+        e_header = report.custom_export_header
+        # all filter settings are set based on the first report filters
+        if idx == 0:
+            page_slug = report.page_slug
+            user_location_data, filter_values, user_filter_values, extended_filter_dict = get_filter_data(
+                request, req_data, f_info,mission_id)
+        # update any variable_location_names  - in query, count query, sort and headers
+        default_sort = r_query['default_sort'] if 'default_sort' in r_query else None
+
+
+        headers, e_header, data_query, count_query, s_info, default_sort = apply_variable_location_info(
+            headers, e_header, d_query, c_query, s_info, default_sort, user_filter_values, user_location_data)
+
+        sort_field, sort_order = set_sort_options(
+            req_data, idx, s_info, default_sort)
+        user_sort_field.append(sort_field)
+        user_sort_order.append(sort_order)
+
+        # page reloads on click of filter, so current page is always set to 1
+        current_page = 1
+        data_query, count_query = apply_filters_to_query(
+            data_query, count_query, f_info, sort_field, sort_order, user_filter_values, current_page, rows_per_page, extended_filter_dict, export_flag)
+        # table header details
+        table_header.append(headers)
+        # get total columns count (colspan sum) - used to display the no records found row
+        header_col_count = 0
+        for item in headers[0]:
+            colspan = item.get('colspan', 0)
+            header_col_count += colspan if colspan > 0 else 1
+
+        data_query_list.append(data_query)
         
 #         if request.method == "POST" and request.POST.get("filter"):
 #             data.append(return_sql_results(data_query))
