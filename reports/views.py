@@ -30,6 +30,11 @@ from application_master.models import (District, Donor, Menus, Mission,
                                        PartnerMissionMapping, Project,
                                        ProjectDonorMapping, ProjectFiles,
                                        State, UserPartnerMapping, UserProjectMapping)
+from datetime import datetime
+from openpyxl import Workbook
+from openpyxl.writer.excel import save_workbook
+from django.utils.encoding import escape_uri_path
+import openpyxl
 
 logger = logging.getLogger(__name__)
 # ****************************************************************************
@@ -45,6 +50,23 @@ def return_sql_results(sql):
     cursor.execute(sql)
     rows = cursor.fetchall()
     return rows
+
+def return_sql_results_json(sql):
+    """
+    Executes an SQL query and returns the result rows.
+    """
+    result_list = []
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    rows = cursor.fetchall()
+    # import ipdb;ipdb.set_trace()
+    # Assuming the query returns a single JSON array as a single row and column
+    json_array_str = rows[0][0]
+    if json_array_str:
+    # Convert JSON string to a Python list
+        result_list = json.loads(json_array_str)
+    
+    return result_list
 
 
 # ****************************************************************************
@@ -116,112 +138,395 @@ def reports_listing(request):
     return render(request, 'reports/reports.html', locals())
     
 
-@ login_required(login_url='/login/')
-def custom_report(request, page_slug):
-    rows_per_page = 10
-    if request.method == "POST":
-        req_data = request.POST
-    elif request.method == "GET":
-        req_data = request.GET
-    mat_view_last_updated = DashboardSummaryLog.objects.get(
-        active=2, log_key='mat_partner_mission_meta_view').last_successful_update
-    export_flag = True if req_data.get('export') and req_data.get(
-        'export').lower() == 'true' else False
-    # order of reports is specified in the ReportMeta default ordering
-    # page_reports = get_list_or_404(ReportMeta, page_slug=page_slug, active=2)
-    page_reports = ReportMeta.objects.filter(
-        page_slug=page_slug, active=2).order_by('display_order')
-    # temp veriable
-    data_query_list = []
-    #report_tabs = []
-    section_title = []
-    table_header = []
-    custom_export_headers = []
-    total_header_cols = []
-    report_slug_list = []
-    data = []
-    nowrap_cols = []
-    user_sort_field = []
-    user_sort_order = []
-    page_info = []
-    sorting_field = []
-    user_location_data = None
-    filter_values = None
+# @ login_required(login_url='/login/')
+# def custom_report(request, page_slug):
+#     rows_per_page = 10
+#     if request.method == "POST":
+#         req_data = request.POST
+#     elif request.method == "GET":
+#         req_data = request.GET
+#     mat_view_last_updated = DashboardSummaryLog.objects.get(
+#         active=2, log_key='mat_partner_mission_meta_view').last_successful_update
+#     export_flag = True if req_data.get('export') and req_data.get(
+#         'export').lower() == 'true' else False
+#     # order of reports is specified in the ReportMeta default ordering
+#     # page_reports = get_list_or_404(ReportMeta, page_slug=page_slug, active=2)
+#     page_reports = ReportMeta.objects.filter(
+#         page_slug=page_slug, active=2).order_by('display_order')
+#     # temp veriable
+#     data_query_list = []
+#     #report_tabs = []
+#     section_title = []
+#     table_header = []
+#     custom_export_headers = []
+#     total_header_cols = []
+#     report_slug_list = []
+#     data = []
+#     nowrap_cols = []
+#     user_sort_field = []
+#     user_sort_order = []
+#     page_info = []
+#     sorting_field = []
+#     user_location_data = None
+#     filter_values = None
 
-    # get user selected filter data and merge with the user configured location heirarcy
-    for idx, report in enumerate(page_reports):
-        r_slug = report.report_slug
-        s_title = report.report_title
-        f_info = report.filter_info
-        s_info = report.sort_info
-        r_query = report.report_query
-        d_query = r_query['sql_query']
-        c_query = r_query['count_query'] if r_query['count_query'] else ''
-        nw_cols = r_query['nowrap_cols']
-        mission_id = r_query['mission_id']
-        headers = report.report_header
-        e_header = report.custom_export_header
-        # all filter settings are set based on the first report filters
-        if idx == 0:
-            page_slug = report.page_slug
-            user_location_data, filter_values, user_filter_values, extended_filter_dict = get_filter_data(
-                request, req_data, f_info,mission_id)
-        # update any variable_location_names  - in query, count query, sort and headers
-        default_sort = r_query['default_sort'] if 'default_sort' in r_query else None
+#     # get user selected filter data and merge with the user configured location heirarcy
+#     for idx, report in enumerate(page_reports):
+#         r_slug = report.report_slug
+#         s_title = report.report_title
+#         f_info = report.filter_info
+#         s_info = report.sort_info
+#         r_query = report.report_query
+#         d_query = r_query['sql_query']
+#         c_query = r_query['count_query'] if r_query['count_query'] else ''
+#         nw_cols = r_query['nowrap_cols']
+#         mission_id = r_query['mission_id']
+#         headers = report.report_header
+#         e_header = report.custom_export_header
+#         # all filter settings are set based on the first report filters
+#         if idx == 0:
+#             page_slug = report.page_slug
+#             user_location_data, filter_values, user_filter_values, extended_filter_dict = get_filter_data(
+#                 request, req_data, f_info,mission_id)
+#         # update any variable_location_names  - in query, count query, sort and headers
+#         default_sort = r_query['default_sort'] if 'default_sort' in r_query else None
 
 
-        headers, e_header, data_query, count_query, s_info, default_sort = apply_variable_location_info(
-            headers, e_header, d_query, c_query, s_info, default_sort, user_filter_values, user_location_data)
+#         headers, e_header, data_query, count_query, s_info, default_sort = apply_variable_location_info(
+#             headers, e_header, d_query, c_query, s_info, default_sort, user_filter_values, user_location_data)
 
-        sort_field, sort_order = set_sort_options(
-            req_data, idx, s_info, default_sort)
-        user_sort_field.append(sort_field)
-        user_sort_order.append(sort_order)
+#         sort_field, sort_order = set_sort_options(
+#             req_data, idx, s_info, default_sort)
+#         user_sort_field.append(sort_field)
+#         user_sort_order.append(sort_order)
 
-        # page reloads on click of filter, so current page is always set to 1
-        current_page = 1
-        data_query, count_query = apply_filters_to_query(
-            data_query, count_query, f_info, sort_field, sort_order, user_filter_values, current_page, rows_per_page, extended_filter_dict, export_flag)
-        # table header details
-        table_header.append(headers)
-        # get total columns count (colspan sum) - used to display the no records found row
-        header_col_count = 0
-        for item in headers[0]:
-            colspan = item.get('colspan', 0)
-            header_col_count += colspan if colspan > 0 else 1
+#         # page reloads on click of filter, so current page is always set to 1
+#         current_page = 1
+#         data_query, count_query = apply_filters_to_query(
+#             data_query, count_query, f_info, sort_field, sort_order, user_filter_values, current_page, rows_per_page, extended_filter_dict, export_flag)
+#         # table header details
+#         table_header.append(headers)
+#         # get total columns count (colspan sum) - used to display the no records found row
+#         header_col_count = 0
+#         for item in headers[0]:
+#             colspan = item.get('colspan', 0)
+#             header_col_count += colspan if colspan > 0 else 1
 
-        data_query_list.append(data_query)
+#         data_query_list.append(data_query)
         
-        if request.method == "POST" and request.POST.get("filter"):
-            data.append(return_sql_results(data_query))
+#         if request.method == "POST" and request.POST.get("filter"):
+#             data.append(return_sql_results(data_query))
 
-        total_header_cols.append(header_col_count)
-        report_slug_list.append(r_slug)
-        custom_export_headers.append(e_header)
-        section_title.append(s_title)
-        nowrap_cols.append(nw_cols)
-        sorting_field.append(s_info)
+#         total_header_cols.append(header_col_count)
+#         report_slug_list.append(r_slug)
+#         custom_export_headers.append(e_header)
+#         section_title.append(s_title)
+#         nowrap_cols.append(nw_cols)
+#         sorting_field.append(s_info)
 
-        # if not for export, prepare pagination details
-        if export_flag == False:
-            # fetch record count and calcualte pagination info
-            total_records = 0
-            count_result=None
-            if request.method == "POST" and request.POST.get("filter"):
-                count_result = return_sql_results(count_query)
-            if count_result:
-                total_records = count_result[0][0]
-            p_info = calculate_pagination_info(total_records, 1, rows_per_page)
-            page_info.append(p_info)
-            # pagination_range will be same for all reports in the page
-            pagination_range = range(p_info.get(
-                'start_page'), p_info.get('end_page')+1)
-    sidebar_active = 'Report'
-    heading = section_title[0]
-    # if export button click, create excel and return as response
-    if export_flag == True:
-        return generate_export_excel(section_title[0], data_query_list, table_header, custom_export_headers, section_title)
-    return render(request, 'reports/multitab_report.html', locals())
+#         # if not for export, prepare pagination details
+#         if export_flag == False:
+#             # fetch record count and calcualte pagination info
+#             total_records = 0
+#             count_result=None
+#             if request.method == "POST" and request.POST.get("filter"):
+#                 count_result = return_sql_results(count_query)
+#             if count_result:
+#                 total_records = count_result[0][0]
+#             p_info = calculate_pagination_info(total_records, 1, rows_per_page)
+#             page_info.append(p_info)
+#             # pagination_range will be same for all reports in the page
+#             pagination_range = range(p_info.get(
+#                 'start_page'), p_info.get('end_page')+1)
+#     sidebar_active = 'Report'
+#     heading = section_title[0]
+#     # if export button click, create excel and return as response
+#     if export_flag == True:
+#         return generate_export_excel(section_title[0], data_query_list, table_header, custom_export_headers, section_title)
+#     return render(request, 'reports/multitab_report.html', locals())
+
+def getacademicyear(fin_yaer):
+    today = datetime.today()
+    current_year = today.year
+    diff_finyear = current_year - int(fin_yaer.split('-')[0])
+    financial_year = []
+    financial_year.append(fin_yaer)
+    for year in range(diff_finyear):
+        if int(financial_year[year].split('-')[1]) != current_year:
+            financial_year.append(f"{financial_year[year].split('-')[1]}-{int(financial_year[year].split('-')[1])+1}")
+        else:
+            if today.month >= 4:
+                financial_year.append(f"{financial_year[year].split('-')[1]}-{int(financial_year[year].split('-')[1])+1}")
+    return financial_year
+
+def getquarteryear(academic_year):
+    selected_fy = academic_year
+    selected_year = selected_fy.split('-')
+    today = datetime.today()
+    result_set = []
+    current_year = today.year
+    current_month = today.month
+    if current_year == int(selected_year[0]) and current_month >= 7 and current_month <= 9:
+        result_set.append('Q1')
+    elif current_year == int(selected_year[0]) and current_month >= 10 and current_month <= 12:
+        result_set.append('Q1')
+        result_set.append('Q2')
+        result_set.append('Q3')
+    elif current_year == int(selected_year[1]) and current_month >= 1 and current_month <= 3:
+        result_set.append('Q1')
+        result_set.append('Q2')
+        result_set.append('Q3')
+    elif current_year == int(selected_year[1]) and current_month >= 4 and current_month <= 6:
+        result_set.append('Q1')
+        result_set.append('Q2')
+        result_set.append('Q3')
+        result_set.append('Q4')
+    return result_set
+
+def get_donor_district_list(request,donor_id,district_id):
+    user_id = request.user.id
+    district_list = []
+    donor_list = Donor.objects.filter(active=2).values_list('id','name').order_by('name')
+    if donor_id != '':
+        donor_project_list = ProjectDonorMapping.objects.filter(active=2, donor_id=int(donor_id)).values_list('project_id', flat=True)
+        district_project_list = Project.objects.filter(active=2, id__in=donor_project_list).values_list('district_id', flat=True)
+        district_list_ids = District.objects.filter(active=2, id__in=district_project_list).values_list('id',flat=True)
+        district_list_ids_str = list(map(str, district_list_ids))
+        district_list = Boundary.objects.filter(active=2,code__in=district_list_ids_str,boundary_level_type_id=2).values_list('id','name').order_by('name')
+    return donor_list,district_list
+
+@csrf_exempt
+@ login_required(login_url='/login/')
+def get_donor_district(request):
+    if request.method == 'GET':
+        selected_donor = request.GET.get('selected_donor', '')
+        donor_project_list = ProjectDonorMapping.objects.filter(active=2, donor_id=int(selected_donor)).values_list('project_id', flat=True)
+        district_project_list = Project.objects.filter(active=2, id__in=donor_project_list).values_list('district_id', flat=True)
+        district_list_ids = District.objects.filter(active=2, id__in=district_project_list).values_list('id',flat=True)
+        district_list_ids_str = list(map(str, district_list_ids))
+        district_list = Boundary.objects.filter(active=2,code__in=district_list_ids_str,boundary_level_type_id=2).values_list('id','name').order_by('name')
+        result_set = []
+        for district in district_list:
+            result_set.append(
+                {'id': district[0], 'name': district[1], })
+        return HttpResponse(json.dumps(result_set))
+
+@ login_required(login_url='/login/')
+def custom_report_donor(request):
+    # import ipdb;ipdb.set_trace()
+    # locations_data = load_user_details_to_session(request)
+    academic_year_list = getacademicyear('2024-2025')
+    current_academic_year = academic_year_list[-1]
+    today = datetime.today()
+    q_year = request.POST.get('q_year','q1')
+    academic_year = request.POST.get('finance_year',current_academic_year)
+    donor_id = request.POST.get('donor','')
+    district_id = request.POST.get('district','')
+    donor_list,district_list = get_donor_district_list(request,donor_id,district_id)
+    financial_year = current_academic_year
+    quarterly_year_list = getquarteryear(academic_year)
+    no_table = True
+    # state_cond,dist_cond,selected_state,selected_district,state_filter,district_filter = get_state_dist_cond(request)
+    if request.method == 'POST':
+        child_scr_data = child_screening_data(academic_year,q_year,donor_id,district_id)
+        spec_comp_data =spec_compliance_data(academic_year,q_year,donor_id,district_id)
+        teach_train_data =teacher_trained_data(academic_year,q_year,donor_id,district_id)
+        surgery_data =surgery_details_data(academic_year,q_year,donor_id,district_id)
+        return  export_excel_donor(child_scr_data,spec_comp_data,teach_train_data,surgery_data,academic_year,q_year)
+    return render(request, 'custom_report/donor_report.html', locals())
+
+
+def child_screening_data(academic_year,q_year,donor_id,district_id):
+    where_cond = ''
+    if donor_id != '':
+        where_cond += f" and donor_id = {int(donor_id)}"
+    if district_id != '':
+        where_cond += f" and school_district_id = {int(district_id)}"
+
+    sql_query = f"""WITH numbered_rows AS (
+                    SELECT 
+                        row_number() OVER () AS row_num,
+                        month,
+                        student_name,
+                        age,
+                        gender,
+                        school_type,
+                        school_name,
+                        school_district,
+                        school_state,
+                        remarks,
+                        screening,
+                        spec_prescriped,
+                        spec_issued,
+                        surgery_advised,
+                        surgery_provided
+                    FROM student_screening_data
+                    WHERE p_quarter = '{q_year.lower()}' AND p_academic_year = '{academic_year}'   {where_cond}
+                )
+                SELECT jsonb_agg(
+                    jsonb_build_array(
+                        row_num::text,
+                        month::text,
+                        student_name::text,
+                        age::text,
+                        gender::text,
+                        school_type::text,
+                        school_name::text,
+                        school_district::text,
+                        school_state::text,
+                        remarks::text,
+                        screening::text,
+                        spec_prescriped::text,
+                        spec_issued::text,
+                        surgery_advised::text,
+                        surgery_provided::text
+                    )
+                )::text
+                FROM numbered_rows;
+
+            """
+    data = return_sql_results_json(sql_query)
+    return data
+
+def surgery_details_data(academic_year,q_year,donor_id,district_id):
+    where_cond = ''
+    if donor_id != '':
+        where_cond += f" and donor_id = {int(donor_id)}"
+    if district_id != '':
+        where_cond += f" and school_district_id = {int(district_id)}"
+    sql_query = f"""
+            WITH numbered_rows AS (
+                    SELECT 
+                        row_number() OVER () AS row_num,
+                        student_name,
+                        age,
+                        gender,
+                        school_name,
+                        school_district,
+                        school_state,
+                        type_of_surgery,
+                        date_of_surgery,
+                        eye_operated_upon,
+                        phase
+                    FROM surgery_data
+                    WHERE p_quarter = '{q_year.lower()}' AND p_academic_year = '{academic_year}' {where_cond}
+                )
+                SELECT jsonb_agg(
+                    jsonb_build_array(
+                        row_num::text,
+                        student_name,
+                        age,
+                        gender,
+                        school_name,
+                        school_district,
+                        school_state,
+                        type_of_surgery,
+                        date_of_surgery,
+                        eye_operated_upon,
+                        phase
+                    )
+                )::text
+                FROM numbered_rows;
+
+            """
+    data = return_sql_results_json(sql_query)
+    return data
+
+def spec_compliance_data(academic_year,q_year,donor_id,district_id):
+    where_cond = ''
+    if donor_id != '':
+        where_cond += f" and donor_id = {int(donor_id)}"
+    if district_id != '':
+        where_cond += f" and school_district_id = {int(district_id)}"
+    sql_query = f"""
+                    WITH numbered_rows AS (
+                    SELECT 
+                        row_number() OVER () AS row_num,
+                        student_name,age,gender,school_name,school_state,spectacle_provided_on,follow_up_done_on,waering_complaince_after_3_month,reason_for_not_wearing
+                    FROM spectacle_complaince_data 
+                    WHERE 1=1 and p_quarter = '{q_year.lower()}' AND p_academic_year = '{academic_year}'
+                    {where_cond}
+                )
+                SELECT jsonb_agg(
+                    jsonb_build_array(
+                        row_num::text,
+                        student_name,age,gender,school_name,school_state,spectacle_provided_on,follow_up_done_on,waering_complaince_after_3_month,reason_for_not_wearing
+                    )
+                )::text
+                FROM numbered_rows;
+            """
+    data = return_sql_results_json(sql_query)
+    return data
+
+def teacher_trained_data(academic_year,q_year,donor_id,district_id):
+    where_cond = ''
+    if donor_id != '':
+        where_cond += f" and donor_id = {int(donor_id)}"
+    if district_id != '':
+        where_cond += f" and school_district_id = {int(district_id)}"
+    sql_query = f"""
+                    WITH numbered_rows AS (
+                    SELECT 
+                        row_number() OVER () AS row_num,
+                        school_name,school_district,school_state,month_of_training,teacher_name,gender,trained
+                    FROM teacher_training_data 
+                    WHERE 1=1 and p_quarter = '{q_year.lower()}' AND p_academic_year = '{academic_year}' {where_cond}
+                )
+                SELECT jsonb_agg(
+                    jsonb_build_array(
+                        row_num::text,
+                        school_name,school_district,school_state,month_of_training,teacher_name,gender,trained
+                    )
+                )::text
+                FROM numbered_rows;
+            """
+    data = return_sql_results_json(sql_query)
+    return data
+
+
+def export_excel_donor(child_screening_data,spectacle_comp_data,teacher_training_data,surgery_details_data,financial_year,quarterly_year):
+    excel_path = settings.DONOR_REPORT_TEMPLATES + '/donoe-report-template.v.0.1.xlsx'  
+    workbook = openpyxl.load_workbook(f'{excel_path}')
+    worksheet_child_screening = workbook.worksheets[1] 
+    worksheet_surgery = workbook.worksheets[2] 
+    worksheet_teacher_training = workbook.worksheets[3] 
+    worksheet_spec_complaince = workbook.worksheets[4] 
+    child_scr_data = child_screening_data if child_screening_data else [['No Data Avilable in the Financial Year and Quarterly Year']]
+    teach_train_data = teacher_training_data if teacher_training_data else [['No Data Avilable in the Financial Year and Quarterly Year']]
+    spec_comp_data = spectacle_comp_data if spectacle_comp_data else [['No Data Avilable in the Financial Year and Quarterly Year']]
+    surgery_data = surgery_details_data if surgery_details_data else [['No Data Avilable in the Financial Year and Quarterly Year']]
+    #childern screening data
+    worksheet_child_screening['A1'] = f"Children Screening Details - {financial_year} - {quarterly_year}"
+    start_row = 3
+    for row_data in child_screening_data:
+        for col_num, cell_value in enumerate(row_data, start=1):
+            worksheet_child_screening.cell(row=start_row, column=col_num, value=cell_value)
+        start_row += 1
+    start_row = 3
+    for row_data in teach_train_data:
+        for col_num, cell_value in enumerate(row_data, start=1):
+            worksheet_teacher_training.cell(row=start_row, column=col_num, value=cell_value)
+        start_row += 1
+    start_row = 2
+    for row_data in spec_comp_data:
+        for col_num, cell_value in enumerate(row_data, start=1):
+            worksheet_spec_complaince.cell(row=start_row, column=col_num, value=cell_value)
+        start_row += 1
+    start_row = 3
+    for row_data in surgery_data:
+        for col_num, cell_value in enumerate(row_data, start=1):
+            worksheet_surgery.cell(row=start_row, column=col_num, value=cell_value)
+        start_row += 1
+    folder_file_name = f"DONOR_REPORT-{financial_year}-{quarterly_year}_{datetime.today().strftime('%d%m%y%H%M')}.xlsx"
+    file_path = os.path.join(settings.MEDIA_ROOT + '/temp_donor_report/', folder_file_name)
+    workbook.save(file_path)
+    if os.path.exists(file_path):
+        with open(file_path, "rb") as excel:
+            data = excel.read()
+            response = HttpResponse(data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = f'attachment; filename={folder_file_name}'
+            os.remove(file_path)
+    return response
 
 
 def generate_export_excel(report_title, data_query_list, table_headers, custom_export_headers, sheet_names):
@@ -812,7 +1117,7 @@ def get_indicator(request):
             result_set.append(
                 {'id': district[0], 'name': district[1], })
         return HttpResponse(json.dumps(result_set))
-from django.views.decorators.csrf import csrf_exempt
+
 @csrf_exempt
 @ login_required(login_url='/login/')
 def get_district(request):
