@@ -13,6 +13,10 @@ from django.shortcuts import render,HttpResponse,HttpResponseRedirect
 import bleach,os
 from rest_framework.response import Response
 from cache_configuration.views import load_data_to_cache_survey,load_data_to_cache_questions,load_data_to_cache_boundary_level
+from django.contrib import messages
+from survey.management.commands.import_responses import questions_validation
+from io import BytesIO
+
 
 pg_size = settings.REST_FRAMEWORK.get('PAGE_SIZE')
 
@@ -668,7 +672,7 @@ class SurveyResponseDataImport(View):
     template_name = 'survey_forms/survey_list_data_import.html'
     
     def get(self, request, *args, **kwargs):
-        surveys = Lineitem.objects.filter(active=2,activity__active=2,project__active=2).exclude(activity__capture_level_type=2).distinct('activity_id').select_related('activity','project').order_by("activity_id","activity__survey_order")
+        # surveys = Lineitem.objects.filter(active=2,activity__active=2,project__active=2).exclude(activity__capture_level_type=2).distinct('activity_id').select_related('activity','project').order_by("activity_id","activity__survey_order")
         project_theme = dict(ProjectTheme.objects.filter(active=2).values_list('project_id','project_theme__name'))
         beneficiaries = dict(BeneficiaryType.objects.filter(active=2).values_list('id','name'))
         survey_beneficiaries,location_level = {},{}
@@ -700,27 +704,27 @@ class SurveyResponseDataImport(View):
         return render(request,self.template_name,locals())
 
 
-
 @method_decorator(login_required, name='dispatch')
 class ImportResponses(View):
-    template_name = 'survey_forms/add_responses_files.html'
+    template_name = 'survey_forms/upload_profile.html'
     max_file_size = settings.RESPONSE_IMPORT['MAX_FILE_SIZE']
     max_file_size_in_mb = max_file_size / 1024 / 1024
     def get(self, request, pk):
-        # TODO: need to create a excel file for format create
-        format_file = f"/media/response_file_format/survey_{pk}_format.xlsx"
-        surveys = load_data_to_cache_survey()
-        survey_name = surveys.get(str(pk),{}).get('name','-')
-        uploaded_responses_list = ResponseImportFiles.objects.filter(active=2,content_type_id=54, object_id=pk).order_by('-created')
+        heading = "Student Data Upload"
+        project = Project.objects.select_related('partner_mission_mapping__mission','partner_mission_mapping__partner','district').get(id=pk)
+        profile_fields = {'Name':project.name,'Mission':project.partner_mission_mapping.mission.name,'Partner':project.partner_mission_mapping.partner.name,'District':project.district.name,'Start Date':project.start_date or '-','End Date':project.end_date or '-'}
+
+        uploaded_responses_list = ResponseImportFiles.objects.filter(active=2,project_id=pk).select_related('survey','project').order_by('-created')
         object_list = get_pagination(request, uploaded_responses_list)
         return render(request,self.template_name,locals())
 
     def post(self, request, pk):
         file = request.FILES.get('file')
-        timestamp_str = datetime.datetime.now().strftime("%Y%b%d%H%M%S")
+        survey_id = request.POST.get('ben_type')
+        timestamp_str = datetime.now().strftime("%Y%b%d%H%M%S")
         file_name_without_extension = file.name.split('.')[0] 
         # TODO: need to create a excel file for format create
-        format_file = f"media/response_file_format/survey_{pk}_format.xlsx"
+        format_file = f"/response_file_format/survey_{survey_id}_format.xlsx"
         # import ipdb;ipdb.set_trace()
         # Check file size
         if file.size > self.max_file_size:
@@ -728,8 +732,8 @@ class ImportResponses(View):
             return render(request, self.template_name, locals())
         
         # Validate Excel file format and headers
-        if not (self.validate_excel_file(file) and self.check_header_equality(request,file, MEDIA_ROOT + format_file,pk)):
-            messages.error(request, "File has been rejected. Please check file format and try again.")
+        if not (self.validate_excel_file(file) and self.check_header_equality(request,file, settings.MEDIA_ROOT + format_file,survey_id,pk)):
+            messages.error(request, "File has been rejected. Please download file format and try again.")
             return render(request, self.template_name, locals())
         
         # Read Excel file
@@ -739,7 +743,7 @@ class ImportResponses(View):
             return render(request, self.template_name, locals())
 
         # Perform custom validation
-        df = questions_validation(df, pk)
+        df = questions_validation(df, survey_id, pk)
         if 'Error Message' in df.columns and df['Error Message'].notnull().any():
             # Prepare error Excel file
             excel_buffer = BytesIO()
@@ -750,36 +754,57 @@ class ImportResponses(View):
             return response
             
         # Save response details
-        ResponseImportFiles.objects.update_or_create(content_type_id=54, object_id=pk, user_id=request.user.id,
-                                                        status__in=['Uploaded'],
-                                                        defaults={
-                                                            "response_image": request.FILES.get('file'),
-                                                            "status": "Uploaded",
-                                                            "modified": datetime.datetime.now(),
-                                                            "error_details": "",
-                                                        })
+        ResponseImportFiles.objects.update_or_create(survey_id = survey_id,project_id = pk,
+            status__in=['Uploaded'],
+            defaults={
+                "user_id":request.user.id,
+                "response_image": file,
+                "status": "Uploaded",
+                "modified": datetime.now(),
+                "error_details": "",
+            })
         messages.success(request, "File has been uploaded successfully.")
         return render(request,self.template_name,locals())
 
+    def validate_excel_file(self,file):
+        try:
+            pd.read_excel(file)
+            return True
+        except Exception as e:
+            return False
 
-def generate_excel(request,pk):
+    def check_header_equality(self,request, file1, file2, survey_id, project_id):
+        df1 = pd.read_excel(file1)
+        if not os.path.exists(file2):
+            data_response = generate_excel(request,survey_id, project_id)
+        if 'Error Message' in df1.columns:
+            df1.drop(columns='Error Message', inplace=True)
+        excel_file = BytesIO(data_response.content)
+        df2 = pd.read_excel(excel_file)
+        result = set(df2.columns).issubset(set(df1.columns))
+        return result
+
+from django.template.defaultfilters import slugify
+
+def generate_excel(request,survey_id,project_id):
     # Define your headers
     unique_ids = settings.RESPONSE_IMPORT['unique_id']
     headers = ['Generation Key','Project']
     survey_questions = load_data_to_cache_questions()
     cache_surveys = load_data_to_cache_survey()
-    survey = cache_surveys.get(str(pk))
-    if survey.get('data_entry_level_id') == 1 or not bool(survey.get('survey_type')) : #Location based activity or Beneficiary survey
+    survey = cache_surveys.get(str(survey_id))
+    project = Project.objects.get(id=project_id)
+    
+    questions = list(Question.objects.filter(block__survey_id=survey_id).exclude(active=0).order_by('code').values('id','qtype','text','api_json','parent_id','is_grid'))
+    if survey.get('data_entry_level_id') == 1 or (not bool(survey.get('survey_type')) and  any(item['qtype'] == 'AW' for item in questions)): #Location based activity or Beneficiary survey
         boundary_levels = load_data_to_cache_boundary_level()
         # boundary_levels = list(BoundaryLevel.objects.filter(active=2).order_by('code').values_list('name',flat=True))
         headers.extend([i[2] for i in boundary_levels])
     
-    questions = list(Question.objects.filter(block__survey_id=pk).exclude(active=0).order_by('code').values('id','qtype','text','api_json','parent_id','is_grid'))
-    headers.extend([i['text'] for i in questions if (i["qtype"] not in ["GD","AI"]) and (not i['parent_id'] )])    
+    headers.extend([i['text'] for i in questions if (i["qtype"] not in ["GD","AI","AW"]) and (not i['parent_id'] )])    
     # for i in questions:
     #     if (i["qtype"] not in ["GD","AI"]) and (not i['parent_id'] ):
     #         headers.append(i['text'])
-
     api_question = list(filter(lambda x: x['qtype'] in ['AI'],questions))
     if api_question and api_question[0].get('api_json',{}).get('lname_que_id'):
         lname_que_id = api_question[0].get('api_json',{}).get('lname_que_id').split(',')
@@ -796,21 +821,25 @@ def generate_excel(request,pk):
 
     # Create a DataFrame with the headers
     df = pd.DataFrame(columns=headers)
+    df.at[0, 'Project'] = project.name
+    df.at[0, 'District'] = project.district.name.strip()
+    df.at[0, 'State'] = project.district.state.name.strip()
 
     # Specify the path to save the file
-    folder_path = os.path.join(settings.MEDIA_DIR, 'response_file_format')
-    file_path = os.path.join(folder_path, f'survey_{pk}_format.xlsx')
+    # folder_path = os.path.join(settings.MEDIA_DIR, 'response_file_format')
+    # file_path = os.path.join(folder_path, f'survey_{survey_id}_format.xlsx')
 
-    # Ensure the directory exists
-    os.makedirs(folder_path, exist_ok=True)
+    # # Ensure the directory exists
+    # os.makedirs(folder_path, exist_ok=True)
 
-    # Save the file to the specified directory
-    with pd.ExcelWriter(file_path, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name='Sheet1')
+    # # Save the file to the specified directory
+    # with pd.ExcelWriter(file_path, engine='openpyxl') as writer:
+    #     df.to_excel(writer, index=False, sheet_name='Sheet1')
 
     # Create a response object and specify content type
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = f'attachment; filename="survey_{pk}_format.xlsx"'
+    file_name = slugify(f"{project.name}_{survey.get('name')}")
+    response['Content-Disposition'] = f'attachment; filename="{file_name}_format.xlsx"'
 
     # Use pandas to write the DataFrame to the response
     with pd.ExcelWriter(response, engine='openpyxl') as writer:

@@ -22,7 +22,7 @@ urlpatterns = [
     path('survey/ajax/get_custom_validation/', custom_validation_survey_wise_version1),
 
     # data import feature
-    path('manage/generate-excel/<pk>/', generate_excel, name='generate_excel'),
+    path('manage/generate-excel/<survey_id>/<project_id>/', generate_excel, name='generate_excel'),
     path('manage/activity/import/', SurveyResponseDataImport.as_view()),
     path('manage/activity/import-responses/<int:pk>/',ImportResponses.as_view()),
 ]

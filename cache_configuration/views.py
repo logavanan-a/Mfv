@@ -7,7 +7,7 @@ from survey.models import Survey
 from application_master.models import BoundaryLevel 
 from django.db import connection,transaction
 import json
-from application_master.models import UserProjectMapping
+from application_master.models import UserProjectMapping,Project
 # Create your views here.
 
 
@@ -122,7 +122,7 @@ def load_data_to_cache_boundary_level():
     
 def get_user_partner_roshni(user):
     cache_key = 'user_partner_for_'+str(user.id)
-    partner = None#cache.get(settings.INSTANCE_CACHE_PREFIX + cache_key)
+    partner = cache.get(settings.INSTANCE_CACHE_PREFIX + cache_key)
     if not partner:
         partner = list(set(UserProjectMapping.objects.filter(active=2,user=user,project__application_type_id=511).values_list('project__partner_mission_mapping__partner_id',flat=True).distinct()))
         if partner:
@@ -130,3 +130,14 @@ def get_user_partner_roshni(user):
             cache_set_with_namespace('RESPONSE_SURVEY_V3',cache_key,partner,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
 
     return partner
+
+def load_data_to_cache_project():
+    cache_key_choices = 'all_project_names'
+    project_dict =  cache.get(settings.INSTANCE_CACHE_PREFIX + cache_key_choices)
+    if not project_dict:
+        project_dict = {}
+        project_details=list(Project.objects.filter(active=2).values('id','name'))
+        for row in project_details:
+            project_dict.update({str(row['id']):row['name']})  
+        cache_set_with_namespace("DASHBOARD",cache_key_choices, project_dict,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
+    return project_dict

@@ -119,7 +119,9 @@
                                 <th>Indicator Type</th>
                                 {% endif %}
                                 <th>Status</th>
+                                {% if not key %}
                                 <th>Action</th>
+                                {% endif %}
                             </tr>    
                         </thead>
                         <tbody>
@@ -146,7 +148,14 @@
                                 <td>{{l.age_group_option }}</td>
                                 {% elif model == 'project' %}
                                 <td>{{ forloop.counter0|add:data.start_index }}</td>
-                                <th>{{ l.name }}</th>
+                                
+                                <td>
+                                    {% if key %}
+                                        <b><a href="/manage/activity/import-responses/{{l.id}}/">{{ l.name }}</a></b>
+                                    {% else %}
+                                        {{ l.name }}
+                                    {% endif %}
+                                </td>
                                 <td>{{l.partner_mission_mapping }}</td>
                                 <td>{{l.district }}</td>
                                 <td>{{l.location }}</td>
@@ -168,10 +177,12 @@
                                 <td>{{l.get_indicator_type_display }}</td>
                                 {% endif %}
                                 <td>{% if l.active == 2 %}Active {% else %}Inactive{% endif %}</td>
-                                <td>  
-                                    <a href="/application_master/edit/{{model}}/{{l.id}}/?page={{page}}" class="btn btn-outline-secondary  edit" title="Edit"><i class="fas fa-pencil-alt"></i></a>
-                                    {% if l.active == 2 %}<button class='btn btn-outline-danger' onclick="Confirm('{{l.id}}', '{{model}}', 'Deactivate')"><i class="mdi mdi-close-circle"  title="Deactivate"></i></button>{% else %}<button class='btn btn-outline-success' onclick="Confirm('{{l.id}}', '{{model}}', 'Activate')"><i class="mdi mdi-checkbox-marked-circle" title="Activate"></i></button>{% endif %}
-                                </td>
+                                {% if not key %}
+                                    <td>  
+                                        <a href="/application_master/edit/{{model}}/{{l.id}}/?page={{page}}" class="btn btn-outline-secondary  edit" title="Edit"><i class="fas fa-pencil-alt"></i></a>
+                                        {% if l.active == 2 %}<button class='btn btn-outline-danger' onclick="Confirm('{{l.id}}', '{{model}}', 'Deactivate')"><i class="mdi mdi-close-circle"  title="Deactivate"></i></button>{% else %}<button class='btn btn-outline-success' onclick="Confirm('{{l.id}}', '{{model}}', 'Activate')"><i class="mdi mdi-checkbox-marked-circle" title="Activate"></i></button>{% endif %}
+                                    </td>
+                                {% endif %}
                             </tr>
                             {% endfor %}
                         </tbody>

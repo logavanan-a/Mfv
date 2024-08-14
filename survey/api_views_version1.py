@@ -503,7 +503,8 @@ def create_answers_version1(user, response_obj, **ans_params):
                 creation_key=app_answer_obj.sample_id, survey=survey)
             ben_answer.beneficiary_type = survey.content_object
             partner_obj = get_user_partner_roshni(user)
-            ben_answer.partner_id = partner_obj
+            if partner_obj:
+                ben_answer.partner_id = partner_obj
             ben_answer.json_answer_id = int(ansobj.id)
             address = ansobj.response.get('address')
             if address:
