@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from survey.models import ResponseImportFiles,Question,QuestionValidation,Choice,JsonAnswer,Survey
-from application_master.models import Boundary,BoundaryLevel,Project
+from application_master.models import Boundary,BoundaryLevel,Project,UserProjectMapping
 from django.db.models import F,Q
 import pandas as pd
 from mfv_mis.settings import *
@@ -34,19 +34,20 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         # Optional argument
         parser.add_argument('-s', '--survey_list', type=int, nargs='+'  )
+        parser.add_argument('-p', '--project_list', type=int, nargs='+'  )
           
     def handle(self,*args, **options):
         try:
             imp_start = datetime.now()
             logger.info('Importing Responses - time taken:' + str(imp_start))
             survey_id = options.get('survey_list')
+            project_id = options.get('project_list')
             response_files = ResponseImportFiles.objects.filter(active=2, status__in=['Uploaded']) 
-            if survey_id:
-                response_files = response_files.filter(survey_id__in = survey_id)
-            response_files = response_files.values('survey_id','user_id').annotate(response_image=F('response_image'),response_id=F('id'))
+            if survey_id and project_id:
+                response_files = response_files.filter(survey_id__in = survey_id,v=project_id)
+            response_files = response_files.values('survey_id').annotate(response_image=F('response_image'),response_id=F('id'))
             
             errors = defaultdict(list)
-            
             for response in response_files:
                 t1 = datetime.now()
                 response_obj = ResponseImportFiles.objects.get(id=response['response_id'])
@@ -57,43 +58,41 @@ class Command(BaseCommand):
                     survey_id = response.get('survey_id')
                     response_file = response.get('response_image')
                     processed_file_name = datetime.now().strftime('%Y%m%d%H%M%S')+'_' + response_file.split('/')[-1]
-                    processed_file = RESPONSE_IMPORT['PROCESSED_FILE_PATH']+processed_file_name
+                    processed_file = RESPONSE_IMPORT['PROCESSED_FILE_PATH'] + processed_file_name
                     df = pd.read_excel(MEDIA_ROOT+'/'+response_file)
                     
                     df = questions_validation(df,survey_id,response_obj.project_id)
 
                     # df['Activity Date'] = pd.to_datetime(df['Activity Date'], format='%Y/%m/%d', errors='coerce').dt.strftime('%d-%m-%Y')
+                    # import ipdb;ipdb.set_trace()
                     if 'Error Message' in df.columns and df['Error Message'].notnull().any():
                         response_obj.status = 'Failed'
                         response_obj.error_details = 'Please validate the file for errors in the "Error Message" column'
+                        df.to_excel(BASE_DIR+processed_file,index=False)
+                        response_obj.processed_file = processed_file
                         response_obj.save()
                         continue
+
                     parsed_data = parse_data_row(df,survey_id)
                     sliced_data = [parsed_data[i:i+chunk_size] for i in range(0, len(parsed_data), chunk_size)]
                     response_data = []
+                    
+                    # get the data entry op based on the project id
+                    data_entry_op = list(UserProjectMapping.objects.filter(active=2,project_id=response_obj.project_id,user__groups__id=1).values_list('user_id'))
+                    
                     for data in sliced_data:
-                        response_data.append(push_data_to_api(data,response.get('user_id',USER_ID)))
+                        response_data.append(push_data_to_api(data,data_entry_op[0] if data_entry_op else USER_ID))
                     application_issue = [item for item in response_data if not item.get('status') ]
+                    
 
                     has_sync_status_0 = {sync_item['r_uuid']:sync_item['error_msg'] for item in response_data for sync_item in item['sync_res'] if sync_item['sync_status'] != 2}
                     df['Status - Error'] = df['Generation Key'].apply(lambda value: f'Failed - {has_sync_status_0.get(value)}' if has_sync_status_0.get(value) else 'Success')
-                    # df.to_excel(processed_file,index=False)
-                    excel_buffer = BytesIO()
-                    with pd.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
-                        df.to_excel(writer, index=False, sheet_name='Sheet1')
-                    excel_content = excel_buffer.getvalue()
-
-                    # Create a file-like object
-                    excel_file = ContentFile(excel_content, processed_file_name)
-
-
-                    # # Permission command for file
-                    # permission_command = RESPONSE_IMPORT['FILE_PERMISSION_COMMAND'].format(processed_file)
-                    # # import ipdb;ipdb.set_trace() 
-                    # result = subprocess.run(permission_command.split(' '), capture_output=True, text=True)
-                    # print('Output:', result.stdout)
-                    # print('Error:', result.stderr)
-                    # ipdb.set_trace()
+                    
+                    df.to_excel(BASE_DIR+processed_file,index=False)
+                    
+                    # Permission command for file
+                    permission_command = RESPONSE_IMPORT['FILE_PERMISSION_COMMAND'].format(processed_file)
+                    result = subprocess.run(permission_command.split(' '), capture_output=True, text=True)
 
                     if has_sync_status_0:
                         response_obj.status = 'Failed'
@@ -101,8 +100,8 @@ class Command(BaseCommand):
                     elif not application_issue:
                         response_obj.status = 'Imported'
                         response_obj.imported_on = timezone.now()
-                        response_obj.response_image.delete(save=False)
-                        response_obj.response_image = excel_file
+                        response_obj.response_image.delete()
+                        response_obj.processed_file = processed_file
                         response_obj.error_details = "Download the file for each record's status."
                     if application_issue:
                         response_obj.error_details = response_obj.error_details + f"\n Failed Batches - {application_issue}"
@@ -389,8 +388,9 @@ def parse_data_row(df,survey_id):
                 data[str(q.id)] = [{'T_0_0': str(row.get(q.text,''))}]
         if survey.survey_type == 1 and survey.data_entry_level_id == 1: #location based survey
             clusters = row[boundary_level.name]
-        creation_key = row.get('Generation Key',datetime.now().strftime('%Y%m%d%H%M%S') + str(uuid4()))
+        creation_key = row.get('Generation Key') or datetime.now().strftime('%Y%m%d%H%M%S') + str(uuid4())
         df.loc[i, 'Generation Key'] = creation_key
+
         final_result.extend([{
             "answers_array":data,
             "project_id":projects.get(row.get('Project'),'-1'),

@@ -714,6 +714,9 @@ class ImportResponses(View):
         project = Project.objects.select_related('partner_mission_mapping__mission','partner_mission_mapping__partner','district').get(id=pk)
         profile_fields = {'Name':project.name,'Mission':project.partner_mission_mapping.mission.name,'Partner':project.partner_mission_mapping.partner.name,'District':project.district.name,'Start Date':project.start_date or '-','End Date':project.end_date or '-'}
 
+        # validating the project have any school 
+        school_exists = BeneficiaryResponse.objects.filter(active=2,survey_id=1,address_2=Boundary.objects.get(active=2,boundary_level_type_id=2,code = project.district_id).id)
+
         uploaded_responses_list = ResponseImportFiles.objects.filter(active=2,project_id=pk).select_related('survey','project').order_by('-created')
         object_list = get_pagination(request, uploaded_responses_list)
         return render(request,self.template_name,locals())
@@ -838,7 +841,7 @@ def generate_excel(request,survey_id,project_id):
 
     # Create a response object and specify content type
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    file_name = slugify(f"{project.name}_{survey.get('name')}")
+    file_name = slugify(f"{project.name[:10]}_{survey.get('id')}")
     response['Content-Disposition'] = f'attachment; filename="{file_name}_format.xlsx"'
 
     # Use pandas to write the DataFrame to the response

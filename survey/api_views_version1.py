@@ -536,6 +536,8 @@ def create_answers_version1(user, response_obj, **ans_params):
                                 'child_reference_id': child_reference_id}
                 if child_reference_id:
                     cluster_dict.update({'BeneficiaryResponse': beneficiary})
+                if project_id:
+                    cluster_dict.update({'project_id': int(project_id)})
                 ansobj.cluster = cluster_dict
                 ansobj.save()
             save_list_view(ben_answer)
