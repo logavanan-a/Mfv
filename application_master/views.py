@@ -579,9 +579,9 @@ def adding_project(request,id):
             partner_mission_mapping_id=partner_mission,
             district_id=district,
             location=location,
-            additional_info=additional_info,
-            start_date=start_date,
-            end_date=end_date,    
+            additional_info=additional_info or None,
+            start_date=start_date or None,
+            end_date=end_date or None,    
             application_type_id=application_type,        
         )
         pro_details.save()
