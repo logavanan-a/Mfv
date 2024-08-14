@@ -24,84 +24,126 @@ def get_item(dictionary, key):
 @register.filter
 def get_item_ans(json_answer,header):
     json_answer = model_to_dict(json_answer)
+
     try:
-        # import ipdb; ipdb.set_trace()
-        if json_answer.get('response').get(str(header.get('id')),'None') == 'None' and header.get('qtype') != 'AW': 
-            return '-'
-        elif header.get('qtype') == 'S':
-            cache_key_choices = INSTANCE_CACHE_PREFIX+'survey_listing_page_answer_choices'#_for_'+str(json_answer.get('survey_id'))
-            survey_heading_choices =  cache.get(cache_key_choices)
-            # print(cache_key_question)
-            # choices=survey_heading_choices.get(header.get('id'))
-            choice_answer=json_answer.get('response').get(str(header.get('id')))
-            selected_choice=next(item for item in survey_heading_choices if str(item.get('id') or '') == choice_answer)
-            return selected_choice.get('text')
-        elif header.get('qtype') == 'R':
-            cache_key_choices = INSTANCE_CACHE_PREFIX+'survey_listing_page_answer_choices'#_for_'+str(json_answer.get('survey_id'))
-            survey_heading_choices =  cache.get(cache_key_choices)
-            # print(cache_key_question)
-            # choices=survey_heading_choices.get(header.get('id'))
-            choice_answer=json_answer.get('response').get(str(header.get('id')))
-            selected_choice=next(item for item in survey_heading_choices if str(item.get('id') or '') == choice_answer)
-            return selected_choice.get('text')
-        elif header.get('qtype') == 'SM':
-            # import ipdb;ipdb.set_trace()
-            cache_key_lookups = INSTANCE_CACHE_PREFIX+'all_master_lookup_caching'
-            survey_heading_lookups =  cache.get(cache_key_lookups)
-            lookup_answer=json_answer.get('response').get(str(header.get('id')))
-            pattern = r'^\[\d+(,\d+)*\]$'
-            if re.match(pattern, lookup_answer):
-                lookup_answer=json.loads(lookup_answer)
-            else:
-                lookup_answer=[int(lookup_answer)]
-            selected_lookup=next(item for item in survey_heading_lookups if item.get('id') in lookup_answer)
-            return selected_lookup.get('name')
-        elif header.get('qtype') == 'AI':
-            answer=json_answer.get('response').get(str(header.get('id')))
-            json_name = JsonAnswer.objects.get(creation_key=answer).response.get('235')
-            return json_name
-        elif header.get('qtype') == 'AW':
-            cache_key_bondaries = INSTANCE_CACHE_PREFIX+'all_boundary_caching'
-            survey_heading_boundaries =  cache.get(cache_key_bondaries)
-            address=json_answer.get('response').get('address')
-            final_address=get_last_level(address)
-            state=final_address.get('1')
-            district=final_address.get('2')
-            final_state=[item for item in survey_heading_boundaries if str(item.get('id') or '') == state]
-            final_district=[item for item in survey_heading_boundaries if str(item.get('id') or '') == district]
-            str_res = '{0}'.format(final_state[0].get('name'))
-            if final_district:
-                str_res='{0}<br/>({1})'.format(final_district[0].get('name'),final_state[0].get('name'))
-            return str_res
-        elif header.get('qtype') == 'C':
-            answer = ast.literal_eval(json_answer.get('response').get(str(header.get('id'))))
-            cache_key_choices = INSTANCE_CACHE_PREFIX+'survey_listing_page_answer_choices'#'survey_listing_page_answer_choices_for_'+str(survey_id)
-            survey_heading_choices =  cache.get(cache_key_choices)
-            res=[]
-            selected_choice=[res.append(item.get('text')) for item in survey_heading_choices if item.get('id') in  answer]
-            return ', '.join(res)
-        elif header.get('qtype') == 'D':
-            date_format = re.compile(r'\d{2}-\d{2}-\d{4}')
-            date_with_format=json_answer.get('response').get(str(header.get('id')))
-            age=None
-            if not date_format.match(date_with_format) and not header.get('training_config').get('month'):
-                date_object = datetime.strptime(date_with_format, '%Y-%m-%d')
-                date_with_format=date_object.strftime(DATE_DISPLAY_FORMAT)
-            elif not header.get('training_config').get('month'):
-                date_object = datetime.strptime(date_with_format, '%d-%m-%Y')
-                date_with_format=date_object.strftime(DATE_DISPLAY_FORMAT)
-            elif header.get('training_config').get('month'):
-                date_object = datetime.strptime(date_with_format, '%m-%Y')
-                date_with_format=date_object.strftime(MONTH_DISPLAY_FORMAT)
-                
-            if header.get('training_config').get('dob'):
-                today = date.today()
-                age=today.year - date_object.year - ((today.month, today.day) < (date_object.month, date_object.day))
-                date_with_format=date_with_format+"("+str(age)+")"
-            return date_with_format
+
+        if json_answer.get('survey') == 7:
+            response_data = json_answer.get('response')
+            if '509' in response_data:
+                follow_data = response_data.get('509')
+                key = list(follow_data.keys())[-1]
+                date_with_format = follow_data.get(key)
+            
+                if header.get('qtype') == 'S':
+                    cache_key_choices = INSTANCE_CACHE_PREFIX+'survey_listing_page_answer_choices'#_for_'+str(json_answer.get('survey_id'))
+                    survey_heading_choices =  cache.get(cache_key_choices)
+                    # print(cache_key_question)
+                    # choices=survey_heading_choices.get(header.get('id'))
+                    choice_answer=json_answer.get('response').get(str(header.get('id')))
+                    selected_choice=next(item for item in survey_heading_choices if str(item.get('id') or '') == choice_answer)
+                    return selected_choice.get('text')
+                elif header.get('qtype') == 'D':
+                    date_format = re.compile(r'\d{2}-\d{2}-\d{4}')
+                    date_with_format=date_with_format.get(str(header.get('id')))
+                    age=None
+                    if not date_format.match(date_with_format) and not header.get('training_config').get('month'):
+                        date_object = datetime.strptime(date_with_format, '%Y-%m-%d')
+                        date_with_format=date_object.strftime(DATE_DISPLAY_FORMAT)
+                    elif not header.get('training_config').get('month'):
+                        date_object = datetime.strptime(date_with_format, '%d-%m-%Y')
+                        date_with_format=date_object.strftime(DATE_DISPLAY_FORMAT)
+                    elif header.get('training_config').get('month'):
+                        date_object = datetime.strptime(date_with_format, '%m-%Y')
+                        date_with_format=date_object.strftime(MONTH_DISPLAY_FORMAT)
+                        
+                    if header.get('training_config').get('dob'):
+                        today = date.today()
+                        age=today.year - date_object.year - ((today.month, today.day) < (date_object.month, date_object.day))
+                        date_with_format=date_with_format+"("+str(age)+")"
+                    return date_with_format
+            
+            datas = date_with_format.get(str(header.get('id')))
+            if not datas:
+                datas = '-'
+
+        else:
+            if json_answer.get('response').get(str(header.get('id')),'None') == 'None' and header.get('qtype') != 'AW': 
+                return '-'
+            elif header.get('qtype') == 'S':
+                cache_key_choices = INSTANCE_CACHE_PREFIX+'survey_listing_page_answer_choices'#_for_'+str(json_answer.get('survey_id'))
+                survey_heading_choices =  cache.get(cache_key_choices)
+                # print(cache_key_question)
+                # choices=survey_heading_choices.get(header.get('id'))
+                choice_answer=json_answer.get('response').get(str(header.get('id')))
+                selected_choice=next(item for item in survey_heading_choices if str(item.get('id') or '') == choice_answer)
+                return selected_choice.get('text')
+            elif header.get('qtype') == 'R':
+                cache_key_choices = INSTANCE_CACHE_PREFIX+'survey_listing_page_answer_choices'#_for_'+str(json_answer.get('survey_id'))
+                survey_heading_choices =  cache.get(cache_key_choices)
+                # print(cache_key_question)
+                # choices=survey_heading_choices.get(header.get('id'))
+                choice_answer=json_answer.get('response').get(str(header.get('id')))
+                selected_choice=next(item for item in survey_heading_choices if str(item.get('id') or '') == choice_answer)
+                return selected_choice.get('text')
+            elif header.get('qtype') == 'SM':
+                # import ipdb;ipdb.set_trace()
+                cache_key_lookups = INSTANCE_CACHE_PREFIX+'all_master_lookup_caching'
+                survey_heading_lookups =  cache.get(cache_key_lookups)
+                lookup_answer=json_answer.get('response').get(str(header.get('id')))
+                pattern = r'^\[\d+(,\d+)*\]$'
+                if re.match(pattern, lookup_answer):
+                    lookup_answer=json.loads(lookup_answer)
+                else:
+                    lookup_answer=[int(lookup_answer)]
+                selected_lookup=next(item for item in survey_heading_lookups if item.get('id') in lookup_answer)
+                return selected_lookup.get('name')
+            elif header.get('qtype') == 'AI':
+                answer=json_answer.get('response').get(str(header.get('id')))
+                json_name = JsonAnswer.objects.get(creation_key=answer).response.get('235')
+                return json_name
+            elif header.get('qtype') == 'AW':
+                cache_key_bondaries = INSTANCE_CACHE_PREFIX+'all_boundary_caching'
+                survey_heading_boundaries =  cache.get(cache_key_bondaries)
+                address=json_answer.get('response').get('address')
+                final_address=get_last_level(address)
+                state=final_address.get('1')
+                district=final_address.get('2')
+                final_state=[item for item in survey_heading_boundaries if str(item.get('id') or '') == state]
+                final_district=[item for item in survey_heading_boundaries if str(item.get('id') or '') == district]
+                str_res = '{0}'.format(final_state[0].get('name'))
+                if final_district:
+                    str_res='{0}<br/>({1})'.format(final_district[0].get('name'),final_state[0].get('name'))
+                return str_res
+            elif header.get('qtype') == 'C':
+                answer = ast.literal_eval(json_answer.get('response').get(str(header.get('id'))))
+                cache_key_choices = INSTANCE_CACHE_PREFIX+'survey_listing_page_answer_choices'#'survey_listing_page_answer_choices_for_'+str(survey_id)
+                survey_heading_choices =  cache.get(cache_key_choices)
+                res=[]
+                selected_choice=[res.append(item.get('text')) for item in survey_heading_choices if item.get('id') in  answer]
+                return ', '.join(res)
+            elif header.get('qtype') == 'D':
+                date_format = re.compile(r'\d{2}-\d{2}-\d{4}')
+                date_with_format=json_answer.get('response').get(str(header.get('id')))
+                age=None
+                if not date_format.match(date_with_format) and not header.get('training_config').get('month'):
+                    date_object = datetime.strptime(date_with_format, '%Y-%m-%d')
+                    date_with_format=date_object.strftime(DATE_DISPLAY_FORMAT)
+                elif not header.get('training_config').get('month'):
+                    date_object = datetime.strptime(date_with_format, '%d-%m-%Y')
+                    date_with_format=date_object.strftime(DATE_DISPLAY_FORMAT)
+                elif header.get('training_config').get('month'):
+                    date_object = datetime.strptime(date_with_format, '%m-%Y')
+                    date_with_format=date_object.strftime(MONTH_DISPLAY_FORMAT)
+                    
+                if header.get('training_config').get('dob'):
+                    today = date.today()
+                    age=today.year - date_object.year - ((today.month, today.day) < (date_object.month, date_object.day))
+                    date_with_format=date_with_format+"("+str(age)+")"
+                return date_with_format
+            datas = json_answer.get('response').get(str(header.get('id')))
     except:
         return '-'
-    return json_answer.get('response').get(str(header.get('id')))
+    return datas
 
 #get last level of dictionary in nested dictinary
 

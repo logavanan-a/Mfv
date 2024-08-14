@@ -639,7 +639,7 @@ def edit_user(request, id):
         #     user_partner_config.partner = Partner.objects.get(id = partner)
         # user_partner_config.save()
 
-        return redirect('mis:user_profile', id = id)
+        return redirect('/user-profile/'+str(id)+'/')
     
     return render(request, 'user/edit_user.html', locals())
 

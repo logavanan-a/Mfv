@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block contents %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h2 class="mb-sm-0 font-size-20" style="color:#000000;"> Donor Report </h2>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+            
+            <form method="POST" action="." class="form-horizontal" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class='row'>
+                    <div class="col-4" >
+                        <div class="mb-2">
+                            <label class="form-label" >Academic Year</label>
+                            <select class=" form-select address_widget"  name="academic_year" id='academic_year' 
+                                aria-label="Floating label select example" data-placeholder=" " required onchange="handleFinanceYearChange()"> 
+                                        {% for ay in academic_year_list %}
+                                        <option value="{{ ay }}" {% if financial_year == ay %}selected {% endif %}>{{ ay }}</option>
+                                        {% endfor %}
+                                        <!-- <option value='2024-2025'>2024-2025</option> -->
+                            </select> 
+                        </div>
+                    </div>
+                    <div class="col-4" >
+                        <div class="mb-2">
+                            <label class="form-label" >Quarterly Year</label>
+                            <select class=" form-select address_widget"  name="q_year" id='q_year' 
+                                aria-label="Floating label select example" data-placeholder=" " required>
+                                {% for qy in quarterly_year_list %}
+                                <option value={{qy}}  {% if half_year == qy %}selected{%endif%}>{{ qy }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-4" >
+                        <div class="mb-2">
+                            <label class="form-label" >Donor</label>
+                            <select class=" form-select address_widget"  name="donor" id='donor' 
+                                aria-label="Floating label select example" data-placeholder=" "> 
+                                        {% if donor_filter|length != 1 %}
+                                        <option value="">All</option>
+                                        {% endif %}
+                                        {% for d in donor_list %}
+                                        <option value={{d.0}} {% if d.0 == selected_donor %}selected{%endif%}>{{d.1}}</option>
+                                        {% endfor %}
+                            </select>
+                            
+                        </div>
+                    </div>
+                    <div class="col-4" >
+                        <div class="mb-2">
+                            <label class="form-label" >District</label>
+                            <select class=" form-select address_widget"  name="district" id='district' 
+                                aria-label="Floating label select example" data-placeholder=" "> 
+                                        <option value="" >Choose Select District</option>
+                                        {% for district in district_list %}
+                                        <option value={{district.0}} {% if district.0 == selected_district %}selected{%endif%}>{{district.1}}</option>
+                                        {% endfor %}
+                            </select>
+                            
+                        </div>
+                    </div>
+
+                    
+                    <div class="col-4" >
+                        <div class='mb-2'>
+                            <label class="form-label" for=""></label>
+                            <div class="">
+                                <input type='submit' class="btn btn-success btn-lg waves-effect waves-light mb-3" value="Go"></input>
+                            </div>
+                        </div>
+                    </div>
+                    
+           </div>
+        </form>
+        </div>
+        </div>
+        </div>
+        </div>
+
+<style>
+    /* Add CSS styles for the table cell */
+    #mpr_sec1_reports td.subheading {
+        background-color: rgb(255, 192, 0);
+        font-weight: bold;
+        text-align: left;
+    }
+    #mpr_sec1_reports th {
+        background-color: rgb(180, 198, 231);
+        font-weight: bold;
+        /* text-align: center; */
+    }
+    #mpr_sec1_reports {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    #mpr_sec1_reports th,
+    #mpr_sec1_reports td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+    }
+</style>
+
+<script src="https://cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"></script>
+<script src="https://cdn.rawgit.com/linways/table-to-excel/v1.0.4/dist/tableToExcel.js"></script>
+
+<script>          
+    function handleFinanceYearChange() {
+        var fy = document.getElementById('finance_year');
+        var valueSelected = fy.value;
+        var data = {'selected_financialyear': valueSelected};
+        $.ajax({
+            type: "GET",
+            url: '/reports/ajax/halfyear/',
+            data: data,
+            success: function(result) {
+                $("#half_year option").remove();
+                $.each(JSON.parse(result),function(key, value)
+                {
+                    for (let index = 0; index < value.length; index++) {
+                    var a = '<option value="' + value[index] + '">' + value[index] + '</option>';
+                    $("#half_year").append(a);
+    
+                }
+                });
+            }
+        });
+    }
+$(document).ready(function() {
+    $("#export").click(function() {
+        let table = document.getElementById('mpr_sec1_reports'); 
+        var fy = document.getElementById('finance_year').value
+        var hy = document.getElementById('half_year').value
+        TableToExcel.convert(table, {
+            name: "mpr_sec1_report"+ "_"+fy+"("+hy+")"+".xlsx",
+            sheet: {
+                name: 'MPR-Reports'
+            },
+        });
+    });
+    });   
+
+    function handleFinanceYearChange() {
+        var fy = document.getElementById('finance_year');
+        var valueSelected = fy.value;
+        var data = {'selected_financialyear': valueSelected};
+        
+        $.ajax({
+            type: "GET",
+            url: '/reports/ajax/halfyear/',
+            data: data,
+            success: function(result) {
+                console.log(result,typeof result)
+                $("#half_year option").remove();
+                $.each(JSON.parse(result),function(key, value)
+                {
+                    for (let index = 0; index < value.length; index++) {
+                    var a = '<option value="' + value[index] + '">' + value[index] + '</option>';
+                    $("#half_year").append(a);
+    
+                }
+                });
+            }
+        });
+    }
+
+    $(document).ready(function(){
+        $('select#donor').change(function () {
+            var optionSelected = $(this).find("option:selected");
+            var valueSelected  = optionSelected.val();
+            data = {'selected_donor' : valueSelected };
+            $.ajax({
+                type:"GET",
+                url: '/reports/ajax/donor_district/',
+                data:data,
+                success:function(result){
+                    $("#district option").remove();
+                    a = '<option selected disabled value="">Select District</option>';
+                    $("#district").append(a);
+                    if(result.length == 0){
+                        $("#district option").remove();
+                        a = '<option selected disabled value="">No district is mapped to this state</option>';
+                        $("#district").append(a);
+                    }
+                    else{
+                        $.each(JSON.parse(result), function (key, value)
+                        {
+                            a = '<option value=' + value['id']+'>' + value['name']+'</option>';
+                            $("#district").append(a);
+                        });
+                    }
+                }
+            });
+        });
+    });  
+    </script>
+
+
+{% endblock %}

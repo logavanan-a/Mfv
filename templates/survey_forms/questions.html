@@ -6,7 +6,7 @@
     {% for block in blocks %}
         {% get_questions block.id as get_questions %}
         {% if get_questions|length > 0 %}
-            {% if blocks|length > 1 and survey.id != 20 %}
+            {% if blocks|length > 1 and survey.id != 7 %}
                 <div class="row">
                     <div class="col-10">
                         <h3 class='mb-3 mt-1'>{{block.name}}</h3 class='mt-3'>
@@ -323,13 +323,12 @@
                                             
                                             $(document).on('change', "input[value='{{choice.id}}']", function (event) {
                                                 if ($(this).prop('checked')){
+                                                    var not_applicable = $(this).val()
                                                     skip_question_list = []
                                                     {% for choice_list in main_choice_list %}
                                                         if (parseInt({{question.id}}) == 246){
                                                             skip_question_list.push({{choice_list.skip_question_ids}})
                                                         }else if (parseInt({{question.id}}) == 254){
-                                                            
-                                                            console.log({{choice_list.skip_question_ids}})
                                                             skip_question_list.push({{choice_list.skip_question_ids}})
                                                         }else if (parseInt({{question.id}}) == 356){
                                                             skip_question_list.push({{choice_list.skip_question_ids}})
@@ -340,14 +339,25 @@
                                                         $.each({{choice.skip_question_ids|safe}}, function(index, name) {
                                                             if (value.includes(parseInt(name))){
                                                                 $.each(value, function(index_3, skip_id) {
-                                                                    $('#'+skip_id.toString()).val('') 
-                                                                    $('#skip_'+skip_id.toString()).show() 
-                                                                    $('.main_checkbox_'+skip_id.toString()).prop('checked',false);
-                                                                    if ($('#skip_'+skip_id.toString()).find('.required').length > 0){
+                                                                    if (parseInt(not_applicable) == 119752 ){
+                                                                        $('#'+skip_id.toString()).val('') 
+                                                                        $('#skip_'+skip_id.toString()).hide() 
+                                                                        $('.main_checkbox_'+skip_id.toString()).prop('checked',false);
+                                                                        if ($('#skip_'+skip_id.toString()).find('.required').length > 0){
+                                                                                $('input[name="'+skip_id.toString()+'"]').removeAttr('required', 'required')
+                                                                            }                          
+                                                                            $('#skip_'+skip_id.toString()).hide() 
+                                                                    }else{
+
+                                                                        $('#'+skip_id.toString()).val('') 
+                                                                        $('#skip_'+skip_id.toString()).show() 
+                                                                        $('.main_checkbox_'+skip_id.toString()).prop('checked',false);
+                                                                        if ($('#skip_'+skip_id.toString()).find('.required').length > 0){
                                                                             $('input[name="'+skip_id.toString()+'"]').attr('required', 'required')
                                                                         }                          
                                                                         $('#skip_'+skip_id.toString()).show() 
-                                                                    })
+                                                                    }
+                                                                })
                                                             }else{
                                                                 $.each(value, function(index_3, skip_id) {
                                                                     $('.main_checkbox_'+skip_id.toString()).prop('checked',false);
@@ -660,6 +670,20 @@
         <button type="submit" id="submitting" name="submitting" class="btn btn-primary w-md">Submit</button>
     </div>
 </form>
+<script>
+    $('form').on('submit', function(event) {
+        // Disable the submit button
+        $('#submitButton').prop('disabled', true);
+
+        // Set a timeout to re-enable the button after 2 minutes (120000 milliseconds)
+        setTimeout(function() {
+            $('#submitButton').prop('disabled', false);
+        }, 120000);
+
+        // Allow the form to be submitted normally
+        return true;
+    });
+</script>
 <script>
     if (parseInt({{survey.id}}) == 8){
         var data = {{request|get_auto_fill:survey.id|safe}}

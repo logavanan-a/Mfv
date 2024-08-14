@@ -23,8 +23,15 @@
         </div>
     </div>
 </div>
+
 <script>
     $(document).ready(function () {
+        
+        var date_vlu = "{{request|display_last_date:'add'}}"
+        var date = new Date(date_vlu);
+        var nextDay = date.toISOString().split('T')[0];
+        var zero = 0
+        $(".D_0_0").attr('min',nextDay)
         //added static code in hiv form(8) for Registered as HIV Positive question , 
         //based on profile question choice will update yes/no option 
         $('[name="563"]').val('{{value}}').trigger('change').attr('disabled', true)
