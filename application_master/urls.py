@@ -5,6 +5,7 @@ app_name = "application_master"
 
 urlpatterns = [
     path('list/<model>/', master_list_form),
+    path('list/<model>/import/', master_list_form,{'key': 'import'}),
     path('add/<model>/', master_add_form),
     path('edit/<model>/<id>/', master_edit_form),
     path('<model>/<id>/delete/', delete_record,name='delete_record'),

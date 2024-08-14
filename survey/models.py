@@ -1829,6 +1829,33 @@ class ResponseFiles(BaseContent):
     def __str__(self):
         return str(self.id)
 
+# import os
+# def get_upload_to(instance, filename):
+#     import ipdb;ipdb.set_trace()
+#     print(instance.status)
+#     if instance.status == 'Imported':  # Replace with your condition for the 'processed' folder
+#         folder_name = 'processed_files'
+#     else:
+#         # Dynamic folder name based on current date
+#         now = datetime.now()
+#         folder_name = now.strftime('%Y/%m/%d')  # Or any other format you need
+
+#     return os.path.join('import-response', folder_name, filename)
+
+class ResponseImportFiles(BaseContent):
+    IMPORT_STATUS_CHOICES = (('Uploaded', 'Uploaded'),('Inprogress', 'Inprogress'),('Failed', 'Failed'),('Imported','Imported'))
+    response_image = models.FileField(upload_to='import-response/%Y/%m/%d', blank=True, null=True)
+    # response_image = models.FileField(upload_to=get_upload_to, blank=True, null=True)
+    survey = models.ForeignKey(Survey,on_delete=models.DO_NOTHING,blank=True, null=True)
+    project = models.ForeignKey(Project,on_delete=models.DO_NOTHING,blank=True, null=True)
+    status = models.CharField(_('Status'), choices=IMPORT_STATUS_CHOICES)
+    user = models.ForeignKey('auth.User',on_delete=models.DO_NOTHING )
+    error_details = models.TextField(blank=True,null=True) 
+    imported_on = models.DateTimeField(blank=True, null=True)
+
+
+    def __str__(self):
+        return str(self.id)
 
 class LanguageTranslationText(BaseContent):
     content_type = models.ForeignKey(ContentType, blank=True, null=True,on_delete=models.DO_NOTHING)

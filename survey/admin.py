@@ -134,3 +134,7 @@ class BeneficiaryResponseAdmin(ImportExportModelAdmin, ImportExportFormat):
 @admin.register(BeneficiaryType)    
 class BeneficiaryTypeAdmin(ImportExportModelAdmin, ImportExportFormat):
     pass
+
+@admin.register(ResponseImportFiles)
+class ResponseImportFilesAdmin(ImportExportModelAdmin, ImportExportFormat):
+    pass

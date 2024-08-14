@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block contents %}
+<div class="row align-items-center">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <div class="card-header card-header-icon mb-3" data-background-color="rose">
+                    <div class="d-flex align-items-center" >
+                        <i class="p-1 fas fa-file-import" style="font-size: 22px;"></i>
+                        <h4 class="p-1 card-title" style="position: relative; top:5px;">Upload Responses - {{survey_name|title}} </h4>
+                    </div>
+
+                </div>
+                {% if object_list %}
+                    <div class="table-responsive">
+                        <table class="table ">
+                            <thead>
+                                <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Uploaded On</th>
+                                <th scope="col">Updated On</th>
+                                <th scope="col">Uploaded By</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Imported On</th>
+                                <th scope="col">Note</th>
+                                <th scope="col">File</th>
+                                {% comment %} <th scope="col">Action</th> {% endcomment %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in object_list %}
+                                    <tr>
+                                        <th scope="row">{{forloop.counter}}</th>
+                                        <td>{{i.created}}</td>
+                                        <td>{{i.modified}}</td>
+                                        <td>{{i.user.username}}</td>
+                                        <td>{{i.status}}</td>
+                                        <td>{{i.imported_on|default:'-'}}</td>
+                                        <td>{{i.error_details|default:"-"}}</td>
+                                        <td>
+                                            <a href="/{{i.response_image}}" class="ng-star-inserted">
+                                            <i class="fas fa-file-download" style="font-size: 30px;" title="download"></i>
+                                            </a>
+                                        </td>
+                                        {% comment %} <td>
+                                            {% if forloop.last and  object_list.last.status in 'Uploaded,Failed' %}
+                                                <a href="/media/{{i.response_image}}/" class="ng-star-inserted">
+                                                <i class="mdi mdi-file-replace" style="font-size: 30px;" title="replace"></i>
+                                                </a>
+                                            {% endif %}
+                                        </td> {% endcomment %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% include 'survey_forms/pagination.html' %}
+                    </div>
+                {% endif %}
+                <form method="POST" action="." class="form-horizontal" id="survey" enctype="multipart/form-data">{% csrf_token %}
+                    
+                    {% if error %}<div class="col-md-12"><div class="error_alert"><h3>{{error}}</h3></div></div>{% endif %}
+                    <div class="card-content"> <!-- "key" for import regional choice question -->
+                        {% comment %} <div class="col-md-6 validate_height" id="div_name">
+                            <label class="col-sm-12 label-on-left">Upload File <span class="required">*</span></label>
+                            <div class="col-sm-12">
+                                    <input class="form-control-file" type="file" value="" name="file">
+                            </div>
+                        </div> {% endcomment %}
+                        <div class="form-group row validate_height" id="div_name">
+                            
+                            <label class="col-sm-2 col-form-label mt-3">{% if uploaded_responses_list.first.status in 'Uploaded' %} Replace File {% else %} Upload File {% endif %}<span class="required">*</span></label>
+                            <div class="col-sm-10">
+                                <input class="form-control-file" type="file" value="" name="file" {% if uploaded_responses_list.first.status == "Inprogress" %}disabled{% endif %}>
+                                <p> * The file should be in <b>.xlsx</b> format and its size should not exceed <b>{{self.max_file_size_in_mb}}</b> MB.<br>
+                                    * Before uploading the file, please ensure that its format matches the required .xlsx format.</br>
+                                    * If the uploaded file contains any data issues, please refer to the downloaded file's <b>Error Message</b> column for details.</p>
+                            </div>
+                        </div>
+                        <p class="fw-normal mt-2">Download file format 
+                            <a href="/manage/generate-excel/{{pk}}/" class="ng-star-inserted">
+                            <i class="fas fa-download" style="font-size: 20px;"></i>
+                            </a>
+                        </p>
+                        <div class="col-md-12 text-right choose_right d-flex justify-content-end" style="gap:10px" >
+                            {% comment %} <a href="/manage/activity/import/">
+                                <span class="btn btn-danger btn-fill btn-sm">Cancel</span>
+                            </a> {% endcomment %}
+
+                            <input type="submit" class="btn btn-primary btn-fill btn-rose btn-sm" value="Save">
+
+                        <div class="ripple-container"></div>
+                        </div>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_javascript %}
+
+<script src="/static/js/jquery.validate.js"></script>
+<script>
+    $(document).ready(function() {
+        {% for message in messages %}
+            Swal.fire({
+                title: '{{ message }}',
+                icon: '{{message.tags}}',
+                showConfirmButton: false,
+                timer: 2000
+            }
+            ).then((result) => {
+                window.location.href = '/manage/activity/import-responses/{{pk}}/';
+            });
+            
+        {% endfor %}
+        $("#survey").validate({
+            rules :
+            {
+                file: {required: true},
+            },
+        });
+    });
+    
+</script>
+
+{% endblock %}

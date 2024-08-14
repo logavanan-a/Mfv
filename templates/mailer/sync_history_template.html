@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Roshni MIS form Responses</title>
+     <style>
+    th, td{padding: 8px;}
+    </style>
+</head>
+    <body>
+        <p>Dear Admin Team,</p></b>
+        <p>The following are the details on the form responses:</p></b>
+        {% for h,t in content.table_data.items %}
+            {% if t %}
+                <div class="table-responsive">
+                    <h3>{{h|title}}</h3>
+                    <table border=1 style="border-collapse: collapse;" class="table">
+                        <thead>
+                            <tr>
+                                <th>Facility UID</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i,v in t.items %}
+                            <tr>
+                                <td>{{i}}</td>
+                                <td>{{v}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        {% endfor %}
+        <hr>
+        <label for=""><b>File Path </b>- {{content.filename|safe}}</label><br>
+        <label for=""><b>Total number of empty pushInput </b>- {{content.blank_push}}</label><br>
+        <label for=""><b>Total number of NON EMPTY pushInput </b>- {{content.res}}</label><br>
+        <label for=""><b>Total number of ERROR input </b>- {{content.error_count}}</label><br>
+        {% comment %} <label for=""><b>Error List </b>- {{content.result}}</label><br> {% endcomment %}
+        <div class="table-responsive">
+            <h3>Error List</h3>
+            <table border=1 style="border-collapse: collapse;" class="table">
+                <thead>
+                    <tr>
+                        <th>Error</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i,v in content.result.items %}
+                        {% if i != ',' %}
+                            <tr>
+                                <td>{{i}}</td>
+                                <td>{{v}}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>

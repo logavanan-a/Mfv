@@ -246,7 +246,7 @@ def dashboard_data_approval(request, id):
         if request.POST.get('remark'):
             group = request.user.groups.all()[0]
             remark_text = f"{request.user.username} ({group.name})  -  {request.POST.get('remark')}"
-            Remarks.objects.create(object_id=monthly_data.id,content_type_id=62,remark=remark_text,user=request.user)
+            Remarks.objects.create(object_id=monthly_data.id,content_type_id=34,remark=remark_text,user=request.user)
 
         # sending email for respected role users
         try:
@@ -260,7 +260,7 @@ def dashboard_data_approval(request, id):
         return JsonResponse({'message': message})
 
     if id != 'new':
-        remarks = Remarks.objects.filter(active=2,content_type_id=62,object_id=monthly_data.id).order_by('created')
+        remarks = Remarks.objects.filter(active=2,content_type_id=34,object_id=monthly_data.id).order_by('created')
     return render(request, "survey_forms/activity_submition_view.html", locals())
 
 def get_count_data(user,start_date,end_date):
@@ -498,7 +498,7 @@ def send_mail_with_template(request,monthly_data,dashboard_data,kwargs={}):
             cognizant_table_html = ""
             if 14 in donor_list:
                 start_date, end_date = get_financial_year_dates()
-                cognizant_yearly_data = get_count_data(request.user,start_date, end_date)
+                cognizant_yearly_data = get_count_data(user_obj,start_date, end_date)
                 dashboard_yearly_data = get_dashboard_data(cognizant_yearly_data)
                 cognizant_table_html = render_to_string('mailer/table_for_dashboard_data.html', {'dashboard_data': dashboard_yearly_data})
                 cognizant_table_html = convert_safe_text(cognizant_table_html)
