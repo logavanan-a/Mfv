@@ -123,8 +123,8 @@ def validation_popup(survey_id, creation_key):
     if survey_id in [6,7,8]:
         refferal_query="""with a as ("""+refferal_vlu+""") select coalesce(sum(case when response->>'344'='272' then 1 else 0 end),0) as ht from a"""
         refferal_result = get_result_query(refferal_query)[0][0]
-        value = 3
-        if len(get_result_query(refferal_vlu)) != 0:
+        value = 4 if len(get_result_query(refferal_vlu)) != 0 and refferal_result == 0 else 3 
+        if len(get_result_query(refferal_vlu)) != 0 and refferal_result == 1:
             value = 0
             query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and js.cluster->>\'BeneficiaryResponse\' = \'{0}\' and s.id =11 order by js.response->>\'445\''.format(creation_key)#
             if survey_id == 8:
@@ -133,12 +133,13 @@ def validation_popup(survey_id, creation_key):
                     value = 2
                 else:
                     value = 0
-                    check_to_spectacle_dispensing = json.loads(result[-1][2]).get('444545')
+                    check_to_spectacle_dispensing = json.loads(result[-1][2]).get('445')
                     date1 = datetime.strptime(check_to_spectacle_dispensing, '%d-%m-%Y')
                     current_date = datetime.today()
                     date_difference = current_date - date1
-                    if date_difference.days <= 90:
+                    if date_difference.days >= 90:
                         value = 1
+            
     return value
 
 

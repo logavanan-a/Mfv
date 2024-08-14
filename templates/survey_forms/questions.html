@@ -661,6 +661,20 @@
     </div>
 </form>
 <script>
+    $('form').on('submit', function(event) {
+        // Disable the submit button
+        $('#submitButton').prop('disabled', true);
+
+        // Set a timeout to re-enable the button after 2 minutes (120000 milliseconds)
+        setTimeout(function() {
+            $('#submitButton').prop('disabled', false);
+        }, 120000);
+
+        // Allow the form to be submitted normally
+        return true;
+    });
+</script>
+<script>
     if (parseInt({{survey.id}}) == 8){
         var data = {{request|get_auto_fill:survey.id|safe}}
         var date_spectacles_given = data['445'] || '';
