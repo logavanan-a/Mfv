@@ -614,15 +614,15 @@ def edit_user(request, id):
         if User.objects.filter(username__iexact=username).exclude(id=user.id).exists():
             user_location = None
             user_exist_error = 'Username already exist'
-            return render(request, 'user/add_user.html', locals())
+            return render(request, 'user/edit_user.html', locals())
         if User.objects.filter(email__iexact=email).exclude(id=user.id).exists():
                 user_location = None
                 user_exist_error = 'Email already exist'
-                return render(request, 'user/add_user.html', locals())
+                return render(request, 'user/edit_user.html', locals())
         if UserProfile.objects.filter(phone_no__iexact=mobile_no).exclude(id=user_profile.id).exists():
             user_location = None
             user_exist_error = 'Mobile no already exist'
-            return render(request, 'user/add_user.html', locals())
+            return render(request, 'user/edit_user.html', locals())
         user.username = username
         user.first_name = first_name
         user.last_name = last_name
