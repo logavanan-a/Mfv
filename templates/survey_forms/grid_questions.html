@@ -74,6 +74,11 @@
                                                             {% if grid_validation_code.message %}{{grid_validation_code.message}}{% else %}Please enter a valid {{grid_question.text}}{% endif %}
                                                         </div>
                                                     </div>
+                                                    <!-- <script>
+                                                        $("#T_{{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}}").keyup(function(){
+                                                            $(this).val()
+                                                        })
+                                                    </script> -->
                                                     {% if grid_question.api_json.auto_calculation_question_ids %}
                                                         <script>
                                                             $(document).ready(function(){
