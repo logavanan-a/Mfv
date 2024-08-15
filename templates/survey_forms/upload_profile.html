@@ -41,7 +41,7 @@
                                 </div>
                                 <div class="col-auto ">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="ben_type" id="student" value="2" required disabled>
+                                        <input class="form-check-input" type="radio" name="ben_type" id="student" value="2" required {% if not school_exists %}disabled{% endif %} >
                                         <label class="form-check-label" for="student">
                                             Student
                                         </label>
@@ -54,7 +54,7 @@
                             <div class='col-auto mt-3'>
                                 <p class="fw-normal mt-2"><b>Download file format : </b> &emsp;
                                     School <a href="/manage/generate-excel/1/{{pk}}/" class="ng-star-inserted"><i class="fas fa-download" style="font-size: 20px;"></i></a>&emsp;
-                                    {% comment %} Students <a href="/manage/generate-excel/2/{{pk}}/" class="ng-star-inserted" readonly><i class="fas fa-download" style="font-size: 20px;"></i></a> {% endcomment %}
+                                    {% if school_exists %}Students <a href="/manage/generate-excel/2/{{pk}}/" class="ng-star-inserted" readonly><i class="fas fa-download" style="font-size: 20px;"></i></a>{% endif %}
                                 </p>
                             </div>
                             <p> * The file should be in <b>.xlsx</b> format and its size should not exceed <b>{{self.max_file_size_in_mb}}</b> MB.<br>
@@ -106,7 +106,7 @@
                                     <td>{{i.imported_on|default:'-'}}</td>
                                     <td>{{i.error_details|default:"-"}}</td>
                                     <td>
-                                        <a href="/{{i.response_image}}" class="ng-star-inserted">
+                                        <a href="{% if i.status == "Imported" and i.processed_file %}{{i.processed_file}}{% elif i.response_image %}{{i.response_image.url}}{% endif %}#" class="ng-star-inserted">
                                         <i class="fas fa-file-download" style="font-size: 30px;" title="download"></i>
                                         </a>
                                     </td>  
