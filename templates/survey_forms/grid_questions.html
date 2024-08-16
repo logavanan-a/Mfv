@@ -69,16 +69,52 @@
                                                 {% elif grid_question.qtype == 'T' %}
                                                     <div class="mb-3 " id='skip_{{is_grid_question.id}}_{{grid_question.id}}'>
                                                         {% comment %} <label class="form-label" >{{grid_validation_code}} </label> {% endcomment %}
-                                                        <input type="{% if grid_validation_code.code == 'N' or grid_validation_code.code == 'D'%}number{% else %}text{% endif %}" id="T_{{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}}" {% if grid_question.api_json.pattern %} pattern="{{grid_question.api_json.pattern}}" {% endif%} name='{{grid_question.id}}' min='{{grid_validation_code.MinMax.min}}' max='{{grid_validation_code.MinMax.max}}'    maxlength='{{grid_validation_code.MinMax.max_length}}' minlength='{{grid_validation_code.MinMax.min_length}}' class="form-control grid_question_{{question.id}} {{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}} {% if grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %}" {% if grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %} {% if creation_key and not grid_question.is_editable and response_obj.response and response_obj.response.616 != '619'   %} disabled {% endif %}>
+                                                        <input type="{% if grid_validation_code.code == 'N' or grid_validation_code.code == 'D'%}number{% else %}text{% endif %}" id="T_{{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}}" {% if grid_question.api_json.pattern and  survey.id != 4 %} pattern="{{grid_question.api_json.pattern}}" {% endif%} name='{{grid_question.id}}' min='{{grid_validation_code.MinMax.min}}' max='{{grid_validation_code.MinMax.max}}'    maxlength='{{grid_validation_code.MinMax.max_length}}' minlength='{{grid_validation_code.MinMax.min_length}}' class="form-control grid_question_{{question.id}} {{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}} {% if grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %}" {% if grid_question.mandatory and grid_get_row_questions.0.id == grid_question.id or grid_question.mandatory and grid_get_row_questions|length == 1 %}required{% endif %} {% if creation_key and not grid_question.is_editable and response_obj.response and response_obj.response.616 != '619'   %} disabled {% endif %}>
                                                         <div class="invalid-feedback">
                                                             {% if grid_validation_code.message %}{{grid_validation_code.message}}{% else %}Please enter a valid {{grid_question.text}}{% endif %}
                                                         </div>
                                                     </div>
-                                                    <!-- <script>
-                                                        $("#T_{{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}}").keyup(function(){
-                                                            $(this).val()
-                                                        })
-                                                    </script> -->
+                                                    {% if survey.id == 4 %}
+                                                    <script>
+                                                        $(document).ready(function() {
+                                                            var $input = $("#T_{{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}}");
+                                                            var regex = /^[+-]?(20(\.00)?|1[0-9](\.00|\.25|\.50|\.75)?|[1-9](\.00|\.25|\.50|\.75)?|0(\.00|\.25|\.50|\.75)?)$/;
+                                                            function validateInput() {
+                                                                var value = $input.val();
+                                                                var parts = value.split('/');
+                                                                if (parts.length  ==  2){
+                                                                    var firstPart = parts[0].trim();
+                                                                    var secondPart = parts[1].trim();
+                                                                    if (regex.test(firstPart) && regex.test(secondPart)){
+                                                                        $input.removeClass('is-invalid').addClass('is-valid');
+                                                                        $input.removeAttr('required');
+                                                                        return true;
+                                                                    }else{
+                                                                        $input.removeClass('is-valid').addClass('is-invalid');
+                                                                        $input.attr('required', 'required');
+                                                                        return false;
+                                                                    }
+                                                                }else if (regex.test(value)) {
+                                                                    $input.removeClass('is-invalid').addClass('is-valid');
+                                                                    $input.removeAttr('required');
+                                                                    return true;
+                                                                } else {
+                                                                    $input.removeClass('is-valid').addClass('is-invalid');
+                                                                    $input.attr('required', 'required');
+                                                                    return false;
+                                                                }
+                                                            }
+                                                    
+                                                            $input.on('input', validateInput);
+                                                    
+                                                            $('#submitting').on('click', function(event) {
+                                                                if (!validateInput()) {
+                                                                    event.preventDefault(); // Only prevent submission if input is invalid
+                                                                }
+                                                            });
+                                                        });
+                                                    </script>
+                                                    {% endif %}
                                                     {% if grid_question.api_json.auto_calculation_question_ids %}
                                                         <script>
                                                             $(document).ready(function(){

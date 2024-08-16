@@ -62,7 +62,6 @@ def applogin(request, **kwargs):
     if request.method == 'POST' and kwargs.get('status', False):
         tabtime = request.POST.get('tabtime')
         user = kwargs.get('user')
-        
         time_data = get_time_difference(tabtime)
         message = time_data.get('message', '')
         response_type = time_data.get('response_type')
