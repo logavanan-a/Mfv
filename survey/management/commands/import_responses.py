@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from survey.models import ResponseImportFiles,Question,QuestionValidation,Choice,JsonAnswer,Survey
+from survey.models import ResponseImportFiles,Question,QuestionValidation,Choice,JsonAnswer,Survey,BeneficiaryResponse
 from application_master.models import Boundary,BoundaryLevel,Project,UserProjectMapping
 from django.db.models import F,Q
 import pandas as pd
@@ -9,7 +9,7 @@ from datetime import datetime, date
 from uuid import uuid4
 import json,requests,ast,re
 from survey.form_views import load_data_to_cache_boundary_meta
-from cache_configuration.views import load_data_to_cache_project
+from cache_configuration.views import load_data_to_cache_project,load_data_to_cache_survey,load_data_to_cache_questions
 from django.utils import timezone
 import logging
 import sys, traceback
@@ -216,9 +216,11 @@ def questions_validation(df,survey_id,project_id):
                 columns = df[column.strip()]
                 question_based_validation(df,question,columns,validation,column)
             continue
-
+        
+        if question.qtype == 'AI':
+            column = get_api_column_name(question)
+            
         # text type fields with validation
-        # import ipdb;ipdb.set_trace()
         columns = df[column]
         question_based_validation(df,question,columns,validation,column)
     
@@ -297,13 +299,12 @@ def question_based_validation(df,question,columns,validation,column):
         ben_survey_id = reference_question.block.survey_id
         question_id = unique_ids.get(str(ben_survey_id))
         copy_df = df[column][df[column].notna()]
-        # import ipdb;ipdb.set_trace()
-        unique_values = copy_df.str.lower().str.strip().str.split(',').explode().dropna().loc[lambda x: x != ''].tolist()
+        unique_values = copy_df.astype(str).str.lower().str.strip().str.split(',').explode().dropna().loc[lambda x: x != ''].tolist()
         beneficiary_dict = get_beneficiary_unique_values(ben_survey_id,question_id,unique_values)
         df[column] = df[column].astype(str)
-        df[column+'-API'] =  df[column].apply(lambda value: str([beneficiary_dict.get(v.strip(), "") for v in value.split(',') if v.strip()]))
+        df[column+'-API'] =  df[column].apply(lambda value: [str(beneficiary_dict.get(v.strip(), "")) for v in value.split(',') if v.strip()])
         if len(set(unique_values)) != len(set(beneficiary_dict)):
-            copy_df['all_values_exist'] = copy_df.apply(lambda x: unique_id_validation(x,beneficiary_dict))
+            copy_df['all_values_exist'] = copy_df.astype(str).apply(lambda x: unique_id_validation(x,beneficiary_dict))
             unique_id_error = columns[~copy_df['all_values_exist']].index.tolist()
             if unique_id_error:
                 error_message =  f"* Validate the value of the {column} question is correct. It does not exist in our database."
@@ -351,6 +352,12 @@ def parse_data_row(df,survey_id):
         boundary_data = {i.name.lower():str(i.id) for i in Boundary.objects.filter(active=2)}
 
     final_result = []
+    ai_questions = questions.filter(qtype='AI')
+    if ai_questions:
+        api_column = get_api_column_name(ai_questions[0])
+        flattened_list = [item for sublist in df[api_column+'-API'].tolist() for item in sublist]
+        cluster_beneficiary_data = get_beneficiary_clusters(flattened_list)
+
     for i in range(len(df)):
         data = {}
         df.fillna('', inplace=True)
@@ -359,7 +366,10 @@ def parse_data_row(df,survey_id):
             if q.qtype in ['C','S','R']:
                 data[str(q.id)] = [{'C_0_0': str(get_choice_id(row.get(q.text),q.id))}]
             elif q.qtype == "AI":
-                data[str(q.id)] = [{'AI_0_0': row.get(q.text+'-API')}]
+                ai_creation_key = row.get(api_column+'-API')[0]
+                data[str(q.id)] = [{'AI_0_0': ai_creation_key}]
+                clusters = str(cluster_beneficiary_data.get(str(ai_creation_key),''))
+                
             elif q.qtype == "D" and row.get(q.text):
                 data[str(q.id)] = [{'D_0_0': format_date(row.get(q.text))}]#.strftime('%d-%m-%Y')
             elif q.qtype == "AW":
@@ -447,3 +457,21 @@ def format_date(value):
 #     except:
 #         return value#split(',')
 
+def get_api_column_name(question):
+    cache_surveys = load_data_to_cache_survey()
+    survey_questions = load_data_to_cache_questions()
+    # api question survey name
+    lname_que_id = question.api_json.get('lname_que_id').split(',')
+    parent_question = survey_questions.get(lname_que_id[0])
+    parent_survey_id = parent_question.get('survey_id')
+    cache_parent_survey = cache_surveys.get(str(parent_survey_id))
+
+    # unique question text
+    unique_ids = RESPONSE_IMPORT['unique_id']
+    question_id = unique_ids.get(str(parent_survey_id))
+    unique_question_name = survey_questions.get(question_id)
+    column = cache_parent_survey.get('name') + "--" +unique_question_name.get('text') 
+    return column
+
+def get_beneficiary_clusters(beneficiaries):
+    return dict(BeneficiaryResponse.objects.filter(creation_key__in=beneficiaries).values_list('creation_key','address_2'))
