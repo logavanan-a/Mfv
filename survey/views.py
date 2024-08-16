@@ -813,8 +813,11 @@ def generate_excel(request,survey_id,project_id):
         lname_que_id = api_question[0].get('api_json',{}).get('lname_que_id').split(',')
         parent_question = survey_questions.get(lname_que_id[0])
         parent_survey_id = parent_question.get('survey_id')
+        parent_survey = cache_surveys.get(str(parent_survey_id))
         unique_id = unique_ids.get(str(parent_survey_id))
-        headers.append(survey_questions.get(unique_id,{}).get('text'))
+
+        parent_survey_name = parent_survey.get('name')
+        headers.append(parent_survey_name + '--' + survey_questions.get(unique_id,{}).get('text'))
     
     gd_question = list(filter(lambda x: x['qtype'] in ['GD'],questions))
     for qu in gd_question:
@@ -825,8 +828,9 @@ def generate_excel(request,survey_id,project_id):
     # Create a DataFrame with the headers
     df = pd.DataFrame(columns=headers)
     df.at[0, 'Project'] = project.name
-    df.at[0, 'District'] = project.district.name.strip()
-    df.at[0, 'State'] = project.district.state.name.strip()
+    if survey_id == 1:
+        df.at[0, 'District'] = project.district.name.strip()
+        df.at[0, 'State'] = project.district.state.name.strip()
 
     # Specify the path to save the file
     # folder_path = os.path.join(settings.MEDIA_DIR, 'response_file_format')

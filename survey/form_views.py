@@ -97,19 +97,19 @@ def cache_set_with_namespace(namespace, key, value,cache_time = None):
      cache.set(key,value)
 
 
-def load_data_to_cache_questions():
-    #caching the questions based on the questions
-    query = "SELECT jsonb_object_agg(id, question_info) FROM ( SELECT a.id, jsonb_build_object( 'qtype', a.qtype, 'text', a.text, 'training_config', a.training_config ) AS question_info FROM survey_question a GROUP BY a.id ) AS x"
+# def load_data_to_cache_questions():
+#     #caching the questions based on the questions
+#     query = "SELECT jsonb_object_agg(id, question_info) FROM ( SELECT a.id, jsonb_build_object( 'qtype', a.qtype, 'text', a.text, 'training_config', a.training_config ) AS question_info FROM survey_question a GROUP BY a.id ) AS x"
 
-    cache_key_questions = INSTANCE_CACHE_PREFIX+'question_meta'
-    questions =  cache.get(cache_key_questions)
-    if not questions:
-        with connection.cursor() as cursor:
-            cursor.execute(query)
-            result = cursor.fetchall()
-            questions = json.loads(result[0][0])
-        cache_set_with_namespace(INSTANCE_CACHE_PREFIX+'FORM_BUILDER',cache_key_questions,questions,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
-    return questions
+#     cache_key_questions = INSTANCE_CACHE_PREFIX+'question_meta'
+#     questions =  cache.get(cache_key_questions)
+#     if not questions:
+#         with connection.cursor() as cursor:
+#             cursor.execute(query)
+#             result = cursor.fetchall()
+#             questions = json.loads(result[0][0])
+#         cache_set_with_namespace(INSTANCE_CACHE_PREFIX+'FORM_BUILDER',cache_key_questions,questions,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
+#     return questions
 
 def load_data_to_cache_boundary_meta():
     #caching the boundary
