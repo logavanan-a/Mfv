@@ -24,6 +24,8 @@ def validate_user(view):
             '''
             # if user_setup().get('login_username_as_casesensitive') == 2:
             email = email.lower()
+            # import ipdb; ipdb.set_trace()
+
             user = authenticate(username=email, password=password)
             if user is None:
                 usr=User.objects.filter(username=email)
