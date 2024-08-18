@@ -828,7 +828,7 @@ def generate_excel(request,survey_id,project_id):
     # Create a DataFrame with the headers
     df = pd.DataFrame(columns=headers)
     df.at[0, 'Project'] = project.name
-    if survey_id == 1:
+    if survey_id == '1':
         df.at[0, 'District'] = project.district.name.strip()
         df.at[0, 'State'] = project.district.state.name.strip()
 

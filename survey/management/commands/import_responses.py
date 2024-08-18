@@ -18,6 +18,8 @@ import numpy as np
 import subprocess
 from io import BytesIO
 from django.core.files.base import ContentFile
+from send_mail.views import send_mail
+from send_mail.models import MailTemplate,MailData
 
 # Mandatories 
 # TODO: Project, State, District, Block,Gram Panchayath, Village, Generation Key, -- All questions related to that form
@@ -44,7 +46,7 @@ class Command(BaseCommand):
             project_id = options.get('project_list')
             response_files = ResponseImportFiles.objects.filter(active=2, status__in=['Uploaded']) 
             if survey_id and project_id:
-                response_files = response_files.filter(survey_id__in = survey_id,v=project_id)
+                response_files = response_files.filter(survey_id__in = survey_id,project_id__in=project_id)
             response_files = response_files.values('survey_id').annotate(response_image=F('response_image'),response_id=F('id'))
             
             errors = defaultdict(list)
@@ -64,7 +66,6 @@ class Command(BaseCommand):
                     df = questions_validation(df,survey_id,response_obj.project_id)
 
                     # df['Activity Date'] = pd.to_datetime(df['Activity Date'], format='%Y/%m/%d', errors='coerce').dt.strftime('%d-%m-%Y')
-                    # import ipdb;ipdb.set_trace()
                     if 'Error Message' in df.columns and df['Error Message'].notnull().any():
                         response_obj.status = 'Failed'
                         response_obj.error_details = 'Please validate the file for errors in the "Error Message" column'
@@ -94,22 +95,40 @@ class Command(BaseCommand):
                     permission_command = RESPONSE_IMPORT['FILE_PERMISSION_COMMAND'].format(processed_file)
                     result = subprocess.run(permission_command.split(' '), capture_output=True, text=True)
 
+                    error_details = ""
                     if has_sync_status_0:
                         response_obj.status = 'Failed'
-                        response_obj.error_details = "Download the file and refer to the error section at the end for details. Remove any successful records before re-uploading."
+                        error_details = "Download the file and refer to the error section at the end for details. Remove any successful records before re-uploading."
                     elif not application_issue:
                         response_obj.status = 'Imported'
                         response_obj.imported_on = timezone.now()
-                        response_obj.response_image.delete()
                         response_obj.processed_file = processed_file
-                        response_obj.error_details = "Download the file for each record's status."
+                        error_details = "Download the file for each record's status."
                     if application_issue:
-                        response_obj.error_details = response_obj.error_details + f"\n Failed Batches - {application_issue}"
+                        error_details = response_obj.error_details + f"\n Failed Batches - {application_issue}"
                     
+                    count_of_records = f"""   <br><b>Total Records Imported: </b>{len(df)}<br>
+                                            <b>Records Imported Successfully: </b>{len(df) - len(has_sync_status_0)}<br>
+                                            <b>Records with Import Errors: </b>{len(has_sync_status_0)} <br>"""
+                    response_obj.error_details = error_details+count_of_records
                     response_obj.save()
                     t2 = datetime.now()
                     logger.info('Response Imported - ' + ':(' +str(response['response_id']) + ') - time taken:' + str(t2-t1) )
-                
+
+                    logger.info('Sending Mail...!')
+                    to_mail_ids = get_all_role_user(response_obj.project)
+                    mail_template = MailTemplate.objects.get(active=2,template_name='Data Upload')
+                    mail_subject = mail_template.subject.format(survey_name=response_obj.survey.name,project_name=response_obj.project.name)
+                    record_url = f'<a href="{HOST_URL}/manage/activity/import-responses/{response_obj.project_id}" target="_blank">Click here</a>'
+                    mail_content = mail_template.content.format(survey_name=response_obj.survey.name,project_name=response_obj.project.name,record_url=record_url,total_count=len(df),success_count=len(df) - len(has_sync_status_0),error_count=len(has_sync_status_0),error_details=error_details)
+                    
+                    # Sending mail..
+                    response = send_mail(to_mail_ids,mail_subject,mail_content)
+                    mail_status = 3 if response['status'] == 200 else 1
+                    send_data_obj = MailData.objects.create(subject = mail_subject,content = mail_content,mail_to = ';'.join([item for item in to_mail_ids if item]),
+                                                        priority = 1,mail_status = mail_status, send_attempt = 1,mail_cc="",mail_bcc="",
+                                                        template_name = mail_template,error_details = str(response) )
+
                 except Exception as e:
                     exc_type, exc_value, exc_traceback = sys.exc_info()
                     error_stack = repr(traceback.format_exception(exc_type, exc_value, exc_traceback))
@@ -153,7 +172,7 @@ def questions_validation(df,survey_id,project_id):
         if mask.any():
             error_message =  f"* Please check {column} data should be unique."
             df.loc[mask, 'Error Message'] = error_message
-        
+    
 
     # Filter rows where 'Project' is null or not project name
     df['Project'] = df['Project'].str.strip() if df['Project'].dtype == 'object' else df['Project']
@@ -219,7 +238,13 @@ def questions_validation(df,survey_id,project_id):
         
         if question.qtype == 'AI':
             column = get_api_column_name(question)
-            
+             # static validating for given project and school landline number in same location or not
+            project_linked_schools = get_school_based_project(project.district_id)
+            mask = ~df[column].apply(lambda value: any(val.strip() in project_linked_schools for val in value.split(',')))
+            if mask.any():
+                error_message =  f"* Please check the given Project and {column} are in same location."
+                df.loc[mask, 'Error Message'] = error_message
+
         # text type fields with validation
         columns = df[column]
         question_based_validation(df,question,columns,validation,column)
@@ -307,7 +332,7 @@ def question_based_validation(df,question,columns,validation,column):
             copy_df['all_values_exist'] = copy_df.astype(str).apply(lambda x: unique_id_validation(x,beneficiary_dict))
             unique_id_error = columns[~copy_df['all_values_exist']].index.tolist()
             if unique_id_error:
-                error_message =  f"* Validate the value of the {column} question is correct. It does not exist in our database."
+                error_message =  f"* Validate the value of the {column} question is correct. It does not exist in our database. (Please ensure commas are used to separate values)."
                 df.loc[unique_id_error, 'Error Message'] = error_message
         
 def get_beneficiary_unique_values(ben_survey_id,question_id,unique_values):
@@ -475,3 +500,13 @@ def get_api_column_name(question):
 
 def get_beneficiary_clusters(beneficiaries):
     return dict(BeneficiaryResponse.objects.filter(creation_key__in=beneficiaries).values_list('creation_key','address_2'))
+
+# get the schools linked to project
+def get_school_based_project(project_district):
+    boundary_data = Boundary.objects.get(code=project_district)
+    beneficiary_data = [i.response.get('428') for i in JsonAnswer.objects.filter(active=2,survey_id=1,response__address__1__234__2=str(boundary_data.id)) if i.response.get('428')]
+    return beneficiary_data
+
+def get_all_role_user(project):
+    email_username = list(UserProjectMapping.objects.filter(active=2,project=project,project__application_type_id=511).values_list('user__email',flat=True).exclude(user__email__isnull=True).exclude(user__email__exact='').distinct())
+    return email_username

@@ -58,9 +58,10 @@
                                 </p>
                             </div>
                             <p> * The file should be in <b>.xlsx</b> format and its size should not exceed <b>{{self.max_file_size_in_mb}}</b> MB.<br>
-                                * Before uploading the file, please ensure that its format matches the required .xlsx format.</br>
+                                * Before uploading the file, please ensure that its format matches the required <b>.xlsx</b> format.</br>
+                                * Please ensure <b>commas</b> are used to separate values for <b>API</b> type questions.</br>
                                 * If the uploaded file contains any data issues, please refer to the downloaded file's <b>Error Message</b> column for details.</p>
-                        </div>
+                            </div>
                     </div>
                     
                     <div class="col-md-12 text-right choose_right d-flex justify-content-end" style="gap:10px" >
@@ -104,9 +105,9 @@
                                     <td>{{i.survey.name}}</td>
                                     <td>{{i.status}}</td>
                                     <td>{{i.imported_on|default:'-'}}</td>
-                                    <td>{{i.error_details|default:"-"}}</td>
+                                    <td>{{i.error_details|safe|default:"-"}}</td>
                                     <td>
-                                        <a href="{% if i.status == "Imported" and i.processed_file %}{{i.processed_file}}{% elif i.response_image %}{{i.response_image.url}}{% endif %}#" class="ng-star-inserted">
+                                        <a href="{% if i.status in "Imported,Failed" and i.processed_file %}{{i.processed_file}}{% elif i.response_image %}{{i.response_image.url}}{% endif %}#" class="ng-star-inserted">
                                         <i class="fas fa-file-download" style="font-size: 30px;" title="download"></i>
                                         </a>
                                     </td>  
