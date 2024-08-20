@@ -153,7 +153,7 @@ def survey_show(survey_id, creation_key):
     query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and js.cluster->>\'BeneficiaryResponse\' = \'{0}\' @@financial_year @@survey_id'.format(creation_key)#
     query=query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
     primary_vlu=query.replace("@@survey_id","and s.id = '{0}'".format(3))
-    primary_query="""with a as ("""+primary_vlu+""") select coalesce(sum(case when response->>'250' in ('154','155') or a.response->>'252' in ('162','163') then 1 else 0 end),0) as ht from a"""
+    primary_query="""with a as ("""+primary_vlu+""") select coalesce(sum(case when response->'489'->'497'->>'498'='314' and a.response->'489'->'497'->>'500'='322' then 1 when response->'489'->'497'->>'498'='314' and a.response->'489'->'497'->>'500'='323' then 1 when response->'489'->'497'->>'498'='315' and a.response->'489'->'497'->>'500'='322' then 1 when response->'489'->'497'->>'498'='315' and a.response->'489'->'497'->>'500'='323' then 1 else 0 end),0) as ht from a"""
     primary = len(get_result_query(primary_vlu)) 
     primary_result = get_result_query(primary_query)[0][0] if primary != 0 else 1
     if primary_result == 0:
