@@ -45,6 +45,23 @@ def get_validation_code(q_id):
 
 
 @register.filter
+def last_record_edit(request, survey_id):
+    start_date, end_date = get_financial_year_dates()
+    ben=request.GET.get('ben','')
+    dates = ''
+    if ben and survey_id in [7,9]:
+        query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id=\'{1}\' and js.cluster->>\'BeneficiaryResponse\' = \'{0}\''.format(ben,survey_id)
+        query=query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
+        result = get_result_query(query)
+        dates = []
+        for val in result:
+            dates.append(val[4])
+    if dates:
+        return dates[-1]
+    else:
+        return dates
+
+@register.filter
 def display_last_date(request, survey_id):
     start_date, end_date = get_financial_year_dates()
     ben=request.GET.get('ben','')
