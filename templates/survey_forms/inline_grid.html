@@ -1,4 +1,5 @@
 {% comment %} {% load static %} {% endcomment %}
+
 {% get_childs question.id as inline_childs %}
 {% if inline_childs|length > 0%}
     <div class="table-responsive" id="skip_{{question.id}}">
@@ -184,6 +185,36 @@
                                             {% endif %}
                                         </style>
                                     </div> 
+                                {% elif inline_questions.qtype == 'R' %}
+                                <div class="d-flex" id='skip_{{inline_questions.id}}'>
+                                    {% for choice in inline_choice_list %}
+                                    <div class="form-check mb-3 me-3">
+                                        <input class="form-check-input main_checkbox_{{inline_questions.id}} {{question.id}}  C_0_0 {% if inline_questions.mandatory %}required{% endif %}" type="radio" name="{{inline_questions.id}}" id="{{inline_questions.id}}" value="{{choice.id}}" {% if inline_questions.mandatory %}required{% endif %}>
+                                        <label class="form-check-label" for="{{choice.id}}">
+                                            {{choice.choice}}
+                                        </label> 
+                                    </div>
+                                    {% endfor %}
+                                    {% if inline_questions.mandatory %}
+                                    <script>
+                                        $(document).ready(function(){
+                                            radia(0)
+                                            $(".add").on('click', function() {
+                                                radia($("tbody tr").length)
+                                            })
+                                            function radia(radia_length){
+                                                var start = 0
+                                                $(document).on('change', "input[name^='group-512']", function() {
+                                                    var totalChecked = $("input[type='radio']:checked").length;
+                                                    $('#388').val(totalChecked);
+                                                });
+                   
+                                            }
+                                          
+                                        }); 
+                                    </script>
+                                    {% endif %}
+                                </div>
                                 {% elif inline_questions.qtype == 'C' %}
                                 <label class="form-check-label mb-2">{{inline_questions.text}}</label>
                                     {% for choice in inline_choice_list %}
@@ -302,9 +333,9 @@
                         </tr>
                 </tbody>
                 <style>
-                    table[name="inline_question"] input ,table[name="inline_question"] select {
+                    /* table[name="inline_question"] input ,table[name="inline_question"] select {
                         width: 100%;
-                    }
+                    } */
                     
                     #datepicker1 input {
                         width: 100%;

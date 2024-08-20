@@ -27,7 +27,7 @@
 <script>
     $(document).ready(function () {
         
-        var date_vlu = "{{request|display_last_date:'add'}}"
+        var date_vlu = "{{request|display_last_date:survey.id}}"
         var date = new Date(date_vlu);
         var nextDay = date.toISOString().split('T')[0];
         var zero = 0

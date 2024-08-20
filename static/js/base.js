@@ -131,7 +131,7 @@ function formating_main_questions(questions, main_ans) {
             values = Array.from(document.querySelectorAll('input[id="' + $(this).attr('id') + '"][type="checkbox"]')).filter((checkbox) => checkbox.checked).map((checkbox) => checkbox.value)
             inner_ans[name_return_fun($(this))] = JSON.stringify(values.map(Number))
         }else if ($(this).is(':radio')) {
-            inner_ans[name_return_fun($(this))] = $('input[name="'+ $(this).attr('id') +'"]:checked').val()
+            inner_ans[name_return_fun($(this))] = $('input[name="'+ $(this).attr('name') +'"]:checked').val()
         } else if (($(this).attr('type') == 'date' || $(this).attr('type') == 'month') && $.trim($(this).val()) != '') {
             var dateObj = new Date($.trim($(this).val()));
             var day = dateObj.getDate();
