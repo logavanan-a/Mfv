@@ -203,13 +203,13 @@ def dashboard_data_approval(request, id):
     user_group = request.session['user_group_list']
     
     # if record status have the permission of group to action {status:role id (group)}
-    role_with_permisson_map = {1:4,2:2,3:3}
+    role_with_permisson_map = {1:4,2:2,3:9}
 
     if request.method == "POST":
         # 4 = Partner Admin
         # 1 = Partner Data Entry Operator
         # 2 = Project In-charge
-        # 3 = MFV Admin
+        # 9 = Roshni Admin
         button = request.POST.get('label')
         approval = {'reject':-1,'approve':+1}
         partner_list = request.session.get('user_partner_list')
@@ -462,8 +462,8 @@ def send_mail_with_template(request,monthly_data,dashboard_data,kwargs={}):
     role_with_mail = {
         1:{'approve':[4]},
         4:{'reject':[1],'approve':[2]},
-        2:{'reject':[4],'approve':[3]},
-        3:{'reject':[2],'approve':[1,2,4]},
+        2:{'reject':[4],'approve':[9]},
+        9:{'reject':[2],'approve':[1,2,4]},
     }
     to_role = role_with_mail.get(user_group).get(button)
     if to_role:
