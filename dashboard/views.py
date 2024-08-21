@@ -516,7 +516,7 @@ def send_mail_with_template(request,monthly_data,dashboard_data,kwargs={}):
 
 def get_next_role_user(partner,to_role):
     # import ipdb;ipdb.set_trace()
-    if 3 in to_role:
+    if 9 in to_role:
         email_username = list(User.objects.filter(is_active=True,groups__id__in=to_role).values_list('first_name','last_name','username','email'))
     else:
         email_username = list(UserProjectMapping.objects.filter(active=2,project__partner_mission_mapping__partner_id__in=partner,project__application_type_id=511,user__groups__id__in=to_role).values_list('user__first_name','user__last_name','user__username','user__email').exclude(user__email__isnull=True).exclude(user__email__exact='').distinct())

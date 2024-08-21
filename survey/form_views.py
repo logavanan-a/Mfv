@@ -1747,7 +1747,7 @@ def get_boundry_based_on_parentboundry(request):
             
             dj_query=Q(survey_id=1)
             #for super user 
-            # if request.user.is_superuser or 3 in request.session['user_role_id']:
+            # if request.user.is_superuser or 9 in request.session['user_role_id']:
             dj_query.add(Q(response__address__1__234__2__in=selected_boundry),Q.AND)
             #for ppm user only
             # elif request.session['user_boundary_levelcode'] == 2 and 27 in request.session['user_role_id']:

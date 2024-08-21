@@ -169,7 +169,8 @@ def questions_validation(df,survey_id,project_id):
         unique_values = column_df.astype(str).explode().dropna().loc[lambda x: x != ''].tolist()
         beneficiary_dict = get_beneficiary_unique_values(survey_id,question_id,unique_values)
         mask = df[column].astype(str).isin(list(beneficiary_dict.keys()))
-        if mask.any():
+        final_mask = mask & (df['Generation Key'] != df[column].astype(str).map(beneficiary_dict))
+        if final_mask.any():
             error_message =  f"* Please check {column} data should be unique."
             df.loc[mask, 'Error Message'] = error_message
     
