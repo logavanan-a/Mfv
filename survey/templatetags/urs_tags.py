@@ -137,7 +137,7 @@ def validation_popup(survey_id, creation_key):
                     date1 = datetime.strptime(check_to_spectacle_dispensing, '%d-%m-%Y')
                     current_date = datetime.today()
                     date_difference = current_date - date1
-                    if date_difference.days >= 90:
+                    if date_difference.days < 90:
                         value = 1
             
     return value
@@ -151,12 +151,9 @@ def survey_show(survey_id, creation_key):
     periodicity= list(Survey.objects.filter(periodicity=7).values_list('id',flat=True))
     periodicity.append(3)
     query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and js.cluster->>\'BeneficiaryResponse\' = \'{0}\' @@financial_year @@survey_id'.format(creation_key)#
-    if survey_id in periodicity: 
-        query=query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
-    else:
-        query=query.replace("@@financial_year","")
+    query=query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
     primary_vlu=query.replace("@@survey_id","and s.id = '{0}'".format(3))
-    primary_query="""with a as ("""+primary_vlu+""") select coalesce(sum(case when response->>'250' in ('154','155') or a.response->>'252' in ('162','163') then 1 else 0 end),0) as ht from a"""
+    primary_query="""with a as ("""+primary_vlu+""") select coalesce(sum(case when response->'489'->'497'->>'498'='314' and a.response->'489'->'497'->>'500'='322' then 1 when response->'489'->'497'->>'498'='314' and a.response->'489'->'497'->>'500'='323' then 1 when response->'489'->'497'->>'498'='315' and a.response->'489'->'497'->>'500'='322' then 1 when response->'489'->'497'->>'498'='315' and a.response->'489'->'497'->>'500'='323' then 1 else 0 end),0) as ht from a"""
     primary = len(get_result_query(primary_vlu)) 
     primary_result = get_result_query(primary_query)[0][0] if primary != 0 else 1
     if primary_result == 0:
@@ -185,8 +182,13 @@ def survey_show(survey_id, creation_key):
                             query=query.replace("@@survey_id","and s.id = '{0}'".format(int(survey_id)))
                             followup_query="""with a as ("""+query+""") select coalesce(sum(case when response->>'506'='54682' then 1 else 0 end),0) as ht from a"""
                             followup_result = get_result_query(followup_query)[0][0]
-                            value = True if followup_result == 0 else False
-                        
+                            value = True if followup_result == 0 else False     
+                    elif survey_id == 9:
+                        query=query.replace("@@survey_id","and s.id = '{0}'".format(int(survey_id)))
+                        call_management_query="""with a as ("""+query+""") select coalesce(sum(case when response->>'521'='119759' then 1 else 0 end),0) as ht from a"""
+                        call_management_result = get_result_query(call_management_query)[0][0]
+                        value = True if call_management_result == 0 else False 
+                     
     elif survey_id == 3 and primary == 0:
         value = True
     elif survey_id == 10:

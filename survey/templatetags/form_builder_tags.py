@@ -6,7 +6,7 @@ from cache_configuration.views import *
 from django.db import connection
 import json
 from survey.form_views import load_data_to_cache_choices
-from survey.form_views import get_result_query
+from survey.form_views import get_result_query, get_financial_year_dates
 
 
 
@@ -45,16 +45,35 @@ def get_validation_code(q_id):
 
 
 @register.filter
-def display_last_date(request, key):
+def last_record_edit(request, survey_id):
+    start_date, end_date = get_financial_year_dates()
     ben=request.GET.get('ben','')
-    query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id=7 and js.cluster->>\'BeneficiaryResponse\' = \'{0}\''.format(ben)
-    result = get_result_query(query)
-    latest_date = ''
-    if ben:
+    dates = ''
+    if ben and survey_id in [7,9]:
+        query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id=\'{1}\' and js.cluster->>\'BeneficiaryResponse\' = \'{0}\''.format(ben,survey_id)
+        query=query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
+        result = get_result_query(query)
         dates = []
         for val in result:
-            data = json.loads(val[2]).get('509')
-            values = [sub_dict['352'] for sub_dict in data.values()]
+            dates.append(val[4])
+    if dates:
+        return dates[-1]
+    else:
+        return dates
+
+@register.filter
+def display_last_date(request, survey_id):
+    start_date, end_date = get_financial_year_dates()
+    ben=request.GET.get('ben','')
+    latest_date = ''
+    if ben and survey_id in [7,9]:
+        query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id=\'{1}\' and js.cluster->>\'BeneficiaryResponse\' = \'{0}\''.format(ben,survey_id)
+        query=query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
+        result = get_result_query(query)
+        dates = []
+        for val in result:
+            data = json.loads(val[2]).get('509') if survey_id == 7 else json.loads(val[2]).get('512')
+            values = [sub_dict['352'] if survey_id == 7 else sub_dict['518'] for sub_dict in data.values()]
             dates.extend(values)
         if len(dates) != 0:
             date_objects = [datetime.strptime(date, '%d-%m-%Y') for date in dates]

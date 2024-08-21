@@ -84,18 +84,26 @@
                     rep=$('#'+ele).repeater()
                     rep.setList(all_response[ele] || {'':''})
                     $.each(all_response[ele], function(index, innerObj) {
-                        
+                        key = Object.keys(innerObj)[0]
+                        obj_len = Object.keys(all_response[ele]).length
                     // Check if the key 352 exists in the inner object
-                        if (innerObj.hasOwnProperty(352)) {
+                        if (innerObj.hasOwnProperty(key)) {
                             // Push the value associated with key 352 to the array
-                            $('#'+ele).find("[name='group-509["+index+"][352]']").attr('type','date')
-                            var date_vlu = `${innerObj[352].split('-')[2]}-${innerObj[352].split('-')[1]}-${innerObj[352].split('-')[0]}`;
+                            $('#'+ele).find("[name='group-"+ele+"["+index+"]["+key+"]']").attr('type','date')
+                            var date_vlu = `${innerObj[key].split('-')[2]}-${innerObj[key].split('-')[1]}-${innerObj[key].split('-')[0]}`;
                             var date = new Date(date_vlu);
-                            $('#'+ele).find("[name='group-509["+index+"][352]']").val(date_vlu)
+                            $('#'+ele).find("[name='group-"+ele+"["+index+"]["+key+"]']").val(date_vlu)
                             date.setDate(date.getDate() + 1);
                             var nextDay = date.toISOString().split('T')[0];
                             var next_index = parseInt(index)+1
-                            $("[name='group-509["+next_index+"][352]']").attr('min',nextDay)
+                            $("[name='group-"+ele+"["+next_index+"]["+key+"]']").attr('min',nextDay)
+                            if (obj_len != 1 && parseInt(index) != 0){
+                                var top_date = new Date(date_vlu);
+                                top_date.setDate(top_date.getDate() - 1);
+                                var Above_Day = top_date.toISOString().split('T')[0];
+                                var top_index = parseInt(index)-1
+                                $("[name='group-"+ele+"["+top_index.toString()+"]["+key+"]']").attr('max',Above_Day)
+                            }
                         }
                     });
                 }else{

@@ -26,25 +26,41 @@ $(document).ready(function () {
                 $(this).find('input').removeAttr('readonly', 'readonly')
                 $(this).find('input').attr('disabled', false)
                 $(this).find('select').attr('disabled', false)
-       
-                $("[name='group-509["+index+"][352]']").on('click', function() {
-                    var date_list = []
-                    $('.D_0_0').each(function () {
-                        var date_vlu = $(this).val()
-                        var index = $(this).index()
-                        if(date_vlu){
-                            date_list.push({index:date_vlu}) 
+                var cc_name = $(this).find('input[type="date"]').attr('class');
+                var id_name = $(this).find('input[type="date"]').attr('id');
+                if (cc_name) {
+                    var first_class = cc_name.split(' ')[0];
+                    $("[name='group-"+first_class+"["+index+"]["+id_name+"]']").on('change', function() {
+                        if (parseInt(index) != 0){
+                            var current_index_data = $(this).val()
+                            var top_index = parseInt(index) - 1
+                            var top_date = new Date(current_index_data);
+                            top_date.setDate(top_date.getDate() - 1);
+                            var selectedDay = top_date.toISOString().split('T')[0];
+                            $("[name='group-"+first_class+"["+top_index.toString()+"]["+id_name+"]']").attr('max', selectedDay);
                         }
                     })
-                    if (date_list.length > 0) {
-                        var min_value = date_list[date_list.length - 1].index; // Get the last value in the array
-                        var date = new Date(min_value);
-                        date.setDate(date.getDate() + 1);
-                        var nextDay = date.toISOString().split('T')[0];
-                        var index = $(this).closest('.repeater-item').index();
-                        $(this).attr('min', nextDay);
-                    }
-                })
+                    $("[name='group-"+first_class+"["+index+"]["+id_name+"]']").on('click', function() {
+                        var date_list = []
+                        $('.D_0_0').each(function () {
+                            var date_vlu = $(this).val()
+                            var index = $(this).index()
+                            if(date_vlu){
+                                date_list.push({index:date_vlu}) 
+                            }
+                        })
+                        if (!$(this).val() && date_list.length > 0) {
+                            var min_value = date_list[date_list.length - 1].index; // Get the last value in the array
+                            var date = new Date(min_value);
+                            date.setDate(date.getDate() + 1);
+                            var nextDay = date.toISOString().split('T')[0];
+                            var index = $(this).closest('.repeater-item').index();
+                            $(this).attr('min', nextDay);
+                            // above_index = index - 1
+                            // $("[name='group-509["+above_index+"][352]']").attr('min', nextDay)
+                        }
+                    })
+                }
             })
         },
         hide: function (deleteElement) {

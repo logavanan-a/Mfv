@@ -667,7 +667,13 @@
             class="btn btn-secondary waves-effect">
             Cancel
         </button>
+        {% if survey.id == 7 or survey.id == 9 and creation_key %}
+            {% if request|last_record_edit:survey.id == creation_key  %}
+            <button type="submit" id="submitting" name="submitting" class="btn btn-primary w-md">Submit</button>
+            {% endif %}
+        {% else %}
         <button type="submit" id="submitting" name="submitting" class="btn btn-primary w-md">Submit</button>
+        {% endif %}
     </div>
 </form>
 <script>
@@ -717,6 +723,7 @@
         const hid = document.getElementById('all_in_one')
         main_ans=formating_main_questions($('.main_question'),main_ans)
         //loop for each grid questions field valu'Re and store in main_ans
+
         $('._hidden_grid_question').each(function(){
             grid_block=$(this)
             grid_items=grid_block.attr('id')
@@ -733,7 +740,7 @@
             })
             main_ans[grid_block.val()]=grid_all_ans
         })
-
+        
         //loop for each inline questions field value and store in main_ans
         repeator_data=$("[name='inline_question']")
         var datePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -745,7 +752,22 @@
                 values=$(val).attr('name').split('-')[1]
                 lists=values.split(/\[(.*?)]/).filter(Boolean)
                 loc={}
-                var entered_value = $(val).val()
+                var entered_value;
+                if ($(val).is(':checkbox')) {
+                    // If the input is a checkbox, get its checked status
+                    entered_value = $(val).is(':checked') ? $(val).val() : 'unchecked';
+                } else if ($(val).is(':radio')) {
+                    // If the input is a radio button, get the checked value
+                    if ($(val).is(':checked')) {
+                        entered_value = $(val).val();
+                    } else {
+                        return; // Skip unchecked radio buttons
+                    }
+                } else {
+                    // For other input types, just get the value
+                    entered_value = $(val).val();
+                }
+                // var entered_value = $(val).val()
                 //if condition for checking the date is in YYYY-MM-DD and convert it to DD-MM-YYYY
                 if (datePattern.test($(val).val())){
                     var parts = $(val).val().split('-');
@@ -756,8 +778,8 @@
                 //}
             })
             main_ans[$(item).attr('id')]=inline
+            
         })
-
         //loop for each address questions field value and store in main_ans
         var addrs = {}
         $('.address_widget').each(function () {
