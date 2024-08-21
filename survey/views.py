@@ -16,6 +16,10 @@ from cache_configuration.views import load_data_to_cache_survey,load_data_to_cac
 from django.contrib import messages
 from survey.management.commands.import_responses import questions_validation
 from io import BytesIO
+import subprocess
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 pg_size = settings.REST_FRAMEWORK.get('PAGE_SIZE')
@@ -766,6 +770,8 @@ class ImportResponses(View):
                 "modified": datetime.now(),
                 "error_details": "",
             })
+
+        self.call_zip_process(survey_id,pk)
         messages.success(request, "File has been uploaded successfully.")
         return render(request,self.template_name,locals())
 
@@ -786,6 +792,15 @@ class ImportResponses(View):
         df2 = pd.read_excel(excel_file)
         result = set(df2.columns).issubset(set(df1.columns))
         return result
+
+    def call_zip_process(self,s_value,p_value):
+        t1 = datetime.now()
+        # This command runs: python manage.py import_responses -s <survey_id> -p <project_id>
+        subprocess.Popen(['python3', 'manage.py', 'import_responses', '-s', str(s_value), '-p', str(p_value)])
+        t2 = datetime.now()
+        time_delta = (t2-t1)
+        logger.info(f'Importing {str(s_value)} , {str(p_value)} - started :{str(t1)} , ended :{str(t2)} - time taken:' + str(time_delta))
+
 
 from django.template.defaultfilters import slugify
 

@@ -20,7 +20,6 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 from send_mail.views import send_mail
 from send_mail.models import MailTemplate,MailData
-
 # Mandatories 
 # TODO: Project, State, District, Block,Gram Panchayath, Village, Generation Key, -- All questions related to that form
 # TODO: Unique validation required for unique fields like aadhar , ration card and other
@@ -53,8 +52,8 @@ class Command(BaseCommand):
             for response in response_files:
                 t1 = datetime.now()
                 response_obj = ResponseImportFiles.objects.get(id=response['response_id'])
-                # response_obj.status = 'Inprogress'
-                # response_obj.save()
+                response_obj.status = 'Inprogress'
+                response_obj.save()
                 try:
                     error = []
                     survey_id = response.get('survey_id')
