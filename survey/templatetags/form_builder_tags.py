@@ -43,6 +43,26 @@ def get_validation_code(q_id):
 
     return validation_dict
 
+@register.filter
+def auto_fill_date(request, survey_id):
+    start_date, end_date = get_financial_year_dates()
+    ben=request.GET.get('ben','')
+    vlu_list = ''
+    if ben and survey_id == 5:
+        query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id=4 and js.cluster->>\'BeneficiaryResponse\' = \'{0}\''.format(ben)
+        query=query.replace("@@financial_year","and (js.created at time zone 'Asia/Kolkata')::date >='{0}' and (js.created at time zone 'Asia/Kolkata')::date <= '{1}'".format(start_date, end_date))
+        result = get_result_query(query)
+        vlu_list = []
+        for val in result:
+            # import ipdb; ipdb.set_trace()
+            auto_vlu = json.loads(val[2]).get('285')
+            name = Choice.objects.get(question_id=285,id=auto_vlu).text
+            vlu_list.append(name)
+
+    if vlu_list:
+        return vlu_list[-1]
+    else:
+        return vlu_list
 
 @register.filter
 def last_record_edit(request, survey_id):
