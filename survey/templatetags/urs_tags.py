@@ -137,7 +137,7 @@ def validation_popup(survey_id, creation_key):
                     date1 = datetime.strptime(check_to_spectacle_dispensing, '%d-%m-%Y')
                     current_date = datetime.today()
                     date_difference = current_date - date1
-                    if date_difference.days >= 90:
+                    if date_difference.days < 90:
                         value = 1
             
     return value
