@@ -667,12 +667,14 @@
             class="btn btn-secondary waves-effect">
             Cancel
         </button>
+        {% if request.user.groups.all.0.id == 1 %}
         {% if survey.id == 7 or survey.id == 9 and creation_key %}
             {% if request|last_record_edit:survey.id == creation_key  %}
             <button type="submit" id="submitting" name="submitting" class="btn btn-primary w-md">Submit</button>
             {% endif %}
         {% else %}
         <button type="submit" id="submitting" name="submitting" class="btn btn-primary w-md">Submit</button>
+        {% endif %}
         {% endif %}
     </div>
 </form>

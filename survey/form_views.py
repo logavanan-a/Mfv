@@ -330,7 +330,7 @@ class WebResponseListing(View):
         donor_obj = Donor.objects.filter(active=2)
         project_list = UserProjectMapping.objects.filter()
         donor_list = ProjectDonorMapping.objects.filter()
-        if request.user.groups.all()[0].id == 1:
+        if request.user.groups.all()[0].id in [1,2,4]:
             project_list = project_list.filter(user_id=request.user.id)
             donor_list = donor_list.filter(project__id__in=project_list.values_list('project_id',flat=True))
             donor_obj = Donor.objects.filter(id__in=donor_list.values_list('donor',flat=True), active=2)
@@ -429,7 +429,7 @@ class WebResponseListing(View):
                 # district_name = Boundary.objects.get(active=2,code=district,boundary_level_type_id=2).name
                 creation_key_wise_district = "','".join(list(BeneficiaryResponse.objects.filter(address_2=district).values_list('creation_key',flat=True)))
             query='select js.id,survey_id,response,s.slug,creation_key,js.created,js.modified,js.active, pd.donor_id from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id left join application_master_userprojectmapping up on up.user_id = js.user_id left join application_master_projectdonormapping pd on pd.project_id = up.project_id where js.active != 0 and s.id = {0} {1}  @@creation_key @@creation_key_wise_district @@filters @@school_creation_key @@donor order by @@order_by'.format(survey.id,facilities)#@@filters
-            if survey.id == 1 and request.user.groups.all()[0].id == 1:\
+            if survey.id == 1 and request.user.groups.all()[0].id in [1,2,4]:
                 query=query.replace("@@creation_key_wise_district"," and creation_key in (\'{0}\')".format(creation_key_wise_district))
             else:
                 query=query.replace("@@creation_key_wise_district","")
@@ -1791,7 +1791,7 @@ def get_donor_district(request, donor_id):
     if request.method == 'GET':
         result_set = []
         project_donor_obj = ProjectDonorMapping.objects.filter(active=2, donor_id=donor_id)
-        if request.user.groups.all()[0].id == 1:
+        if request.user.groups.all()[0].id in [1,2,4]:
             project_obj = UserProjectMapping.objects.filter(user_id=request.user.id).values_list('project_id',flat=True)
             project_donor_obj = project_donor_obj.filter(project_id__in=project_obj)
         district_obj = Boundary.objects.filter(active=2,code__in=list(map(str,project_donor_obj.values_list('project__district__id',flat=True))),boundary_level_type_id=2)
