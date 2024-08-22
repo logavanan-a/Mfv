@@ -794,13 +794,19 @@ class ImportResponses(View):
         return result
 
     def call_zip_process(self,s_value,p_value):
-        t1 = datetime.now()
+        # Command to activate the environment and then run the Django command
+        command = f'{settings.PROJECT_ENV}/bin/python3 {settings.BASE_DIR}/manage.py import_responses -s {s_value} -p {p_value}'
+        # Run the command using bash
+        # subprocess.Popen(command, cwd=project_path, shell=True, executable='/bin/bash')
+
+        # t1 = datetime.now()
         # This command runs: python manage.py import_responses -s <survey_id> -p <project_id>
-        subprocess.Popen(['python3', 'manage.py', 'import_responses', '-s', str(s_value), '-p', str(p_value)])
-        t2 = datetime.now()
-        time_delta = (t2-t1)
-        logger.info(f'Importing {str(s_value)} , {str(p_value)} - started :{str(t1)} , ended :{str(t2)} - time taken:' + str(time_delta))
-        logger.info(f'python manage.py import_responses -s {str(s_value)} -p {str(p_value)}')
+        # subprocess.Popen(['python3', 'manage.py', 'import_responses', '-s', str(s_value), '-p', str(p_value)])
+        subprocess.Popen(command, cwd=settings.BASE_DIR, shell=True, executable='/bin/bash')
+        # t2 = datetime.now()
+        # time_delta = (t2-t1)
+        # logger.info(f'Importing {str(s_value)} , {str(p_value)} - started :{str(t1)} , ended :{str(t2)} - time taken:' + str(time_delta))
+        # logger.info(command)
 
 
 from django.template.defaultfilters import slugify
