@@ -79,7 +79,7 @@ class MissionForm(forms.ModelForm):
 
 class ProjectForm(forms.ModelForm):
     name = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'Enter Name'}), max_length=150, strip=True)
-    partner_mission_mapping = forms.ModelChoiceField(queryset=PartnerMissionMapping.objects.filter(active=2),required = True,empty_label="Select Partnermissionmapping")
+    # partner_mission_mapping = forms.ModelChoiceField(queryset=PartnerMissionMapping.objects.filter(active=2),required = True,empty_label="Select Partnermissionmapping")
     state = forms.ModelChoiceField(queryset=State.objects.filter(active=2).order_by("name"),required = True,empty_label="Select State")
     district = forms.ModelChoiceField(queryset=District.objects.filter(active=2).order_by("name"),required = True,empty_label="Select District")
     location = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'Enter location'}), max_length=150)
@@ -99,7 +99,7 @@ class ProjectForm(forms.ModelForm):
             except ProjectDonorMapping.DoesNotExist:
                 pass
 
-        self.fields['partner_mission_mapping'].widget.attrs['class'] = 'form-select select2'
+        # self.fields['partner_mission_mapping'].widget.attrs['class'] = 'form-select select2'
         self.fields['state'].widget.attrs['class'] = 'form-select select2'
         self.fields['application_type'].widget.attrs['class'] = 'form-select select2'
         self.fields['district'].widget.attrs['class'] = 'form-select select2'
@@ -123,7 +123,7 @@ class ProjectForm(forms.ModelForm):
             
     class Meta:
         model = Project
-        fields = ['name', 'partner_mission_mapping', 'state', 'district','location','start_date','end_date', 'donor', 'application_type','additional_info']
+        fields = ['name', 'state', 'district','location','start_date','end_date', 'donor', 'application_type','additional_info']
 
 
 class DonorForm(forms.ModelForm):
