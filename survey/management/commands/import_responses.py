@@ -50,6 +50,7 @@ class Command(BaseCommand):
             
             errors = defaultdict(list)
             for response in response_files:
+                logger.info('Importing Responses Id :'+str(response['response_id'])+' - '+str(survey_id)+' - '+str(project_id))
                 t1 = datetime.now()
                 response_obj = ResponseImportFiles.objects.get(id=response['response_id'])
                 response_obj.status = 'Inprogress'

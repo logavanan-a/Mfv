@@ -761,7 +761,7 @@ class ImportResponses(View):
             return response
             
         # Save response details
-        ResponseImportFiles.objects.update_or_create(survey_id = survey_id,project_id = pk,
+        resp_obj,_ = ResponseImportFiles.objects.update_or_create(survey_id = survey_id,project_id = pk,
             status__in=['Uploaded'],
             defaults={
                 "user_id":request.user.id,
@@ -770,7 +770,7 @@ class ImportResponses(View):
                 "modified": datetime.now(),
                 "error_details": "",
             })
-
+        logger.info(f'ResponseImportFiles {str(resp_obj.id)} created')
         self.call_zip_process(survey_id,pk)
         messages.success(request, "File has been uploaded successfully.")
         return render(request,self.template_name,locals())
@@ -800,6 +800,7 @@ class ImportResponses(View):
         t2 = datetime.now()
         time_delta = (t2-t1)
         logger.info(f'Importing {str(s_value)} , {str(p_value)} - started :{str(t1)} , ended :{str(t2)} - time taken:' + str(time_delta))
+        logger.info(f'python manage.py import_responses -s {str(s_value)} -p {str(p_value)}')
 
 
 from django.template.defaultfilters import slugify
