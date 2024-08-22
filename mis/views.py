@@ -568,12 +568,15 @@ def user_profile(request, user_id):
     
 
 @ login_required(login_url='/')
-def add_map_project(request, user_id):
+def add_map_project(request, user_id,group_id):
     heading = "Add User Project Mapping"
-    partner = Partner.objects.filter()
+    partner_ids = UserProjectMapping.objects.filter(user__groups=group_id).values_list('project__partner_mission_mapping__partner_id',flat=True)
     user_profile = UserProjectMapping.objects.filter(user_id=user_id,active=2)
+    partner = Partner.objects.filter().exclude(id__in=partner_ids)
+        
     vlu=''
     if user_profile.exists():
+        partner = Partner.objects.filter()
         vlu = user_profile.first().project.partner_mission_mapping.partner.id
         project = Project.objects.filter(partner_mission_mapping__partner__id=vlu)
     if request.method == 'POST':
@@ -608,7 +611,6 @@ def edit_user(request, id):
         last_name = data.get('last_name')
         email = data.get('email')
         user_role = data.get('user_role')
-        partner = data.get('partner')
         login_type = data.get('login_type')
         mobile_no = data.get('mobile_no')
         if User.objects.filter(username__iexact=username).exclude(id=user.id).exists():

@@ -39,7 +39,7 @@
                                 <h5 class="font-size-14">{{ user.last_login|default:'-' }}</h5>
                                 </div>
                                 <div class="">
-                                    <button type="button" class="btn btn-primary me-2" onclick="location.href='/user-edit/{{ user.id }}/'">Edit</button>
+                                    <button type="button" class="btn btn-primary me-2" onclick="location.href='/user-edit/{{ user.id }}/{{ user.groups.all.0.id }}/'">Edit</button>
                                     <button type="button" class="btn btn-warning me-2" onclick="location.href='/user-change-password/{{ user.id }}/'">Change Password</button>
                                 </div>
                             </div>
@@ -89,7 +89,7 @@
                 {% if user.groups.all.0.id != 3 %}
 
                 <div class="table-responsive mb-3" data-pattern="priority-columns">
-                    <button type="button" class="btn btn-outline-primary waves-effect btn-xs float-end mb-2 mx-0" onclick="location.href='/add/map-project/{{ user.id }}/'"><i class="bx bx-plus-medical" title="Add New"></i></button>
+                    <button type="button" class="btn btn-outline-primary waves-effect btn-xs float-end mb-2 mx-0" onclick="location.href='/add/map-project/{{ user.id }}/{{ user.groups.all.0.id }}/'"><i class="bx bx-plus-medical" title="Add New"></i></button>
                     <table  class="table  dt-responsive w-100 mb-0">
                         <thead class="table-light">
                             <tr>
