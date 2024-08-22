@@ -293,7 +293,7 @@
                                             <td>
                                                 <div class="row">
                                                     {% with profile_obj.survey.slug|default:survey.slug|make_string:"edit" as keystrings %}
-                                                        {% if object_lists|length and creation_key and request.user.groups.all.0.id == 1 %}
+                                                        {% if object_lists|length and creation_key  %}
                                                             <div class="col-auto mb-2">
                                                                 <a href="/configuration/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/?ben={{creation_key}}" >
                                                                     <span class="bx bxs-edit-alt bx-md"></span>
@@ -306,7 +306,7 @@
                                                             <div class="col-sm-6">
                                                                 <div class="dropdown">                                                                    
                                                                     {% with profile_obj.survey.slug|default:survey.slug|make_string:"edit" as keystrings %}
-                                                                    {% if not main_add_button and request.user.groups.all.0.id == 1 %}
+                                                                    {% if not main_add_button %}
                                                                         <a href='/configuration/edit-survey-form/{{json_answer.slug}}/{{json_answer.creation_key}}/'><span class="bx bxs-edit-alt bx-md"></span></a>
                                                                         {% endif %}
                                                                         {% endwith %}
@@ -315,7 +315,7 @@
                                                             </div>
                                                             {% with profile_obj.survey.slug|default:survey.slug|make_string:"approve" as keystrings %}
                                                                 {% comment %}{% transfer_check json_answer.creation_key as transfer_status %}{% endcomment %}
-                                                                {% if survey.id == 1 and request.user.groups.all.0.id == 1 %}
+                                                                {% if survey.id == 1  %}
                                                                     <a href="/configuration/transfer/add/{{json_answer.creation_key}}/" >
                                                                         <button type="button" class="btn btn-info mt-2">
                                                                     <i class="bx bx-transfer-alt d-block font-size-16"></i> 

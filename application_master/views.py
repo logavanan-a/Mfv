@@ -375,15 +375,15 @@ def edit_user_partner_project(request, id, model):
         partner = data.get('partner')
         login_type = data.get('login_type')
         mobile_no = data.get('mobile_no')
-        if User.objects.filter(username__iexact=username).exclude(id=user.id).exists():
+        if User.objects.filter(username__iexact=username).exists():
             user_location = None
             user_exist_error = 'Username already exist'
             return render(request, 'user/add_user.html', locals())
-        if User.objects.filter(email__iexact=email).exclude(id=user.id).exists():
+        if User.objects.filter(email__iexact=email).exists():
                 user_location = None
                 user_exist_error = 'Email already exist'
                 return render(request, 'user/add_user.html', locals())
-        if UserProfile.objects.filter(phone_no__iexact=mobile_no).exclude(id=user_profile.id).exists():
+        if UserProfile.objects.filter(phone_no__iexact=mobile_no).exists():
             user_location = None
             user_exist_error = 'Mobile no already exist'
             return render(request, 'user/add_user.html', locals())

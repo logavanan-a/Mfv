@@ -336,27 +336,17 @@
                                                     {% endfor %}
                                                     $.each(skip_question_list, function(index_2, value) {
                                                         {% if choice.skip_question_ids %}
+                                                        console.log(value)
                                                         $.each({{choice.skip_question_ids|safe}}, function(index, name) {
                                                             if (value.includes(parseInt(name))){
                                                                 $.each(value, function(index_3, skip_id) {
-                                                                    if (parseInt(not_applicable) == 119752 ){
-                                                                        $('#'+skip_id.toString()).val('') 
-                                                                        $('#skip_'+skip_id.toString()).hide() 
-                                                                        $('.main_checkbox_'+skip_id.toString()).prop('checked',false);
-                                                                        if ($('#skip_'+skip_id.toString()).find('.required').length > 0){
-                                                                                $('input[name="'+skip_id.toString()+'"]').removeAttr('required', 'required')
-                                                                            }                          
-                                                                            $('#skip_'+skip_id.toString()).hide() 
-                                                                    }else{
-
-                                                                        $('#'+skip_id.toString()).val('') 
-                                                                        $('#skip_'+skip_id.toString()).show() 
-                                                                        $('.main_checkbox_'+skip_id.toString()).prop('checked',false);
-                                                                        if ($('#skip_'+skip_id.toString()).find('.required').length > 0){
-                                                                            $('input[name="'+skip_id.toString()+'"]').attr('required', 'required')
-                                                                        }                          
-                                                                        $('#skip_'+skip_id.toString()).show() 
-                                                                    }
+                                                                    $('#'+skip_id.toString()).val('') 
+                                                                    $('#skip_'+skip_id.toString()).show() 
+                                                                    $('.main_checkbox_'+skip_id.toString()).prop('checked',false);
+                                                                    if ($('#skip_'+skip_id.toString()).find('.required').length > 0){
+                                                                        $('input[name="'+skip_id.toString()+'"]').attr('required', 'required')
+                                                                    }                          
+                                                                    $('#skip_'+skip_id.toString()).show() 
                                                                 })
                                                             }else{
                                                                 $.each(value, function(index_3, skip_id) {
@@ -371,11 +361,20 @@
                                                             } 
                                                         })
                                                         {% else %}
+                                                                $.each(value, function(index_3, skip_id) {
+                                                                    $('.main_checkbox_'+skip_id.toString()).prop('checked',false);
+                                                                    $('#'+skip_id.toString()).val('') 
+                                                                    $('#skip_'+skip_id.toString()).hide() 
+                                                                    if ($('#skip_'+skip_id.toString()).find('.required').length > 0){
+                                                                        $('input[name="'+skip_id.toString()+'"]').removeAttr('required').val(null)
+                                                                    } 
+                                                                    $('#skip_'+skip_id.toString()).hide()                                     
+                                                                })
 
-                                                            if ($('#skip_'+value.toString()).find('.required').length > 0){
-                                                                $('input[name="'+value.toString()+'"]').removeAttr('required').val(null)
-                                                            }    
-                                                            $('#skip_'+value.toString()).hide() 
+                                                            // if ($('#skip_'+value.toString()).find('.required').length > 0){
+                                                            //     $('input[name="'+value.toString()+'"]').removeAttr('required').val(null)
+                                                            // }    
+                                                            // $('#skip_'+value.toString()).hide() 
                                                         {% endif %}
                                                     })
                                                 }
@@ -667,12 +666,16 @@
             class="btn btn-secondary waves-effect">
             Cancel
         </button>
+        {% if request.user.groups.all.0.id == 1 %}
         {% if survey.id == 7 or survey.id == 9 and creation_key %}
             {% if request|last_record_edit:survey.id == creation_key  %}
+            <button type="submit" id="submitting" name="submitting" class="btn btn-primary w-md">Submit</button>
+            {% elif not creation_key %}
             <button type="submit" id="submitting" name="submitting" class="btn btn-primary w-md">Submit</button>
             {% endif %}
         {% else %}
         <button type="submit" id="submitting" name="submitting" class="btn btn-primary w-md">Submit</button>
+        {% endif %}
         {% endif %}
     </div>
 </form>
@@ -691,6 +694,19 @@
     });
 </script>
 <script>
+    var auto_date = "{{request|auto_fill_date:survey.id}}"
+    var diagnosis = $('#522 option').filter(function() {return $(this).text() === auto_date;})
+    diagnosis.prop('selected', true);
+    $('#522').prop('disabled', true);
+    console.log(auto_date)
+    var date_vlu = "{{request|display_last_date:survey.id}}"
+    if(date_vlu){
+        var date = new Date(date_vlu);
+        var nextDay = date.toISOString().split('T')[0];
+        var zero = 0
+        $(".D_0_0").attr('min',nextDay)
+    }
+    $("#409").attr('min','')
     if (parseInt({{survey.id}}) == 8){
         var data = {{request|get_auto_fill:survey.id|safe}}
         var date_spectacles_given = data['445'] || '';
