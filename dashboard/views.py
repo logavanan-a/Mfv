@@ -26,7 +26,6 @@ from django.http import JsonResponse
 from django.db.models import Case, Value, When, Q , Sum
 from mfv_mis.settings import DASHBOARD_SUBMISSION_DAY
 from uuid import uuid4
-from survey.api_view import MonthlyDashboardData
 logger = logging.getLogger(__name__)
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
