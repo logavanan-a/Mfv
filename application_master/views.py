@@ -561,7 +561,7 @@ def adding_project(request,id):
     donors = Donor.objects.filter(active=2)
     partner = Partner.objects.filter(id=id).values_list('id', flat=True)
     application_type_obj = MasterLookUp.objects.filter(parent_id=509)
-    partner_mission = PartnerMissionMapping.objects.filter(partner_id__in=partner)
+    partner_missions = PartnerMissionMapping.objects.filter(partner_id__in=partner)
     if request.method == 'POST':
         name = request.POST.get('name')
         partner_mission = request.POST.get('partner_mission')
@@ -573,22 +573,23 @@ def adding_project(request,id):
         end_date = request.POST.get('end_date')
         additional_info = request.POST.get('additional_info')
         application_type = request.POST.get('application_type')
-        
-        pro_details = Project.objects.create(
-            name=name,
-            partner_mission_mapping_id=partner_mission,
-            district_id=district,
-            location=location,
-            additional_info=additional_info or None,
-            start_date=start_date or None,
-            end_date=end_date or None,    
-            application_type_id=application_type,        
-        )
-        pro_details.save()
-        ProjectDonorMapping.objects.update_or_create(
-                    project_id=pro_details.id,
-                    defaults={'donor_id': donor}
-                )
-        return redirect('/application_master/details/partner/'+ str(id) + '/')
-
+        if not Project.objects.filter(district_id=district,active=2).exists():
+            pro_details = Project.objects.create(
+                name=name,
+                partner_mission_mapping_id=partner_mission,
+                district_id=district,
+                location=location,
+                additional_info=additional_info or None,
+                start_date=start_date or None,
+                end_date=end_date or None,    
+                application_type_id=application_type,        
+            )
+            pro_details.save()
+            ProjectDonorMapping.objects.update_or_create(
+                        project_id=pro_details.id,
+                        defaults={'donor_id': donor}
+                    )
+            return redirect('/application_master/details/partner/'+ str(id) + '/')
+        else:
+            error_msg = "Already, This District is mapped to a different project."        
     return render(request, 'user/adding_project.html', locals())

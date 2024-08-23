@@ -62,9 +62,10 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            if UserProfile.objects.filter(user=user,login_type=1).exists():
+            application_type_id = 0
+            user_project=UserProjectMapping.objects.filter(user=request.user,active=2,project__application_type_id__isnull=False).select_related('project','project__partner_mission_mapping','project__partner_mission_mapping__partner','project__partner_mission_mapping__mission','project__district','project__district__state')
+            if UserProfile.objects.filter(user=user,login_type=1).exists() and user_project.exists():
                 if user.groups.filter(name__in = ['Partner Data Entry Operator','Partner Admin','Project In-charge']).exists():# project incharge
-                    user_project=UserProjectMapping.objects.filter(user=request.user,active=2).select_related('project','project__partner_mission_mapping','project__partner_mission_mapping__partner','project__partner_mission_mapping__mission','project__district','project__district__state')
                     application_type_id = user_project.first().project.application_type_id
                     user_project_ids = user_project.values_list('project__id',flat=True)
                     user_partner_list_roshni = user_project.filter(project__application_type_id=511).values_list('project__partner_mission_mapping__partner_id',flat=True)
@@ -78,7 +79,6 @@ def login_view(request):
                 elif user.is_superuser:
                     user_mission_id=Mission.objects.filter(active=2).values_list('id',flat=True)
                     user_project_ids=Project.objects.filter(active=2).values_list('id',flat=True)
-                    application_type_id = 0
                     user_partner_list_roshni = user_project_ids.filter(application_type_id=511).values_list('partner_mission_mapping__partner_id',flat=True)
                     user_partner_id=Partner.objects.filter(active=2).values_list('id',flat=True)
                     user_donor_id=Donor.objects.filter(active=2).values_list('id',flat=True).distinct()
