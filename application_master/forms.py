@@ -115,8 +115,9 @@ class ProjectForm(forms.ModelForm):
         cleaned_data = super().clean()
         start_date = cleaned_data.get('start_date')
         end_date = cleaned_data.get('end_date')
-
-        if start_date and end_date and start_date > end_date:
+        if Project.objects.filter(district=cleaned_data.get('district'), active=2).exclude(id=self.instance.id).exists():
+            self.add_error('district', 'This district is already mapped to another project')
+        elif start_date and end_date and start_date > end_date:
             self.add_error('end_date', 'End date must be later than start date.')
 
         return cleaned_data

@@ -10,12 +10,12 @@ map_project{% extends 'base.html' %}
                 <form id="myForm" method='POST' class="needs-validation" autocomplete="off"  novalidate>
                     {% csrf_token %}
                     <div class='text-danger'>
-                        {{error}}
+                        {{error_msg}}
                     </div> 
                     <div class="row mb-4">
                         <label class="col-md-2 col-form-label">Name<span class="required-field"></span></label>
                         <div class="col-md-4"> 
-                            <input type="text"  name= "name" class="form-control" placeholder="Enter Name" required />
+                            <input type="text"  name= "name" class="form-control" placeholder="Enter Name" value="{{name|default_if_none:''}}" required />
                             <div class="invalid-feedback">
                                 Please enter name.
                             </div>
@@ -24,8 +24,8 @@ map_project{% extends 'base.html' %}
                         <div class="col-md-4">
                             <select name="partner_mission" class="form-select select2" required>
                                 <option value="" disabled selected>Select partner mission mapping</option>
-                                {% for donor in partner_mission %}
-                                    <option value="{{ donor.id }}">{{ donor }}</option>
+                                {% for pm in partner_missions %}
+                                    <option value="{{ pm.id }}"{% if pm.id|slugify == partner_mission %}selected{% endif %}>{{ pm }}</option>
                                 {% endfor %}
                             </select> 
                             <div class="invalid-feedback">
@@ -38,8 +38,8 @@ map_project{% extends 'base.html' %}
                         <div class="col-md-4">
                             <select name="state" id="id_state" class="form-select select2" required>
                                 <option value="" selected>Select State</option>
-                                {% for state in states %}
-                                    <option value="{{state.id}}">{{ state }}</option>
+                                {% for st in states %}
+                                    <option value="{{st.id}}"{% if st.id|slugify == state %}selected{% endif %}>{{ st }}</option>
                                 {% endfor %}
                             </select>
                             <div class="invalid-feedback">
@@ -50,8 +50,8 @@ map_project{% extends 'base.html' %}
                         <div class="col-md-4">
                             <select name="district" id="id_district" class="form-select select2" required>
                                 <option value="" disabled selected>Select District</option>
-                                {% for district in districts %}
-                                    <option value="{{district.id}}">{{ district }}</option>
+                                {% for dst in districts %}
+                                    <option value="{{dst.id}}"{% if dst.id|slugify == district %}selected{% endif %}>{{ dst }}</option>
                                 {% endfor %}
                             </select>
                             <div class="invalid-feedback">
@@ -62,7 +62,7 @@ map_project{% extends 'base.html' %}
                     <div class="row mb-4">
                         <label class="col-md-2 col-form-label">Location<span class="required-field"></span></label>
                         <div class="col-md-4">
-                            <input type="text"  name= "location" class="form-control" required placeholder="Enter Location" />
+                            <input type="text"  name= "location" class="form-control" value="{{location|default_if_none:''}}" required placeholder="Enter Location" />
                             <div class="invalid-feedback">
                                 Please enter location.
                             </div>
@@ -71,8 +71,8 @@ map_project{% extends 'base.html' %}
                         <div class="col-md-4">
                             <select name="donor" class="form-select select2" required>
                                 <option value="" disabled selected>Select Donor</option>
-                                {% for donor in donors %}
-                                    <option value="{{ donor.id }}">{{ donor }}</option>
+                                {% for dns in donors %}
+                                    <option value="{{ dns.id }}"{% if dns.id|slugify == donor %}selected{% endif %}>{{ dns }}</option>
                                 {% endfor %}
                             </select> 
                             <div class="invalid-feedback">
@@ -83,14 +83,14 @@ map_project{% extends 'base.html' %}
                     <div class="row mb-4">
                         <label class="col-md-2 col-form-label">Start Date</label>
                         <div class="col-md-4">
-                            <input type="date" name= "start_date"  class="form-control" id="myDateInput"  onfocus="this.max=new Date().toISOString().split('T')[0]">
+                            <input type="date" name= "start_date"  class="form-control" id="myDateInput" value="{{start_date|default_if_none:''}}"  onfocus="this.max=new Date().toISOString().split('T')[0]">
                             <div class="invalid-feedback">
                                 Please choose date.
                             </div>
                         </div>
                         <label class="col-md-2 col-form-label">End Date</label>
                         <div class="col-md-4">
-                            <input type="date" name= "end_date"  class="form-control" id="myDateInput"  onfocus="this.max=new Date().toISOString().split('T')[0]">
+                            <input type="date" name= "end_date"  class="form-control" id="myDateInput" value="{{end_date|default_if_none:''}}" onfocus="this.max=new Date().toISOString().split('T')[0]">
                             <div class="invalid-feedback">
                                 Please choose date.
                             </div>
@@ -102,8 +102,8 @@ map_project{% extends 'base.html' %}
                         <div class="col-md-4">
                             <select name="application_type" class="form-select select2" required>
                                 <option value="" disabled selected>Select application type</option>
-                                {% for application_type in application_type_obj %}
-                                    <option value="{{ application_type.id }}">{{ application_type.name }}</option>
+                                {% for at in application_type_obj %}
+                                    <option value="{{ at.id }}"{% if at.id|slugify == application_type %}selected{% endif %}>{{ at.name|default_if_none:'' }}</option>
                                 {% endfor %}
                             </select> 
                             <div class="invalid-feedback">
@@ -112,7 +112,7 @@ map_project{% extends 'base.html' %}
                         </div>
                         <label class="col-md-2 col-form-label">Additional Info<span ></span></label>
                         <div class="col-md-4">
-                            <textarea type="text" class="form-control" id="" name='additional_info' placeholder="Enter Additional info"  rows="5" cols="50"> </textarea>
+                            <textarea type="text" class="form-control" id="" name='additional_info' placeholder="Enter Additional info"  rows="5" cols="50"> {{additional_info}}</textarea>
                         </div>
                     </div>
                     <div class="gap-2" style="float:right;">

@@ -1,0 +1,298 @@
+{% load static %}
+<style>
+  .tableCell{
+    text-align:center;
+  }
+  .headerCell{
+    background-color:#FFAA00;
+  }
+  .oddTableRow{
+    /*background-color:#ffeecd;*/
+    background-color:#eeeeed;;
+  }
+  .hoverTableRow{
+    background-color:#dededc;
+  }
+  .selectedTableRow{
+    background-color:#d1d6bb;
+  }
+  .google-visualization-table-sortind {
+    color: #fff!important;
+    padding-left: 4px;
+  }
+  
+</style>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script type="text/javascript">
+
+//console.log(value.container_id);
+google.charts.load('current', {'packages':['corechart','table']});
+google.charts.setOnLoadCallback(drawChart);
+var datas = {};
+//var chartsRef = {"chart_slug1":"","char_slug2":""}
+var chartsRef = {};
+//var chartsFunctionname = {"chart_slug1":chart_slug1_click_handler,"chart_slug2":chart_slug2_lick_handler}
+var chartsFunctionname = {};
+
+var chartsDefaultPointer = {};
+
+var chartsHandPointer = {};
+
+    {% for ct in data_html.chart %}
+        {% if ct.click_url_template != "" %}
+            window.{{ct.chart_name}}_click_handler = function (){
+                var selectedChart = chartsRef['{{ct.chart_name}}'];
+                var selection = selectedChart.getSelection();
+                var click_url_template = '{{ct.click_url_template}}';
+                {%if ct.chart_row_id_value %}
+                  var chart_row_id_value = {{ct.chart_row_id_value}};
+                {% else %}
+                  var chart_row_id_value = [];
+                {% endif %}
+                //console.log("click_url_template:"+click_url_template);
+                //alert($('#state').val());
+                var url = click_url_template.replaceAll("&amp;","&");
+                url = url.replace('chcl_state=&','chcl_state=' + $('#chcl_state').val() + '&');
+                url = url.replace('chcl_district=&','chcl_district=' + $('#chcl_district').val() + '&');
+                url = url.replace('chcl_shelter=&','chcl_shelter=' + $('#chcl_shelter').val() + '&');
+                var row_id = -1;
+                for (var i = 0; i < selection.length; i++) {
+                    if (selection[i].row != null)
+                    {
+                        //url = on_click_urls[selection[i].row];
+                        //url = on_click_urls[selection[i].row];
+                        url = url.replace('chcl_chart_row=&','chcl_chart_row=' + selection[i].row + "&");
+                        row_id = selection[i].row;
+                        if (chart_row_id_value.length > 0)
+                        {
+                          url = url.replace('chcl_chart_data_id=','chcl_chart_data_id=' + chart_row_id_value[selection[i].row]);
+                        }
+                        if (selection[i].column != null)
+                        {
+                            //url = on_click_urls[selection[i].row];
+                            //url = on_click_urls[selection[i].row];
+                            url = url.replace('chcl_chart_col=&','chcl_chart_col=' + selection[i].column + "&");
+                        }
+                        break;
+                    }
+                }
+                if(url.length > 0 && row_id != -1)
+                {
+                    url = url.replaceAll("&amp;","&");
+                    window.open(url,'{{ct.chart_name}} - Report');
+                    //alert('Chart url({{ct.chart_name}}): ' + url);
+                    //console.log('URL:' + url);
+                }
+            }
+
+            window.displayDefaultPointer_{{ct.chart_name}} = function() {
+                $('#{{ct.chart_name}}').css('cursor','default');
+            }
+            window.displayHandPointer_{{ct.chart_name}} = function() {
+                $('#{{ct.chart_name}}').css('cursor','pointer')
+            }
+            chartsFunctionname['{{ct.chart_name}}'] = window.{{ct.chart_name}}_click_handler;
+            chartsDefaultPointer['{{ct.chart_name}}'] = window.displayDefaultPointer_{{ct.chart_name}};
+            chartsHandPointer['{{ct.chart_name}}'] = window.displayHandPointer_{{ct.chart_name}};
+        {% endif %}
+    {% endfor %}
+
+function drawChart()
+{
+datas= {{ data|safe }};
+var chart;
+
+for (data in datas.chart)
+{
+  var value = datas.chart[data];
+  //console.log(value)
+  if(value.chart_type == 'CARDCHART')
+  {
+    // chartsRef[value.chart_name] = chart;
+    chartsRef[value.chart_name] = chart;
+    continue;
+  }
+  const colours=value.colours
+  if (colours != undefined){
+    for (var i = 0; i < value['datas'].length; i++) {
+      value['datas'][i].push(colours[i])
+    }
+  }
+  var show_bar_numbers = value.show_bar_numbers;
+  var data = new google.visualization.arrayToDataTable(value.datas);
+  var options = value.options;
+  var on_click_url_template = value.click_url_template;
+  //var on_click_urls = value.on_click_urls;
+  //var on_click_handler = value.on_click_handler;
+  var chart_type= value.chart_type;
+  var containerID= value.chart_name;
+
+  //document.getElementById(value.title_div).append(value.chart_title);
+  //$(value.div_size_id).addClass(value.div);
+  if(data.getNumberOfRows() == 0)
+  {
+    document.getElementById(containerID).append("Data Not Available");
+  }
+  else 
+  {
+      if(chart_type == 'COLUMNCHART' )
+      {
+        // if all values are empty display "Data Not Available" instead of empty chart
+        var arrayColumn = (arr, n) => arr.map(x => x[n]);
+        var second_column = arrayColumn(value.datas, 1);
+        var slice_first_row = second_column.slice(1, second_column.length);
+        var all_array_value = slice_first_row.filter(x => x > 0).length >= 1;
+        if(all_array_value==true)
+        {
+          var view = new google.visualization.DataView(data);
+        if(show_bar_numbers == "true")
+        {
+          view.setColumns([0, 1,
+                  { calc: "stringify",
+                    sourceColumn: 1,
+                    type: "string",
+                    role: "annotation" },2]);
+        }
+        else{
+          view.setColumns([0, 1, 2]);          
+        }
+        chart = new google.visualization.ColumnChart(document.getElementById(containerID));
+        if(on_click_url_template != '')
+        {
+                google.visualization.events.addListener(chart, 'select', chartsFunctionname[value.chart_name]);
+                google.visualization.events.addListener(chart, 'onmouseover', chartsHandPointer[value.chart_name]);
+                google.visualization.events.addListener(chart, 'onmouseout', chartsDefaultPointer[value.chart_name]);
+        }
+        chart.draw(view, options);
+      }
+      else
+      {
+        document.getElementById(containerID).append("Data Not Available");
+      }
+    }
+    else if(chart_type == 'PIECHART')
+    { 
+      // if all values are empty display "Data Not Available" instead of empty chart
+      var arrayColumn = (arr, n) => arr.map(x => x[n]);
+      var second_column = arrayColumn(value.datas, 1);
+      var slice_first_row = second_column.slice(1, second_column.length);
+      var all_array_value = slice_first_row.filter(x => x > 0).length >= 1;
+      if(all_array_value==true)
+      {
+        var chart = new google.visualization.PieChart(document.getElementById(containerID));
+        if(on_click_url_template != '')
+        {     
+                google.visualization.events.addListener(chart, 'select', chartsFunctionname[value.chart_name]);
+                google.visualization.events.addListener(chart, 'onmouseover', chartsHandPointer[value.chart_name]);
+                google.visualization.events.addListener(chart, 'onmouseout', chartsDefaultPointer[value.chart_name]);
+        }
+        chart.draw(data, options);
+      }
+      else
+      {
+        document.getElementById(containerID).append("Data Not Available");
+      }
+    }
+    else if(chart_type == 'TABLECHART')
+    {
+      var chart = new google.visualization.Table(document.getElementById(containerID));
+        if(on_click_url_template != '')
+        {     
+                google.visualization.events.addListener(chart, 'select', chartsFunctionname[value.chart_name]);
+                google.visualization.events.addListener(chart, 'onmouseover', chartsHandPointer[value.chart_name]);
+                google.visualization.events.addListener(chart, 'onmouseout', chartsDefaultPointer[value.chart_name]);
+        }
+      chart.draw(data, options);
+      
+    }
+    else if(chart_type == 'BARCHART' )
+    {
+          chart = new google.visualization.BarChart(document.getElementById(containerID));
+          if(on_click_url_template != '')
+          {     
+                google.visualization.events.addListener(chart, 'select', chartsFunctionname[value.chart_name]);
+                google.visualization.events.addListener(chart, 'onmouseover', chartsHandPointer[value.chart_name]);
+                google.visualization.events.addListener(chart, 'onmouseout', chartsDefaultPointer[value.chart_name]);
+          }
+          chart.draw(data, options);
+        
+      }
+    else if(chart_type == 'COLUMNSTACK')
+      
+      {
+          
+          chart = new google.visualization.ColumnChart(document.getElementById(containerID));
+          var col_arr = [];
+          if (value.datas.length > 0)
+          {
+            var arr_len = value.datas[0].length;
+            for(var x=0;x<arr_len;x++)
+            {
+              col_arr.push(x);
+              if(show_bar_numbers == "true")
+              {
+                if(x > 0)
+                {
+                  col_arr.push({ calc: "stringify",
+                      sourceColumn: x,
+                      type: "string",
+                      role: "annotation" });
+                }
+              }
+            }
+          }
+          var view = new google.visualization.DataView(data);
+          view.setColumns(col_arr);
+
+          if(on_click_url_template != '')
+          {     
+                google.visualization.events.addListener(chart, 'select', chartsFunctionname[value.chart_name]);
+                google.visualization.events.addListener(chart, 'onmouseover', chartsHandPointer[value.chart_name]);
+                google.visualization.events.addListener(chart, 'onmouseout', chartsDefaultPointer[value.chart_name]);
+          }
+          chart.draw(view, options);
+        
+      }
+      
+      else if(chart_type == 'BARSTACK')
+      {
+          chart = new google.visualization.BarChart(document.getElementById(containerID));
+          var col_arr = [];
+          if (value.datas.length > 0)
+          {
+            var arr_len = value.datas[0].length;
+            for(var x=0;x<arr_len;x++)
+            {
+              col_arr.push(x);
+              if(show_bar_numbers == "true")
+              {
+                if(x > 0)
+                {
+                  col_arr.push({ calc: "stringify",
+                      sourceColumn: x,
+                      type: "string",
+                      role: "annotation" });
+                }
+              }
+            }
+          }
+          var view = new google.visualization.DataView(data);
+          view.setColumns(col_arr);
+          if(on_click_url_template != '')
+          {     
+                google.visualization.events.addListener(chart, 'select', chartsFunctionname[value.chart_name]);
+                google.visualization.events.addListener(chart, 'onmouseover', chartsHandPointer[value.chart_name]);
+                google.visualization.events.addListener(chart, 'onmouseout', chartsDefaultPointer[value.chart_name]);
+          }
+          chart.draw(view, options);
+        
+      }
+  }
+  chartsRef[value.chart_name] = chart;
+}
+}
+
+
+</script>
+
