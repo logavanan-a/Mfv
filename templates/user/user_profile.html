@@ -39,7 +39,7 @@
                                 <h5 class="font-size-14">{{ user.last_login|default:'-' }}</h5>
                                 </div>
                                 <div class="">
-                                    <button type="button" class="btn btn-primary me-2" onclick="location.href='/user-edit/{{ user.id }}/{{ user.groups.all.0.id }}/'">Edit</button>
+                                    <button type="button" class="btn btn-primary me-2" onclick="location.href='/user-edit/{{ user.id }}/'">Edit</button>
                                     <button type="button" class="btn btn-warning me-2" onclick="location.href='/user-change-password/{{ user.id }}/'">Change Password</button>
                                 </div>
                             </div>
