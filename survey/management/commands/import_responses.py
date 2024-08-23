@@ -61,8 +61,8 @@ class Command(BaseCommand):
                     response_file = response.get('response_image')
                     processed_file_name = datetime.now().strftime('%Y%m%d%H%M%S')+'_' + response_file.split('/')[-1]
                     processed_file = RESPONSE_IMPORT['PROCESSED_FILE_PATH'] + processed_file_name
-                    df = pd.read_excel(MEDIA_ROOT+'/'+response_file)
-                    
+                    df = pd.read_excel(MEDIA_ROOT+'/'+response_file,dtype=str)
+                    # ipdb.set_trace()
                     df = questions_validation(df,survey_id,response_obj.project_id)
 
                     # df['Activity Date'] = pd.to_datetime(df['Activity Date'], format='%Y/%m/%d', errors='coerce').dt.strftime('%d-%m-%Y')
@@ -383,7 +383,6 @@ def parse_data_row(df,survey_id):
         api_column = get_api_column_name(ai_questions[0])
         flattened_list = [item for sublist in df[api_column+'-API'].tolist() for item in sublist]
         cluster_beneficiary_data = get_beneficiary_clusters(flattened_list)
-
     for i in range(len(df)):
         data = {}
         df.fillna('', inplace=True)
