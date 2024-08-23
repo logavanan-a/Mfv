@@ -1,0 +1,111 @@
+{% load static %}
+
+<div class="card-body"> 
+    <div class="card position-relative">
+       {% comment %} <p class="text-right position-absolute top-0 end-0 text-muted">Data as on {{mat_view_last_updated|date:'d/m/Y g:iA'}}</p>   {% endcomment %} 
+    </div>
+	<form action="{{form_url}}" class="form-horizontal" method="POST" id="filters">
+        {%csrf_token%}
+        <div class="row">
+                <div class="filter_class d-flex flex-wrap">
+                    <div class="p-1 col-12 col-md-6">
+                        <div class="">
+                            <div class="form-group label-floating select_group">
+                                <span>Financial Year<span class="required"></span></span>
+                                <select class="selectpicker select2" data-width="100%" data-style="select-with-transition" name="financial-year" id="id_financialyear" data-live-search="true">
+                                    <option value="" disabled>Select Financial Year</option>
+                                    {% for fin_year in financial_year_list %}
+                                        <option value="{{fin_year}}" {% if selected_items.0|slugify == fin_year|slugify %}selected{% endif %}>{{fin_year}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div> 
+                        </div>
+                    </div>
+                    <div class="p-1 col-12 col-md-6">
+                        <div class="">
+                            <div class="form-group label-floating select_group">
+                                <span>Quarterly Year <span class="required"></span></span>
+                                <select class="selectpicker select2" data-width="100%" data-style="select-with-transition" name="quarterly-year" id="id_quarterlyyear" data-live-search="true">
+                                    <option value="" disabled>Select Quarterly Year</option>
+                                    {% for q_year in quarterly_year_list %}
+                                        <option value="{{ q_year }}" {% if selected_items.1|slugify == q_year|slugify %}selected{% endif %}>
+                                            {{ q_year }}
+                                        </option>
+                                    {% endfor %}
+                                </select>   
+                            </div> 
+                        </div>
+                    </div>
+                    <div class="p-1 col-12 col-md-6">
+                        <div class="">
+                            <div class="form-group label-floating select_group">
+                                <span>Partners<span class="required"></span> 
+                                </span>
+                                <select class="selectpicker select2 " data-width="100%" data-style="select-with-transition" name="Partner" id="id_partner" data-live-search="true" multiple="multiple">
+                                    <option value="" disabled >Select Partners</option>
+                                    {% for part in partnerlist %}
+                                        <option value="{{part.id}}" {% if part.id|slugify in selected_partner_list  %}selected{% endif %}>{{part.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div> 
+                        </div>
+                    </div>
+                    <div class="p-1 col-12 col-md-6">
+                        <div class="">
+                            <div class="form-group label-floating select_group">
+                                <span>Districts<span class="required"></span> 
+                                </span>
+                                <select class="selectpicker select2 " data-width="100%" data-style="select-with-transition" name="District" id="id_district" data-live-search="true" multiple="multiple">
+                                    <option value="" disabled >Select Districts</option>
+                                    {% for dist in districts_list %}
+                                        <option value="{{dist.id}}" {% if dist.id|slugify in selected_district_list  %}selected{% endif %}>{{dist.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div> 
+                        </div>
+                    </div>
+            <div class="col-lg-4 mt-3">
+                <button type="submit" class="btn btn-square btn-success btn-lg float-right">Filter</button>
+                <button type="button" id="reset" class="btn btn-square btn-primary btn-lg float-right">Reset</button>
+            </div>
+        </div>
+	</form>
+	
+</div>
+<script type="text/javascript"> 
+    /*Resetting the Dropdown selected options while clicking Reset Button*/
+    document.addEventListener('DOMContentLoaded', function() {
+        $("button[id='reset']").on("click", function(event){
+            $('#id_project').val('');
+            $('#id_2').val('');
+            $('#id_3').val('');
+            $('#filters').submit();
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        $("#id_partner").on('change', function(){
+            $.ajax({
+               type:"POST",
+               url:"/dashboard/partner-districts/",
+               dataType: "json",
+               data: {'partner_id[]':$("#id_partner").val(),'user_id': '{{request.user.id}}'},
+               success: function(d) {
+                   if (d.data) {    
+                        var res = d.data;
+                        $('#id_district').find('option').remove().end();
+                        for (i=0;i<res.length;i++) {
+                            if(Number('{{request.GET.district}}') == res[i].id){
+                                $('<option>', {value : res[i].id}).html(res[i].name).appendTo('#id_district' ).attr('selected', 'selected')
+                            }
+                            else{
+                                $('<option>', {value : res[i].id }).html(res[i].name).appendTo('#id_district');
+                            }
+                        }
+                        $('.selectpicker').selectpicker('refresh')
+                    }
+                }
+            });
+        });
+        });
+    </script>
+    
