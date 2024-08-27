@@ -26,7 +26,6 @@ from django.http import JsonResponse
 from django.db.models import Case, Value, When, Q , Sum
 from mfv_mis.settings import DASHBOARD_SUBMISSION_DAY
 from uuid import uuid4
-from survey.api_view import MonthlyDashboardData
 logger = logging.getLogger(__name__)
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
@@ -1157,7 +1156,7 @@ def dashboard_data_approval(request, id):
     from survey.api_views_version1 import submitted_record_mails
     try:
         monthly_data = MonthlyDashboard.objects.get(id=id)
-        month_obj = datetime.strptime(str(monthly_data.month), '%m%Y')
+        month_obj = datetime.strptime(str(monthly_data.month), 'Y%m%d')
     except:
         current_date = datetime.now()
         month_obj,end_of_previous_month=get_first_and_last_date_of_month(current_date.year,DASHBOARD_SUBMISSION_DAY)
@@ -1361,7 +1360,7 @@ def dashboard_data_approval(request, id):
             for field in array_fields:
                 monthly_data_dict[field] = []
 
-            month_field = month_obj.strftime('%m%Y')
+            month_field = month_obj.strftime('Y%m%d')
 
             # Preprocess the dictionary to replace None with 0
             preprocessed_dict = {k: (0 if v is None else v) for k, v in monthly_data_dict.items()}
