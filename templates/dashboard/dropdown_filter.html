@@ -48,7 +48,7 @@
                                         <option value="{{ partnerlist.0.id }}" selected>{{ partnerlist.0.name }}</option>
                                     {% else %}
                                         {% for part in partnerlist %}
-                                            <option value="{{ part.id }}" {% if part.0 == selected_partner %}selected{% endif %}>{{ part.name }}</option>
+                                            <option value="{{ part.id }}" {% if part.0 == selected_partner_list %}selected{% endif %}>{{ part.name }}</option>
                                         {% endfor %}
                                     {% endif %}
                                 </select>
