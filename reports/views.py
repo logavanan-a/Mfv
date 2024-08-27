@@ -7,7 +7,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect,get_list_or_404
 from django.contrib.auth.decorators import login_required
 from django.db import connection
-from .models import ReportMeta, QuietlyReport
+from .models import ReportMeta,QuarterlyReport
 from dashboard.models import DashboardSummaryLog
 from django.contrib.contenttypes.models import ContentType
 from django.template.loader import render_to_string
@@ -59,7 +59,6 @@ def return_sql_results_json(sql):
     cursor = connection.cursor()
     cursor.execute(sql)
     rows = cursor.fetchall()
-    # import ipdb;ipdb.set_trace()
     # Assuming the query returns a single JSON array as a single row and column
     json_array_str = rows[0][0]
     if json_array_str:
@@ -214,7 +213,7 @@ def reports_listing(request):
 
 #         data_query_list.append(data_query)
 @ login_required(login_url='/login/')
-def quietly_report(request):
+def quarterly_report(request):
     heading = 'Quietly Report'
     from datetime import datetime
     current_year = datetime.now().year+1
@@ -234,7 +233,7 @@ def quietly_report(request):
             q2_target = request.POST.get('q2_target_'+str(indicator.id),0)
             q3_target = request.POST.get('q3_target_'+str(indicator.id),0)
             q4_target = request.POST.get('q4_target_'+str(indicator.id),0)
-            obj, created=QuietlyReport.objects.update_or_create(
+            obj, created=QuarterlyReport.objects.update_or_create(
                     project_id=project_id,
                     indicator_id=indicator.id,
                     academic_year=academic_year,
@@ -247,9 +246,9 @@ def quietly_report(request):
                     }
                 )
             obj.save()
-        return redirect('/quietly-report/?district='+str(district_id)+'&academic_year='+str(academic_year))
+        return redirect('/quarterly-report/?district='+str(district_id)+'&academic_year='+str(academic_year))
 
-    return render(request, 'reports/quietly_report.html', locals())
+    return render(request, 'reports/quarterly_report.html', locals())
     
 @ login_required(login_url='/login/')
 def custom_report(request, page_slug):
@@ -396,24 +395,58 @@ def getquarteryear(academic_year):
         result_set.append('Q4')
     return result_set
 
-def get_donor_district_list(request,donor_id,district_id):
+def get_donor_district_list(request,partner_id,donor_id,district_id):
     user_id = request.user.id
-    district_list = []
-    donor_list = Donor.objects.filter(active=2).values_list('id','name').order_by('name')
-    if donor_id != '':
-        donor_project_list = ProjectDonorMapping.objects.filter(active=2, donor_id=int(donor_id)).values_list('project_id', flat=True)
+    donor_list,district_list = [],[]
+    user_details = load_user_details(request)
+    if 'user_partner_list' in request.session:
+        partner_ids = request.session['user_partner_list']
+    partner_list = Partner.objects.filter(id__in=partner_ids).values_list('id','name').order_by('name')
+    if partner_id != '' or len(partner_ids) == 1:
+        if len(partner_ids) == 1: 
+            part_mission_ids = PartnerMissionMapping.objects.filter(active=2,partner_id__in=partner_ids).values_list('id',flat=True)
+        else:
+            part_mission_ids = PartnerMissionMapping.objects.filter(active=2,partner_id=int(partner_id)).values_list('id',flat=True)
+        project_ids = Project.objects.filter(active=2,partner_mission_mapping_id__in=part_mission_ids).values_list('id',flat=True)
+        donor_ids = ProjectDonorMapping.objects.filter(active=2,project_id__in=project_ids).values_list('donor_id',flat=True)
+        donor_list = Donor.objects.filter(active=2,id__in=donor_ids).values_list('id','name').order_by('name')
+    if donor_id != '' and partner_id != '':
+        part_mission_ids = PartnerMissionMapping.objects.filter(active=2,partner_id=int(partner_id)).values_list('id',flat=True)
+        project_ids = Project.objects.filter(active=2,partner_mission_mapping_id__in=part_mission_ids).values_list('id',flat=True)
+        donor_project_list = ProjectDonorMapping.objects.filter(active=2, project_id__in=project_ids).values_list('project_id', flat=True)
         district_project_list = Project.objects.filter(active=2, id__in=donor_project_list).values_list('district_id', flat=True)
         district_list_ids = District.objects.filter(active=2, id__in=district_project_list).values_list('id',flat=True)
         district_list_ids_str = list(map(str, district_list_ids))
         district_list = Boundary.objects.filter(active=2,code__in=district_list_ids_str,boundary_level_type_id=2).values_list('id','name').order_by('name')
-    return donor_list,district_list
+    print(partner_list,'---------')
+    return partner_list,donor_list,district_list
+
+@csrf_exempt
+@ login_required(login_url='/login/')
+def get_partner_district(request):
+    if request.method == 'GET':
+        selected_partner = request.GET.get('selected_partner', '')
+        part_mission_ids = PartnerMissionMapping.objects.filter(active=2,partner_id=int(selected_partner)).values_list('id',flat=True)
+        project_ids = Project.objects.filter(active=2,partner_mission_mapping_id__in=part_mission_ids).values_list('id',flat=True)
+        donor_ids = ProjectDonorMapping.objects.filter(active=2,project_id__in=project_ids).values_list('donor_id',flat=True)
+        donor_list = Donor.objects.filter(active=2,id__in=donor_ids).values_list('id','name').order_by('name')
+        result_set = []
+        for donor in donor_list:
+            result_set.append(
+                {'id': donor[0], 'name': donor[1], })
+        return HttpResponse(json.dumps(result_set))
+
+
 
 @csrf_exempt
 @ login_required(login_url='/login/')
 def get_donor_district(request):
     if request.method == 'GET':
         selected_donor = request.GET.get('selected_donor', '')
-        donor_project_list = ProjectDonorMapping.objects.filter(active=2, donor_id=int(selected_donor)).values_list('project_id', flat=True)
+        selected_partner = request.GET.get('selected_partner','')
+        part_mission_ids = PartnerMissionMapping.objects.filter(active=2,partner_id=int(selected_partner)).values_list('id',flat=True)
+        project_ids = Project.objects.filter(active=2,partner_mission_mapping_id__in=part_mission_ids).values_list('id',flat=True)
+        donor_project_list = ProjectDonorMapping.objects.filter(active=2, project_id__in=project_ids).values_list('project_id', flat=True)
         district_project_list = Project.objects.filter(active=2, id__in=donor_project_list).values_list('district_id', flat=True)
         district_list_ids = District.objects.filter(active=2, id__in=district_project_list).values_list('id',flat=True)
         district_list_ids_str = list(map(str, district_list_ids))
@@ -433,26 +466,30 @@ def custom_report_donor(request):
     today = datetime.today()
     q_year = request.POST.get('q_year','q1')
     academic_year = request.POST.get('finance_year',current_academic_year)
+    partner_id = request.POST.get('partner','')
     donor_id = request.POST.get('donor','')
     district_id = request.POST.get('district','')
-    donor_list,district_list = get_donor_district_list(request,donor_id,district_id)
+    partner_list,donor_list,district_list = get_donor_district_list(request,partner_id,donor_id,district_id)
     financial_year = current_academic_year
     quarterly_year_list = getquarteryear(academic_year)
     no_table = True
     # state_cond,dist_cond,selected_state,selected_district,state_filter,district_filter = get_state_dist_cond(request)
     if request.method == 'POST':
-        child_scr_data = child_screening_data(academic_year,q_year,donor_id,district_id)
-        spec_comp_data =spec_compliance_data(academic_year,q_year,donor_id,district_id)
-        teach_train_data =teacher_trained_data(academic_year,q_year,donor_id,district_id)
-        surgery_data =surgery_details_data(academic_year,q_year,donor_id,district_id)
-        return  export_excel_donor(child_scr_data,spec_comp_data,teach_train_data,surgery_data,academic_year,q_year)
+        child_scr_data = child_screening_data(academic_year,q_year,partner_id,donor_id,district_id)
+        spec_comp_data =spec_compliance_data(academic_year,q_year,partner_id,donor_id,district_id)
+        teach_train_data =teacher_trained_data(academic_year,q_year,partner_id,donor_id,district_id)
+        surgery_data =surgery_details_data(academic_year,q_year,partner_id,donor_id,district_id)
+        pt_heading,a_data,t_data,state_dist_name = program_tracker_data(academic_year,q_year,partner_id,donor_id,district_id)
+        return  export_excel_donor(child_scr_data,spec_comp_data,teach_train_data,surgery_data,academic_year,q_year,pt_heading,a_data,t_data,state_dist_name)
     return render(request, 'custom_report/donor_report.html', locals())
 
 
-def child_screening_data(academic_year,q_year,donor_id,district_id):
+def child_screening_data(academic_year,q_year,partner_id,donor_id,district_id):
     where_cond = ''
-    if donor_id != '':
-        where_cond += f" and donor_id = {int(donor_id)}"
+    # if partner_id != '':
+    #     where_cond += f" and partner_id = {int(partner_id)}"
+    # if donor_id != '':
+    #     where_cond += f" and donor_id = {int(donor_id)}"
     if district_id != '':
         where_cond += f" and school_district_id = {int(district_id)}"
 
@@ -474,7 +511,7 @@ def child_screening_data(academic_year,q_year,donor_id,district_id):
                         surgery_advised,
                         surgery_provided
                     FROM student_screening_data
-                    WHERE p_quarter = '{q_year.lower()}' AND p_academic_year = '{academic_year}'   {where_cond}
+                    WHERE p_quarter = '{q_year}' AND p_academic_year = '{academic_year}'   {where_cond}
                 )
                 SELECT jsonb_agg(
                     jsonb_build_array(
@@ -501,10 +538,12 @@ def child_screening_data(academic_year,q_year,donor_id,district_id):
     data = return_sql_results_json(sql_query)
     return data
 
-def surgery_details_data(academic_year,q_year,donor_id,district_id):
+def surgery_details_data(academic_year,q_year,partner_id,donor_id,district_id):
     where_cond = ''
-    if donor_id != '':
-        where_cond += f" and donor_id = {int(donor_id)}"
+    # if partner_id != '':
+    #     where_cond += f" and partner_id = {int(partner_id)}"
+    # if donor_id != '':
+    #     where_cond += f" and donor_id = {int(donor_id)}"
     if district_id != '':
         where_cond += f" and school_district_id = {int(district_id)}"
     sql_query = f"""
@@ -522,7 +561,7 @@ def surgery_details_data(academic_year,q_year,donor_id,district_id):
                         eye_operated_upon,
                         phase
                     FROM surgery_data
-                    WHERE p_quarter = '{q_year.lower()}' AND p_academic_year = '{academic_year}' {where_cond}
+                    WHERE p_quarter = '{q_year}' AND p_academic_year = '{academic_year}' {where_cond}
                 )
                 SELECT jsonb_agg(
                     jsonb_build_array(
@@ -545,10 +584,226 @@ def surgery_details_data(academic_year,q_year,donor_id,district_id):
     data = return_sql_results_json(sql_query)
     return data
 
-def spec_compliance_data(academic_year,q_year,donor_id,district_id):
+def program_tracker_data(academic_year,q_year,partner_id,donor_id,district_id):
+    heading = [f'Cumulative Target till date (June to March {academic_year.split("-")[1]})',f'Actual s till date (June to March {academic_year.split("-")[1]})','% Achieved',f'July {academic_year.split("-")[0]}- September {academic_year.split("-")[0]}',f'October {academic_year.split("-")[0]} - December {academic_year.split("-")[0]}',f'January {academic_year.split("-")[1]} - March {academic_year.split("-")[1]}',f'April {academic_year.split("-")[1]} - June {academic_year.split("-")[1]}']
+    where_cond,state_dist_name = '',''
+    if district_id != '':
+        where_cond += f" and boundary_district_id = {int(district_id)}"
+        state_dist_name_query = f"""
+        select t2.name||' - '||t1.name from application_master_boundary t1 inner join application_master_boundary t2 on t1.parent_id = t2.id where t1.id = {int(district_id)}
+                """
+        state_dist_name = return_sql_results(state_dist_name_query)
+    a_sql_query  = f"""
+            WITH target_data AS (
+            SELECT 
+            DISTINCT ON (quarterly_year)
+            quarterly_year,
+            children_screened_q_target,
+            children_prescribed_spectacles_q_target,
+            children_provided_spectacles_q_target,
+            children_refered_surgery_q_target,
+            children_provided_surgery_q_target,
+            schools_covered_q_target,
+            teacher_trained_q_target,
+            spectacle_compliance_3_months_q_target
+        FROM 
+            program_tracker_data
+        where financial_year = '{academic_year}' {where_cond}
+        ORDER BY 
+            quarterly_year
+            ),summed_data AS (
+                    SELECT 
+                        t1.quarterly_year,
+                        t2.children_screened_q_target as children_screened_q_target,
+                        t2.children_prescribed_spectacles_q_target as children_prescribed_spectacles_q_target,
+                        t2.children_provided_spectacles_q_target as children_provided_spectacles_q_target,
+                        t2.children_refered_surgery_q_target as children_refered_surgery_q_target,
+                        t2.children_provided_surgery_q_target as children_provided_surgery_q_target,
+                        t2.schools_covered_q_target as schools_covered_q_target,
+                        t2.teacher_trained_q_target as teacher_trained_q_target,
+                        t2.spectacle_compliance_3_months_q_target as spectacle_compliance_3_months_q_target,
+                        t1.children_screened_ach AS children_screened_ach,
+                        t1.children_prescribed_spectacles_ach AS children_prescribed_spectacles_ach,
+                        t1.children_provided_spectacles_ach AS children_provided_spectacles_ach,
+                        t1.children_refered_surgery_ach AS children_refered_surgery_ach,
+                        t1.children_provided_surgery_ach AS children_provided_surgery_ach,
+                        t1.schools_covered_ach AS schools_covered_ach,
+                        t1.teacher_trained_ach AS teacher_trained_ach,
+                        t1.spectacle_compliance_3_months_ach AS spectacle_compliance_3_months_ach,
+                        sum(coalesce(t1.children_screened_male,0)) as children_screened_male,
+                        sum(coalesce(t1.children_screened_female,0)) as children_screened_female,
+                        sum(coalesce(t1.children_screened_total,0)) as children_screened_total,
+                        SUM(COALESCE(t1.children_prescribed_spectacles_male, 0)) AS children_prescribed_spectacles_male,
+                        SUM(COALESCE(t1.children_prescribed_spectacles_female, 0)) AS children_prescribed_spectacles_female,
+                        SUM(COALESCE(t1.children_prescribed_spectacles_total, 0)) AS children_prescribed_spectacles_total,
+                        SUM(COALESCE(t1.children_provided_spectacles_male, 0)) AS children_provided_spectacles_male,
+                        SUM(COALESCE(t1.children_provided_spectacles_female, 0)) AS children_provided_spectacles_female,
+                        SUM(COALESCE(t1.children_provided_spectacles_total, 0)) AS children_provided_spectacles_total,
+                        SUM(COALESCE(t1.children_refered_surgery_male, 0)) AS children_refered_surgery_male,
+                        SUM(COALESCE(t1.children_refered_surgery_female, 0)) AS children_refered_surgery_female,
+                        SUM(COALESCE(t1.children_refered_surgery_total, 0)) AS children_refered_surgery_total,
+                        SUM(COALESCE(t1.children_provided_surgery_male, 0)) AS children_provided_surgery_male,
+                        SUM(COALESCE(t1.children_provided_surgery_female, 0)) AS children_provided_surgery_female,
+                        SUM(COALESCE(t1.children_provided_surgery_total, 0)) AS children_provided_surgery_total,
+                        SUM(COALESCE(t1.schools_covered_male, 0)) AS schools_covered_male,
+                        SUM(COALESCE(t1.schools_covered_female, 0)) AS schools_covered_female,
+                        SUM(COALESCE(t1.schools_covered_total, 0)) AS schools_covered_total,
+                        SUM(COALESCE(t1.teacher_trained_male, 0)) AS teacher_trained_male,
+                        SUM(COALESCE(t1.teacher_trained_female, 0)) AS teacher_trained_female,
+                        SUM(COALESCE(t1.teacher_trained_total, 0)) AS teacher_trained_total,
+                        SUM(COALESCE(t1.spectacle_compliance_3_months_male, 0)) AS spectacle_compliance_3_months_male,
+                        SUM(COALESCE(t1.spectacle_compliance_3_months_female, 0)) AS spectacle_compliance_3_months_female,
+                        SUM(COALESCE(t1.spectacle_compliance_3_months_total, 0)) AS spectacle_compliance_3_months_total 
+                    FROM 
+                        program_tracker_data t1 
+                        left join target_data t2 on t1.quarterly_year = t2.quarterly_year
+                        where financial_year = '{academic_year}' {where_cond}
+                    GROUP BY 
+                        t1.quarterly_year,
+                        t2.children_screened_q_target,
+                        t2.children_prescribed_spectacles_q_target,
+                        t2.children_provided_spectacles_q_target,
+                        t2.children_refered_surgery_q_target,
+                        t2.children_provided_surgery_q_target,
+                        t2.schools_covered_q_target,
+                        t2.teacher_trained_q_target,
+                        t2.spectacle_compliance_3_months_q_target,
+                        t1.children_screened_ach,
+                        t1.children_prescribed_spectacles_ach,
+                        t1.children_provided_spectacles_ach,
+                        t1.children_refered_surgery_ach,
+                        t1.children_provided_surgery_ach,
+                        t1.schools_covered_ach,
+                        t1.teacher_trained_ach,
+                        t1.spectacle_compliance_3_months_ach
+                )
+                SELECT 
+                    quarterly_year,
+                    json_build_array(
+                        json_build_array(
+                        children_screened_q_target,
+                            children_screened_male,
+                            children_screened_female,
+                            children_screened_total,
+                            children_screened_ach
+                        ),
+                        json_build_array(
+                            children_prescribed_spectacles_q_target,
+                            children_prescribed_spectacles_male,
+                            children_prescribed_spectacles_female,
+                            children_prescribed_spectacles_total,
+                            children_prescribed_spectacles_ach
+                        ),
+                        json_build_array(
+                            children_provided_spectacles_q_target,
+                            children_provided_spectacles_male,
+                            children_provided_spectacles_female,
+                            children_provided_spectacles_total,
+                            children_provided_spectacles_ach
+                        ),
+                        json_build_array(
+                            children_refered_surgery_q_target,
+                            children_refered_surgery_male,
+                            children_refered_surgery_female,
+                            children_refered_surgery_total,
+                            children_refered_surgery_ach
+                        ),
+                        json_build_array(
+                            children_provided_surgery_q_target,
+                            children_provided_surgery_male,
+                            children_provided_surgery_female,
+                            children_provided_surgery_total,
+                            children_provided_surgery_ach
+                        ),
+                        json_build_array(
+                            schools_covered_q_target,
+                            schools_covered_male,
+                            schools_covered_female,
+                            schools_covered_total,
+                            schools_covered_ach
+                        ),
+                        json_build_array(
+                        teacher_trained_q_target,
+                            teacher_trained_male,
+                            teacher_trained_female,
+                            teacher_trained_total,
+                            teacher_trained_ach
+                        ),
+                        json_build_array(
+                        spectacle_compliance_3_months_q_target,
+                            spectacle_compliance_3_months_male,
+                            spectacle_compliance_3_months_female,
+                            spectacle_compliance_3_months_total,
+                            spectacle_compliance_3_months_ach 
+                        )
+                    ) as aggregated_data
+                FROM 
+                    summed_data
+                ORDER BY 
+                    CASE quarterly_year
+                        WHEN 'Q1' THEN 1
+                        WHEN 'Q2' THEN 2
+                        WHEN 'Q3' THEN 3
+                        WHEN 'Q4' THEN 4
+                        ELSE 5
+                    END;
+            """
+
+    t_sql_query = f"""
+            with ach_data as (
+            select financial_year,512 as i_id,sum(children_screened_total) as cum_total ,sum(children_screened_ach) as cum_ach
+            from program_tracker_data t1 where t1.financial_year = '{academic_year}' {where_cond} group by financial_year
+            union ALL
+            select financial_year,513 as i_id,sum(children_prescribed_spectacles_total) as cum_total ,sum(children_prescribed_spectacles_ach) as cum_ach
+            from program_tracker_data t1 where t1.financial_year = '{academic_year}' {where_cond} group by financial_year
+            union ALL
+            select financial_year,514 as i_id,sum(children_provided_spectacles_total) as cum_total ,sum(children_provided_spectacles_ach) as cum_ach
+            from program_tracker_data t1 where t1.financial_year = '{academic_year}' {where_cond} group by financial_year
+            union ALL
+            select financial_year,515 as i_id,sum(children_refered_surgery_total) as cum_total ,sum(children_refered_surgery_ach) as cum_ach
+            from program_tracker_data t1 where t1.financial_year = '{academic_year}' {where_cond} group by financial_year
+            union ALL
+            select financial_year,516 as i_id,sum(children_provided_surgery_total) as cum_total ,sum(children_provided_surgery_ach) as cum_ach
+            from program_tracker_data t1 where t1.financial_year = '{academic_year}' {where_cond} group by financial_year
+            union ALL
+            select financial_year,517 as i_id,sum(schools_covered_total) as cum_total ,sum(schools_covered_ach) as cum_ach
+            from program_tracker_data t1 where t1.financial_year = '{academic_year}' {where_cond} group by financial_year
+            union ALL
+            select financial_year,518 as i_id,sum(teacher_trained_total) as cum_total ,sum(teacher_trained_ach) as cum_ach
+            from program_tracker_data t1 where t1.financial_year = '{academic_year}' {where_cond} group by financial_year
+            union ALL
+            select financial_year,519 as i_id,sum(spectacle_compliance_3_months_total) as cum_total ,sum(spectacle_compliance_3_months_ach) as cum_ach
+            from program_tracker_data t1 where t1.financial_year = '{academic_year}' {where_cond} group by financial_year 
+        )
+        select t2.name,
+        t1.annual_target,
+        sum(t1.q1_target+t1.q2_target+t1.q3_target+t1.q4_target),
+        coalesce(t3.cum_total,0),
+        coalesce(t3.cum_ach,0)
+        from reports_quarterlyreport t1 
+        left join application_master_masterlookup t2
+        on t1.indicator_id = t2.id
+        left join ach_data t3 on t3.i_id = t1.indicator_id
+        where t1.academic_year = '{int(academic_year.split("-")[0])}'
+        group by t2.name,
+        t1.annual_target,
+        t3.cum_total,
+        t3.cum_ach,
+        t2.listing_order
+        order by t2.listing_order
+    
+            """
+    a_data = return_sql_results(a_sql_query)
+    t_data = return_sql_results(t_sql_query)
+    return heading,a_data,t_data,state_dist_name
+
+
+def spec_compliance_data(academic_year,q_year,partner_id,donor_id,district_id):
     where_cond = ''
-    if donor_id != '':
-        where_cond += f" and donor_id = {int(donor_id)}"
+    # if partner_id != '':
+    #     where_cond += f" and partner_id = {int(partner_id)}"
+    # if donor_id != '':
+    #     where_cond += f" and donor_id = {int(donor_id)}"
     if district_id != '':
         where_cond += f" and school_district_id = {int(district_id)}"
     sql_query = f"""
@@ -557,7 +812,7 @@ def spec_compliance_data(academic_year,q_year,donor_id,district_id):
                         row_number() OVER () AS row_num,
                         student_name,age,gender,school_name,school_state,spectacle_provided_on,follow_up_done_on,waering_complaince_after_3_month,reason_for_not_wearing
                     FROM spectacle_complaince_data 
-                    WHERE 1=1 and p_quarter = '{q_year.lower()}' AND p_academic_year = '{academic_year}'
+                    WHERE 1=1 and p_quarter = '{q_year}' AND p_academic_year = '{academic_year}'
                     {where_cond}
                 )
                 SELECT jsonb_agg(
@@ -571,10 +826,12 @@ def spec_compliance_data(academic_year,q_year,donor_id,district_id):
     data = return_sql_results_json(sql_query)
     return data
 
-def teacher_trained_data(academic_year,q_year,donor_id,district_id):
+def teacher_trained_data(academic_year,q_year,partner_id,donor_id,district_id):
     where_cond = ''
-    if donor_id != '':
-        where_cond += f" and donor_id = {int(donor_id)}"
+    # if partner_id != '':
+    #     where_cond += f" and partner_id = {int(partner_id)}"
+    # if donor_id != '':
+    #     where_cond += f" and donor_id = {int(donor_id)}"
     if district_id != '':
         where_cond += f" and school_district_id = {int(district_id)}"
     sql_query = f"""
@@ -597,9 +854,10 @@ def teacher_trained_data(academic_year,q_year,donor_id,district_id):
     return data
 
 
-def export_excel_donor(child_screening_data,spectacle_comp_data,teacher_training_data,surgery_details_data,financial_year,quarterly_year):
-    excel_path = settings.DONOR_REPORT_TEMPLATES + '/donoe-report-template.v.0.1.xlsx'  
+def export_excel_donor(child_screening_data,spectacle_comp_data,teacher_training_data,surgery_details_data,financial_year,quarterly_year,pt_heading,a_data,t_data,state_dist_name):
+    excel_path = settings.DONOR_REPORT_TEMPLATES + '/donoe-report-template.v.0.2.xlsx'  
     workbook = openpyxl.load_workbook(f'{excel_path}')
+    worksheet_child_program_tracker = workbook.worksheets[0] 
     worksheet_child_screening = workbook.worksheets[1] 
     worksheet_surgery = workbook.worksheets[2] 
     worksheet_teacher_training = workbook.worksheets[3] 
@@ -608,27 +866,68 @@ def export_excel_donor(child_screening_data,spectacle_comp_data,teacher_training
     teach_train_data = teacher_training_data if teacher_training_data else [['No Data Avilable in the Financial Year and Quarterly Year']]
     spec_comp_data = spectacle_comp_data if spectacle_comp_data else [['No Data Avilable in the Financial Year and Quarterly Year']]
     surgery_data = surgery_details_data if surgery_details_data else [['No Data Avilable in the Financial Year and Quarterly Year']]
-    #childern screening data
+    program_tracker_a_data = a_data if a_data else [['No Data Avilable in the Financial Year and Quarterly Year']]
+    # sheet 1 - Program Tracker
+    # import ipdb;ipdb.set_trace()
+    #append heading
+    start_row = 2
+    for col_num, cell_value in enumerate(pt_heading[:3], start=1):
+        worksheet_child_program_tracker.cell(row=start_row, column=3+col_num, value=cell_value)
+    start_row = 3
+    for col_num, cell_value in enumerate(pt_heading[3:], start=1):
+        col_idx = 7+(5*(col_num-1))
+        worksheet_child_program_tracker.cell(row=start_row, column=col_idx, value=cell_value)
+    
+    if state_dist_name:
+        worksheet_child_program_tracker.cell(row=5, column=1, value=state_dist_name[0][0])
+    # import ipdb;ipdb.set_trace()
+    if t_data:
+        start_row = 5
+        for row_idx, row_data in enumerate(t_data):
+            for idx,data in enumerate(row_data,start=1):
+                col_idx = idx + 1
+                worksheet_child_program_tracker.cell(row=start_row, column=col_idx, value=data)
+            start_row += 1
+    # Define a dictionary to map 'Q1', 'Q2', 'Q3', and 'Q4' to their respective column offsets
+    quarter_to_column_offset = {
+        'Q1': 6,
+        'Q2': 11,
+        'Q3': 16,
+        'Q4': 21
+    }
+    # Iterate over program tracker data and fill in the cells
+    for row_data in program_tracker_a_data:
+        quarter = row_data[0]
+        if quarter in quarter_to_column_offset:
+            col_offset = quarter_to_column_offset[quarter]
+            for idx, data_list in enumerate(row_data[1], start=1):
+                start_row = 4 + idx
+                for col_num, cell_value in enumerate(data_list, start=1):
+                    worksheet_child_program_tracker.cell(row=start_row, column=col_offset + col_num, value=cell_value)
+    #sheet2 - Children Screening Data
     worksheet_child_screening['A1'] = f"Children Screening Details - {financial_year} - {quarterly_year}"
     start_row = 3
     for row_data in child_screening_data:
         for col_num, cell_value in enumerate(row_data, start=1):
             worksheet_child_screening.cell(row=start_row, column=col_num, value=cell_value)
         start_row += 1
+    #sheet3 - Surgery Details
+    start_row = 3
+    for row_data in surgery_data:
+        for col_num, cell_value in enumerate(row_data, start=1):
+            worksheet_surgery.cell(row=start_row, column=col_num, value=cell_value)
+        start_row += 1
+    #sheet 4 - Teacher Training
     start_row = 3
     for row_data in teach_train_data:
         for col_num, cell_value in enumerate(row_data, start=1):
             worksheet_teacher_training.cell(row=start_row, column=col_num, value=cell_value)
         start_row += 1
+    #sheet5 - Spectacles Complaince
     start_row = 2
     for row_data in spec_comp_data:
         for col_num, cell_value in enumerate(row_data, start=1):
             worksheet_spec_complaince.cell(row=start_row, column=col_num, value=cell_value)
-        start_row += 1
-    start_row = 3
-    for row_data in surgery_data:
-        for col_num, cell_value in enumerate(row_data, start=1):
-            worksheet_surgery.cell(row=start_row, column=col_num, value=cell_value)
         start_row += 1
     folder_file_name = f"DONOR_REPORT-{financial_year}-{quarterly_year}_{datetime.today().strftime('%d%m%y%H%M')}.xlsx"
     file_path = os.path.join(settings.MEDIA_ROOT + '/temp_donor_report/', folder_file_name)

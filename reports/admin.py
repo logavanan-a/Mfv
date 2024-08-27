@@ -1,6 +1,6 @@
 from django.contrib import admin
 from import_export import fields
-from reports.models import ReportMeta, QuietlyReport
+from reports.models import ReportMeta,QuarterlyReport
 from import_export.admin import ImportExportActionModelAdmin
 
 
@@ -17,8 +17,8 @@ class ReportMetaAdmin(ImportExportActionModelAdmin,admin.ModelAdmin):
     list_filter = ['report_title', 'report_slug']
     search_fields = ['report_title', 'report_slug']
 
-@admin.register(QuietlyReport)
-class QuietlyReportAdmin(ImportExportActionModelAdmin,admin.ModelAdmin):
+@admin.register(QuarterlyReport)
+class QuarterlyReportAdmin(ImportExportActionModelAdmin,admin.ModelAdmin):
     """
     Customizes the administration interface for the ReportMeta model.
     """

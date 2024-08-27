@@ -41,12 +41,28 @@
                     </div>
                     <div class="col-4" >
                         <div class="mb-2">
+                            <label class="form-label" >Partner</label>
+                            <select class=" form-select address_widget"  name="partner" id='partner' 
+                                aria-label="Floating label select example" data-placeholder=" " required> 
+                                        <option value="" >Select Partner</option>
+                                    {% if partner_list|length == 1 %}
+                                        <!-- Automatically select the only option if there's only one item in partner_list -->
+                                        <option value="{{ partner_list.0.0 }}" selected>{{ partner_list.0.1 }}</option>
+                                    {% else %}
+                                        {% for part in partner_list %}
+                                            <option value="{{ part.0 }}" {% if part.0 == selected_partner %}selected{% endif %}>{{ part.1 }}</option>
+                                        {% endfor %}
+                                    {% endif %}
+                            </select>
+                            
+                        </div>
+                    </div>
+                    <div class="col-4" >
+                        <div class="mb-2">
                             <label class="form-label" >Donor</label>
                             <select class=" form-select address_widget"  name="donor" id='donor' 
-                                aria-label="Floating label select example" data-placeholder=" "> 
-                                        {% if donor_filter|length != 1 %}
-                                        <option value="">All</option>
-                                        {% endif %}
+                                aria-label="Floating label select example" data-placeholder=" " required> 
+                                        <option value="" >Select Donor</option>
                                         {% for d in donor_list %}
                                         <option value={{d.0}} {% if d.0 == selected_donor %}selected{%endif%}>{{d.1}}</option>
                                         {% endfor %}
@@ -58,8 +74,8 @@
                         <div class="mb-2">
                             <label class="form-label" >District</label>
                             <select class=" form-select address_widget"  name="district" id='district' 
-                                aria-label="Floating label select example" data-placeholder=" "> 
-                                        <option value="" >Choose Select District</option>
+                                aria-label="Floating label select example" data-placeholder=" " required> 
+                                        <option value="" >Select District</option>
                                         {% for district in district_list %}
                                         <option value={{district.0}} {% if district.0 == selected_district %}selected{%endif%}>{{district.1}}</option>
                                         {% endfor %}
@@ -172,12 +188,42 @@ $(document).ready(function() {
             }
         });
     }
-
+    $(document).ready(function(){
+        $('select#partner').change(function () {
+            var optionSelected = $(this).find("option:selected");
+            var valueSelected  = optionSelected.val();
+            data = {'selected_partner' : valueSelected };
+            $.ajax({
+                type:"GET",
+                url: '/reports/ajax/partner_district/',
+                data:data,
+                success:function(result){
+                    $("#donor option").remove();
+                    a = '<option selected disabled value="">Select District</option>';
+                    $("#donor").append(a);
+                    if(result.length == 0){
+                        $("#donor option").remove();
+                        a = '<option selected disabled value="">No district is mapped to this state</option>';
+                        $("#donor").append(a);
+                    }
+                    else{
+                        $.each(JSON.parse(result), function (key, value)
+                        {
+                            a = '<option value=' + value['id']+'>' + value['name']+'</option>';
+                            $("#donor").append(a);
+                        });
+                    }
+                }
+            });
+        });
+    });
     $(document).ready(function(){
         $('select#donor').change(function () {
             var optionSelected = $(this).find("option:selected");
             var valueSelected  = optionSelected.val();
-            data = {'selected_donor' : valueSelected };
+            var partneroptionSelected = $("#partner").find("option:selected");
+            var partnervalueSelected  = partneroptionSelected.val();
+            data = {'selected_donor' : valueSelected , 'selected_partner':partnervalueSelected};
             $.ajax({
                 type:"GET",
                 url: '/reports/ajax/donor_district/',

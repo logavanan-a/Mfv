@@ -39,7 +39,7 @@ class ReportMeta(BaseContent):
         return self.report_slug
     
 
-class QuietlyReport(BaseContent):
+class QuarterlyReport(BaseContent):
     project =  models.ForeignKey('application_master.Project', on_delete = models.DO_NOTHING, blank=True, null=True)
     indicator =  models.ForeignKey('application_master.MasterLookup',on_delete = models.DO_NOTHING, blank=True, null=True)
     academic_year = models.IntegerField()
