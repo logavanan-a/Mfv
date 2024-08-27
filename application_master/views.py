@@ -591,5 +591,5 @@ def adding_project(request,id):
                     )
             return redirect('/application_master/details/partner/'+ str(id) + '/')
         else:
-            error_msg = "Already, This District is mapped to a different project."        
+            error_msg = "This district is already mapped to another project."        
     return render(request, 'user/adding_project.html', locals())

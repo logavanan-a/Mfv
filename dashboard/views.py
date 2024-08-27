@@ -1,9 +1,23 @@
+from django.template.defaultfilters import striptags
+import psycopg2
+import requests,json
+from django.shortcuts import render
+from dashboard.models import *
+from survey.models import *
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from django.db import connection
+from application_master.models import Boundary
+from ast import literal_eval
+from collections import OrderedDict
+import colorsys
+import logging
+from dateutil.relativedelta import relativedelta
 from django.shortcuts import render,HttpResponse
 from django.db import connection
-from dashboard.models import DashboardSummaryLog,MonthlyDashboard,Remarks,STATUS_CHOICES,ArrayField
+from dashboard.models import DashboardSummaryLog,MonthlyDashboard,Remarks,STATUS_CHOICES,ArrayField,ChartMeta
 from application_master.models import UserPartnerMapping,UserProjectMapping,PartnerMissionMapping
 from datetime import datetime,date, timedelta
-from dateutil.relativedelta import relativedelta
 from mis.models import *
 from survey.views import get_pagination,JsonAnswer,BeneficiaryResponse
 from django.contrib.auth.decorators import login_required
@@ -19,144 +33,1105 @@ from rest_framework.request import Request as DRFRequest
 from uuid import uuid4
 import sys, traceback
 import logging
+from rest_framework.generics import CreateAPIView
+from rest_framework.response import Response
+from reports.views import load_user_details
 
 logger = logging.getLogger(__name__)
 
-# Create your views here.
+# ****************************************************************************
+# Login Function
+# ****************************************************************************
+
+def filter_location_data(request):
+    # zone_list,state_list,partner_list,donor_list=[],[],[],[]
+    partner_filter,zone_filter,state_filter,district_filter,donor_filter = None,None,None,None,None
+    selected_items = []
+    user_filter_data = []
+    user_role = request.session.get('role_id')
+    if request.session.get('role_id')in (8,9,10):
+        get_state_partner_linkage = ApplicationUserStateLinkage.objects.filter(status=2,user_id=request.user.id).values_list('state',flat=True)
+        zone_id = State.objects.filter(status=2,id__in=get_state_partner_linkage).values_list('zone',flat=True)
+        zone_filter = Zone.objects.filter(status=2,id__in=zone_id).order_by('name')
+        selected_items.insert(0, str(zone_id[0]))
+        user_filter_data.insert(0, str(zone_id[0]))
+        state_filter = State.objects.filter(status=2,id__in=get_state_partner_linkage,zone__in=zone_id).order_by('name')
+        partner_id = Partner.objects.filter(status=2,state_id__in=get_state_partner_linkage).values_list('id',flat=True)
+        partner_filter = Partner.objects.filter(status=2,id__in=partner_id).order_by('name')
+        donor_id = DonorPartnerLinkage.objects.filter(status=2,partner_id__in=partner_id).values_list('donor_id',flat=True)
+        donor_filter = Donor.objects.filter(status=2,id__in=donor_id).order_by('name')
+        if request.POST.get('state', '') != '':
+            state_id = request.POST.get('state', '')
+            district_filter = District.objects.filter(status=2,state_id=int(state_id)).order_by('name')
+            selected_items.insert(1,'['+str(request.POST.get('state', ''))+']')
+            user_filter_data.insert(1,request.POST.get('state', ''))
+        else:
+            selected_items.insert(1, str([i for i in get_state_partner_linkage]))
+            user_filter_data.insert(1,request.POST.get('state', ''))
+        # selected_items.insert(2,request.POST.get('district', ''))
+        # user_filter_data.insert(2,request.POST.get('district', ''))
+        if request.POST.get('partner', '') != '':
+            selected_items.insert(3,'['+str(request.POST.get('partner', ''))+']')
+            user_filter_data.insert(3, request.POST.get('partner', ''))
+        else:
+            selected_items.insert(3,request.POST.get('partner',str([i for i in partner_id])))
+            user_filter_data.insert(3, request.POST.get('partner', ''))
+        # selected_items.insert(4,request.POST.get('donor', ''))
+        # user_filter_data.insert(4,request.POST.get('donor', ''))
+        # selected_items.insert(2,request.POST.get('district', ''))
+        # user_filter_data.insert(2,request.POST.get('district', '')) 
+    elif request.session.get('role_id') == 4:
+        partner_users = UserPartnerLinkage.objects.get(user_id=request.user.id)
+        partner_filter=Partner.objects.filter(status=2,id=partner_users.partner_id).order_by('name')
+        state_id = Partner.objects.filter(status=2,id=partner_users.partner_id).values_list('state_id',flat=True)
+        zone_id = State.objects.filter(status=2,id__in=state_id).values_list('zone',flat=True)
+        zone_filter = Zone.objects.filter(status=2,id__in=zone_id).order_by('name')
+        if request.POST.get('zone', '') != '':
+            state_filter = State.objects.filter(status=2,id__in=state_id).order_by('name')
+            selected_items.insert(0, request.POST.get('zone', ''))
+            user_filter_data.insert(0, request.POST.get('zone', ''))
+        else:
+            selected_items.insert(0, request.POST.get('zone', ''))
+            user_filter_data.insert(0, request.POST.get('zone', ''))
+        if request.POST.get('state', '') != '':
+            district_filter = District.objects.filter(status=2,state__in = state_id).order_by('name')
+            selected_items.insert(1,'['+str(request.POST.get('state', ''))+']')
+            user_filter_data.insert(1,request.POST.get('state', ''))
+        else:
+            selected_items.insert(1,request.POST.get('state', ''))
+            user_filter_data.insert(1,request.POST.get('state', ''))
+        # selected_items.insert(2,request.POST.get('district', ''))
+        # user_filter_data.insert(2,request.POST.get('district', ''))
+        selected_items.insert(3,'['+str(partner_users.partner_id)+']')
+        user_filter_data.insert(3,str(partner_users.partner_id))
+        donor_id = DonorPartnerLinkage.objects.filter(status=2,partner_id=partner_users.partner_id).values_list('donor_id',flat=True)
+        donor_filter = Donor.objects.filter(status=2,id__in=donor_id).order_by('name')
+        # selected_items.insert(4,request.POST.get('donor', ''))
+        # user_filter_data.insert(4,request.POST.get('donor', ''))
+    else:
+        zone_filter = Zone.objects.filter(status=2).order_by('name')
+        if request.POST.get('zone', '') != '':
+            zone_id = request.POST.get('zone', '')
+            state_filter = State.objects.filter(status=2,zone_id=int(zone_id)).order_by('name')
+            selected_items.insert(0, request.POST.get('zone', ''))
+            user_filter_data.insert(0, request.POST.get('zone', ''))
+        else:
+            selected_items.insert(0, request.POST.get('zone', ''))
+            user_filter_data.insert(0, request.POST.get('zone', ''))
+        if request.POST.get('state', '') != '':
+            state_id = request.POST.get('state', '')
+            district_filter = District.objects.filter(status=2,state_id=int(state_id)).order_by('name')
+            selected_items.insert(1,'['+str(request.POST.get('state', ''))+']') 
+            user_filter_data.insert(1,request.POST.get('state', ''))
+        else:
+            selected_items.insert(1,request.POST.get('state', ''))
+            user_filter_data.insert(1,request.POST.get('state', ''))
+        # selected_items.insert(2,request.POST.get('district', ''))
+        # user_filter_data.insert(2,request.POST.get('district', ''))
+        partner_filter=Partner.objects.filter(status=2).order_by('name')
+        if request.POST.get('partner', '') != '':
+            selected_items.insert(3,'['+str(request.POST.get('partner', ''))+']')
+            user_filter_data.insert(3, request.POST.get('partner', ''))
+        else:
+            selected_items.insert(3, request.POST.get('partner', '')) 
+            user_filter_data.insert(3, request.POST.get('partner', ''))
+        donor_filter=Donor.objects.filter(status=2).order_by('name')
+        # selected_items.insert(4,request.POST.get('donor', ''))
+        # user_filter_data.insert(4,request.POST.get('donor', ''))
+    selected_items.insert(4,request.POST.get('donor', ''))
+    user_filter_data.insert(4,request.POST.get('donor', ''))
+    selected_items.insert(2,request.POST.get('district', ''))
+    user_filter_data.insert(2,request.POST.get('district', ''))
+    from_date = request.POST.get('from_date', '') 
+    to_date = request.POST.get('to_date', '')
+    selected_items.insert(5,from_date)
+    user_filter_data.insert(5,from_date)
+    selected_items.insert(6,to_date)  
+    user_filter_data.insert(6,to_date)
+    return zone_filter,partner_filter,state_filter,district_filter,donor_filter,selected_items,user_filter_data,user_role
+
+# ****************************************************************************
+# Function to load user details to session
+# ****************************************************************************
+
+
+def load_user_details_to_sessions(request):
+    # Getting the user role config if not it will raise exception
+    try:
+        user_role_location_level_config = UserRoleLocationLevelConfig.objects.get(
+            user=request.user, status=2)
+    except UserRoleLocationLevelConfig.DoesNotExist:
+        # user_role_location_level_config = None
+        configure_error = 'Username not configured . Please contact administrator.'
+        return configure_error
+
+    # User group for checking group permission with menu permission
+    user_group = user_role_location_level_config.group
+    location_hierarchy_type_id = user_role_location_level_config.location_hierarchy_type.id
+
+    # Return user location relation id and object id list , if user mapped with multiple location.
+    user_object_id = UserLocationRelation.objects.filter(
+        UserRoleLocationLevelConfig=user_role_location_level_config, content_type__id=location_hierarchy_type_id, status=2).values_list('object_id', flat=True)
+
+    menus = Menu.objects.filter(status=2)
+    menu_to_display = []
+
+    for menu in menus:
+        if user_group.permissions.filter(id=menu.model_permission.id).exists():
+            menu_to_display.append(
+                (menu.name, menu.slug, menu.icon, menu.feature_link))
+
+    request.session['menus'] = menu_to_display
+    # request.session['user_group_id'] = user_group.id
+    request.session['location_hierarchy_type_id'] = location_hierarchy_type_id
+    request.session['user_object_id'] = list(
+        user_object_id)
+
+# #****************************************************************************
+# # update stackabar chart data to replace dummy data with actual values
+# #****************************************************************************
+
+
+def set_dynamic_column_stack_chart_data(sql, headers):
+    cursor = None
+    try:
+        chart_row_id_value = []
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+        newdata = []
+        newdata.append(headers)
+        for row in rows:
+            row_data = list(row)
+            chart_id_val = row_data.pop(0)
+            chart_row_id_value.append(chart_id_val)
+            newdata.append(row_data)
+            #new_row_data = []
+    finally:
+        if cursor:
+            cursor.close()
+    return newdata, chart_row_id_value
+
+
+# #****************************************************************************
+# # update pie chart data to replace dummy data with actual values
+# #****************************************************************************
+
+
+def set_pie_chart_data(sql, labels=None):
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    descr = cursor.description
+    rows = cursor.fetchall()
+    data = []
+    if labels:
+        data = [dict(zip([column for column in labels], row))for row in rows]
+        return data[0].items()
+    else:
+        return rows
+
+
+def set_card_chart_data(sql, labels=None):
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    descr = cursor.description
+    rows = cursor.fetchall()
+    data = []
+    if labels:
+        data =[(labels[idx],row[0]) for idx,row in enumerate(rows)]
+        return data
+    else:
+        return rows
+
+# #****************************************************************************
+# # update column chart data  and labels to replace dummy data with actual values
+# # labels only for dynamic bars - last 6 months kind of charts
+# #****************************************************************************
+
+
+def set_column_chart_data(sql, labels):
+    cursor = None
+    try:
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+        descr = cursor.description
+        counter = 0
+        data = []
+        if rows:
+            # data = [dict(zip([column for column in labels], row))for row in rows]
+            # row = rows[0]
+            for i in range(0,len(rows)):
+                value = (labels[i],rows[i][1])
+                data.append(value)
+
+            return data
+        else:
+            data = []
+            row = None
+    finally:
+        if cursor:
+            cursor.close()
+    return data[0].items()
+
+
+
+def set_bar_chart_dynamic_lable(sql):
+    cursor = None
+    try:
+        # query output strucutre - "location name", location_id, data values
+        # location_id not required in chart_data so remove and add it to dict 
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+        #descr = cursor.description
+        data = []
+        chart_row_id_value = []
+        for idx,i in enumerate(rows):
+            i = list(i)
+            #i[1] = int(i[1])
+            loc_id = i.pop(0)
+            chart_row_id_value.append(int(loc_id))
+            data.append(i)
+    finally:
+        if cursor:
+            cursor.close()
+    return data, chart_row_id_value
+
+def table_html_chart(sql):
+    cursor = None
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    rows = cursor.fetchall()
+    return rows
+
+def custom_table_html_chart(sql):
+    cursor = None
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    rows = cursor.fetchall()
+    rows = [json.loads(data) for data in rows[0]]
+    return rows
+
+def custom_header_html_chart(sql):
+    cursor = None
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    rows = cursor.fetchall()
+    rows = [json.loads(rows[0][0])]
+    return rows
+
+def dynamic_table_html_chart(sql):
+    cursor = None
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    rows = cursor.fetchall()
+    return rows
+
+# {'sql_query': 'select mc.name as colony_name, coalesce(approved_count,0) as approved_count from masterdata_colony as mc left outer join dash_board_benefits_enrollment_view dbev on dbev.colony_id = mc.id order by trim(lower(mc.name))', 'col_headers': ['Colony Name', 'Board Benefits']}
+def get_location_data(request,user_id):
+    state_list,district_list,block_list,survey_list,project_list = [],[],[],[],[]
+    location_data = load_user_details_to_session(request)
+    if location_data[0][0] != 0:
+        user =  User.objects.get(id= user_id)
+        # if user is not None:
+        #     if not user.is_superuser and not user.is_staff:
+        user_boundary_levelcode = UserRoles.objects.get(user=user_id)
+        project_list = OrganizationLocation.objects.filter(user_id=user_boundary_levelcode.id).exclude(project_id=None,active=0).values_list('project',flat=True)
+        projectlist = Project.objects.filter(id__in=ProjectUserRelation.objects.filter(user=user.userroles).exclude(active=0)).values_list("id",flat=True)
+        project_list = list(set(list(project_list)+list(projectlist)))
+        survey = Lineitem.objects.filter(project__in = project_list).exclude(active=0).values_list('activity', flat=True)
+        survey_list = list(set(survey))
+        if None in survey_list:
+            survey_list.remove(None)
+        boundary_object = Boundary.objects.get_or_none(id=user_boundary_levelcode.get_location_type()[0])
+        state_list = [i[0] for i in location_data[0][2]]
+        district_list = [i[0] for i in location_data[1][2]]
+        block_list = [i[0] for i in location_data[2][2]]
+    return state_list,district_list,block_list,survey_list,project_list
+
+
+def replace_filter_values(sql_query,selected_items):
+    f_start_value = str(selected_items[1]) + '-04'
+    f_end_value = selected_items[0]
+    sql_query = sql_query.replace('@@fy_start_value', f_start_value)
+    sql_query = sql_query.replace('@@fy_end_value', f_end_value)
+    return sql_query
+
+
+def filter_conditions(request, sql_query, filter_info,selected_items):
+    user_id = request.user.id
+    district_list,partner_list = [],[]
+    # district_list,project_list = get_location_data(request,user_id)
+    filter_cond = filter_info.get('filter_cond','')
+    #logger.error("selected_items:" + str(selected_items))
+    fin_year_cond,quarterly_year_cond,partner_cond,dist_cond,block_cond = "","","","",""
+    for key in filter_info['filter_cond'].keys():
+        if key == 'financial_year':
+            if selected_items[0] != '':
+                fin_year_cond = filter_info['filter_cond'][key].replace('@@filter_value',f"'{selected_items[0]}'")
+        elif key == 'quarterly_year':
+            if selected_items[1] != '':
+                quarterly_year_cond = filter_info['filter_cond'][key].replace('@@filter_value',f"'{selected_items[1]}'")
+        elif key == 'partner':
+            if selected_items[2] != '':
+                partner_cond = filter_info['filter_cond'][key].replace('@@filter_value',f"{selected_items[2]}")
+            elif partner_list:
+                partner_cond = filter_info['filter_cond'][key].replace('@@filter_value',f"{str(parter_list)[1:-1]}")
+        elif key == 'district':
+            if selected_items[3] != '':
+                dist_cond = filter_info['filter_cond'][key].replace('@@filter_value',f"{selected_items[3]}")
+            elif district_list:
+                dist_cond = filter_info['filter_cond'][key].replace('@@filter_value',f"{str(district_list)[1:-1]}")
+    sql_query = sql_query.replace('@@financial_year_filter',fin_year_cond).replace('@@quarterly_year_filter',quarterly_year_cond).replace('@@partner_filter',partner_cond).replace('@@district_filter',dist_cond).replace('@@block_filter',block_cond)
+    #logger.error("sql_query:" + sql_query)
+    return sql_query
+
+# #****************************************************************************
+# # update table chart data to replace dummy data with actual values
+# #****************************************************************************
+
+def set_dynamic_table_chart_data(sql, headers):
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    rows = cursor.fetchall()
+    newdata = []
+    chart_row_id_value = []
+    newdata.append(headers)
+    data = []
+    data.insert(0,tuple(headers))
+    for idx,row in enumerate(rows):
+        # newdata.append(list(map(str, list(row))))
+       data.insert(idx+1,row)
+    return data
+
+
+# #****************************************************************************
+# # Get Financial year
+# #****************************************************************************
+
+def getfinancialyear(fin_yaer):
+    today = datetime.today()
+    current_year = today.year
+    diff_finyear = current_year - int(fin_yaer.split('-')[0])
+    financial_year = []
+    financial_year.append(fin_yaer)
+    for year in range(diff_finyear):
+        if int(financial_year[year].split('-')[1]) != current_year:
+            financial_year.append(f"{financial_year[year].split('-')[1]}-{int(financial_year[year].split('-')[1])+1}")
+        else:
+            if today.month >= 4:
+                financial_year.append(f"{financial_year[year].split('-')[1]}-{int(financial_year[year].split('-')[1])+1}")
+    return financial_year
+
+
+def getacademicyear(fin_yaer):
+    today = datetime.today()
+    current_year = today.year
+    diff_finyear = current_year - int(fin_yaer.split('-')[0])
+    financial_year = []
+    financial_year.append(fin_yaer)
+    for year in range(diff_finyear):
+        if int(financial_year[year].split('-')[1]) != current_year:
+            financial_year.append(f"{financial_year[year].split('-')[1]}-{int(financial_year[year].split('-')[1])+1}")
+        else:
+            if today.month >= 4:
+                financial_year.append(f"{financial_year[year].split('-')[1]}-{int(financial_year[year].split('-')[1])+1}")
+    return financial_year
+
+#Header Dynmic
+
+def custom_header_query(sql_query):
+    cursor = connection.cursor()
+    cursor.execute(sql_query)
+    rows = cursor.fetchall()
+    headers = json.loads(rows[0][0])
+    return headers
+
+# #****************************************************************************
+# # Dashboard
+# #****************************************************************************
+
+def gethalfyear(financial_year):
+    selected_fy = financial_year
+    selected_year = selected_fy.split('-')
+    today = datetime.today()
+    result_set = []
+    current_year = today.year
+    current_month = today.month
+    if current_year == int(selected_year[0]) and current_month >= 4 and current_month <= 6:
+        result_set.append('Q1')
+    elif current_year == int(selected_year[0]) and current_month >= 7 and current_month <= 9:
+        result_set.append('Q1')
+        result_set.append('Q2')
+    elif current_year == int(selected_year[0]) and current_month >= 10 and current_month <= 12:
+        result_set.append('Q1')
+        result_set.append('Q2')
+        result_set.append('Q3')
+    elif current_year == int(selected_year[1]) and current_month >= 1 and current_month <= 3:
+        result_set.append('Q1')
+        result_set.append('Q2')
+        result_set.append('Q3')
+        result_set.append('Q4')
+    return result_set
+
+def user_projects(user):
+    projectlist = Project.objects.filter(active=2).values('id','name').order_by('name')
+    return projectlist
+
+def get_district_list(selected_partner_list):
+    partner_mission_id = PartnerMissionMapping.objects.filter(active=2,partner__in=selected_partner_list).values_list('id',flat=True)
+    project_id = Project.objects.filter(active=2,partner_mission_mapping__in=partner_mission_id).values_list('district',flat=True)
+    master_district_ids = Project.objects.filter(active=2,id__in=project_id).values_list('district_id',flat=True)
+    boundarys = Boundary.objects.filter(active=2,code__in=[int(dist_id) for dist_id in master_district_ids]).values('id','name').order_by('name')
+    return boundarys
+
+class PartnerDistricts(CreateAPIView):
+    def post(self, request):
+        data = request.data
+        partner_id = data.getlist('partner_id[]') or data.getlist('partner_id')
+        partner_mission_id = PartnerMissionMapping.objects.filter(active=2,partner__in=partner_id).values_list('id',flat=True)
+        project_id = Project.objects.filter(active=2,partner_mission_mapping__in=partner_mission_id).values_list('district',flat=True)
+        master_district_ids = Project.objects.filter(active=2,id__in=project_id).values_list('district_id',flat=True)
+        boundarys = Boundary.objects.filter(active=2,code__in=[int(dist_id) for dist_id in master_district_ids]).order_by('name')
+        print(boundarys)
+        data = [{'id': i.id, 'name': "{}".format(i.name) if i.name else i.code} for i in boundarys]
+        print(data)
+        response = ({'status': 2, 'data': data, 'message': 'success', })
+        return Response(response)
+
+
+@login_required(login_url='/login/')
 def dashboard(request):
-    """
-    View function for the dashboard page.
+    heading = 'Dashboard'
+    page_slug = request.GET.get('page_slug')
+    financial_year_list = getfinancialyear('2024-2025')
+    selected_financial_year = request.POST.get('finacial-year',financial_year_list[0])
+    quarterly_year_list = gethalfyear(selected_financial_year)
+    selected_quarterly_year = request.POST.get('quarterly-year',quarterly_year_list[-1])
+    selected_partner_list = request.POST.getlist('Partner',[])
+    selected_district_list = request.POST.getlist('District',[])
+    partner_list_id = ','.join(str(eval(i)) for i in request.POST.getlist('Partner'))
+    district_list_id = ','.join(str(eval(i)) for i in request.POST.getlist('District'))
+    print(selected_quarterly_year,selected_financial_year,'-------------')
+    user_details = load_user_details(request)
+    if 'user_partner_list' in request.session:
+        partner_ids = request.session['user_partner_list']
+    partnerlist = Partner.objects.filter(id__in=partner_ids).values("id","name")
+    if 'user_district_list' in request.session:
+        district_ids = request.session['user_district_list']
+    district_list = []
+    if selected_partner_list:
+        district_list = get_district_list(selected_partner_list)
+    try:
+        cht = ChartMeta.objects.filter(
+            active=2,page_slug=page_slug).order_by('display_order')
+        chart_list = []
+        # financial_year = getfinancialyear(request.POST.get('from_month',datetime.today().strftime("%Y-%m")))
+        # index 5,6,7 are chcl_district_id and chcl_block_id,chcl_fy are used to pass as query parameters when dispalying dashboard on user click action
+        selected_items =[selected_financial_year,selected_quarterly_year,partner_list_id,district_list_id]
+        for i in cht:
+            if i.chart_type == 8:
+                # chart_type values: 
+                # 1=Column Chart, 2=Pie Chart, 3=Table Chart, 4=Bar Chart, 5=Column Stack, 6=Bar Dynamic Chart, 7=Column Dynamic Stack,
+                # 8=Card Chart
+                cht_info = {}
+                chart_row_id_value = []
+                chart_list = []
+                data = []
+                filtered_query = filter_conditions(
+                    request, i.chart_query.get('sql_query'), i.filter_info, selected_items)
+                chart_data = list(set_card_chart_data(
+                    filtered_query, i.chart_query.get('labels')))
+                cht_info = {"chart_type": "CARDCHART"}
+                cht_info["chart_title"] = i.chart_title
+                # cht_info.update({"colours": [
+                                # {'role': 'style'}, '#FF3333', '#32B517', '#FFEA00', '#FFAA00', '#FF3333']})
+                # chart_data = [('Male',96), ('Female',45), ('TG',32)]
+                cht_info["datas"] = chart_data
+                cht_info["bx_bg"] = i.chart_options.get('bx_bg',[])
+                cht_info["bx_icon"] = i.chart_options.get('bx_icon',[])
+                cht_info["bx_text"] = i.chart_options.get('bx_text',[])
+                cht_info["bx_div"] = i.chart_options.get('bx_div',[])
+                cht_info.update({"tooltip": i.chart_tooltip})
+                cht_info.update({"chart_note": i.chart_note})
+                cht_info.update({"chart_name": i.chart_slug})
+                cht_info["chart_height"] = i.chart_height
+                cht_info.update({"div": i.div_class})
+                cht_info.update({"click_url_template":i.chart_query.get("click_url","")})
+                chart_list.append(cht_info)
+                counter_list = [i[1] for i in chart_data]
+            elif i.chart_type == 10:#line chart
+                cht_info = {}
+                filtered_query = filter_conditions(
+                    request, i.chart_query.get('sql_query'), i.filter_info, selected_items)
+                
+                chart_data = set_dynamic_table_chart_data(
+                    filtered_query, headers)
+                cht_info = {"chart_type": "LINECHART"}
+                cht_info["chart_title"] = i.chart_title
+                # cht_info.update({"colours": [
+                                # {'role': 'style'}, '#FF3333', '#32B517', '#FFEA00', '#FFAA00', '#FF3333']})
+                # chart_data = [('Male',96), ('Female',45), ('TG',32)]
+                cht_info["datas"] = chart_data
+                cht_info["bx_bg"] = i.chart_options.get('bx_bg',[])
+                cht_info["bx_icon"] = i.chart_options.get('bx_icon',[])
+                cht_info["bx_text"] = i.chart_options.get('bx_text',[])
+                cht_info["bx_div"] = i.chart_options.get('bx_div',[])
+                cht_info.update({"tooltip": i.chart_tooltip})
+                cht_info.update({"chart_note": i.chart_note})
+                cht_info.update({"chart_name": i.chart_slug})
+                cht_info["chart_height"] = i.chart_height
+                cht_info.update({"div": i.div_class})
+                cht_info.update({"click_url_template":i.chart_query.get("click_url","")})
+                chart_list.append(cht_info)
+            elif i.chart_type == 1:
+                # chart_type values: 
+                # 1=Column Chart, 2=Pie Chart, 3=Table Chart, 4=Bar Chart, 5=Column Stack, 6=Bar Dynamic Chart, 7=Column Dynamic Stack,
+                cht_info = {}
+                # list to hold chart row id value - location id or classification id, etc based for the row
+                # row/chart number mapps to the index in the list
+                # used for dynamic charts where click handling is required
+                chart_row_id_value = []
+                filtered_query = filter_conditions(
+                    request, i.chart_query.get('sql_query'), i. filter_info, selected_items)
+                chart_data = list(set_column_chart_data(
+                    filtered_query, i.chart_query.get('labels')))
+                cht_info = {"chart_type": "COLUMNCHART"}
+                cht_info["chart_title"] = i.chart_title
+                chart_data.insert(0, ('', ''))
+                cht_info["datas"] = chart_data
+                # cht_info["datas"] = [('', ''), ('Ordered', 60), ('Pending', 30), ('Ready', 40), ('Delivered', 50), (' Received', 25),('Examined',55),('Prescibed',10)] 
+                cht_info.update({"options": i.chart_options})
+                cht_info.update({"colours": [
+                                {'role': 'style'}, '#FF3333', '#32B517', '#FFEA00', '#FFAA00', '#FF3333']})
+                cht_info.update({"tooltip": i.chart_tooltip})
+                cht_info.update({"chart_note": i.chart_note})
+                cht_info.update({"chart_name": i.chart_slug})
+                cht_info["chart_height"] = i.chart_height
+                cht_info.update({"div": i.div_class})
+                cht_info.update({"click_url_template":i.chart_query.get("click_url","")})
+                cht_info.update({"chart_row_id_value":chart_row_id_value})
+                chart_list.append(cht_info)
+            elif i.chart_type == 2:
+                # chart_type values: 
+                # 1=Column Chart, 2=Pie Chart, 3=Table Chart, 4=Bar Chart, 5=Column Stack, 6=Bar Dynamic Chart, 7=Column Dynamic Stack,
+                cht_info = {}
+                # list to hold chart row id value - location id or classification id, etc based for the row
+                # row/chart number mapps to the index in the list
+                # used for dynamic charts where click handling is required
+                chart_row_id_value = []
+                data = []
+                filtered_query = filter_conditions(
+                    request, i.chart_query.get('sql_query'), i. filter_info, selected_items)
 
-    This view handles the rendering of the dashboard page and performs necessary operations
-    such as executing a database query, fetching data, and passing it to the template.
+                chart_data = list(set_pie_chart_data(
+                    filtered_query, i.chart_query.get('labels')))
 
-    """
-    heading = "Dashboard"
-    start_month =  request.POST.get('start_filter','') 
-    end_month = request.POST.get('end_filter','')
-    query = build_query(request)
-    # execute query 
-    # parse the 1 row returned from the query and assign values to the dashboard placeholders in blade
-    # add logic to hide the mission / programs based on the user type and data visibility
+                cht_info = {"chart_type": "PIECHART"}
+                cht_info["chart_title"] = i.chart_title
+                cht_info.update({"colours": [
+                                {'role': 'style'}, '#FF3333', '#32B517', '#FFEA00', '#FFAA00', '#FF3333']})
+                chart_data.insert(0, ('', ''))
+                cht_info["datas"] = chart_data
+                # cht_info["datas"] = [('', ''), ('Male', 60), ('Female', 50), ('Transgender', 40)]
+                cht_info["options"] = i.chart_options
+                cht_info["options"].update({"sliceVisibilityThreshold":0.0001})
+                cht_info.update({"tooltip": i.chart_tooltip})
+                cht_info.update({"chart_note": i.chart_note})
+                cht_info.update({"chart_name": i.chart_slug})
+                cht_info["chart_height"] = i.chart_height
+                cht_info.update({"div": i.div_class})
+                cht_info.update({"click_url_template":i.chart_query.get("click_url","")})
+                chart_list.append(cht_info)
+            elif i.chart_type == 3:
+                # chart_type values: 
+                # 1=Column Chart, 2=Pie Chart, 3=Table Chart, 4=Bar Chart, 5=Column Stack, 6=Bar Dynamic Chart, 7=Column Dynamic Stack,
+                cht_info = {"chart_type": "TABLECHART"}
+                # list to hold chart row id value - location id or classification id, etc based for the row
+                # row/chart number mapps to the index in the list
+                # used for dynamic charts where click handling is required
+                # chart_row_id_value = []
+                headers = i.chart_query.get('col_headers')
+                filtered_query = filter_conditions(
+                    request, i.chart_query.get('sql_query'), i. filter_info, selected_items)
+                chart_data = set_dynamic_table_chart_data(
+                    filtered_query, headers)
+                cht_info["chart_title"] = i.chart_title
+                cht_info["options"] = i.chart_options
+                cht_info["datas"] = chart_data
+                # cht_info["datas"] = [('Visual impairment', 'Total No. of <br/>Patients'), ('Early VI (6/12-6/18) (Better eye PV)', 4), ('Moderate VI(6/18-6/60) (Better eye PV)', 6), ('Severe VI(6/60-3/60) (Better eye PV)', 5), ('Blind (less than 3/60) (Better eye PV)', 0)]
+                # cht_info["datas"] = [('Spectacle Type', 'gender','Ordered','Pending','Ready','Delivered','Received'), ('Near','Male', 60, 12, 18, 45, 19), ('R2C','Female', 50,80,22,44,10), ('R2C','Transgender', 40,44,19,25,16), ('Near','Male', 60, 12, 18, 45, 19), ('R2C','Male', 60, 12, 18, 45, 19),('R2C','Female', 60, 12, 19, 45, 52),('R2C','Male', 45, 12, 18, 45, 19)]
+                cht_info["tooltip"] = i.chart_tooltip
+                cht_info["chart_height"] = i.chart_height
+                cht_info["chart_name"] = i.chart_slug
+                cht_info["div"] = i.div_class
+                cht_info.update({"click_url_template":i.chart_query.get("click_url","")})
+                # cht_info.update({"chart_row_id_value":chart_row_id_value})
+            elif i.chart_type == 4 or i.chart_type == 6:
+                # chart_type values: 
+                # 1=Column Chart, 2=Pie Chart, 3=Table Chart, 4=Bar Chart, 5=Column Stack, 6=Bar Dynamic Chart, 7=Column Dynamic Stack,
+                cht_info = {}
+                # list to hold chart row id value - location id or classification id, etc based for the row
+                # row/chart number mapps to the index in the list
+                # used for dynamic charts where click handling is required
+                chart_row_id_value = []
+                filtered_query = filter_conditions(
+                    request, i.chart_query.get('sql_query'), i. filter_info, selected_items)
+                if i.chart_type == 4:
+                    chart_data = list(set_pie_chart_data(
+                        filtered_query, i.chart_query.get('labels')))
+                else:
+                    # chart_data, chart_row_id_value = list(set_bar_chart_dynamic_lable(filtered_query))
+                    first_tuple, *rest_of_data = [('Place', 'Value'), ('Vision Center', 180), ('Camp', 220), ('Both', 60)]
+                cht_info = {"chart_type": "BARCHART"}
+                cht_info["chart_title"] = i.chart_title
+                chart_data.insert(0, ('', ''))
+                
+                cht_info["datas"] = chart_data
+                # cht_info["datas"] = [('Place', 'Value'), ('Vision Center', 180), ('Camp', 220), ('Both', 60)]
+                cht_info.update({"tooltip": i.chart_tooltip})
+                cht_info.update({"options": i.chart_options})
+                cht_info.update({"chart_note": i.chart_note})
+                cht_info.update({"chart_name": i.chart_slug})
+                cht_info["chart_height"] = i.chart_height
+                cht_info.update({"div": i.div_class})
+                cht_info.update({"click_url_template":i.chart_query.get("click_url","")})
+                #location id values. chart bar mapped to the index in list
+                cht_info.update({"chart_row_id_value":chart_row_id_value})
+                #logger.error("URL_Template:"+ i.chart_query.get("click_url",""))
+                chart_list.append(cht_info)
+            elif i.chart_type == 5:
+                # chart_type values: 
+                # 1=Column Chart, 2=Pie Chart, 3=Table Chart, 4=Bar Chart, 5=Column Stack, 6=Bar Dynamic Chart, 7=Column Dynamic Stack,
+                cht_info = {"chart_type": "COLUMNSTACK"}
+                # list to hold chart row id value - location id or classification id, etc based for the row
+                # row/chart number mapps to the index in the list
+                # used for dynamic charts where click handling is required
+                chart_row_id_value = []
+                filtered_query = filter_conditions(
+                    request, i.chart_query.get('sql_query'), i.filter_info, selected_items)
+                headers = i.chart_query.get('col_headers')
+                chart_data = set_dynamic_table_chart_data(
+                    filtered_query, headers)
+                cht_info["chart_title"] = i.chart_title
+                cht_info["datas"] = chart_data
+                cht_info["options"] = i.chart_options
+                # chart_type values: 1=Column Chart, 2=Pie Chart, 3=Table Chart , 4- Column Stack
+                cht_info["chart_height"] = i.chart_height
+                cht_info["chart_name"] = i.chart_slug
+                cht_info["div"] = i.div_class
+                cht_info.update({"tooltip": i.chart_tooltip})
+                cht_info.update({"chart_note": i.chart_note})
+                cht_info.update({"click_url_template":i.chart_query.get("click_url","")})
+                cht_info.update({"chart_row_id_value":chart_row_id_value})
+                chart_list.append(cht_info)
+            elif i.chart_type == 9:
+                # chart_type values: 
+                # 1=Column Chart, 2=Pie Chart, 3=Table Chart, 4=Bar Chart, 5=Column Stack, 6=Bar Dynamic Chart, 7=Column Dynamic Stack, 8=Card Chart, 9=HTML Table Chart,10=Line chart,11=Progressive Line, 12=Dounut chart
+                cht_info = {"chart_type": "HTMLTABLECHART"}
+                cht_info["headers"] = i.chart_query.get('thead')
+                cht_info["chart_title"] = i.chart_title
+                filtered_query = filter_conditions(
+                    request, i.chart_query.get('sql_query'), i.filter_info, selected_items)
+                logger.error("HTMLTABLECHART QUERY: " + filtered_query)
+                url_columns =  i.chart_query.get('url_columns',[])
+                cht_info["url_columns"] = url_columns
+                chart_data = table_html_chart(filtered_query)
+                cht_info["datas"] = chart_data
+                # cht_info["options"] = i.chart_options
+                # # chart_type values: 1=Column Chart, 2=Pie Chart, 3=Table Chart , 4- Column Stack
+                cht_info["chart_height"] = i.chart_height
+                cht_info["chart_name"] = i.chart_slug
+                cht_info["div"] = i.div_class
+                cht_info.update({"tooltip": i.chart_tooltip})
+                cht_info.update({"chart_note": i.chart_note})
+                cht_info.update({"row_css_class":i.chart_query.get("row_css_class",{})})
+                color_code_columns = i.chart_query.get("color_coded_columns",{})
+                num_header_rows_in_data_list = color_code_columns.get("num_header_rows_in_data_list",0)
+                color_codes = {}
+                if color_code_columns != {}:
+                    # logger.error("color_code_columns:"+str(color_code_columns))
+                    # logger.error("color_code_columns-type:"+str(type(color_code_columns)))
+                    color_codes = generate_color_codes(color_code_columns, chart_data, num_header_rows_in_data_list)
+                    # logger.error("color_codes:" + str(color_codes))
+                cht_info.update({"color_codes":color_codes})
+                # cht_info.update({"click_url_template":i.chart_query.get("click_url","")})
+                # cht_info.update({"chart_row_id_value":chart_row_id_value})
+                chart_list.append(cht_info)
+            elif i.chart_type == 14:
+                # chart_type values: 
+                # 1=Column Chart, 2=Pie Chart, 3=Table Chart, 4=Bar Chart, 5=Column Stack, 6=Bar Dynamic Chart, 7=Column Dynamic Stack, 8=Card Chart, 9=HTML Table Chart,10=Line chart,11=Progressive Line, 12=Dounut chart
+                cht_info = {"chart_type": "CUSTOMHTMLTABLECHART"}
+                header_query = i.chart_query.get('header_dynamic')
+                cht_info["chart_title"] = i.chart_title
+                report_headers_filters = getfiniacialmonth(selected_items[0],selected_items[1])
+                sql_query = i.chart_query.get('sql_query').replace('@@start_date',f"'{report_headers_filters[1]}'").replace('@@end_date',f"'{report_headers_filters[2]}'")
+                filtered_query = filter_conditions(
+                    request, sql_query, i.filter_info, selected_items)
+                print(filtered_query,'----------')
+                logger.error("CUSTOMHTMLTABLECHART QUERY: " + filtered_query)
+                # url_columns =  i.chart_query.get('url_columns',[])
+                # cht_info["url_columns"] = url_columns
+                chart_data = custom_table_html_chart(filtered_query)
+                chart_header_data = custom_header_html_chart(header_query)
+                print(selected_items[0],selected_items[1],'-----------------')
+                # chart_data_with_url = generate_url_pattern(request,filtered_query,selected_items,url_columns,chart_data,i.chart_slug)
+                cht_info["datas"] = chart_data
+                cht_info["headers"] = report_headers_filters[0]
+                # cht_info["options"] = i.chart_options
+                # # chart_type values: 1=Column Chart, 2=Pie Chart, 3=Table Chart , 4- Column Stack
+                cht_info["chart_height"] = i.chart_height
+                cht_info["chart_name"] = i.chart_slug
+                cht_info["div"] = i.div_class
+                cht_info.update({"tooltip": i.chart_tooltip})
+                cht_info.update({"chart_note": i.chart_note})
+                cht_info.update({"row_css_class":i.chart_query.get("row_css_class",{})})
+                color_code_columns = i.chart_query.get("color_coded_columns",{})
+                num_header_rows_in_data_list = color_code_columns.get("num_header_rows_in_data_list",0)
+                color_codes = {}
+                if color_code_columns != {}:
+                    # logger.error("color_code_columns:"+str(color_code_columns))
+                    # logger.error("color_code_columns-type:"+str(type(color_code_columns)))
+                    color_codes = generate_color_codes(color_code_columns, chart_data, num_header_rows_in_data_list)
+                    # logger.error("color_codes:" + str(color_codes))
+                cht_info.update({"color_codes":color_codes})
+                # cht_info.update({"click_url_template":i.chart_query.get("click_url","")})
+                # cht_info.update({"chart_row_id_value":chart_row_id_value})
+                chart_list.append(cht_info)
+            elif i.chart_type == 13:
+                # chart_type values: 
+                #1=Column Chart, 2=Pie Chart, 3=Table Chart, 4=Bar Chart, 5=Column Stack, 6=Bar Dynamic Chart, 7=Column Dynamic Stack, 8=Card Chart, 9=Geo chart,10=Line chart,11=Progressive Line, 12=Dounut chart,13= 'Html Table Chart Dynmaic'
+                cht_info = {"chart_type": "HTMLTABLECHARTDYNAMIC"}
+                header_query = i.chart_query.get('header_dynamic')
+                header_query = replace_filter_values(header_query, selected_items)
+                header_query = filter_conditions(request, header_query, i.filter_info, selected_items)
+                dynamic_headers = custom_header_query(header_query)
+                cht_info["headers"] = dynamic_headers
+                cht_info["chart_title"] = i.chart_title
+                filtered_query = i.chart_query.get('sql_query')
+                filtered_query = filter_conditions(
+                    request, i.chart_query.get('sql_query'), i.filter_info, selected_items)
+                filtered_query = replace_filter_values(filtered_query,selected_items)
+                logger.error("HTMLTABLECHARTDYNAMIC QUERY: " + filtered_query)
+                chart_data = dynamic_table_html_chart(filtered_query)
+                chart_data_temp = []
+                if chart_data[0][0] is not None:
+                    chart_data_temp = [[ch_data['row_headers']] + ch_data['row_data'] for ch_data in json.loads(chart_data[0][0])]
+                # chart_data_temp = [[]]
+                cht_info["datas"] = chart_data_temp
+                # cht_info["options"] = i.chart_options
+                # # chart_type values: 1=Column Chart, 2=Pie Chart, 3=Table Chart , 4- Column Stack
+                cht_info["chart_height"] = i.chart_height
+                cht_info["chart_name"] = i.chart_slug
+                cht_info["div"] = i.div_class
+                cht_info.update({"tooltip": i.chart_tooltip})
+                cht_info.update({"chart_note": i.chart_note})
+                url_columns = i.chart_query.get("url_columns",[])
+                cht_info.update({"url_columns":url_columns})
+                cht_info.update({"row_css_class":i.chart_query.get("row_css_class",{})})
+                color_code_columns = i.chart_query.get("color_coded_columns",{})
+                num_header_rows_in_data_list = color_code_columns.get("num_header_rows_in_data_list",0)
+                color_codes = {}
+                if color_code_columns != {} and chart_data_temp != []:
+                    #logger.error("color_code_columns:"+str(color_code_columns))
+                    #logger.error("color_code_columns-type:"+str(type(color_code_columns)))
+                    color_codes = generate_color_codes(color_code_columns, chart_data_temp, num_header_rows_in_data_list)
+                    #logger.error("color_codes:" + str(color_codes))
+                cht_info.update({"color_codes":color_codes})
+                # cht_info.update({"click_url_template":i.chart_query.get("click_url","")})
+                # cht_info.update({"chart_row_id_value":chart_row_id_value})
+                chart_list.append(cht_info)
+                #logger.error("ChartData:" + str(chart_data_temp))
+            #logger.error("SLUG: " + str(i.chart_slug) + " -- filtered_query" + str(filtered_query))
+        data = {"chart": chart_list}
+        #store the dashboard filter values for handling chart click events
+        
+        # mat_view_last_updated = DashboardWidgetSummaryLog.objects.get(
+        #     status=2, log_key='meta_dashboard_views').last_successful_update
+        request_data = None
+        context = {
+            'data': json.dumps(data, cls=DateTimeEncoder),
+            'data_html': data,
+            'page_slug': page_slug,
+            'selected_items': selected_items,
+            'partnerlist':partnerlist,
+            # 'levels_to_filter':levels_to_filter,
+            'request':request,
+            'selected_partner_list':selected_partner_list,
+            'selected_district_list':selected_district_list,
+            'districts_list':district_list,
+            'partner_list_id':partner_list_id,
+            # 'districtlist':districtlist,
+            'district_list_id':district_list_id,
+            'financial_year_list':financial_year_list,
+            'quarterly_year_list':quarterly_year_list
+        }
+        # if page_slug == 'mis-dashboard1':
+        #     return render(request, 'dashboard/dashboard.html', context)
+        # elif page_slug == 'block-wise-summary':
+        #     return render(request, 'dashboard/dashboard_block_wise_head_wise.html', context)
+        # else:
+        #     # return export_excel(request,chart_list)
+        if page_slug == 'mhm-dashboard':
+            return render(request, 'dashboard/dashboard_mhm.html', context)
+        else:
+            return render(request, 'dashboard/dashboard.html', context)
+    except KeyError:
+        return redirect('/login/')
+
+
+def getfiniacialmonth(financial_year,q_year):
+    months = []
+    months_header = []
+    month_start = f"Apr-{financial_year.split('-')[0][2:]}"
+    start_month = datetime.strptime(month_start, "%b-%y")
+    if q_year == 'Q1':
+        length=3
+        for i in range(0,length):
+            next_month = start_month + relativedelta(months=i)
+            months.insert(i,next_month.strftime("%Y-%m-%d"))
+            months_header.insert(i,next_month.strftime("%b-%y"))
+        months_header.insert(i+1,'Quarter 1')
+        months_header.insert(i+2,'Total')
+        months_header.insert(i+3,'Cummulative Acheivemnet')
+        result = (months_header,months[0],months[-1])
+    elif q_year == 'Q2':
+        length=6
+        for i in range(0,length):
+            next_month = start_month + relativedelta(months=i)
+            months.insert(i,next_month.strftime("%Y-%m-%d"))
+            months_header.insert(i,next_month.strftime("%b-%y"))
+        months_header.insert(3,'Quarter 1')
+        months_header.append('Quarter 2')
+        months_header.append('Total')
+        months_header.append('Cummulative Acheivemnet')
+        result = (months_header,months[0],months[-1])
+    elif q_year == 'Q3':
+        length=9
+        for i in range(0,length):
+            next_month = start_month + relativedelta(months=i)
+            months.insert(i,next_month.strftime("%Y-%m-%d"))
+            months_header.insert(i,next_month.strftime("%b-%y"))
+        months_header.insert(3,'Quarter 1')
+        months_header.insert(7,'Quarter 2')
+        months_header.append('Quarter 3')
+        months_header.append('Total')
+        months_header.append('Cummulative Acheivemnet')
+        result = (months_header,months[0],months[-1])
+    elif q_year == 'Q4':
+        length=12
+        for i in range(0,length):
+            next_month = start_month + relativedelta(months=i)
+            months.insert(i,next_month.strftime("%Y-%m-%d"))
+            months_header.insert(i,next_month.strftime("%b-%y"))
+        months_header.insert(3,'Quarter 1')
+        months_header.insert(7,'Quarter 2')
+        months_header.insert(11,'Quarter 3')
+        months_header.append('Quarter 4')
+        months_header.append('Total')
+        months_header.append('Cummulative Acheivemnet')
+        result = (months_header,months[0],months[-1])
+    return result
+
+def export_excel(request,chart_data):
+    excel_meta_data = []
+    excel_config = []
+    for c_meta in chart_data:
+        excel_config_dict = {}
+        excel_data = []
+        if len(c_meta['headers']) == 2:
+            headers_1 = [head['label'] for head in c_meta['headers'][0]]
+            headers_2 = [head['label'] for head in c_meta['headers'][1]]
+            excel_data.insert(0,headers_1)
+            excel_data.insert(1,headers_2)
+        else:
+            headers_1 = [head['label'] for head in c_meta['headers'][0]]
+            excel_data.insert(0,headers_1)
+        for idx,data in enumerate(c_meta['datas']):
+            excel_data.insert(idx+2,list(data))
+        excel_meta_data.append(excel_data)
+        excel_config_dict[c_meta['chart_title']] = [len(excel_data),len(excel_data[-1])]
+        excel_config.append(excel_config_dict)
+    response = write_excel_data(request,excel_config,excel_meta_data)
+    return response
+
+def write_excel_data(request,excel_config,excel_meta_data):
+    import openpyxl,os
+    chart_position = {0:False,1:False,2:True,3:False}
+    from django.http import HttpResponse
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+    worksheet.title = "Dashboard"
+    dashboard_sheet = workbook.worksheets[0]
+    for idx,row_col in enumerate(excel_config):
+        if chart_position[idx] == True:
+            row_idx = row_idx+value[0]+5
+            col_idx = 3
+            dashboard_sheet.cell(row=row_idx, column=col_idx, value='')
+        elif idx != 0:
+            row_idx = row_idx
+            col_idx = col_idx+value[1]+5
+            dashboard_sheet.cell(row=row_idx, column=col_idx, value='')
+        else:
+            row_idx = 2
+            col_idx = 2
+            dashboard_sheet.cell(row=row_idx, column=col_idx, value='')
+        for key,value in row_col.items():
+            for data in excel_meta_data[idx]:
+                dashboard_sheet.append(data)
+    folder_file_name = "dashboard-mis"+"_"+ datetime.today().strftime("%d%m%y%H%M") + ".xlsx"
+    file_path = os.path.join(settings.MEDIA_DIR + '/temp_dash_data/', folder_file_name)
+    workbook.save(file_path)
+    if os.path.exists(file_path):
+        with open(file_path, "rb") as excel:
+            data = excel.read()
+            response = HttpResponse(data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = f'attachment; filename={folder_file_name}'
+            os.remove(file_path)
+    return response
+def generate_color_codes(color_coded_columns, data_list, skip_num_rows):
+    # column list, start and end columns are with index starting from 1
+    column_indexes = []
+    col_numbers_list = color_coded_columns.get("col_index_list",[])
+    if col_numbers_list != []:
+        column_indexes = col_numbers_list
+    else:
+        start_column_index = color_coded_columns.get("start_index",-1)
+        end_column_index = color_coded_columns.get("end_index",-1)
+        for i in range(1,len(data_list[0])+1):
+            if i >= start_column_index and (end_column_index == -1 or i <= end_column_index):
+                column_indexes.append(i)
+    percent_values = []
+    original_p_values= []
+    p_val_for_max = []
+    for idx,row in enumerate(data_list):
+        if idx >= skip_num_rows: 
+            for col_index in column_indexes:
+                original_p_values.append(row[col_index-1])            
+                p_val = round(int(row[col_index-1].strip('%'))*1.0/100.0,2) if row[col_index-1] is not None else row[col_index-1]            
+                if p_val is not None and p_val != 0:
+                    percent_values.append((p_val,row[col_index-1]))
+                    p_val_for_max.append(p_val)
+    percent_values = list(set(percent_values)) # to remove duplicates
+    # logger.error("percent_values:" + str(percent_values))
+    # logger.error("original_p_values:" + str(original_p_values))
+    color_codes = {}
+    if p_val_for_max and len(p_val_for_max) > 0:
+        max_percentage_val = max(p_val_for_max)
+        # Assign colors to percentages
+        for p_t in percent_values:
+            #color_codes.update({str(p).replace(".","").lstrip('0') + "%":percentage_to_color(p,max_percentage_val)})
+            color_codes.update({p_t[1]:percentage_to_color(p_t[0],max_percentage_val)})
+    return color_codes
+
+# def percentage_to_color(percentage):
+#     """Map a percentage to a color from red to dark green."""
+#     # Map the percentage to a color from red to dark green
+#     segment = int(percentage * 5)
+#     segment_remainder = (percentage * 5) - segment
+#     # Define colors for each segment
+#     colors = [
+#         (1.0, 0.0, 0.0),   # Red
+#         (1.0, 0.5, 0.0),   # Orange
+#         (1.0, 1.0, 0.0),   # Yellow
+#         (0.5, 1.0, 0.0),   # Light Green
+#         (0.0, 0.5, 0.0)    # Dark Green
+#     ]
+#     # Interpolate between adjacent colors
+#     color = (
+#         colors[segment][0] * (1 - segment_remainder) + colors[segment + 1][0] * segment_remainder,
+#         colors[segment][1] * (1 - segment_remainder) + colors[segment + 1][1] * segment_remainder,
+#         colors[segment][2] * (1 - segment_remainder) + colors[segment + 1][2] * segment_remainder
+#     )
+#     # Convert RGB to hexadecimal
+#     color_code = "#{:02X}{:02X}{:02X}".format(int(color[0] * 255), int(color[1] * 255), int(color[2] * 255))
+#     return color_code
+
+def percentage_to_color(percentage, max_percentage_value):
+    """Map a percentage to a color from red to dark green."""
+    # Adjust the percentage to be within the range [0, 2], with .5 as yellow
+    percentage = max(0.0, min(percentage, max_percentage_value))
+    
+    # Map the percentage to a color from red to dark green
+    segment = int(percentage * 5 / 2)
+    
+    if segment >= 4:  # If the segment reaches the maximum
+        #segment = 3
+        segment_remainder = 1.0 if segment == 4 else 0.5
+    else:
+        segment_remainder = (percentage * 5 / 2) - segment
+
+    # Define colors for each segment
+    colors = [
+        # (1.0, 0.0, 0.0),   # Red
+        # (1.0, 0.5, 0.0),   # Orange
+        # (1.0, 1.0, 0.0),   # Yellow
+        # (0.5, 1.0, 0.0),   # Light Green
+        # (0.0, 0.5, 0.0)    # Dark Green
+        (1.0, 0.36, 0.37),   # Red 255,91,94
+        (1.0, 0.66, 0.42),   # Orange 255,169,108
+        (1.0, 0.94, 0.45),   # Yellow 255,239,114
+        (0.65, 0.86, 0.46),   # Light Green 166,219, 118
+        (0.22, 0.77, 0.46)    # Dark Green 55,197,119
+    ]
+
+    # Interpolate between adjacent colors
+    if segment >= 4:  # If we're at the last segment
+        color = colors[4]
+    else:
+        next_segment = segment+1 if segment < 4 else segment
+        color = (
+            colors[segment][0] * (1 - segment_remainder) + colors[next_segment][0] * segment_remainder,
+            colors[segment][1] * (1 - segment_remainder) + colors[next_segment][1] * segment_remainder,
+            colors[segment][2] * (1 - segment_remainder) + colors[next_segment][2] * segment_remainder
+        )
+
+    # Convert RGB to hexadecimal
+    color_code = "#{:02X}{:02X}{:02X}".format(int(color[0] * 255), int(color[1] * 255), int(color[2] * 255))
+    return color_code
+
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, datetime):
+            return o.isoformat()
+        return super().default(o)
+
+# ****************************************************************************
+# Function to refresh_materialized_view
+# ****************************************************************************
+
+def refresh_materialized_view(view_name):
+    query = f'REFRESH MATERIALIZED VIEW {view_name};'
     cursor = connection.cursor()
     cursor.execute(query)
-    data = cursor.fetchall()
-    partner = request.POST.get('partner') if(request.POST.get('partner') != 'None') else None
-    partners = int(partner) if partner not in [None, 'None', ''] else None
 
-    partner_objs = Partner.objects.filter(active=2,id__in=request.session['user_partner_list']).order_by('name')
-    dash_summary = DashboardSummaryLog.objects.filter(log_key="mat_partner_mission_meta_view").first()
-    last_updated_on = ''
-    if dash_summary and dash_summary.last_successful_update:
-        last_updated_on = datetime.strftime(dash_summary.last_successful_update,'%d-%m-%Y %-I%M %p')
-    return render(request, 'dashboard/dashboard.html', locals())
-
-def build_query(request):
-    """
-    Build and return the SQL query based on the request parameters.
-
-    This function constructs a SQL query using the request parameters, such as start month,
-    end month, and user filters. It replaces placeholders in the base query string with
-    the corresponding values.
-    """
-    start_month =  request.POST.get('start_filter','')
-    end_month = request.POST.get('end_filter','')
-    partner = request.POST.get('partner') if(request.POST.get('partner') != 'None') else None
-   
-    start_date,end_date,start_month_condition,end_month_condition='','','',''
-    if start_month:
-        start_date = start_month + "-01"
-        start_month_condition='and ach.task_month >= ' + start_month.replace('-', '')
-    if end_month:
-        end_date = end_month + "-01"
-        end_date = datetime.strptime(end_date,'%Y-%m-%d')
-        end_date = end_date + relativedelta('1 months')
-        end_date = datetime.strftime(end_date,'%Y-%m-%d')
-        end_month_condition='and ach.task_month <= ' + end_month.replace('-', '')
-
-    logged_in_user_id = request.user.id#request_get user_id
-
-    query="""select coalesce(jyot_vcs.vcs_count,0) as jyot_vcs_count, a.* from (select sum(case when key in ('total_33','total_296') then value else 0 end) as jyot_eye_screening,
-            sum(case when key in ('total_40','total_346') then value else 0 end) as jyot_spectacles_dispensed,
-            sum(case when key in ('total_301','total_46','total_292','total_304') then value else 0 end) as jyot_surgeries,
-            0 as jyot_average_opd_vc,
-            sum(case when key in ('total_40') then value else 0 end) as jyot_spectacles_conversion_vc_numerator,
-            sum(case when key in ('total_39') then value else 0 end) as jyot_spectacles_conversion_vc_denominator,
-            0 as jyot_avg_spec_transaction_value_vc_numerator,
-            0 as jyot_avg_spec_transaction_value_vc_denominator,
-            sum(case when key in ('total_121','total_221','total_122','total_222','total_223') then value else 0 end) as nayan_neonates_screened_rop,
-            sum(case when key in ('total_224','total_225') then value else 0 end) as nayan_children_rop_positive,
-            sum(case when key in ('total_229','total_230','total_232','total_231') then value else 0 end) as nayan_num_treatments_done,
-            0 as jeevan_child_enrolled,
-            sum(case when key in ('total_16') then value else 0 end) as roshni_children_screened,
-            sum(case when key in ('total_132') then value else 0 end) as roshni_spectacles_dispensed,
-            sum(case when key in ('total_1') then value else 0 end) as disha_screening,
-            sum(case when key in ('total_2') then value else 0 end) as disha_spectacles_dispensed,
-            0 as saksham_aop_completed_training,
-            sum(case when key in ('total_284') then value else 0 end) as saksham_aop_in_training,
-            0 as netra_cataract_surgeries,
-            sum(case when key in ('total_112','total_273','total_264') then value else 0 end) as base_screening,
-            sum(case when key in ('total_274','total_265','total_113') then value else 0 end) as base_cataract_surgeries,
-            sum(case when key in ('total_281','total_272','total_263') then value else 0 end) as base_other_surgeries,
-            (case when coalesce(sum(case when key in ('total_33','total_296') then value else 0 end),0) = 0 then 0::numeric else round(sum(case when key in ('total_40','total_346') then value else 0 end) * 100/sum(case when key in ('total_33','total_296') then value else 0 end)::numeric,0) end)::integer as jyot_spectacles_dispensed_percentage,
-            (case when coalesce(sum(case when key in ('total_33','total_296') then value else 0 end),0) = 0 then 0::numeric else round(sum(case when key in ('total_301','total_46','total_292','total_304') then value else 0 end) * 100/sum(case when key in ('total_33','total_296') then value else 0 end)::numeric,0) end)::integer as jyot_surgeries_percentage,
-            (case when coalesce(sum(case when key in ('total_16') then value else 0 end),0) = 0 then 0::numeric else round(sum(case when key in ('total_132') then value else 0 end) * 100/sum(case when key in ('total_16') then value else 0 end)::numeric,0) end)::integer as roshni_spectacles_dispensed_percentage,
-            (case when coalesce(sum(case when key in ('total_1') then value else 0 end),0) = 0 then 0::numeric else round(sum(case when key in ('total_2') then value else 0 end) * 100/sum(case when key in ('total_1') then value else 0 end)::numeric,0) end)::integer as disha_spectacles_dispensed_percentage,
-            (case when coalesce(sum(case when key in ('total_112','total_273','total_264') then value else 0 end),0) = 0 then 0::numeric else round(sum(case when key in ('total_274','total_265','total_113') then value else 0 end) * 100/sum(case when key in ('total_112','total_273','total_264') then value else 0 end)::numeric,0) end)::integer as base_cataract_surgeries_percentage,
-            (case when coalesce(sum(case when key in ('total_112','total_273','total_264') then value else 0 end),0) = 0 then 0::numeric else round(sum(case when key in ('total_281','total_272','total_263') then value else 0 end) * 100/sum(case when key in ('total_112','total_273','total_264') then value else 0 end)::numeric,0) end)::integer as base_other_surgeries_percentage
-            from mat_dashboard_achievement_view as ach
-            where 1=1 @@fvalue_start_month @@fvalue_end_month @@user_project_filter @@user_partner_filter @@partnerfilter
-            ) as a
-            left outer join (select mission_id, count(distinct project_id) as vcs_count
-            from mat_partner_mission_meta_view
-            where mission_id = 5 @@fvalue_start_date @@fvalue_end_date
-            @@user_project_filter @@user_partner_filter @@partnerfilter
-            group by mission_id
-            ) as jyot_vcs on true"""
-
-    user_partner_filter_cond = ""
-    user_project_filter_cond = ""
-
-    if request.user.is_superuser:
-        user_project_filter_cond=''
-    elif UserPartnerMapping.objects.filter(user=request.user).exists() :#and user is partner_level_user then 
-        user_partner_filter_cond = """ and project_id in (select distinct project_id 
-                                                    from mat_partner_mission_meta_view 
-                                                    where partner_id in (select partner_id 
-                                                            from application_master_userpartnermapping 
-                                                            where user_id = """ + str(logged_in_user_id) +"""
-                                                    )
-                                        ) """
-    elif UserProjectMapping.objects.filter(user=request.user).exists():#user is project_level_user then 
-        user_project_filter_cond = """ and project_id in (select project_id 
-                                            from application_master_userprojectmapping 
-                                            where user_id = """ + str(logged_in_user_id) + """)"""
-    
-    end_date_condition=''
-    if start_date != '':
-        end_date_condition="and (project_end_date is null or project_end_date >= '" + start_date +"')" 
-
-    start_date_condition=''
-    if end_date != '':
-        start_date_condition="and project_start_date < '" + end_date +"'" 
-
-    partner_cond = ''
-    if partner :
-        partner_cond = """ and project_id in (select distinct project_id 
-                                                    from mat_partner_mission_meta_view 
-                                                    where partner_id = """ + partner +"""
-                                                    ) """
-
-    query = query.replace("@@user_partner_filter",user_partner_filter_cond) 
-    query = query.replace("@@user_project_filter",user_project_filter_cond)
-    query = query.replace("@@fvalue_start_date",start_date_condition) #should be of format 2022-01-25
-    query = query.replace("@@fvalue_end_date",end_date_condition) #should be of format 2022-01-25
-    query = query.replace("@@fvalue_start_month",start_month_condition) #should be of format 202201
-    query = query.replace("@@fvalue_end_month",end_month_condition) #should be of format 202201
-    query = query.replace("@@partnerfilter",partner_cond)
-    return query
-
-
+def materialized_view_master():
+    try:
+        refresh_materialized_view('dash_glass_prescription_view')
+        refresh_materialized_view('dash_patient_basic_info_view')
+        refresh_materialized_view('dash_screening_info_view')
+        print('MATERIALIZED VIEWS REFRESHED SUCCESS')
+        now = datetime.now()
+        logdata, created = DashboardWidgetSummaryLog.objects.get_or_create(
+            log_key='meta_dashboard_views')
+        logdata.last_successful_update = now
+        logdata.most_recent_update = now
+        logdata.most_recent_update_status = 'Success'
+        logdata.save()
+    except Exception as ex1:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        error_stack = repr(traceback.format_exception(
+            exc_type, exc_value, exc_traceback))
+        logger.error(error_stack)
+        now = datetime.now()
+        logdata, created = DashboardWidgetSummaryLog.objects.get_or_create(
+            log_key='meta_dashboard_views')
+        logdata.last_successful_update = now
+        logdata.most_recent_update = now
+        logdata.most_recent_update_status = 'Failed'
+        logdata.save()
+    return True
 
 @login_required(login_url="/login/")
 def monthly_dashboard_list(request):
@@ -189,7 +1164,7 @@ def dashboard_data_approval(request, id):
     user_boundary_list = request.session['user_boundary_list']
     try:
         monthly_data = MonthlyDashboard.objects.get(id=id)
-        month_obj = datetime.strptime(str(monthly_data.month), '%m%Y')
+        month_obj = datetime.strptime(str(monthly_data.month), 'Y%m%d')
     except:
         current_date = datetime.now()
         month_obj,end_of_previous_month=get_first_and_last_date_of_month(current_date.year,DASHBOARD_SUBMISSION_DAY)
@@ -221,7 +1196,7 @@ def dashboard_data_approval(request, id):
             for field in array_fields:
                 monthly_data_dict[field] = []
 
-            month_field = month_obj.strftime('%m%Y')
+            month_field = month_obj.strftime('%Y%m%d')
 
             # Preprocess the dictionary to replace None with 0
             preprocessed_dict = {k: (0 if v is None else v) for k, v in monthly_data_dict.items()}
@@ -487,7 +1462,7 @@ def send_mail_with_template(request,monthly_data,dashboard_data,kwargs={}):
 
             join_usersname = ' and '.join(users_name) if len(users_name) > 1 else users_name[0]
             
-            month_obj = datetime.strptime(str(monthly_data.month), '%m%Y')
+            month_obj = datetime.strptime(str(monthly_data.month), '%Y%m%d')
             partner_name = monthly_data.partner.name
             mail_subject = mail_template.subject.format(partner_name=partner_name, month_year=month_obj.strftime('%B %Y'))
             html_template = mail_template.content.format(partner_name=partner_name,month_year=month_obj.strftime('%B %Y'),to_username=join_usersname,from_username=from_username)
