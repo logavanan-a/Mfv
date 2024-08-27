@@ -79,7 +79,7 @@
                         </table><br>
                     </div>
                     <div class="d-flex justify-content-end gap-3">
-                        <button type="reset" onclick="location.href='/quietly-report/'" class="btn btn-success mr-1 waves-effect waves-float waves-light" tabindex="5">Clear</button>
+                        <button type="reset" onclick="location.href='/quarterly-report/'" class="btn btn-success mr-1 waves-effect waves-float waves-light" tabindex="5">Clear</button>
                         <button type="submit" class="btn btn-primary mr-1 waves-effect waves-float waves-light" tabindex="5">Save</button>
                     </div> 
                     {% endif %}
@@ -94,7 +94,7 @@ $( document ).ready(function() {
         var district = $('#district').val();               // Get the selected value of the district dropdown
         var academic_year = $('#academic_year').val();   // Get the selected value of the academic_year dropdown
         if (district && academic_year) {
-            window.location.href = `/quietly-report/?district=${district}&academic_year=${academic_year}`;
+            window.location.href = `/quarterly-report/?district=${district}&academic_year=${academic_year}`;
         }
     });
 });
