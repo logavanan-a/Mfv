@@ -33,7 +33,6 @@ from rest_framework.request import Request as DRFRequest
 from uuid import uuid4
 import sys, traceback
 import logging
-from survey.api_view import MonthlyDashboardData
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from reports.views import load_user_details
