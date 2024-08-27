@@ -698,8 +698,8 @@
     var diagnosis = $('#522 option').filter(function() {return $(this).text() === auto_date;})
     diagnosis.prop('selected', true);
     $('#522').prop('disabled', true);
-    console.log(auto_date)
     var date_vlu = "{{request|display_last_date:survey.id}}"
+    console.log(date_vlu)
     if(date_vlu){
         var date = new Date(date_vlu);
         var nextDay = date.toISOString().split('T')[0];
@@ -708,7 +708,7 @@
     }
     $("#409").attr('min','')
     if (parseInt({{survey.id}}) == 8){
-        var data = {{request|get_auto_fill:survey.id|safe}}
+        var data = {{request|get_auto_fill:''|safe}}
         var date_spectacles_given = data['445'] || '';
         var glass_power_re_sphere = data['273']?.['275']?.['277'] || '';
         var glass_power_re_cyl = data['273']?.['275']?.['278'] || '';
