@@ -26,9 +26,22 @@
                       {% elif submenus.slug == 'reporting-month' %}
                           <li><a onclick='CurrentMonth("{{i.app_link}}")' key="t-user-list">{{submenus.name}}</a></li>
                       {% else %}
-                      <li><a href="{{submenus.app_link}}" key="t-user-list">{{submenus.name}}</a></li>
-
-                      {% endif %}
+                        {% if submenus.get_sub_menus.count > 0 %}
+                        <li>
+                          <a href="javascript: void(0);" class="has-arrow waves-effect">
+                            {% if submenus.icon %}<i class="{{submenus.icon}}"></i>{% endif %}
+                            <span key="t-contacts">{{submenus.name}}</span>
+                          </a>
+                          <ul class="sub-menu mm-collapse" aria-expanded="false">
+                            {% for undersubmenus in submenus.get_sub_menus %}
+                            <li><a href="{{undersubmenus.app_link}}" key="t-user-list">{{undersubmenus.name}}</a></li>
+                            {% endfor %}
+                          </ul>
+                        </li>
+                        {% else %}
+                          <li><a href="{{submenus.app_link}}" key="t-user-list">{{submenus.name}}</a></li>
+                        {% endif %}
+                        {% endif %}
                     {% endfor %}
                </ul>
             </li>
@@ -49,7 +62,7 @@
             </li>
             {% endif %}
             {% endif %}
-            {% endfor %}
+          {% endfor %}
 
         
         
