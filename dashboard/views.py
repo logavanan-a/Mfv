@@ -1164,7 +1164,7 @@ def dashboard_data_approval(request, id):
     user_boundary_list = request.session['user_boundary_list']
     try:
         monthly_data = MonthlyDashboard.objects.get(id=id)
-        month_obj = datetime.strptime(str(monthly_data.month), '%m%Y')
+        month_obj = datetime.strptime(str(monthly_data.month), 'Y%m%d')
     except:
         current_date = datetime.now()
         month_obj,end_of_previous_month=get_first_and_last_date_of_month(current_date.year,DASHBOARD_SUBMISSION_DAY)
@@ -1196,7 +1196,7 @@ def dashboard_data_approval(request, id):
             for field in array_fields:
                 monthly_data_dict[field] = []
 
-            month_field = month_obj.strftime('%m%Y')
+            month_field = month_obj.strftime('%Y%m%d')
 
             # Preprocess the dictionary to replace None with 0
             preprocessed_dict = {k: (0 if v is None else v) for k, v in monthly_data_dict.items()}
@@ -1462,7 +1462,7 @@ def send_mail_with_template(request,monthly_data,dashboard_data,kwargs={}):
 
             join_usersname = ' and '.join(users_name) if len(users_name) > 1 else users_name[0]
             
-            month_obj = datetime.strptime(str(monthly_data.month), '%m%Y')
+            month_obj = datetime.strptime(str(monthly_data.month), '%Y%m%d')
             partner_name = monthly_data.partner.name
             mail_subject = mail_template.subject.format(partner_name=partner_name, month_year=month_obj.strftime('%B %Y'))
             html_template = mail_template.content.format(partner_name=partner_name,month_year=month_obj.strftime('%B %Y'),to_username=join_usersname,from_username=from_username)
