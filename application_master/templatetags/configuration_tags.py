@@ -153,5 +153,5 @@ def get_skip_question(choice, question):
 
 @register.filter
 def integer_to_month(month):
-    month_obj = datetime.strptime(str(month), '%m%Y')
+    month_obj = datetime.strptime(str(month), 'Y%m%d')
     return month_obj

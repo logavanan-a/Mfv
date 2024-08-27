@@ -109,8 +109,8 @@ def login_view(request):
                     request.session['partner_mission_mapping_id'] = list(partner_mission_mapping_id)
                     
                 except:
-                    user_partner = ''              
-                return redirect('/task-list/')
+                    user_partner = ''  
+                return redirect('/task-list/') if user.groups.all()[0].id != 9 else redirect('/dashboard/?page_slug=mission-roshni')
             else:
                 error_message = "Please contact administrator."
         else:
