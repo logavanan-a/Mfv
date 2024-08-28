@@ -110,7 +110,7 @@ def login_view(request):
                     
                 except:
                     user_partner = ''  
-                return redirect('/task-list/') if user.groups.all()[0].id != 9 else redirect('/dashboard/?page_slug=mission-roshni')
+                return redirect('/task-list/') if user.groups.all()[0].id != 9 and application_type_id !=511 else redirect('/dashboard/?page_slug=mission-roshni')
             else:
                 error_message = "Please contact administrator."
         else:
