@@ -429,7 +429,7 @@ class MasterLookUp(BaseContent):
     #     else:
     #         locations= ','.join(str(i) for i in locations)
     #     return locations
-LOGIN_CHOICES  = ((1, 'WEB'),(2,"APP"))
+LOGIN_CHOICES  = ((1, 'WEB'),(2,"APP"),(3,"BOTH"))
 
 class UserProfile(BaseContent):
     user = models.OneToOneField(User, on_delete = models.CASCADE)

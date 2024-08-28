@@ -70,10 +70,12 @@ def master_list_form(request,model,key=None):
         if district_names:
             objects=objects.filter(district_id=district_names).order_by('-id')
 
-    # if key == 'import':
-    #     print(key)
-
-
+    if key == 'import':
+        heading = 'Import Data'
+        if not request.user.is_superuser:
+            project_list = request.session['user_project_list']
+            objects = objects.filter(id__in=project_list)
+            
     data = get_pagination(request, objects)
     
     current_page = request.GET.get('page', 1)
