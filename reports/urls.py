@@ -4,7 +4,7 @@ from reports.views import custom_report, custom_report_reload, get_indicator,rep
 app_name = "reports"
 urlpatterns = [
     path('reports/exportcsv/<slug:slug>/',export_reportcsv),
-    path('reports/custom-reports/donor-report/',custom_report_donor),
+    path('reports/custom-reports/performance-tracker/',custom_report_donor),
     path('reports/', reports_listing, name="reports_listing"),
     # path('report/<page_slug>/', custom_report, name="custom_report"),
     path('ajax/custom_report_reload/<page_slug>/<report_slug>/', custom_report_reload, name="custom_report_reload"),
