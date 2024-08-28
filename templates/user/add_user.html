@@ -28,9 +28,9 @@
                             <div class="form-floating mb-3">
                                 <select  class="select2 form-control select2 "  
                                 data-placeholder="Choose User Role" id="validationCustom04" name='user_role' required>      
-                                    <!-- <option selected disabled value="">Select User Role</option> -->
+                                    <option selected disabled value="">Select Group</option>
                                     {% for group in groups %}
-                                    <option value="{{group.id}}" >{{group.name}}</option>
+                                    <option value="{{group.id}}" {% if group.id|slugify == user_role %}selected{% endif %}>{{group.name}}</option>
                                     {% endfor %}
                                 </select>
                                 <div class="invalid-feedback">
@@ -45,7 +45,7 @@
                                 data-placeholder="Choose Partner" id="validationCustom04" name='partner' required>      
                                     <option selected disabled value="">Select Partner</option>
                                     {% for partner in partners %}
-                                    <option value="{{partner.id}}">{{partner.name}}</option>
+                                    <option value="{{partner.id}}" >{{partner.name}}</option>
                                     {% endfor %}
                                 </select>
                                 <div class="invalid-feedback">
@@ -68,7 +68,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-4">
-                                <input type="password" class="form-control"  name='password2'  id="password2"
+                                <input type="password" class="form-control"   name='password2'  id="password2"
                                     placeholder="Enter Confirm Password" required>
                                 <label for="floatingemailInput">Enter Confirm Password<span class="required-field"></span></label>
                                 <div class="invalid-feedback">
@@ -81,7 +81,7 @@
                     <div class='row'>
                         <div class="col-lg-6">
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control" name='first_name' id="floatingnameInput"  placeholder="Enter First Name" >
+                                <input type="text" class="form-control" name='first_name' id="floatingnameInput" value="{{first_name|default_if_none:''}}" placeholder="Enter First Name" >
                                 <label for="floatingnameInput">Enter First Name</label>
                                 <div class="invalid-feedback">
                                     Please enter the first name.
@@ -90,7 +90,7 @@
                         </div>
                         <div class="col-lg-6">
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control" name='last_name' id="floatingnameInput"  placeholder="Enter Last Name" >
+                                <input type="text" class="form-control" name='last_name' id="floatingnameInput" value="{{last_name|default_if_none:''}}" placeholder="Enter Last Name" >
                                 <label for="floatingnameInput">Enter Last Name</label>
                                 <div class="invalid-feedback">
                                     Please enter the last name.
@@ -99,7 +99,7 @@
                         </div>
                         <div class="col-lg-6">
                             <div class="form-floating mb-3">
-                                <input type="email" class="form-control" name='email' id="floatingnameInput"  placeholder="Enter Email" >
+                                <input type="email" class="form-control" name='email' id="floatingnameInput" value="{{email|default_if_none:''}}" placeholder="Enter Email" >
                                 <label for="floatingnameInput">Enter Email</label>
                                 <div class="invalid-feedback">
                                     Please enter the email.
@@ -113,12 +113,12 @@
                         </div>
                         <div class="col-lg-6">
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control" name='mobile_no' id="floatingnameInput"  placeholder="Mobile no" pattern="[0-9]{10}">
+                                <input type="text" class="form-control" name='mobile_no' id="floatingnameInput"  placeholder="Mobile no" value="{{mobile_no|default_if_none:''}}" pattern="[0-9]{10}">
                                 <label for="floatingnameInput">Mobile No</label>
                                 <div class="invalid-feedback">
                                     Please enter the Mobile no.
                                 </div>
-                                {% if email_error %}
+                                {% if mobile_no_error %}
                                 <div class="text-danger">
                                     {{mobile_no_error}}
                                 </div>
@@ -129,8 +129,8 @@
                             <select  class="select2 form-control select2 "  
                                 data-placeholder="Choose Login Type" id="validationCustom04" name='login_type' required> 
                                     <option value="" disabled selected>Select Login Type</option>
-                                    <option value="1">WEB</option>
-                                    <option value="2">APP</option>
+                                    <option value="1" {% if login_type == "1" %}selected{% endif %}>WEB</option>
+                                    <option value="2" {% if login_type == "2" %}selected{% endif %}>APP</option>
                                 </select> 
                                 <div class="invalid-feedback">
                                     Please select the Login Type.

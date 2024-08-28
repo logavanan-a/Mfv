@@ -17,6 +17,11 @@
                                 <div class="invalid-feedback">
                                     Please enter the username.
                                 </div>
+                                {% if user_exist_error %}
+                                <div class="text-danger">
+                                    {{user_exist_error}}
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
 
@@ -50,6 +55,11 @@
                             <div class="form-floating mb-3">
                                 <input type="email" class="form-control" name='email' id="floatingnameInput" value="{{user.email}}" placeholder="Enter Email" >
                                 <label for="floatingnameInput">Enter Email</label>
+                                {% if email_error %}
+                                <div class="text-danger">
+                                    {{email_error}}
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -59,6 +69,11 @@
                                 <div class="invalid-feedback">
                                     Please enter the Mobile no.
                                 </div>
+                                {% if mobile_no_error %}
+                                <div class="text-danger">
+                                    {{mobile_no_error}}
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-lg-6">
