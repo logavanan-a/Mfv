@@ -744,7 +744,7 @@ class ImportResponses(View):
             return render(request, self.template_name, locals())
         
         # Read Excel file
-        df = pd.read_excel(file)
+        df = pd.read_excel(file,dtype=str)
         if df.empty:
             messages.error(request, "Please ensure that the file contains data and try again.")
             return render(request, self.template_name, locals())
