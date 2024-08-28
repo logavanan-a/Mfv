@@ -1164,7 +1164,7 @@ def dashboard_data_approval(request, id):
     user_boundary_list = request.session['user_boundary_list']
     try:
         monthly_data = MonthlyDashboard.objects.get(id=id)
-        month_obj = datetime.strptime(str(monthly_data.month), 'Y%m%d')
+        month_obj = datetime.strptime(str(monthly_data.month), '%Y%m%d')
     except:
         current_date = datetime.now()
         month_obj,end_of_previous_month=get_first_and_last_date_of_month(current_date.year,DASHBOARD_SUBMISSION_DAY)

@@ -116,7 +116,7 @@ class Command(BaseCommand):
                     logger.info('Response Imported - ' + ':(' +str(response['response_id']) + ') - time taken:' + str(t2-t1) )
 
                     logger.info('Sending Mail...!')
-                    to_mail_ids = get_all_role_user(response_obj.project)
+                    to_mail_ids = get_all_role_user(response_obj.project) + ACTIVITY_MAIL_RECIEVER
                     mail_template = MailTemplate.objects.get(active=2,template_name='Data Upload')
                     mail_subject = mail_template.subject.format(survey_name=response_obj.survey.name,project_name=response_obj.project.name)
                     record_url = f'<a href="{HOST_URL}/manage/activity/import-responses/{response_obj.project_id}" target="_blank">Click here</a>'
@@ -241,7 +241,8 @@ def questions_validation(df,survey_id,project_id):
             column = get_api_column_name(question)
              # static validating for given project and school landline number in same location or not
             project_linked_schools = get_school_based_project(project.district_id)
-            mask = ~df[column].apply(lambda value: any(val.strip() in project_linked_schools for val in value.split(',')))
+            # import ipdb;ipdb.set_trace()
+            mask = ~df[column].apply(lambda value: any(val.strip() in project_linked_schools for val in str(value).split(',')))
             if mask.any():
                 error_message =  f"* Please check the given Project and {column} are in same location."
                 df.loc[mask, 'Error Message'] = error_message
