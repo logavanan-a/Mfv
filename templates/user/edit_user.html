@@ -82,6 +82,7 @@
                                     <option value="" disabled selected>Select Login Type</option>
                                     <option value="1" {% if user_profile.login_type|slugify == "1"%}selected{% endif %}>WEB</option>
                                     <option value="2" {% if user_profile.login_type|slugify == "2"%}selected{% endif %}>APP</option>
+                                    <option value="3" {% if user_profile.login_type|slugify == "3"%}selected{% endif %}>BOTH</option>
                                 </select> 
                                 <div class="invalid-feedback">
                                     Please select the Login Type.
