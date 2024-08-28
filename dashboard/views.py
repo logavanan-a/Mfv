@@ -463,16 +463,16 @@ def gethalfyear(financial_year):
     result_set = []
     current_year = today.year
     current_month = today.month
-    if current_year == int(selected_year[0]) and current_month >= 4 and current_month <= 6:
+    if current_year == int(selected_year[0]) and current_month >= 7 and current_month <= 9:
         result_set.append('Q1')
-    elif current_year == int(selected_year[0]) and current_month >= 7 and current_month <= 9:
-        result_set.append('Q1')
-        result_set.append('Q2')
     elif current_year == int(selected_year[0]) and current_month >= 10 and current_month <= 12:
         result_set.append('Q1')
         result_set.append('Q2')
+    elif current_year == int(selected_year[0]) and current_month >= 1 and current_month <= 3:
+        result_set.append('Q1')
+        result_set.append('Q2')
         result_set.append('Q3')
-    elif current_year == int(selected_year[1]) and current_month >= 1 and current_month <= 3:
+    elif current_year == int(selected_year[1]) and current_month >= 4 and current_month <= 6:
         result_set.append('Q1')
         result_set.append('Q2')
         result_set.append('Q3')
