@@ -91,7 +91,7 @@ def applogin(request, **kwargs):
                      "updateMessage": "New update available, download from playstore",
                      "link": ""}
         user_list = UserProjectMapping.objects.filter(user=user,project__application_type__id=511)
-        user_profile = UserProfile.objects.filter(user=user)
+        user_profile = UserProfile.objects.filter(user=user,login_type=2)
         if role_typ == 1 and user_profile.exists() and user_list.exists():
 
             response = {

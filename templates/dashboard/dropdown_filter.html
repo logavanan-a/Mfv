@@ -42,10 +42,15 @@
                                 <span>Partners<span class="required"></span> 
                                 </span>
                                 <select class="selectpicker select2 " data-width="100%" data-style="select-with-transition" name="Partner" id="id_partner" data-live-search="true" multiple="multiple">
-                                    <option value="" disabled >Select Partners</option>
-                                    {% for part in partnerlist %}
-                                        <option value="{{part.id}}" {% if part.id|slugify in selected_partner_list  %}selected{% endif %}>{{part.name}}</option>
-                                    {% endfor %}
+                                        <option value="" >Select Partner</option>
+                                    {% if partnerlist|length == 1 %}
+                                        <!-- Automatically select the only option if there's only one item in partner_list -->
+                                        <option value="{{ partnerlist.0.id }}" selected>{{ partnerlist.0.name }}</option>
+                                    {% else %}
+                                        {% for part in partnerlist %}
+                                            <option value="{{ part.id }}" {% if part.0 == selected_partner_list %}selected{% endif %}>{{ part.name }}</option>
+                                        {% endfor %}
+                                    {% endif %}
                                 </select>
                             </div> 
                         </div>

@@ -362,7 +362,11 @@ def replace_filter_values(sql_query,selected_items):
 def filter_conditions(request, sql_query, filter_info,selected_items):
     user_id = request.user.id
     district_list,partner_list = [],[]
-    # district_list,project_list = get_location_data(request,user_id)
+    user_details = load_user_details(request)
+    if 'user_partner_list' in request.session:
+        partner_list = request.session['user_partner_list']
+    if 'user_district_list' in request.session:
+        district_list = request.session['user_district_list']
     filter_cond = filter_info.get('filter_cond','')
     #logger.error("selected_items:" + str(selected_items))
     fin_year_cond,quarterly_year_cond,partner_cond,dist_cond,block_cond = "","","","",""
@@ -377,7 +381,7 @@ def filter_conditions(request, sql_query, filter_info,selected_items):
             if selected_items[2] != '':
                 partner_cond = filter_info['filter_cond'][key].replace('@@filter_value',f"{selected_items[2]}")
             elif partner_list:
-                partner_cond = filter_info['filter_cond'][key].replace('@@filter_value',f"{str(parter_list)[1:-1]}")
+                partner_cond = filter_info['filter_cond'][key].replace('@@filter_value',f"{str(partner_list)[1:-1]}")
         elif key == 'district':
             if selected_items[3] != '':
                 dist_cond = filter_info['filter_cond'][key].replace('@@filter_value',f"{selected_items[3]}")
@@ -459,16 +463,21 @@ def gethalfyear(financial_year):
     result_set = []
     current_year = today.year
     current_month = today.month
-    if current_year == int(selected_year[0]) and current_month >= 4 and current_month <= 6:
+    if current_year == int(selected_year[0]) and current_month >= 7 and current_month <= 9:
         result_set.append('Q1')
-    elif current_year == int(selected_year[0]) and current_month >= 7 and current_month <= 9:
-        result_set.append('Q1')
-        result_set.append('Q2')
     elif current_year == int(selected_year[0]) and current_month >= 10 and current_month <= 12:
         result_set.append('Q1')
         result_set.append('Q2')
+    elif current_year == int(selected_year[0]) and current_month >= 1 and current_month <= 3:
+        result_set.append('Q1')
+        result_set.append('Q2')
         result_set.append('Q3')
-    elif current_year == int(selected_year[1]) and current_month >= 1 and current_month <= 3:
+    elif current_year == int(selected_year[1]) and current_month >= 4 and current_month <= 6:
+        result_set.append('Q1')
+        result_set.append('Q2')
+        result_set.append('Q3')
+        result_set.append('Q4')
+    else:
         result_set.append('Q1')
         result_set.append('Q2')
         result_set.append('Q3')
@@ -481,8 +490,7 @@ def user_projects(user):
 
 def get_district_list(selected_partner_list):
     partner_mission_id = PartnerMissionMapping.objects.filter(active=2,partner__in=selected_partner_list).values_list('id',flat=True)
-    project_id = Project.objects.filter(active=2,partner_mission_mapping__in=partner_mission_id).values_list('district',flat=True)
-    master_district_ids = Project.objects.filter(active=2,id__in=project_id).values_list('district_id',flat=True)
+    master_district_ids = Project.objects.filter(active=2,partner_mission_mapping__in=partner_mission_id).values_list('district',flat=True)
     boundarys = Boundary.objects.filter(active=2,code__in=[int(dist_id) for dist_id in master_district_ids]).values('id','name').order_by('name')
     return boundarys
 
@@ -490,10 +498,11 @@ class PartnerDistricts(CreateAPIView):
     def post(self, request):
         data = request.data
         partner_id = data.getlist('partner_id[]') or data.getlist('partner_id')
+        if 'user_district_list' in request.session:
+            district_ids = request.session['user_district_list']
         partner_mission_id = PartnerMissionMapping.objects.filter(active=2,partner__in=partner_id).values_list('id',flat=True)
         project_id = Project.objects.filter(active=2,partner_mission_mapping__in=partner_mission_id).values_list('district',flat=True)
-        master_district_ids = Project.objects.filter(active=2,id__in=project_id).values_list('district_id',flat=True)
-        boundarys = Boundary.objects.filter(active=2,code__in=[int(dist_id) for dist_id in master_district_ids]).order_by('name')
+        boundarys = Boundary.objects.filter(active=2,code__in=[int(dist_id) for dist_id in project_id]).order_by('name')
         print(boundarys)
         data = [{'id': i.id, 'name': "{}".format(i.name) if i.name else i.code} for i in boundarys]
         print(data)
@@ -505,8 +514,8 @@ class PartnerDistricts(CreateAPIView):
 def dashboard(request):
     heading = 'Dashboard'
     page_slug = request.GET.get('page_slug')
-    financial_year_list = getfinancialyear('2024-2025')
-    selected_financial_year = request.POST.get('finacial-year',financial_year_list[0])
+    financial_year_list = getfinancialyear('2022-2023')
+    selected_financial_year = request.POST.get('finacial-year',financial_year_list[-1])
     quarterly_year_list = gethalfyear(selected_financial_year)
     selected_quarterly_year = request.POST.get('quarterly-year',quarterly_year_list[-1])
     selected_partner_list = request.POST.getlist('Partner',[])
@@ -521,7 +530,8 @@ def dashboard(request):
     if 'user_district_list' in request.session:
         district_ids = request.session['user_district_list']
     district_list = []
-    if selected_partner_list:
+    if selected_partner_list or len(partner_ids)==1:
+        selected_partner_list = partner_ids if len(partner_ids)==1 else selected_partner_list
         district_list = get_district_list(selected_partner_list)
     try:
         cht = ChartMeta.objects.filter(

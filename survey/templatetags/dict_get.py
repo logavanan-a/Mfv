@@ -277,8 +277,8 @@ def get_dict_header(dictionary):
         return '-'
     
 @register.filter
-def get_auto_fill(request,survey_id):
-    ben=request.GET.get('ben','')
+def get_auto_fill(request,creation_key=None):
+    ben=request.GET.get('ben','') if not creation_key else creation_key 
     val=''
     transformed_dict = {}
     query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active,s.extra_config from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id =11 and js.cluster->>\'BeneficiaryResponse\' = \'{0}\' order by js.response->>\'445\''.format(ben)
