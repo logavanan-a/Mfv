@@ -810,7 +810,7 @@ def spec_compliance_data(academic_year,q_year,partner_id,donor_id,district_id):
                     WITH numbered_rows AS (
                     SELECT 
                         row_number() OVER () AS row_num,
-                        student_name,age,gender,school_name,school_state,spectacle_provided_on,follow_up_done_on,waering_complaince_after_3_month,reason_for_not_wearing
+                        student_name,age,gender,school_name,school_state,spectacle_provided_on,using_spectacles,waering_complaince_after_3_month,reason_for_not_wearing
                     FROM spectacle_complaince_data 
                     WHERE 1=1 and p_quarter = '{q_year}' AND p_academic_year = '{academic_year}'
                     {where_cond}
@@ -818,7 +818,7 @@ def spec_compliance_data(academic_year,q_year,partner_id,donor_id,district_id):
                 SELECT jsonb_agg(
                     jsonb_build_array(
                         row_num::text,
-                        student_name,age,gender,school_name,school_state,spectacle_provided_on,follow_up_done_on,waering_complaince_after_3_month,reason_for_not_wearing
+                        student_name,age,gender,school_name,school_state,spectacle_provided_on,using_spectacles,waering_complaince_after_3_month,reason_for_not_wearing
                     )
                 )::text
                 FROM numbered_rows;
