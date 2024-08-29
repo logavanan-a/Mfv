@@ -481,7 +481,7 @@ def custom_report_donor(request):
         surgery_data =surgery_details_data(academic_year,q_year,partner_id,donor_id,district_id)
         pt_heading,a_data,t_data,state_dist_name = program_tracker_data(academic_year,q_year,partner_id,donor_id,district_id)
         return  export_excel_donor(child_scr_data,spec_comp_data,teach_train_data,surgery_data,academic_year,q_year,pt_heading,a_data,t_data,state_dist_name)
-    return render(request, 'custom_report/donor_report.html', locals())
+    return render(request, 'custom_report/performance_tracker.html', locals())
 
 
 def child_screening_data(academic_year,q_year,partner_id,donor_id,district_id):
@@ -855,7 +855,7 @@ def teacher_trained_data(academic_year,q_year,partner_id,donor_id,district_id):
 
 
 def export_excel_donor(child_screening_data,spectacle_comp_data,teacher_training_data,surgery_details_data,financial_year,quarterly_year,pt_heading,a_data,t_data,state_dist_name):
-    excel_path = settings.DONOR_REPORT_TEMPLATES + '/donoe-report-template.v.0.2.xlsx'  
+    excel_path = settings.PERFORMANCE_TRACKER_TEMPLATES + '/performance-tracker-template.v.0.2.xlsx'  
     workbook = openpyxl.load_workbook(f'{excel_path}')
     worksheet_child_program_tracker = workbook.worksheets[0] 
     worksheet_child_screening = workbook.worksheets[1] 
@@ -929,7 +929,7 @@ def export_excel_donor(child_screening_data,spectacle_comp_data,teacher_training
         for col_num, cell_value in enumerate(row_data, start=1):
             worksheet_spec_complaince.cell(row=start_row, column=col_num, value=cell_value)
         start_row += 1
-    folder_file_name = f"DONOR_REPORT-{financial_year}-{quarterly_year}_{datetime.today().strftime('%d%m%y%H%M')}.xlsx"
+    folder_file_name = f"PERFORMANCE_TRACKER_REPORT-{financial_year}-{quarterly_year}_{datetime.today().strftime('%d%m%y%H%M')}.xlsx"
     file_path = os.path.join(settings.MEDIA_ROOT + '/temp_donor_report/', folder_file_name)
     workbook.save(file_path)
     if os.path.exists(file_path):
