@@ -1830,6 +1830,21 @@ class ResponseFiles(BaseContent):
         return str(self.id)
 
 
+class ResponseImportFiles(BaseContent):
+    IMPORT_STATUS_CHOICES = (('Uploaded', 'Uploaded'),('Inprogress', 'Inprogress'),('Failed', 'Failed'),('Imported','Imported'))
+    response_image = models.FileField(upload_to='import-response/%Y/%m/%d', blank=True, null=True)
+    survey = models.ForeignKey(Survey,on_delete=models.DO_NOTHING,blank=True, null=True)
+    project = models.ForeignKey(Project,on_delete=models.DO_NOTHING,blank=True, null=True)
+    status = models.CharField(_('Status'), choices=IMPORT_STATUS_CHOICES)
+    user = models.ForeignKey('auth.User',on_delete=models.DO_NOTHING )
+    error_details = models.TextField(blank=True,null=True) 
+    imported_on = models.DateTimeField(blank=True, null=True)
+    processed_file = models.FileField(upload_to='import-response/processed_files', blank=True, null=True)
+
+
+    def __str__(self):
+        return str(self.id)
+
 class LanguageTranslationText(BaseContent):
     content_type = models.ForeignKey(ContentType, blank=True, null=True,on_delete=models.DO_NOTHING)
     object_id = models.PositiveIntegerField(blank=True, null=True)

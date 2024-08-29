@@ -64,7 +64,7 @@ def login_view(request):
             login(request, user)
             application_type_id = 0
             user_project=UserProjectMapping.objects.filter(user=request.user,active=2,project__application_type_id__isnull=False).select_related('project','project__partner_mission_mapping','project__partner_mission_mapping__partner','project__partner_mission_mapping__mission','project__district','project__district__state')
-            if UserProfile.objects.filter(user=user,login_type=1).exists():
+            if UserProfile.objects.filter(user=user,login_type__in = [1,3]).exists():
                 if user.groups.filter(name__in = ['Partner Data Entry Operator','Partner Admin','Project In-charge']).exists():# project incharge
                     if user_project.exists():
                         application_type_id = user_project.first().project.application_type_id

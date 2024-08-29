@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% block contents %}
+{% load static %}
+
+<style>
+    .bx-md {
+        font-size: 1.2rem !important;
+    }
+</style>
+<div class="row">
+    <div class="col-12">
+        <div style="background-color: #DBD4FE; padding: 10px; ">
+            <h5 class="m-0"><b>Project Details</b></h5>
+        </div>
+        <div class="card m-0">
+            <div class="card-body">
+                {% include "../survey_forms/profile.html" %}
+            </div>
+        </div>
+        
+        <div style="background-color: #DBD4FE; padding: 10px; " class='mt-4'>
+            <h5 class="m-0"><b>Data Import</b></h5>
+        </div>
+        <div class="card">
+            <form method="POST" action="." class="form-horizontal m-2" id="survey" enctype="multipart/form-data">{% csrf_token %}
+                           
+                {% if error %}<div class="col-md-12"><div class="error_alert"><h3>{{error}}</h3></div></div>{% endif %}
+                <div class="card-content"> 
+                    <div class="form-group row" id="div_name">
+                        
+                        <label class="col-sm-2 col-form-label mt-3">{% if uploaded_responses_list.first.status in 'Uploaded' %} Replace File {% else %} Upload File {% endif %}<span class="required">*</span></label>
+                        <div class="col-sm-10 row">
+                            <div class="row align-items-center">
+                                <div class="col-auto ">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="ben_type" id="school" value="1" required>
+                                        <label class="form-check-label" for="school">
+                                            School
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-auto ">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="ben_type" id="student" value="2" required {% if not school_exists %}disabled{% endif %} >
+                                        <label class="form-check-label" for="student">
+                                            Student
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='col-auto'>
+                                <input class="form-control-file" type="file" value="" name="file" {% if uploaded_responses_list.first.status == "Inprogress" %}disabled{% endif %} required >
+                            </div>
+                            <div class='col-auto mt-3'>
+                                <p class="fw-normal mt-2"><b>Download file format : </b> &emsp;
+                                    School <a href="/manage/generate-excel/1/{{pk}}/" class="ng-star-inserted"><i class="fas fa-download" style="font-size: 20px;"></i></a>&emsp;
+                                    {% if school_exists %}Students <a href="/manage/generate-excel/2/{{pk}}/" class="ng-star-inserted" readonly><i class="fas fa-download" style="font-size: 20px;"></i></a>{% endif %}
+                                </p>
+                            </div>
+                            <p> * The file should be in <b>.xlsx</b> format and its size should not exceed <b>{{self.max_file_size_in_mb}}</b> MB.<br>
+                                * Before uploading the file, please ensure that its format matches the required <b>.xlsx</b> format.</br>
+                                {% comment %} * Please ensure <b>commas</b> are used to separate values for <b>API</b> type questions.</br> {% endcomment %}
+                                * If the uploaded file contains any data issues, please refer to the downloaded file's <b>Error Message</b> column for details.</p>
+                            </div>
+                    </div>
+                    
+                    <div class="col-md-12 text-right choose_right d-flex justify-content-end" style="gap:10px" >
+                        <a href="/application_master/list/project/import/">
+                            <span class="btn btn-danger btn-fill btn-sm">Cancel</span>
+                        </a>
+
+                        <input type="submit" class="btn btn-primary btn-fill btn-rose btn-sm" value="Save">
+
+                    <div class="ripple-container"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="mt-4" style="background-color: #DBD4FE; padding: 10px; ">
+            <h5 class="m-0"><b> Data History</b></h5>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <!-- listing page with table  -->
+                <div class="table-responsive my-2" >
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                            <tr class='bg-warning ' style='font-size:medium'>
+                                <th scope="col">Uploaded On</th>
+                                <th scope="col">Updated On</th>
+                                <th scope="col">Uploaded By</th>
+                                <th scope="col">Beneficiary Type</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Imported On</th>
+                                <th scope="col">Note</th>
+                                <th scope="col">File</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in object_list %}
+                                <tr class="odd font-size-16">
+                                    <td>{{i.created}}</td>
+                                    <td>{{i.modified}}</td>
+                                    <td>{{i.user.username}}</td>
+                                    <td>{{i.survey.name}}</td>
+                                    <td>{{i.status}}</td>
+                                    <td>{{i.imported_on|default:'-'}}</td>
+                                    <td>{{i.error_details|safe|default:"-"}}</td>
+                                    <td>
+                                        <a href="{% if i.status in "Imported,Failed" and i.processed_file %}{{i.processed_file}}{% elif i.response_image %}{{i.response_image.url}}{% endif %}#" class="ng-star-inserted">
+                                        <i class="fas fa-file-download" style="font-size: 30px;" title="download"></i>
+                                        </a>
+                                    </td>  
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if object_lists %}
+                    {% include 'survey_forms/web_pagination.html' %}
+                {% endif %}
+            </div>
+        </div>
+        
+    </div> <!-- end col -->
+</div>
+<style>
+    @media (min-width: 768px) and @media (min-width: 992px) and @media (min-width: 576px){
+        .table-responsive {
+            overflow: visible;
+        }
+    }
+    table.table-hover tbody tr td:hover {
+        background-color: #fb9692 !important; 
+    }
+</style>
+<script>
+    $(document).ready(function() {
+        {% for message in messages %}
+            Swal.fire({
+                title: '{{ message }}',
+                icon: '{{message.tags}}',
+                showConfirmButton: false,
+                timer: 2000
+            }
+            ).then((result) => {
+                window.location.href = '/manage/activity/import-responses/{{pk}}/';
+            });
+            
+        {% endfor %}
+        $("#survey").validate({
+            rules :
+            {
+                file: {required: true},
+            },
+        });
+    });
+    
+</script>
+{% endblock  %}
+{% block extra_javascript %}
+    <script src="{% static 'js/pages/datatables.init.js' %}"></script>
+    <!-- Required datatable js -->
+    <script src="{% static 'libs/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+    <!-- Buttons examples -->
+    <script src="{% static 'libs/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'libs/jszip/dist/jszip.min.js' %}"></script>
+    <script src="{% static 'libs/pdfmake/build/pdfmake.min.js' %}"></script>
+    <script src="{% static 'libs/pdfmake/build/vfs_fonts.js' %}"></script>
+    <script src="{% static 'libs/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'libs/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
+    <script src="{% static 'libs/datatables.net-buttons/js/buttons.colVis.min.js' %}"></script>
+
+    <!-- Responsive examples -->
+    <script src="{% static 'libs/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
+{% endblock %}

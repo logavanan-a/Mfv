@@ -16,7 +16,7 @@ from rest_framework.views import APIView
 from application_master.serializers import LoginAndroidSerializer
 from django.http import JsonResponse
 
-def master_list_form(request,model):
+def master_list_form(request,model,key=None):
     heading = 'user profile'    
     page = request.GET.get('page', '1')
     state= State.objects.filter(active=2).order_by('name')
@@ -69,7 +69,13 @@ def master_list_form(request,model):
             district_obj= District.objects.filter(active=2, state_id=state_name)
         if district_names:
             objects=objects.filter(district_id=district_names).order_by('-id')
-                
+
+    if key == 'import':
+        heading = 'Import Data'
+        if not request.user.is_superuser:
+            project_list = request.session['user_project_list']
+            objects = objects.filter(id__in=project_list)
+            
     data = get_pagination(request, objects)
     
     current_page = request.GET.get('page', 1)
