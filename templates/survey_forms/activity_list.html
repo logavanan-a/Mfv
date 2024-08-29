@@ -91,7 +91,8 @@
                     <table id="datatables" class="table table-striped" cellspacing="0" width="100%" style="width:100%">
                         <thead class="table-light" >
                             <th>Partner Name</th>
-                            <th> Month</th>
+                            <th> Start Date</th>
+                            <th> End Date</th>
                             <th> Submitted By</th>
                             <th> Submitted On</th>
                             <th> Stage</th>
@@ -100,7 +101,8 @@
                             {% for obj in object_list %}
                             <tr>
                                 <td>{{obj.partner.name}}</td>
-                                <td>{{obj.month|integer_to_month|date:"M-Y"}}</td>
+                                <td>{{obj.start_date|date:'d-m-Y'}}</td>
+                                <td>{{obj.end_date|date:'d-m-Y'}}</td>
                                 <td>{{obj.submitted_by}}</td>
                                 <td>{{obj.created|date:'d-m-Y'}}</td>
                                 <td><a  href="../{{obj.id}}/">{{ obj.get_current_status_display|default:"-" }}</a></td>

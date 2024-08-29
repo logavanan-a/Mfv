@@ -1174,7 +1174,7 @@ def dashboard_data_approval(request, id):
     user_boundary_list = request.session['user_boundary_list']
     try:
         monthly_data = MonthlyDashboard.objects.get(id=id)
-        month_obj = datetime.strptime(str(monthly_data.month), '%Y%m%d')
+        # month_obj = datetime.strptime(str(monthly_data.month), 'Y%m%d')
     except:
         current_date = datetime.now()
         month_obj,end_of_previous_month=get_first_and_last_date_of_month(current_date.year,DASHBOARD_SUBMISSION_DAY)
@@ -1472,10 +1472,11 @@ def send_mail_with_template(request,monthly_data,dashboard_data,kwargs={}):
 
             join_usersname = ' and '.join(users_name) if len(users_name) > 1 else users_name[0]
             
-            month_obj = datetime.strptime(str(monthly_data.month), '%Y%m%d')
+            # month_obj = datetime.strptime(str(monthly_data.month), '%Y%m%d')
+            start_date_and_end_date = f"{monthly_data.start_date.strftime('%d-%m-%Y')} to {monthly_data.end_date.strftime('%d-%m-%Y')}"
             partner_name = monthly_data.partner.name
-            mail_subject = mail_template.subject.format(partner_name=partner_name, month_year=month_obj.strftime('%B %Y'))
-            html_template = mail_template.content.format(partner_name=partner_name,month_year=month_obj.strftime('%B %Y'),to_username=join_usersname,from_username=from_username)
+            mail_subject = mail_template.subject.format(partner_name=partner_name, month_year=start_date_and_end_date)
+            html_template = mail_template.content.format(partner_name=partner_name,month_year=start_date_and_end_date,to_username=join_usersname,from_username=from_username)
             html_template = html_template.replace('@@dashboard_content',table_html)
             html_template = html_template.replace('@@remark',request.POST.get('remark',''))
 
