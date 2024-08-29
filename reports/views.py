@@ -840,7 +840,7 @@ def teacher_trained_data(academic_year,q_year,partner_id,donor_id,district_id):
                         row_number() OVER () AS row_num,
                         school_name,school_district,school_state,month_of_training,teacher_name,gender,trained
                     FROM teacher_training_data 
-                    WHERE 1=1 and p_quarter = '{q_year.lower()}' AND p_academic_year = '{academic_year}' {where_cond}
+                    WHERE 1=1 and p_quarter = '{q_year}' AND p_academic_year = '{academic_year}' {where_cond}
                 )
                 SELECT jsonb_agg(
                     jsonb_build_array(
