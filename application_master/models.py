@@ -52,7 +52,7 @@ class Menus(BaseContent):
     
     def get_sub_menus(self):
         # model method to filter menus based parent id
-        return Menus.objects.filter(parent=self).order_by('menu_order')
+        return Menus.objects.filter(parent=self,active=2).order_by('menu_order')
 
 class State(BaseContent):
     #-------------------#
