@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-12">
         <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-            <h2 class="mb-sm-0 font-size-20" style="color:#000000;"> Donor Report </h2>
+            <h2 class="mb-sm-0 font-size-20" style="color:#000000;"> Performance Tracker Report </h2>
         </div>
     </div>
 </div>
@@ -199,11 +199,11 @@ $(document).ready(function() {
                 data:data,
                 success:function(result){
                     $("#donor option").remove();
-                    a = '<option selected disabled value="">Select District</option>';
+                    a = '<option selected disabled value="">Select Donor</option>';
                     $("#donor").append(a);
                     if(result.length == 0){
                         $("#donor option").remove();
-                        a = '<option selected disabled value="">No district is mapped to this state</option>';
+                        a = '<option selected disabled value="">No Donor is mapped to this partner</option>';
                         $("#donor").append(a);
                     }
                     else{
