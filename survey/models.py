@@ -1835,7 +1835,7 @@ class ResponseImportFiles(BaseContent):
     response_image = models.FileField(upload_to='import-response/%Y/%m/%d', blank=True, null=True)
     survey = models.ForeignKey(Survey,on_delete=models.DO_NOTHING,blank=True, null=True)
     project = models.ForeignKey(Project,on_delete=models.DO_NOTHING,blank=True, null=True)
-    status = models.CharField(_('Status'), choices=IMPORT_STATUS_CHOICES)
+    status = models.CharField(_('Status'), choices=IMPORT_STATUS_CHOICES,max_length=100)
     user = models.ForeignKey('auth.User',on_delete=models.DO_NOTHING )
     error_details = models.TextField(blank=True,null=True) 
     imported_on = models.DateTimeField(blank=True, null=True)

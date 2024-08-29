@@ -65,7 +65,9 @@ STATUS_CHOICES = (
 )
 class MonthlyDashboard(BaseContent):
     creation_key = models.CharField(max_length=75, unique=True)
-    month = models.IntegerField('Month(YYYYMM)')
+    # month = models.IntegerField('Month(YYYYMM)')
+    start_date = models.DateField() 
+    end_date = models.DateField() 
     children_covered_uuid = ArrayField(models.CharField(max_length=75, blank=True),)
     children_covered_count = models.IntegerField(default=0)
     school_covered_uuid = ArrayField(models.CharField(max_length=75, blank=True),)
@@ -97,7 +99,7 @@ class MonthlyDashboard(BaseContent):
     partner = models.ForeignKey(Partner, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"Coverage Data for {self.month}"
+        return f"Coverage Data for {self.start_date} to {self.end_date}"
 
     def get_all_array_fields(self):
         all_arrays = (
