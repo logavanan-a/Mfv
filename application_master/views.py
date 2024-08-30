@@ -223,7 +223,7 @@ def master_details_form(request,model,id):
         missions = Mission.objects.filter(active=2).count()
         parner_mission_obj = PartnerMissionMapping.objects.filter(partner_id__in=part,active=2).order_by('-id')
         total = parner_mission_obj.count()
-        project_map = Project.objects.filter(partner_mission_mapping_id__in = parner_mission_obj,application_type_id=510).order_by('-id')
+        project_map = Project.objects.filter(partner_mission_mapping_id__in = parner_mission_obj).order_by('-id')
     elif model == 'project':
         heading="Project"
         user_mapping = UserProjectMapping.objects.filter(project_id=id).values_list('user_id', flat=True)
