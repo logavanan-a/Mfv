@@ -145,16 +145,17 @@ def send_mail(mail_to, mail_subject, mail_content, html_template = None,reply_to
     #         )
     #         message.add_attachment(attachedFile)
     if cc:
-        message.cc = cc_emails
+        message['Cc'] = ', '.join(cc_emails)
     if bcc:
-        message.bcc = bcc_emails
+        message['Bcc'] = ', '.join(bcc_emails)
+    all_recipients = to_emails + cc_emails + bcc_emails
 
     logger = logging.getLogger('user_obj')
     try:
         # message.send()
         with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as server:
             server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
-            server.sendmail(settings.EMAIL_HOST_USER, mail_to, message.as_string())
+            server.sendmail(settings.EMAIL_HOST_USER, all_recipients, message.as_string())
         response = {'status':200,'message':'success'}
     except Exception as e:
         exc_type, exc_value, exc_traceback = sys.exc_info()
