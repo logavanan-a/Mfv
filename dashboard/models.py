@@ -57,7 +57,7 @@ class DashboardChartWidgets(BaseContent):
 
 
 STATUS_CHOICES = (
-    (1, 'Submitted for Approval'), # once submitted for approval from app it will goes to parter admin
+    (1, 'Submited for Partner Admin'), # once submitted for approval from app it will goes to parter admin
     (2, 'Submitted for Project In-charge'), # once partner admin reveiwed and submitted to Project In-charge
     (3, 'Submitted for Admin'), # once Project In-charge reveiwed and submitted to MFV admin
     (4, 'Approved'), # once project incharge approved , final status

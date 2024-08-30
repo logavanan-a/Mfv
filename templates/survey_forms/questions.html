@@ -297,7 +297,7 @@
                                 <div class="col-lg-6" id='skip_{{question.id}}'>
                                     {% for choice in main_choice_list %}
                                     <div class="form-check mb-3">
-                                        <input class="form-check-input main_checkbox_{{question.id}} main_question C_0_0 {% if question.mandatory %}required{% endif %}" type="radio" name="{{question.id}}" id="{{question.id}}" value="{{choice.id}}" {% if question.mandatory %}required{% endif %}>
+                                        <input class="form-check-input main_checkbox_{{question.id}} main_question R_0_0 {% if question.mandatory %}required{% endif %}" type="radio" name="{{question.id}}" id="{{question.id}}" value="{{choice.id}}" {% if question.mandatory %}required{% endif %}>
                                         <label class="form-check-label" for="{{choice.id}}">
                                             {{choice.choice}}
                                         </label>
@@ -424,7 +424,7 @@
                                 <div class="col-lg-6" id='skip_{{question.id}}'>
                                     {% for choice in main_choice_list %}
                                     <div class="form-check mb-3">
-                                        <input class="form-check-input main_checkbox_{{question.id}} main_question C_0_0 {% if question.mandatory %}required{% endif %}" type="radio" name="{{question.id}}" id="{{question.id}}" value="{{choice.id}}" {% if question.mandatory %}required{% endif %} >
+                                        <input class="form-check-input main_checkbox_{{question.id}} main_question R_0_0 {% if question.mandatory %}required{% endif %}" type="radio" name="{{question.id}}" id="{{question.id}}" value="{{choice.id}}" {% if question.mandatory %}required{% endif %} >
                                         <label class="form-check-label" for="{{choice.id}}">
                                             {{choice.choice}}
                                         </label>
@@ -669,25 +669,26 @@
         {% if request.user.groups.all.0.id == 1 %}
         {% if survey.id == 7 or survey.id == 9 and creation_key %}
             {% if request|last_record_edit:survey.id == creation_key  %}
-            <button type="submit" id="submitting" name="submitting" class="btn btn-primary w-md">Submit</button>
+            <button type="submit" id="submitting" name="submitting" class="btn btn-primary w-md" {% if button %}disabled{% endif %}>Submit</button>
             {% elif not creation_key %}
-            <button type="submit" id="submitting" name="submitting" class="btn btn-primary w-md">Submit</button>
+            <button type="submit" id="submitting" name="submitting" class="btn btn-primary w-md" {% if button %}disabled{% endif %}>Submit</button>
             {% endif %}
         {% else %}
-        <button type="submit" id="submitting" name="submitting" class="btn btn-primary w-md">Submit</button>
+        <button type="submit" id="submitting" name="submitting" class="btn btn-primary w-md" {% if button %}disabled{% endif %}>Submit</button>
         {% endif %}
         {% endif %}
     </div>
 </form>
 <script>
     $('form').on('submit', function(event) {
+        console.log('lii')
         // Disable the submit button
-        $('#submitButton').prop('disabled', true);
+        $('#submitting').prop('disabled', true);
 
         // Set a timeout to re-enable the button after 2 minutes (120000 milliseconds)
         setTimeout(function() {
-            $('#submitButton').prop('disabled', false);
-        }, 120000);
+            $('#submitting').prop('disabled', false);
+        }, 8000);
 
         // Allow the form to be submitted normally
         return true;
