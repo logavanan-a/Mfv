@@ -675,7 +675,7 @@ def user_change_password(request, id):
         password = data.get('password1')
         user.set_password(password)
         user.save()
-        return redirect('mis:user_profile', id = id)
+        return redirect('mis:user_profile', user_id = id)
     return render(request, 'user/user_change_password.html', locals())
 
 @csrf_exempt 
