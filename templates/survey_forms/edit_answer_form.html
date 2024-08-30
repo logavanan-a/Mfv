@@ -84,6 +84,7 @@
                     rep=$('#'+ele).repeater()
                     rep.setList(all_response[ele] || {'':''})
                     $.each(all_response[ele], function(index, innerObj) {
+                        
                         key = Object.keys(innerObj)[0]
                         obj_len = Object.keys(all_response[ele]).length
                     // Check if the key 352 exists in the inner object
@@ -96,7 +97,9 @@
                             date.setDate(date.getDate() + 1);
                             var nextDay = date.toISOString().split('T')[0];
                             var next_index = parseInt(index)+1
+                            var index_first_vlu = $("[name='group-"+ele+"[0]["+key+"]']").val()
                             $("[name='group-"+ele+"["+next_index+"]["+key+"]']").attr('min',nextDay)
+                            $("[name='group-"+ele+"[0]["+key+"]']").attr('min',index_first_vlu)
                             if (obj_len != 1 && parseInt(index) != 0){
                                 var top_date = new Date(date_vlu);
                                 top_date.setDate(top_date.getDate() - 1);

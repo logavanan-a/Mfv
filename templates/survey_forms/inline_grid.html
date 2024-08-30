@@ -189,7 +189,7 @@
                                 <div class="d-flex" id='skip_{{inline_questions.id}}'>
                                     {% for choice in inline_choice_list %}
                                     <div class="form-check mb-3 me-3">
-                                        <input class="form-check-input main_checkbox_{{inline_questions.id}} {{question.id}}  C_0_0 {% if inline_questions.mandatory %}required{% endif %}" type="radio" name="{{inline_questions.id}}" id="{{inline_questions.id}}" value="{{choice.id}}" {% if inline_questions.mandatory %}required{% endif %}>
+                                        <input class="form-check-input main_checkbox_{{inline_questions.id}} {{question.id}}  R_0_0 {% if inline_questions.mandatory %}required{% endif %}" type="radio" name="{{inline_questions.id}}" id="{{inline_questions.id}}" value="{{choice.id}}" {% if inline_questions.mandatory %}required{% endif %}>
                                         <label class="form-check-label" for="{{choice.id}}">
                                             {{choice.choice}}
                                         </label> 
@@ -200,6 +200,17 @@
                                         $(document).ready(function(){
                                             radia(0)
                                             $(".add").on('click', function() {
+                                                var radio = $("[name='group-512[0][519]']:checked").val()
+                                                var radioButtons = $("[name='group-512[0][519]'][value='"+radio+"']");
+
+                                                if (radioButtons.length > 0) {
+                                                    console.log(';pppooiii')
+                                                    // Uncheck all radio buttons with the value '119757'
+                                                    radioButtons.prop('checked', true);
+
+                                                    // Check only the first radio button in the repeater with the value '119757'
+                                                    radioButtons.last().prop('checked', true);
+                                                }
                                                 radia($("tbody tr").length)
                                             })
                                             function radia(radia_length){
@@ -312,7 +323,7 @@
                                     <div class="col-lg-6"  style="width: 100%;" id='skip_{{inline_questions.id}}'>
                                         <div class=" mb-3">
                                             {% comment %} <label class="form-label" for="floatingnameInput">{{inline_questions.text}} {% if inline_questions.mandatory %}<span class="required-field"></span>{% endif %}</label> {% endcomment %}
-                                            <input type="date" style="width: 100;" onclick="enableDateField(this)" oninput="enableDateField(this)"   {% if inline_questions.training_config.dob %} onchange="getAge(this,{{inline_questions.id}},{{inline_questions.training_config.minor|default:'false'}})"{% endif %}  class="{{question.id}} form-control  D_0_0 {% if inline_questions.mandatory %}required{% endif %}"  pattern="DD/MM/YYYY" name="{{inline_questions.id}}"  max='{{inline_validation_code.MinMax.max}}' id="{{inline_questions.id}}" {% if inline_questions.mandatory %}required{% endif %} {% if creation_key and not inline_questions.is_editable and response_obj.response and response_obj.response.616 != '619'   %} disabled {% endif %}>
+                                            <input type="date" style="width: 100;" onclick="enableDateField(this)" oninput="enableDateField(this)"   {% if inline_questions.training_config.dob %} onchange="getAge(this,{{inline_questions.id}},{{inline_questions.training_config.minor|default:'false'}})"{% endif %}  class="{{question.id}} form-control  D_0_0 inline {% if inline_questions.mandatory %}required{% endif %}"  pattern="DD/MM/YYYY" name="{{inline_questions.id}}"  max='{{inline_validation_code.MinMax.max}}' id="{{inline_questions.id}}" {% if inline_questions.mandatory %}required{% endif %} {% if creation_key and not inline_questions.is_editable and response_obj.response and response_obj.response.616 != '619'   %} disabled {% endif %}>
                                             <div class="invalid-feedback">
                                                 {% if inline_validation_code.message %}{{inline_validation_code.message}}{% else %}Please enter a valid {{inline_questions.text}}{% endif %}
                                             </div>
