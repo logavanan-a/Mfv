@@ -546,9 +546,12 @@ def add_user(request, user_location=None):
                 mobile_no_error = 'Mobile no already exist'
                 return render(request, 'user/add_user.html', locals())
             user = User.objects.create_user(username=username.lower(), password=password)
-            user.email =  email or None
-            user.first_name = first_name or None
-            user.last_name = last_name or None
+            if email:
+                user.email =  email
+            if first_name:
+                user.first_name = first_name
+            if last_name:
+                user.last_name = last_name
             user.groups.add(Group.objects.get(id = user_role ))
             user.save()
 
