@@ -7,13 +7,11 @@ File: Form repeater Js File
 */
 
 $(document).ready(function () {
-    
     'use strict';
-
     $('.repeater').repeater({
-
         show: function () {
             $(this).slideDown()
+            $(this).find('input[type="date"]').attr('max', '');
             var row = $(this).closest('tr')
             var index = $(this).index()
             if (row.prev().find('select') && row.prev().find('select').hasClass('sm_question')) {
@@ -22,6 +20,7 @@ $(document).ready(function () {
                 $(this).find('select').append($options)
             }
 
+            
             $(this).find('td').each(function () {
                 $(this).find('input').removeAttr('readonly', 'readonly')
                 $(this).find('input').attr('disabled', false)
@@ -42,7 +41,7 @@ $(document).ready(function () {
                     })
                     $("[name='group-"+first_class+"["+index+"]["+id_name+"]']").on('click', function() {
                         var date_list = []
-                        $('.D_0_0').each(function () {
+                        $('.inline').each(function () {
                             var date_vlu = $(this).val()
                             var index = $(this).index()
                             if(date_vlu){
@@ -56,11 +55,10 @@ $(document).ready(function () {
                             var nextDay = date.toISOString().split('T')[0];
                             var index = $(this).closest('.repeater-item').index();
                             $(this).attr('min', nextDay);
-                            // above_index = index - 1
-                            // $("[name='group-509["+above_index+"][352]']").attr('min', nextDay)
                         }
                     })
                 }
+                
             })
         },
         hide: function (deleteElement) {
