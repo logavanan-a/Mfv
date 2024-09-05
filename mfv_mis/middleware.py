@@ -29,7 +29,7 @@ class CheckPreviousMonthDataSubmissionMiddleware:
                 submission_exists = MonthlyDashboard.objects.filter(
                     active=2,
                     partner_id__in = user_partner,
-                    month=month_year_need_to_check
+                    # month=month_year_need_to_check
                 ).exists()
                 # If data is not submitted, redirect to a specific page
                 if not submission_exists:

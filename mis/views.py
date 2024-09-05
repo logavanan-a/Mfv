@@ -9,7 +9,7 @@ from application_master.models import (District, Donor, Menus, Mission,
                                        MissionIndicatorTarget, Partner,
                                        PartnerMissionMapping, Project,
                                        ProjectDonorMapping, ProjectFiles,
-                                       State, UserPartnerMapping, UserProjectMapping,UserProfile)
+                                       State, UserPartnerMapping, UserProjectMapping,UserProfile,MasterLookUp)
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user, login, logout
@@ -62,15 +62,14 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            application_type_id = 0
+            application_type_id = []
             user_project=UserProjectMapping.objects.filter(user=request.user,active=2,project__application_type_id__isnull=False).select_related('project','project__partner_mission_mapping','project__partner_mission_mapping__partner','project__partner_mission_mapping__mission','project__district','project__district__state')
             if UserProfile.objects.filter(user=user,login_type__in = [1,3]).exists():
                 if user.groups.filter(name__in = ['Partner Data Entry Operator','Partner Admin','Project In-charge']).exists():# project incharge
                     if user_project.exists():
-                        application_type_id = user_project.first().project.application_type_id
+                        application_type_id = user_project.values_list('project__application_type_id',flat=True)
                     else:
                         error_message = "Please contact administrator."
-                        application_type_id=0
                         return render(request, 'login.html', locals())
                     user_project_ids = user_project.values_list('project__id',flat=True)
                     user_partner_list_roshni = user_project.filter(project__application_type_id=511).values_list('project__partner_mission_mapping__partner_id',flat=True)
@@ -91,7 +90,7 @@ def login_view(request):
                     user_parent_boundary_list = State.objects.filter(active=2).values_list('id',flat=True)
                     user_boundary_list = District.objects.filter(active=2).values_list('id',flat=True)
                 
-                request.session['application_type_id']=application_type_id
+                request.session['application_type_id']=list(application_type_id)
                 request.session['user_mission_list']=list(user_mission_id)
                 request.session['user_project_list']=list(user_project_ids)
                 request.session['user_partner_list']=list(user_partner_id)
@@ -539,20 +538,23 @@ def add_user(request, user_location=None):
             if User.objects.filter(username__iexact=username).exists():
                 user_exist_error = 'Username already exist'
                 return render(request, 'user/add_user.html', locals())
-            if email and User.objects.filter(email__iexact=email).exists():
-                email_error = 'Email already exist'
-                return render(request, 'user/add_user.html', locals())
+            # if email and User.objects.filter(email__iexact=email).exists():
+            #     email_error = 'Email already exist'
+            #     return render(request, 'user/add_user.html', locals())
             if UserProfile.objects.filter(phone_no__iexact=mobile_no).exists():
                 mobile_no_error = 'Mobile no already exist'
                 return render(request, 'user/add_user.html', locals())
             user = User.objects.create_user(username=username.lower(), password=password)
-            user.email =  email or None
-            user.first_name = first_name or None
-            user.last_name = last_name or None
+            if email:
+                user.email =  email
+            if first_name:
+                user.first_name = first_name
+            if last_name:
+                user.last_name = last_name
             user.groups.add(Group.objects.get(id = user_role ))
             user.save()
 
-            user_profile=UserProfile.objects.create(user=user, phone_no=mobile_no or None, login_type=login_type)
+            user_profile=UserProfile.objects.create(user=user, phone_no=mobile_no, login_type=login_type)
             user_profile.save()
             return redirect('mis:user_listing')
         except:
@@ -622,18 +624,21 @@ def edit_user(request, id):
             user_location = None
             user_exist_error = 'Username already exist'
             return render(request, 'user/edit_user.html', locals())
-        if User.objects.filter(email__iexact=email).exclude(id=user.id).exists():
-                user_location = None
-                email_error = 'Email already exist'
-                return render(request, 'user/edit_user.html', locals())
+        # if User.objects.filter(email__iexact=email).exclude(id=user.id).exists():
+        #         user_location = None
+        #         email_error = 'Email already exist'
+        #         return render(request, 'user/edit_user.html', locals())
         if UserProfile.objects.filter(phone_no__iexact=mobile_no).exclude(id=user_profile.id).exists():
             user_location = None
             mobile_no_error = 'Mobile no already exist'
             return render(request, 'user/edit_user.html', locals())
         user.username = username.lower()
-        user.first_name = first_name
-        user.last_name = last_name
-        user.email = email
+        if email:
+            user.email =  email
+        if first_name:
+            user.first_name = first_name
+        if last_name:
+            user.last_name = last_name
 
         if user_role:
             user.groups.clear()
