@@ -17,6 +17,9 @@
     margin-right: 20px;
     margin-left: 20px;
     }
+    .nav-pills .nav-link.active, .nav-pills .show>.nav-link{
+        color: #fff !important;
+    }
 </style>
 <div class="row align-items-center">
     <div class="col-xl-12 mx-auto">
@@ -93,78 +96,66 @@
                 </table>
                 
             </div>
-            <div class="container-fluid p-0">
-                <div class="row">
-                    <div class="col-md-12 d-flex justify-content-between">
-                        <div>
-                            <ul class="nav nav-tabs custom-tabs" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link active" data-bs-toggle="tab" href="#profile" role="tab"
-                                        aria-selected="false" tabindex="-1">
-                                        <span class="d-none d-sm-block">{% if model == 'partner' %} Mission Details {% endif %}</span>
-                                        <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="tab" href="#contact" role="tab"
-                                        aria-selected="false" tabindex="-1">
-                                        <span class="d-none d-sm-block">{% if model == 'partner' %} Project Details {% endif %}</span>
-                                        <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+            <div class="row">
+                <ul class="nav nav-pills p-2" role="tablist">
+                    <li class="nav-item waves-effect waves-light">
+                        <a class="nav-link active partner_class" data-bs-toggle="tab" href="#partner_tab" role="tab">
+                            <span class="">{% if model == 'partner' %} Mission Details {% endif %}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item waves-effect waves-light">
+                        <a class="nav-link project_class" data-bs-toggle="tab" href="#project_tab" role="tab">
+                            <span class="">{% if model == 'partner' %} Project Details {% endif %}</span>
+                        </a>
+                    </li>
+                </ul>
             </div>
-
-            <div class="tab-content" id="myTabContent">
+            <div class="tab-content p-2" id="myTabContent">
                 
                 {% if model == 'partner' %}
-                
-                <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                    <div class="table-responsive" data-pattern="priority-columns">
-                        <button type="button" class="btn btn-outline-primary waves-effect btn-xs float-end mb-2 mx-0" onclick="location.href='/application_master/partner_mission_mapping/{{id}}/'"><i class="bx bx-plus-medical" title="Add New"></i></button>
-                    </div>
-                    {% if parner_mission_obj %}
-                    <div class="table-responsive">
-                        <table class="table dt-responsive">
-                            <thead class="table-light">
+                    <div class="tab-pane fade show active" id="partner_tab" role="tabpanel" aria-labelledby="profile-tab">
+                        <div class="table-responsive" data-pattern="priority-columns">
+                            <button type="button" class="btn btn-outline-primary waves-effect btn-xs float-end mb-2 mx-0" onclick="location.href='/application_master/partner_mission_mapping/{{id}}/'"><i class="bx bx-plus-medical" title="Add New"></i></button>
+                        </div>
+                        {% if parner_mission_obj %}
+                        <div class="table-responsive">
+                            <table class="table dt-responsive">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th colspan="5">Mission mapping details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Partner</th>
+                                        <th>Mission</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    {% for l in parner_mission_obj %}
                                 <tr>
-                                    <th colspan="5">Mission mapping details</th>
+                                    <td>{{ l.id }}</td>
+                                    <td>{{ l.partner }}</td>
+                                    <td>{{ l.mission|default_if_none:'-' }}</td>
+                                    <td>{% if l.active == 2 %}Active {% else %}Inactive{% endif %}</td>
+                                    <td>                                  
+                                        {% if l.active == 2 %}<button class='btn btn-outline-danger' onclick="Confirm('{{l.id}}', 'Deactivate')"><i class="mdi mdi-close-circle"  title="Deactivate"></i></button>{% else %}<button class='btn btn-outline-success' onclick="Confirm('{{l.id}}', 'Activate')"><i class="mdi mdi-checkbox-marked-circle" title="Activate"></i></button>{% endif %}
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <th>Id</th>
-                                    <th>Partner</th>
-                                    <th>Mission</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                                {% for l in parner_mission_obj %}
-                            <tr>
-                                <td>{{ l.id }}</td>
-                                <td>{{ l.partner }}</td>
-                                <td>{{ l.mission|default_if_none:'-' }}</td>
-                                <td>{% if l.active == 2 %}Active {% else %}Inactive{% endif %}</td>
-                                <td>                                  
-                                    {% if l.active == 2 %}<button class='btn btn-outline-danger' onclick="Confirm('{{l.id}}', 'Deactivate')"><i class="mdi mdi-close-circle"  title="Deactivate"></i></button>{% else %}<button class='btn btn-outline-success' onclick="Confirm('{{l.id}}', 'Activate')"><i class="mdi mdi-checkbox-marked-circle" title="Activate"></i></button>{% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                                {% endfor %}
+                                </tbody>
+                        </table>
+                        </div>
                 {% else %}
-                <div class ="col text-center">
-                    <h5 style="color: red;">Please map the Mission to a partner. No data available.</h5>
-                </div>
+                    <div class ="col text-center">
+                        <h5 style="color: red;">Please map the Mission to a partner. No data available.</h5>
+                    </div>
                 {% endif %}
                 </div>
                 {% endif %}
                 {% if model == 'partner' %}
-                <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                <div class="tab-pane fade" id="project_tab" role="tabpanel" aria-labelledby="contact-tab">
                     {% if parner_mission_obj %}
                     <div class="table-responsive" data-pattern="priority-columns">
                         <button type="button" class="btn btn-outline-primary waves-effect btn-xs float-end mb-2 mx-0" onclick="location.href='/application_master/adding_project/{{id}}/'"><i class="bx bx-plus-medical" title="Add New"></i></button>
@@ -173,7 +164,7 @@
                         <table class="table  dt-responsive ">
                             <thead class="table-light">
                                 <tr>
-                                    <th colspan="9">Project Details</th>
+                                    <th colspan="10">Project Details</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -182,10 +173,12 @@
                                     <th>Name</th>
                                     <th>Partner Mission Mapping</th>
                                     <th>District</th>
+                                    <th>Donor</th>
                                     <th>Location</th>
                                     <th>Start Date</th>
                                     <th>End Date</th>
                                     <th>Status</th>
+                                    <th>Action</th>
                                 </tr>
                                 {% for l in project_map %}
                                 <tr>
@@ -193,10 +186,15 @@
                                     <td>{{ l.name }}</td>
                                     <td>{{l.partner_mission_mapping }}</td>
                                     <td>{{l.district }}</td>
+                                    <td>{{l.projectdonormapping.donor.name }}</td>
                                     <td>{{l.location }}</td>
                                     <td>{{l.start_date|default_if_none:'-' }}</td>
                                     <td>{{l.end_date|default_if_none:'-' }}</td>
                                     <td>{{l.get_active_display }}</td>
+                                    <td>  
+                                        <a href="/application_master/edit/project/{{l.id}}/?project" class="btn btn-outline-secondary  edit" title="Edit"><i class="fas fa-pencil-alt"></i></a>
+                                        {% comment %} {% if l.active == 2 %}<button class='btn btn-outline-danger' onclick="Confirm('{{l.id}}', '{{model}}', 'Deactivate')"><i class="mdi mdi-close-circle"  title="Deactivate"></i></button>{% else %}<button class='btn btn-outline-success' onclick="Confirm('{{l.id}}', '{{model}}', 'Activate')"><i class="mdi mdi-checkbox-marked-circle" title="Activate"></i></button>{% endif %} {% endcomment %}
+                                    </td>
                                 </tr> 
                                 {% endfor %}
                             </tbody>
@@ -210,6 +208,8 @@
                 </div>
                 {% endif %}
             </div>
+        
+            
         </div>
     </div> 
 </div> 
@@ -230,6 +230,13 @@
 <!-- Datatable init js -->
 <script src="{% static 'js/pages/datatables.init.js' %}"></script>
 <script type="text/javascript" >
+    {% if "project" in request.GET.dict %}
+        $(document).ready(function(){
+            //$('.project_class').trigger('click');
+            $('.nav-pills a[href="#project_tab"]').tab('show');
+        });
+    {% endif %}
+    
     function Confirm(id, title) {
         Swal.fire({
             title: "Are you sure!",

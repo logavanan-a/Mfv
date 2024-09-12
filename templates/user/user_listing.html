@@ -54,7 +54,7 @@
                                     {% for u in object_list %}
                                         <tr>
                                             <tr>
-                                                <td><a href="/user-profile/{{u.user.id}}/">{{u.user.username}}</a></td>
+                                                <td><b><a href="/user-profile/{{u.user.id}}/">{{u.user.username}}</a></b></td>
                                                 <td>
                                                     {{ u.user.groups.all.0 }} 
                                                 </td>
