@@ -86,7 +86,7 @@ class ProjectForm(forms.ModelForm):
     start_date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
     end_date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
     donor = forms.ModelChoiceField(queryset=Donor.objects.all(), required=True, empty_label="Select Donor")
-    application_type = forms.ModelChoiceField(queryset=MasterLookUp.objects.filter(active=2,parent_id=509).order_by("name"),required = True,empty_label="select application type")
+    # application_type = forms.ModelChoiceField(queryset=MasterLookUp.objects.filter(active=2,parent_id=509).order_by("name"),required = True,empty_label="select application type")
     additional_info = forms.CharField(widget=forms.Textarea(attrs={'placeholder':'Enter description','rows':3}),required = False)
 
     def __init__(self, *args, **kwargs):
@@ -101,7 +101,7 @@ class ProjectForm(forms.ModelForm):
 
         # self.fields['partner_mission_mapping'].widget.attrs['class'] = 'form-select select2'
         self.fields['state'].widget.attrs['class'] = 'form-select select2'
-        self.fields['application_type'].widget.attrs['class'] = 'form-select select2'
+        # self.fields['application_type'].widget.attrs['class'] = 'form-select select2'
         self.fields['district'].widget.attrs['class'] = 'form-select select2'
         self.fields['donor'].widget.attrs['class'] = 'form-select select2'
         self.fields['additional_info'].widget.attrs['class'] = 'form-control'
@@ -124,7 +124,7 @@ class ProjectForm(forms.ModelForm):
             
     class Meta:
         model = Project
-        fields = ['name', 'state', 'district','location','start_date','end_date', 'donor', 'application_type','additional_info']
+        fields = ['name', 'state', 'district','location','start_date','end_date', 'donor','additional_info']
 
 
 class DonorForm(forms.ModelForm):

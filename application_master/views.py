@@ -77,7 +77,7 @@ def master_list_form(request,model,key=None):
             objects = objects.filter(id__in=project_list)
             
     data = get_pagination(request, objects)
-    
+
     current_page = request.GET.get('page', 1)
     page_number_start = int(current_page) - 2 if int(current_page) > 2 else 1
     page_number_end = page_number_start + 5 if page_number_start + \
@@ -139,8 +139,8 @@ def master_edit_form(request,model,id):
         part = Partner.objects.filter(id=id).values_list('id', flat=True)
         user_prop = UserPartnerMapping.objects.filter(partner_id__in = part)
     if model == 'project':
-        part = Project.objects.filter(id=id).values_list('id', flat=True)
-        user_prop = UserProjectMapping.objects.filter(project_id__in = part)
+        part = Project.objects.get(id=id)
+        user_prop = UserProjectMapping.objects.filter(project = part)
         project_donor_obj = ProjectDonorMapping.objects.filter(project_id=id).values_list('donor_id', flat=True)
         donor = Donor.objects.filter(id__in=project_donor_obj).first()
 
@@ -170,6 +170,8 @@ def master_edit_form(request,model,id):
                 project_id=id,
                 defaults={'donor_id': donor}
             )
+            if 'project' in request.GET.dict():
+                return redirect(f'/application_master/details/partner/{part.partner_mission_mapping.partner_id}/?project')
         return redirect('/application_master/list/'+str(model)+'/?page='+str(page))
     else:
         message = [str(forms.errors[error][0]) for error in forms.errors.as_data()]
@@ -223,7 +225,7 @@ def master_details_form(request,model,id):
         missions = Mission.objects.filter(active=2).count()
         parner_mission_obj = PartnerMissionMapping.objects.filter(partner_id__in=part,active=2).order_by('-id')
         total = parner_mission_obj.count()
-        project_map = Project.objects.filter(partner_mission_mapping_id__in = parner_mission_obj).order_by('-id')
+        project_map = Project.objects.filter(partner_mission_mapping_id__in = parner_mission_obj).select_related('projectdonormapping','projectdonormapping__donor').order_by('-id')
     elif model == 'project':
         heading="Project"
         user_mapping = UserProjectMapping.objects.filter(project_id=id).values_list('user_id', flat=True)
@@ -559,23 +561,25 @@ def stripmessage(errors):
 
 def adding_project(request,id):
     states = State.objects.filter(active=2).order_by('name')
-    districts = District.objects.filter(active=2).order_by('name')
+    
     donors = Donor.objects.filter(active=2)
-    partner = Partner.objects.filter(id=id).values_list('id', flat=True)
-    application_type_obj = MasterLookUp.objects.filter(parent_id=509)
-    partner_missions = PartnerMissionMapping.objects.filter(partner_id__in=partner)
+    # partner = Partner.objects.filter(id=id).values_list('id', flat=True)
+    # # application_type_obj = MasterLookUp.objects.filter(parent_id=509) # not req need to remove 
+    partner_missions = PartnerMissionMapping.objects.filter(active=2,partner_id = id).distinct()
     if request.method == 'POST':
         name = request.POST.get('name')
         partner_mission = request.POST.get('partner_mission')
         state = request.POST.get('state')
+        if state:
+            districts = District.objects.filter(active=2,state_id=state).order_by('name')
         district = request.POST.get('district')
         location = request.POST.get('location')
         donor = request.POST.get('donor')
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date')
         additional_info = request.POST.get('additional_info')
-        application_type = request.POST.get('application_type')
-        if not Project.objects.filter(district_id=district,active=2).exists():
+        # application_type = request.POST.get('application_type')
+        if not ProjectDonorMapping.objects.filter(active=2,project__active=2,project__partner_mission_mapping_id=partner_mission,project__district_id=district).exists():
             pro_details = Project.objects.create(
                 name=name,
                 partner_mission_mapping_id=partner_mission,
@@ -584,14 +588,14 @@ def adding_project(request,id):
                 additional_info=additional_info or None,
                 start_date=start_date or None,
                 end_date=end_date or None,    
-                application_type_id=application_type,        
+                # application_type_id=application_type,        
             )
             pro_details.save()
             ProjectDonorMapping.objects.update_or_create(
                         project_id=pro_details.id,
                         defaults={'donor_id': donor}
                     )
-            return redirect('/application_master/details/partner/'+ str(id) + '/')
+            return redirect('/application_master/details/partner/'+ str(id) + '/?project')
         else:
-            error_msg = "This district is already mapped to another project."        
+            error_msg = "Please ensure the selected Partner, District and Donor already exists."        
     return render(request, 'user/adding_project.html', locals())

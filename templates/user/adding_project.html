@@ -20,12 +20,12 @@ map_project{% extends 'base.html' %}
                                 Please enter name.
                             </div>
                         </div>
-                        <label class="col-md-2 col-form-label">Partner mission mapping<span class="required-field"></span></label>
+                        <label class="col-md-2 col-form-label">Mission<span class="required-field"></span></label>
                         <div class="col-md-4">
                             <select name="partner_mission" class="form-select select2" required>
-                                <option value="" disabled selected>Select partner mission mapping</option>
+                                <option value="" disabled {% if partner_missions|length > 1 %} selected {% endif %}  >Select mission</option>
                                 {% for pm in partner_missions %}
-                                    <option value="{{ pm.id }}"{% if pm.id|slugify == partner_mission %}selected{% endif %}>{{ pm }}</option>
+                                <option value="{{ pm.id }}" >{{ pm.mission.name }}</option>
                                 {% endfor %}
                             </select> 
                             <div class="invalid-feedback">
@@ -83,14 +83,14 @@ map_project{% extends 'base.html' %}
                     <div class="row mb-4">
                         <label class="col-md-2 col-form-label">Start Date</label>
                         <div class="col-md-4">
-                            <input type="date" name= "start_date"  class="form-control" id="myDateInput" value="{{start_date|default_if_none:''}}"  onfocus="this.max=new Date().toISOString().split('T')[0]">
+                            <input type="date" name= "start_date" onchange="end_date.min=this.value" class="form-control" id="start_date" value="{{start_date|default_if_none:''}}"  onfocus="this.max=new Date().toISOString().split('T')[0]">
                             <div class="invalid-feedback">
                                 Please choose date.
                             </div>
                         </div>
                         <label class="col-md-2 col-form-label">End Date</label>
                         <div class="col-md-4">
-                            <input type="date" name= "end_date"  class="form-control" id="myDateInput" value="{{end_date|default_if_none:''}}" onfocus="this.max=new Date().toISOString().split('T')[0]">
+                            <input type="date" name= "end_date"  class="form-control" id="end_date" value="{{end_date|default_if_none:''}}" onfocus="this.max=new Date().toISOString().split('T')[0]">
                             <div class="invalid-feedback">
                                 Please choose date.
                             </div>
@@ -98,7 +98,7 @@ map_project{% extends 'base.html' %}
                     </div>
                       
                     <div class="row mb-4">
-                        <label class="col-md-2 col-form-label">Application Type<span class="required-field"></span></label>
+                        {% comment %} <label class="col-md-2 col-form-label">Application Type<span class="required-field"></span></label>
                         <div class="col-md-4">
                             <select name="application_type" class="form-select select2" required>
                                 <option value="" disabled selected>Select application type</option>
@@ -109,7 +109,7 @@ map_project{% extends 'base.html' %}
                             <div class="invalid-feedback">
                                 Please select application type.
                             </div>                       
-                        </div>
+                        </div> {% endcomment %}
                         <label class="col-md-2 col-form-label">Additional Info<span ></span></label>
                         <div class="col-md-4">
                             <textarea type="text" class="form-control" id="" name='additional_info' placeholder="Enter Additional info"  rows="5" cols="50"> {{additional_info}}</textarea>
