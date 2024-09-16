@@ -324,70 +324,19 @@ class WebResponseListing(View):
         extra_config,profile_obj,object_lists={},None,None
         survey=None
         survey_questions={}
-        facilities=''
         request_data=request.GET.dict()
         donor_obj = Donor.objects.filter(active=2)
         project_list = UserProjectMapping.objects.filter()
         donor_list = ProjectDonorMapping.objects.filter()
+
+        #load_data_to_cache call for if cache cleared
+        load_data_to_cache()
+        
         if request.user.groups.all()[0].id in [1,2,4]:
             project_list = project_list.filter(user_id=request.user.id)
             donor_list = donor_list.filter(project__id__in=project_list.values_list('project_id',flat=True))
             donor_obj = Donor.objects.filter(id__in=donor_list.values_list('donor',flat=True), active=2)
             
-        #load_data_to_cache call for if cache cleared
-        load_data_to_cache()
-        
-        #Getting the mapped facility json answer ids from UserFacilityMapping
-        #District level user = 29 / State level user = 28 / National level user = 27
-        locations=request.session.get('user_boundary_list')
-
-        #Caching the facility ids for the user
-        # cache_key_facility = 'faclity_ids_for_user'
-        # user_facility_list =  cache.get(cache_key_facility)
-        # if not user_facility_list:
-        # import ipdb;ipdb.set_trace()
-        current_time = datetime.now()
-        if request.session.get('user_organizationunit_id') in [29,28] :
-            # facilities='or survey_id = 2'
-            #added for RC data to show the district only
-            rc_json_id =  BeneficiaryResponse.objects.filter(Q(address_2__in = locations) | Q(address_1__in = locations),survey_id=2,active=2).values_list('json_answer_id',flat=True)
-            facilities='or js.id in ({0})'.format(str(list(rc_json_id) or ['0'])[1:-1])
-            user_role_type_ids=request.session.get('user_role_id')
-            #get all the beneficiries based on assigned locations
-            if (27 in user_role_type_ids):
-                #get json answers created by ppm
-                user_facility_list=cache.get(f'{INSTANCE_CACHE_PREFIX}facility_mapping_{request.user.id}')
-                if not user_facility_list:
-                    user_facility_list=UserFacilityMapping.objects.filter(Q(deactivate_date__gte=current_time) | Q(deactivate_date=None),user_id=request.user.id).exclude(active=0).values_list('json_answer_id',flat=True)
-                    cache_set_with_namespace(INSTANCE_CACHE_PREFIX+'SURVEY_LISTING_PAGE',f'{INSTANCE_CACHE_PREFIX}facility_mapping_{request.user.id}',user_facility_list,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
-                # user_facility_list=request.session.get('facility_list',[-1])
-                facilities=facilities+" or (user_id = {0} and (survey_id in (5,6,7,17) or js.response ->> '616' != '620'))".format(request.user.id)
-                # facilities=facilities+" or (s.id = 7 and user_id = {0}) or (js.response ->> '616' != '620' and user_id = {0})".format(request.user.id)
-            else:
-                user_facility_list=BeneficiaryResponse.objects.filter((Q(address_2__in=locations)|Q(address_1__in=locations)|Q(survey_id=2)),active=2).values_list('json_answer_id',flat=True)
-                #boundaries based on user
-                boundaries =  load_data_to_cache_boundaries_name()
-                district_boundarys=[item.get('id') for item in boundaries if item.get('parent') in locations or item.get('id') in locations] 
-                facilities=facilities+" or (survey_id in (7) and js.cluster ->> 'Boundary' in ({0}))".format(str(list(map(str, district_boundarys if district_boundarys else [-1])))[1:-1])
-
-            #js.id in ({0})  or 
-            facilities=' and (js.facility_id in ({0}) {1})'.format(','.join(list(map(str, user_facility_list if user_facility_list else [-1]))),facilities)
-        # else:
-        #     
-        # elif request.session.get('user_organizationunit_id') == 28:
-        #     user_facility_list=BeneficiaryResponse.objects.filter(active=2,address_1__in=locations).values_list('json_answer_id',flat=True)
-        # else:
-        #     user_facility_list=JsonAnswer.objects.filter(active=2).values_list('id',flat=True)
-            # cache_set_with_namespace('SURVEY_LISTING_PAGE',cache_key_facility,user_facility_list,settings.CACHES.get("default")['DEFAULT_SHORT_DURATION'])
-        
-        # #Caching the location based json ids for the user
-        # cache_key_location_json = 'lcoation_json_ids_for_user'
-        # user_location_json_list =  cache.get(cache_key_location_json)
-        # if not user_location_json_list:
-
-
-        
-
         if creation_key:
             profile_obj = JsonAnswer.objects.get(creation_key=creation_key)
             survey=profile_obj.survey
@@ -404,18 +353,6 @@ class WebResponseListing(View):
                 cache_survey_id.update({profile_cache_key:survey.id})
                 survey_id = survey
             
-
-            # if survey.data_entry_level_id == 1:
-                # level_obj = BoundaryLevel.objects.get(code=request.session.get('user_boundary_levelcode'))
-                # user_locations = user_projects_locations(request.user, level_obj)
-                # if request.session.get('user_boundary_levelcode') == 2 :
-                #     ben_responses=BeneficiaryResponse.objects.filter(address_2__in = user_locations,survey__slug=survey_slug).order_by('modified')
-                # else:
-                #     ben_responses=BeneficiaryResponse.objects.filter(address_1__in = user_locations,survey__slug=survey_slug).order_by('modified')
-                # ben_responses_ids=ben_responses.values_list('json_answer_id',flat=True) 
-                # query='select js.id,survey_id,response,s.slug,creation_key,js.created,js.modified,js.active from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active=2 and s.id = {0} and js.id in ({1}) @@filters order by @@order_by'.format(survey.id,','.join(list(map(str, user_facility_list if user_facility_list else [0]))))
-                # object_lists = JsonAnswer.objects.filter(id__in=ben_responses_ids,survey__slug=survey_slug,active=2).values('survey_id','response','survey__slug','creation_key','created','modified','active').order_by(*listing_order)
-            # else:
             user_district = list(UserProjectMapping.objects.filter(user_id=request.user.id).values_list('project__district__id',flat=True))
             district_id=Boundary.objects.filter(active=2,code__in=list(map(str,user_district))).values_list('id',flat=True)
             creation_key_wise_district = "','".join(list(BeneficiaryResponse.objects.filter(address_2__in=district_id).values_list('creation_key',flat=True)))
@@ -427,16 +364,13 @@ class WebResponseListing(View):
             if district:
                 # district_name = Boundary.objects.get(active=2,code=district,boundary_level_type_id=2).name
                 creation_key_wise_district = "','".join(list(BeneficiaryResponse.objects.filter(address_2=district).values_list('creation_key',flat=True)))
-            query='select js.id,survey_id,response,s.slug,creation_key,js.created,js.modified,js.active, pd.donor_id from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id left join application_master_userprojectmapping up on up.user_id = js.user_id left join application_master_projectdonormapping pd on pd.project_id = up.project_id where js.active != 0 and s.id = {0} {1}  @@creation_key @@creation_key_wise_district @@filters @@school_creation_key @@donor order by @@order_by'.format(survey.id,facilities)#@@filters
+            query='select DISTINCT ON (js.creation_key)  js.id,survey_id,response,s.slug,creation_key,js.created,js.modified,js.active, pd.donor_id from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id left outer join application_master_userprojectmapping up on up.user_id = js.user_id left outer join application_master_projectdonormapping pd on pd.project_id = up.project_id where js.active != 0 and s.id = {0} @@creation_key @@creation_key_wise_district @@filters @@school_creation_key @@donor order by @@order_by'.format(survey.id)#@@filters
             if survey.id == 1 and request.user.groups.all()[0].id in [1,2,4]:
                 query=query.replace("@@creation_key_wise_district"," and creation_key in (\'{0}\')".format(creation_key_wise_district))
             else:
                 query=query.replace("@@creation_key_wise_district","")
-                # query='select js.id,survey_id,response,s.slug,creation_key,js.created,js.modified,js.active from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} {1} and creation_key in (\'{2}\')  @@creation_key @@filters @@donor order by @@order_by'.format(survey.id,facilities,creation_key_wise_district)#@@filters
             if school_creation_key:
                 query=query.replace("@@school_creation_key"," and js.response->>\'237\'=\'{0}\'".format(school_creation_key))
-                # query='select js.id,survey_id,js.response,s.slug,creation_key,js.created,js.modified,js.active from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id where js.active != 0 and s.id = {0} {1} and js.response->>\'237\'=\'{2}\'  @@creation_key @@filters @@donor order by @@order_by'.format(survey.id,facilities,school_creation_key)#@@filters
-                # object_lists = JsonAnswer.objects.filter(facility_id__in=request.session.get('facility_list'),survey__slug=survey_slug,active=2).values('survey_id','response','survey__slug','creation_key','created','modified','active').order_by(*listing_order)
             else:
                 query=query.replace("@@school_creation_key","")
 
@@ -449,9 +383,6 @@ class WebResponseListing(View):
             else:
                 query=query.replace("@@donor","")
 
-
-
-                # object_lists=object_lists.filter(cluster__BeneficiaryResponse=creation_key).order_by('-created')                
             survey_key_question = INSTANCE_CACHE_PREFIX+'survey_heading_questions_for_'+str(survey.id)
             cache_survey_id.update({survey_key_question:survey.id})
         
@@ -526,15 +457,10 @@ class WebResponseListing(View):
 
                 
             filtered_query=search_filter_replace(request,query,filters,search_field,address_widget_filter)
-            
-            filtered_query=filtered_query.replace('@@order_by','created desc')
+            filtered_query=filtered_query.replace('@@order_by','js.creation_key, js.created DESC')
             object_lists=JsonAnswer.objects.raw(filtered_query)
-            #validation of add button inside the profile page
-            button_query=query.replace('@@order_by','created desc limit 1')
-            button_query=button_query.replace('@@filters','')
-            object_list=JsonAnswer.objects.raw(button_query)
 
-            # import ipdb;ipdb.set_trace()
+            
             #inside the profile page add button validation
             hide_button=add_button_validation_profile(survey,object_list)
             #main listing page button hide 

@@ -31,12 +31,12 @@ def get_menu_list(request):
     group =request.user.groups.all()[0].id
     user_mission_list=request.session.get('user_mission_list')
     menus = []
-    if len(user_mission_list) == 2:
-        menus = Menus.objects.filter(active = 2, parent=None,group=group).order_by("menu_order")
-    elif 5 in user_mission_list:
-        menus = Menus.objects.filter(active = 2, parent=None,group=group).exclude(id=18).order_by("menu_order")
-    elif 2 in user_mission_list:
-        menus = Menus.objects.filter(active = 2, parent=None,group=group).exclude(id=1).order_by("menu_order")
+    menus = Menus.objects.filter(active = 2, parent=None,group=group).order_by("menu_order")
+    if (not request.user.is_superuser) and (not (5 in user_mission_list and 2 in user_mission_list)):
+        if 5 in user_mission_list:
+            menus = menus.exclude(id=18).order_by("menu_order")
+        elif 2 in user_mission_list:
+            menus = menus.exclude(id=1).order_by("menu_order")
     return menus
 
 # @register.simple_tag
