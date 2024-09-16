@@ -515,7 +515,21 @@
                     <div class="col-lg-6" id='skip_{{question.id}}'>
                         <div class=" mb-3">
                             <label class="form-label" for="floatingnameInput">{{question.form_question_number|default:''}} {{question.text}} {% if question.mandatory %}<span class="required-field"></span>{% endif %}</label>
-                            <input type="{% if question.training_config.month %}month{% else %}date{% endif %}" class="form-control main_question D_0_0 {% if question.mandatory %}required{% endif %}" {% if question.training_config.dob %}onchange="getAge(this,{{question.id}},{{question.training_config.minor|default:'false'}})"{% endif %} pattern="DD/MM/YYYY" name="{{question.id}}" min='{% if question.training_config.month %}{{validation_code.MinMax.min|slice:":-"|slice:"-3"}}{% else %}{{validation_code.MinMax.min}}{% endif%}' max='{% if question.training_config.month %}{{validation_code.MinMax.max|slice:":-"|slice:"-3"}}{% else %}{{validation_code.MinMax.max}}{% endif %}' id="{{question.id}}" {% if question.mandatory %}required{% endif %} {% if not question.is_editable and response_obj.response and response_obj.response.616 != '619'   and creation_key %}readonly{% endif %}>
+                            {% comment %} <input type="{% if question.training_config.month %}month{% else %}date{% endif %}" class="form-control main_question D_0_0 {% if question.mandatory %}required{% endif %}" {% if question.training_config.dob %}onchange="getAge(this,{{question.id}},{{question.training_config.minor|default:'false'}})"{% endif %} pattern="DD/MM/YYYY" name="{{question.id}}" min='{% if question.training_config.month %}{{validation_code.MinMax.min|slice:":-"|slice:"-3"}}{% else %}{{validation_code.MinMax.min}}{% endif%}' max='{% if question.training_config.month %}{{validation_code.MinMax.max|slice:":-"|slice:"-3"}}{% else %}{{validation_code.MinMax.max}}{% endif %}' id="{{question.id}}" {% if question.mandatory %}required{% endif %} {% if not question.is_editable and response_obj.response and response_obj.response.616 != '619'   and creation_key %}readonly{% endif %}> {% endcomment %}
+                            <input 
+                                type="{% if question.training_config.month %}month{% else %}date{% endif %}" 
+                                class="form-control main_question D_0_0 {% if question.mandatory %}required{% endif %}" 
+                                {% if question.training_config.dob %}onchange="getAge(this, {{ question.id }}, {{ question.training_config.minor|default:'false' }})"{% endif %} 
+                                pattern="DD/MM/YYYY" 
+                                name="{{ question.id }}" 
+                                min="{% if question.training_config.month %}{{ validation_code.MinMax.min|slice:":-"|slice:"-3" }}{% else %}{{ validation_code.MinMax.min }}{% endif %}" 
+                                max="{% if question.training_config.month %}{{ validation_code.MinMax.max|slice:":-"|slice:"-3" }}{% else %}{{ validation_code.MinMax.max }}{% endif %}" 
+                                id="{{ question.id }}" 
+                                {% if question.mandatory %}required{% endif %} 
+                                {% if not question.is_editable and response_obj.response and response_obj.response.616 != '619' and creation_key %}readonly{% endif %}
+                                {% if question.text|lower == 'activity date' and not response_obj %}value="{{ request.session.activity_date|default:'' }}"{% endif %}
+                            />
+
                             <div class="invalid-feedback">
                                 {% if validation_code.message %}{{validation_code.message}}{% else %}Please enter a valid {{question.text}}{% endif %}
                             </div>

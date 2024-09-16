@@ -599,3 +599,26 @@ def adding_project(request,id):
         else:
             error_msg = "Please ensure the selected Partner, District and Donor already exists."        
     return render(request, 'user/adding_project.html', locals())
+
+
+@csrf_exempt
+def save_activity(request):
+    if request.method == 'POST':
+        activity_date = request.POST.get('activity_date')
+        user = request.user  # Assuming the user is authenticated
+
+        # Fetch the latest active activity for the user
+        latest_activity = UserActivityDate.objects.filter(user=user,active=2).order_by('-activity_date').first()
+
+        # Check if the new activity date is different from the latest one
+        if (not latest_activity) or (latest_activity and latest_activity.activity_date.strftime('%Y-%m-%d') != activity_date):
+
+            # Find any existing active activity for the user and update its status to 0 (inactive)
+            UserActivityDate.objects.filter(user=user, active=2).update(active=0)
+
+            # Create and save the new activity with status = True (active)
+            activity = UserActivityDate.objects.create(user=user, activity_date=activity_date)
+            request.session['activity_date'] = activity_date
+
+        return JsonResponse({'status': 'success', 'message': 'Activity date saved.'})
+    return JsonResponse({'status': 'fail', 'message': 'Invalid request'}, status=400)
