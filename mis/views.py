@@ -62,17 +62,17 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            application_type_id = []
-            user_project=UserProjectMapping.objects.filter(user=request.user,active=2,project__application_type_id__isnull=False).select_related('project','project__partner_mission_mapping','project__partner_mission_mapping__partner','project__partner_mission_mapping__mission','project__district','project__district__state')
+            # application_type_id = []
+            user_project=UserProjectMapping.objects.filter(user=request.user,active=2).select_related('project','project__partner_mission_mapping','project__partner_mission_mapping__partner','project__partner_mission_mapping__mission','project__district','project__district__state')
             if UserProfile.objects.filter(user=user,login_type__in = [1,3]).exists():
                 if user.groups.filter(name__in = ['Partner Data Entry Operator','Partner Admin','Project In-charge']).exists():# project incharge
-                    if user_project.exists():
-                        application_type_id = user_project.values_list('project__application_type_id',flat=True)
-                    else:
-                        error_message = "Please contact administrator."
-                        return render(request, 'login.html', locals())
+                    # if user_project.exists():
+                    #     application_type_id = user_project.values_list('project__application_type_id',flat=True)
+                    # else:
+                    #     error_message = "Please contact administrator."
+                    #     return render(request, 'login.html', locals())
                     user_project_ids = user_project.values_list('project__id',flat=True)
-                    user_partner_list_roshni = user_project.filter(project__application_type_id=511).values_list('project__partner_mission_mapping__partner_id',flat=True)
+                    user_partner_list_roshni = user_project.filter(project__partner_mission_mapping__mission_id=2).values_list('project__partner_mission_mapping__partner_id',flat=True)
                     user_partner_id = user_project.values_list('project__partner_mission_mapping__partner_id',flat=True)
                     user_mission_id = user_project.values_list('project__partner_mission_mapping__mission_id',flat=True)
 
@@ -83,14 +83,14 @@ def login_view(request):
                 elif user.is_superuser:
                     user_mission_id=Mission.objects.filter(active=2).values_list('id',flat=True)
                     user_project_ids=Project.objects.filter(active=2).values_list('id',flat=True)
-                    user_partner_list_roshni = user_project_ids.filter(application_type_id=511).values_list('partner_mission_mapping__partner_id',flat=True)
+                    user_partner_list_roshni = user_project_ids.filter(partner_mission_mapping__mission_id=2).values_list('partner_mission_mapping__partner_id',flat=True)
                     user_partner_id=Partner.objects.filter(active=2).values_list('id',flat=True)
                     user_donor_id=Donor.objects.filter(active=2).values_list('id',flat=True).distinct()
                     user_category_list=MissionIndicatorCategory.objects.filter(active=2).values_list('id',flat=True)
                     user_parent_boundary_list = State.objects.filter(active=2).values_list('id',flat=True)
                     user_boundary_list = District.objects.filter(active=2).values_list('id',flat=True)
                 
-                request.session['application_type_id']=list(application_type_id)
+                # request.session['application_type_id']=list(application_type_id)
                 request.session['user_mission_list']=list(user_mission_id)
                 request.session['user_project_list']=list(user_project_ids)
                 request.session['user_partner_list']=list(user_partner_id)
@@ -109,7 +109,7 @@ def login_view(request):
                     
                 except:
                     user_partner = ''  
-                return redirect('/task-list/') if user.groups.all()[0].id != 9 and application_type_id !=511 else redirect('/dashboard/?page_slug=mission-roshni')
+                return redirect('/task-list/') if user.groups.all()[0].id != 9 and 2 not in user_mission_id else redirect('/dashboard/?page_slug=mission-roshni')
             else:
                 error_message = "Please contact administrator."
         else:
@@ -291,7 +291,7 @@ def task_list(request):
     below_last_two_month = datetime.now().date() - relativedelta(months=2)
 
     mission_objs = Mission.objects.filter(active=2,id__in=request.session['user_mission_list'])
-    project_objs = Project.objects.filter(active=2,id__in=request.session['user_project_list'],application_type_id=510).order_by('name')
+    project_objs = Project.objects.filter(active=2,id__in=request.session['user_project_list']).order_by('name')
     partner_objs = Partner.objects.filter(active=2,id__in=request.session['user_partner_list']).order_by('name')
     filter_data = request.GET
     archive = filter_data.get('archive') if(filter_data.get('archive') != 'None') else None
@@ -393,7 +393,7 @@ def project_list(request):
     heading= 'Project List'
     partner = UserPartnerMapping.objects.get(user = request.user).partner
     partner_mission_mapping_ids = PartnerMissionMapping.objects.filter(partner = partner).values_list('id', flat=True)
-    project_obj = Project.objects.filter(partner_mission_mapping__id__in = partner_mission_mapping_ids, partner_mission_mapping__mission__id__in = [2,1],application_type_id=510)
+    project_obj = Project.objects.filter(partner_mission_mapping__id__in = partner_mission_mapping_ids, partner_mission_mapping__mission__id__in = [2,1])
     object_list = get_pagination(request, project_obj)
 
     page_number_display_count = 5
@@ -449,7 +449,7 @@ class ProjectAdd(View):
         if partner_mission_mapping_id:
             partner = UserPartnerMapping.objects.get(user = request.user).partner
             partner_mission_mapping_obj = PartnerMissionMapping.objects.get(partner = partner, id = partner_mission_mapping_id)
-        project_add = Project.objects.create(name = name, start_date = start_date, partner_mission_mapping = partner_mission_mapping_obj, district = district_obj, location=location,application_type_id=510 )
+        project_add = Project.objects.create(name = name, start_date = start_date, partner_mission_mapping = partner_mission_mapping_obj, district = district_obj, location=location,partner_mission_mapping__mission_id=5 )
         return redirect('/project-list/')
 
 
@@ -691,9 +691,9 @@ def project_list_filter(request):
     if request.method == "POST":
         mission_id =request.POST.get('mission_id')
         if mission_id:
-            project_obj =  Project.objects.filter(active=2).filter(partner_mission_mapping__mission__id = mission_id,id__in=request.session['user_project_list'],application_type_id=510)
+            project_obj =  Project.objects.filter(active=2).filter(partner_mission_mapping__mission__id = mission_id,id__in=request.session['user_project_list'],partner_mission_mapping__mission_id=5)
         else:
-            project_obj =  Project.objects.filter(active=2).filter(id__in=request.session['user_project_list'],application_type_id=510)
+            project_obj =  Project.objects.filter(active=2).filter(id__in=request.session['user_project_list'],partner_mission_mapping__mission_id=5)
         data=list(project_obj.values('id',"name").order_by("name"))
         return HttpResponse(json.dumps(data), content_type="application/json")   
 

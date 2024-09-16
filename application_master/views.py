@@ -366,7 +366,7 @@ def edit_user_partner_project(request, id, model):
     user = User.objects.get(id=id)
    
     vendor_id = UserProjectMapping.objects.filter(user_id=user).values_list('project_id', flat=True)
-    vendor_partner_id = Project.objects.filter(id__in = vendor_id,application_type_id=510).first()
+    vendor_partner_id = Project.objects.filter(id__in = vendor_id,partner_mission_mapping__mission_id=5).first()
     user_partner_config = UserProjectMapping.objects.get(user=user)
     user_profile = UserProfile.objects.get(user=user)
     if request.method == 'POST':

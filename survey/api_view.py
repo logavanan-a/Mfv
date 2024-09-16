@@ -90,7 +90,7 @@ def applogin(request, **kwargs):
                      "appVersion": 0,
                      "updateMessage": "New update available, download from playstore",
                      "link": ""}
-        user_list = UserProjectMapping.objects.filter(user=user,project__application_type__id=511)
+        user_list = UserProjectMapping.objects.filter(user=user,project__partner_mission_mapping__mission_id=2)
         user_profile = UserProfile.objects.filter(user=user,login_type__in=[2,3])
         if role_typ == 1 and user_profile.exists() and user_list.exists():
 
@@ -1246,7 +1246,7 @@ def get_levels(request, level):
         user = User.objects.get(id=request.POST.get('uid'))
         boundary_level = {1:State,2:District}
         # tagged_locations = UserProjectMapping.objects.filter(user=user,active=2).select_related('project','project__district','project__district__state')
-        project_mapped_locations = list(UserProjectMapping.objects.filter(user=user,active=2,project__application_type_id = 511).select_related('project__district').values_list('project__district',flat=True))
+        project_mapped_locations = list(UserProjectMapping.objects.filter(user=user,active=2,project__partner_mission_mapping__mission_id = 2).select_related('project__district').values_list('project__district',flat=True))
         # level_obj = BoundaryLevel.objects.get(code=int(url_level))
         # user_locations = user_projects_locations(user, level_obj)
         tagged_locations = Boundary.objects.filter(boundary_level_type_id=2,code__in=list(map(str,project_mapped_locations))).order_by('modified').select_related('parent','boundary_level_type','parent__boundary_level_type')
@@ -1474,7 +1474,7 @@ class MonthlyDashboardData(g.GenericAPIView):
                 active=2,
                 user_id=user_id,
                 user__groups__id__in=[1],
-                project__application_type_id = 511
+                project__partner_mission_mapping__mission_id = 2
             ).select_related('project__partner_mission_mapping__partner')
             return list(user_with_project.values_list('project__partner_mission_mapping__partner',flat=True))
         except:

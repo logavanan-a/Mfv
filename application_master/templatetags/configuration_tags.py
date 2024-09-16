@@ -29,13 +29,13 @@ def get_menu_list(request):
     Return a list of menus.
     """
     group =request.user.groups.all()[0].id
-    application_type_id=request.session.get('application_type_id')
-    menus = Menus.objects.filter(active = 2, parent=None,group=group).order_by("menu_order")
-    if len(application_type_id) == 2:
+    user_mission_list=request.session.get('user_mission_list')
+    menus = []
+    if len(user_mission_list) == 2:
         menus = Menus.objects.filter(active = 2, parent=None,group=group).order_by("menu_order")
-    elif 510 in application_type_id:
+    elif 5 in user_mission_list:
         menus = Menus.objects.filter(active = 2, parent=None,group=group).exclude(id=18).order_by("menu_order")
-    elif 511 in application_type_id:
+    elif 2 in user_mission_list:
         menus = Menus.objects.filter(active = 2, parent=None,group=group).exclude(id=1).order_by("menu_order")
     return menus
 

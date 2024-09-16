@@ -37,6 +37,6 @@ urlpatterns = [
 
 
     #Monthly dashboard data pull request
-    path('<method>/monthly-dashboard/',MonthlyDashboardData.as_view(),name='Monthly Dashboard'),
+    path('<method>/weekly-dashboard/',MonthlyDashboardData.as_view(),name='Monthly Dashboard'),
 
 ]

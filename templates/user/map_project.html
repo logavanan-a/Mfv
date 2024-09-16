@@ -40,6 +40,18 @@ map_project{% extends 'base.html' %}
                                 Please select donor.
                             </div>                       
                         </div> 
+                        {% comment %} <label class="col-md-2 col-form-label mt-3">Application Type<span class="required-field"></span></label>
+                        <div class="col-md-4 mt-3">
+                            <select name="application_type" id="id_application_type" class="form-select " required>
+                                <option value="" disabled selected>Select Type</option>
+                                {% for i in application_type %}
+                                    <option value="{{i.id}}" >{{i.name}}</option>
+                                {% endfor %}
+                            </select> 
+                            <div class="invalid-feedback">
+                                Please select application type.
+                            </div>                       
+                        </div>  {% endcomment %}
                     </div>  
                     
                     <div class="gap-2" style="float:right;">

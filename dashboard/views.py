@@ -1249,7 +1249,7 @@ def dashboard_data_approval(request, id):
     return render(request, "survey_forms/activity_submition_view.html", locals())
 
 def get_count_data(user,start_date,end_date):
-    beneficiary_creation_keys = list(BeneficiaryResponse.objects.filter(active=2,partner_id__in=UserProjectMapping.objects.filter(active=2,user=user,project__application_type_id=511).values_list('project__partner_mission_mapping__partner_id',flat=True).distinct()).values_list('creation_key', flat=True))
+    beneficiary_creation_keys = list(BeneficiaryResponse.objects.filter(active=2,partner_id__in=UserProjectMapping.objects.filter(active=2,user=user,project__partner_mission_mapping__mission_id=2).values_list('project__partner_mission_mapping__partner_id',flat=True).distinct()).values_list('creation_key', flat=True))
     
     monthly_data_queryset = JsonAnswer.objects.values(
             'cluster__BeneficiaryResponse'
@@ -1435,7 +1435,7 @@ def send_mail_with_template(request,monthly_data,dashboard_data,kwargs={}):
         user_group = list(user_obj.groups.all().values_list('id', flat=True))[0]
         partner_list = kwargs.get('user_partner')
         button = kwargs.get('label')
-        donor_list = list(ProjectDonorMapping.objects.filter(active=2,project__in=UserProjectMapping.objects.filter(active=2,user=user_obj,project__application_type_id = 511).values_list('project',flat=True)).values_list('donor',flat=True))
+        donor_list = list(ProjectDonorMapping.objects.filter(active=2,project__in=UserProjectMapping.objects.filter(active=2,user=user_obj,project__partner_mission_mapping__mission_id=2).values_list('project',flat=True)).values_list('donor',flat=True))
     else:
         user_group = request.session['user_group_list'][0]
         partner_list = request.session['user_partner_list_roshni']
@@ -1505,7 +1505,7 @@ def get_next_role_user(partner,to_role):
     if 9 in to_role:
         email_username = list(User.objects.filter(is_active=True,groups__id=9).values_list('first_name','last_name','username','email'))
     else:
-        email_username = list(UserProjectMapping.objects.filter(active=2,project__partner_mission_mapping__partner_id__in=partner,project__application_type_id=511,user__groups__id__in=to_role).values_list('user__first_name','user__last_name','user__username','user__email').exclude(user__email__isnull=True).exclude(user__email__exact='').distinct())
+        email_username = list(UserProjectMapping.objects.filter(active=2,project__partner_mission_mapping__partner_id__in=partner,project__partner_mission_mapping__mission_id=2,user__groups__id__in=to_role).values_list('user__first_name','user__last_name','user__username','user__email').exclude(user__email__isnull=True).exclude(user__email__exact='').distinct())
     return email_username
 
 def convert_safe_text(content):
