@@ -183,7 +183,7 @@ class Project(BaseContent):
     additional_info = models.TextField(blank=True, null=True)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
-    application_type = models.ForeignKey('application_master.MasterLookup', related_name='masterlookup_application', **OPTIONAL,on_delete=models.DO_NOTHING)
+    # application_type = models.ForeignKey('application_master.MasterLookup', related_name='masterlookup_application', **OPTIONAL,on_delete=models.DO_NOTHING)
 
     class Meta:
         ordering = ('name',)
@@ -436,4 +436,9 @@ class UserProfile(BaseContent):
     phone_no  = models.CharField(max_length=10, blank=True, null=True)
     login_type  = models.PositiveIntegerField(choices = LOGIN_CHOICES)
 
+class UserActivityDate(BaseContent):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    activity_date = models.DateField(auto_now_add=True)
     
+    def __str__(self):
+        return f"{self.user.username} - {self.activity_date.strftime('%Y-%m-%d %H:%M:%S')}"

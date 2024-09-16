@@ -509,5 +509,5 @@ def get_school_based_project(project_district):
     return beneficiary_data
 
 def get_all_role_user(project):
-    email_username = list(UserProjectMapping.objects.filter(active=2,project=project,project__application_type_id=511).values_list('user__email',flat=True).exclude(user__email__isnull=True).exclude(user__email__exact='').distinct())
+    email_username = list(UserProjectMapping.objects.filter(active=2,project=project,project__partner_mission_mapping__mission_id=2).values_list('user__email',flat=True).exclude(user__email__isnull=True).exclude(user__email__exact='').distinct())
     return email_username

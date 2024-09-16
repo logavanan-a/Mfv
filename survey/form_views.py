@@ -208,7 +208,6 @@ def load_data_to_cache_masterlookup_meta():
     return master_lookup
 
 def question_based_answers(survey_id,answer,questions):
-    print(answer,questions,'answer,questions')
     final_result = {}
     questions_dict = load_data_to_cache_questions()
     for question_id in questions:
