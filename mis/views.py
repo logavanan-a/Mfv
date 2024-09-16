@@ -9,7 +9,7 @@ from application_master.models import (District, Donor, Menus, Mission,
                                        MissionIndicatorTarget, Partner,
                                        PartnerMissionMapping, Project,
                                        ProjectDonorMapping, ProjectFiles,
-                                       State, UserPartnerMapping, UserProjectMapping,UserProfile,MasterLookUp)
+                                       State, UserPartnerMapping, UserProjectMapping,UserProfile,MasterLookUp,UserActivityDate)
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user, login, logout
@@ -109,6 +109,11 @@ def login_view(request):
                     
                 except:
                     user_partner = ''  
+                
+                # updating the activity date for user based if the activity date eixsts
+                latest_activity = UserActivityDate.objects.filter(user=user,active=2).order_by('-activity_date').first()
+                if latest_activity and latest_activity.activity_date.strftime('%Y-%m-%d'):
+                    request.session['activity_date'] =  latest_activity.activity_date.strftime('%Y-%m-%d')
                 return redirect('/task-list/') if user.groups.all()[0].id != 9 and 2 not in user_mission_id else redirect('/dashboard/?page_slug=mission-roshni')
             else:
                 error_message = "Please contact administrator."

@@ -564,3 +564,63 @@ function disable_edit_fields() {
     $('#survey select').attr('disabled', true);
     $('#submitting').attr('disabled', true);
 }
+
+
+// On menu button click, open SweetAlert with a date input
+$('.change_activity_date').on('click', function() {
+    const today = new Date().toISOString().split('T')[0];
+
+    // Get the last activity date from the data attribute
+    const lastActivityDate = $(this).data('last-activity') || '';
+
+    Swal.fire({
+        title: 'Enter Activity Date',
+        html: `
+            <input type="date" id="activity-date" class="swal2-input" max="${today}" value="${lastActivityDate}" placeholder="Activity Date">
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Save',
+        cancelButtonText: 'Cancel',
+        preConfirm: () => {
+            const activityDate = document.getElementById('activity-date').value;
+            if (!activityDate) {
+                Swal.showValidationMessage('Please enter a date');
+            }
+            return activityDate;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const activityDate = result.value;
+            saveActivityDate(activityDate);
+        }
+    });
+});
+
+// AJAX function to save the activity date
+function saveActivityDate(activityDate) {
+    $.ajax({
+        url: '/application_master/save-activity/',  // Django URL to save the activity
+        method: 'POST',
+        data: {
+            'activity_date': activityDate,
+        },
+        success: function(response) {
+            Swal.fire({
+                title: 'Success!',
+                text: 'Activity date saved successfully.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                location.reload();
+            });
+        },
+        error: function(error) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to save activity date.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
+}

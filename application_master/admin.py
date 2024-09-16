@@ -9,7 +9,7 @@ from application_master.models import (District, Donor, Menus, Mission,
                                        PartnerMissionMapping, Project,
                                        ProjectDonorMapping, ProjectFiles,
                                        State, UserPartnerMapping,UserProfile,
-                                       UserProjectMapping,MasterLookUp,Boundary,BoundaryLevel)
+                                       UserProjectMapping,MasterLookUp,Boundary,BoundaryLevel,UserActivityDate)
 
 # @admin.register(BoundaryLevel)
 # @admin.register(Boundary)
@@ -273,6 +273,10 @@ class MasterLookUpAdmin(ImportExportModelAdmin, ImportExportFormat):
 class UserProfileAdmin(ImportExportModelAdmin, ImportExportFormat):
     list_display = ['user']
     
+@admin.register(UserActivityDate)    
+class UserActivityDateAdmin(ImportExportModelAdmin, ImportExportFormat):
+    list_display = ['user','activity_date']    
+
 # from django.apps import apps
 
 # # Get all models in the project

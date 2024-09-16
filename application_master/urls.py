@@ -24,4 +24,8 @@ urlpatterns = [
     
     path('android_login/',LoginAndroidView.as_view()),
     path('user/android/list/',UserlistAndroid.as_view()),
+
+    # ajax for save the activity date
+    path('save-activity/', save_activity, name='save-activity'),
+
 	]

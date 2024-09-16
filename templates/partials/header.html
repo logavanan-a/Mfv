@@ -42,6 +42,9 @@
                                 <a class="dropdown-item" href="/login/"><i
                                         class="bx bx-log-in font-size-16 align-middle me-1 "></i> Log In</a>
                             {% endif %}
+
+                            <a class="dropdown-item change_activity_date" data-last-activity="{{ request.session.activity_date|default:'' }}" ><i class="mdi mdi-update font-size-16 align-middle me-1 "></i> Set Activity Date</a>
+                    
                         </div>
                     </div>
                 </div>
