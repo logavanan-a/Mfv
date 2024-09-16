@@ -82,13 +82,12 @@
                                                             var $grid_question_text = '{{question.text}}'.trim();
                                                             var $input = $("#T_{{is_grid_question.id|default:'0'}}_{{grid_question.id|default:'0'}}");
 
-                                                            const REGEX_SPH = /^[+-]?(20(\.00\.0)?|1[0-9](\.00\.0|\.25|\.50|\.75)?|[1-9](\.00|\.25|\.50|\.75)?|0(\.25|\.50|\.75)?)$/;
-                                                            const REGEX_CYL = /^[+-]?((6(\.00|\.0)?)|([1-5](\.0|\.00|\.25|\.50|\.75)?)|(0(\.25|\.50|\.75)?))$/;
-                                                            const REGEX_AXIS = /^(?:0|[1-9]?[05]|1[0-7][05]|180)$/;
-                                                            function getRegexForText(text) {
-                                                                if (text === 'SPH') return REGEX_SPH;
-                                                                if (text === 'CYL') return REGEX_CYL;
-                                                                if (text === 'Axis') return REGEX_AXIS;
+                                                            //const REGEX_SPH = /^[+-]?(20(\.00\.0)?|1[0-9](\.00\.0|\.25|\.50|\.75)?|[1-9](\.00|\.25|\.50|\.75)?|0(\.25|\.50|\.75)?)$/;
+                                                            //const REGEX_CYL = /^[+-]?((6(\.00|\.0)?)|([1-5](\.0|\.00|\.25|\.50|\.75)?)|(0(\.25|\.50|\.75)?))$/;
+                                                            //const REGEX_AXIS = /^(?:0|[1-9]?[05]|1[0-7][05]|180)$/;
+                                                            const REGEX_PATTERN = "{{grid_question.api_json.pattern|default:''}}"
+                                                            function getRegexForText() {
+                                                                return new RegExp(REGEX_PATTERN);
                                                                 return null;
                                                             }
                                                             function updateInputState(isValid) {
@@ -124,12 +123,12 @@
                                                                 }else if (parts.length === 2 && text !== 'Axis') {
                                                                     var firstPart = parts[0].trim();
                                                                     var secondPart = parts[1].trim();
-                                                                    if (regex.test(firstPart) && regex.test(secondPart) && firstPart !== '0' && secondPart !== '0') {
+                                                                    if (regex.test(firstPart) && regex.test(secondPart)) {
                                                                         updateInputState(true);
                                                                         return true;
                                                                     }
                                                                 }
-                                                                else if (regex.test(value) &&  value !== '0'){
+                                                                else if (regex.test(value)){
                                                                     updateInputState(true);
                                                                     return true;
                                                                 }
