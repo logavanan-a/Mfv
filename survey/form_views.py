@@ -462,7 +462,7 @@ class WebResponseListing(View):
 
             
             #inside the profile page add button validation
-            hide_button=add_button_validation_profile(survey,object_list)
+            hide_button=add_button_validation_profile(survey,object_lists)
             #main listing page button hide 
             main_add_button=survey.extra_config.get('restrict_add',False)
 
