@@ -78,42 +78,43 @@
                         <thead class="table-light  ">
                             <tr>
                                 {% if model == 'state' %}
-                                <th>SI No</th>
+                                <th>Id</th>
                                 <th>Name</th>
                                 {% elif model == 'district' %}
-                                <th>SI No</th>
+                                <th>Id</th>
                                 <th>Name</th>
                                 <th>State</th>
                                 {% elif model == 'partner' %}
-                                <th>SI No</th>
+                                <th>Id</th>
                                 <th>Name</th>
                                 <th>Slug</th>
                                 {% elif model == 'mission' %}
-                                <th>SI No</th>
+                                <th>Id</th>
                                 <th>Name</th>
                                 <th>Short Description</th>
                                 <th>Mission Template</th>
                                 <th>Slug</th>
                                 <th>Age Group</th>
                                 {% elif model == 'project' %}
-                                <th>SI No</th>
+                                <th>Id</th>
                                 <th>Name</th>
-                                <th>Partner Mission Mapping</th>
+                                <th>Partner</th>
+                                <th>Mission</th>
                                 <th>District</th>
                                 <th>Location</th>
                                 <th>Start Date</th>
                                 <th>End Date</th>
                                 {% elif model == 'donor' %}
-                                <th>SI No</th>
+                                <th>Id</th>
                                 <th>Name</th>
                                 {% elif model == 'missionindicatorcategory' %}
-                                <th>SI No</th>
+                                <th>Id</th>
                                 <th>Name</th>
                                 <th>Mission</th>
                                 <th>Category Type</th>
                                 <th>Label Configuration</th>
                                 {% elif model == 'missionindicator' %}
-                                <th>SI No</th>
+                                <th>Id</th>
                                 <th>Name</th>
                                 <th>Category</th>
                                 <th>Indicator Type</th>
@@ -129,25 +130,25 @@
                             <tr>
                                 
                                 {% if model == 'state' %}
-                                <td>{{ forloop.counter0|add:data.start_index }}</td>
+                                <td>{{ l.id }}</td>
                                 <td>{{l.name}}</td>
                                 {% elif model == 'district' %}
-                                <td>{{ forloop.counter0|add:data.start_index }}</td>
+                                <td>{{ l.id }}</td>
                                 <td>{{l.name}}</td>
                                 <td>{{l.state }}</td>
                                 {% elif model == 'partner' %}
-                                <td>{{ forloop.counter0|add:data.start_index }}</td>
+                                <td>{{ l.id }}</td>
                                 <th><a href="/application_master/details/{{model}}/{{l.id}}/">{{ l.name }}</a></th>
                                 <td>{{l.slug }}</td>
                                 {% elif model == 'mission' %}
-                                <td>{{ forloop.counter0|add:data.start_index }}</td>
+                                <td>{{ l.id }}</td>
                                 <td>{{l.name}}</td>
                                 <td>{{l.short_description|default_if_none:'-' }}</td>
                                 <td>{{l.get_mission_template_display }}</td>
                                 <td>{{l.slug }}</td>
                                 <td>{{l.age_group_option }}</td>
                                 {% elif model == 'project' %}
-                                <td>{{ forloop.counter0|add:data.start_index }}</td>
+                                <td>{{ l.id }}</td>
                                 
                                 <td>
                                     {% if key %}
@@ -156,22 +157,23 @@
                                         {{ l.name }}
                                     {% endif %}
                                 </td>
-                                <td>{{l.partner_mission_mapping }}</td>
+                                <td>{{l.partner_mission_mapping.partner }}</td>
+                                <td>{{l.partner_mission_mapping.mission }}</td>
                                 <td>{{l.district }}</td>
                                 <td>{{l.location }}</td>
                                 <td>{{l.start_date|default_if_none:'-' }}</td>
                                 <td>{{l.end_date|default_if_none:'-' }}</td>
                                 {% elif model == 'donor' %}
-                                <td>{{ forloop.counter0|add:data.start_index }}</td>
+                                <td>{{ l.id }}</td>
                                 <td>{{l.name}}</td>
                                 {% elif model == 'missionindicatorcategory' %}
-                                <td>{{ forloop.counter0|add:data.start_index }}</td>
+                                <td>{{ l.id }}</td>
                                 <td>{{l.name}}</td>
                                 <td>{{l.mission|default_if_none:'-' }}</td>
                                 <td>{{l.get_category_type_display }}</td>
                                 <td>{{l.label_configuration }}</td>
                                 {% elif model == 'missionindicator' %}
-                                <td>{{ forloop.counter0|add:data.start_index }}</td>
+                                <td>{{ l.id }}</td>
                                 <td>{{l.name}}</td>
                                 <td>{{l.category|default_if_none:'-' }}</td>
                                 <td>{{l.get_indicator_type_display }}</td>
