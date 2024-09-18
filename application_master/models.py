@@ -258,6 +258,8 @@ class MissionIndicator(BaseContent):
 class MissionIndicatorTarget(BaseContent):
     mission_indicator = models.ForeignKey(MissionIndicator, on_delete=models.DO_NOTHING,blank=True, null=True)
     project = models.ForeignKey(Project, on_delete=models.DO_NOTHING,null=True, blank=True)
+    target = models.IntegerField(null=True, blank=True)
+    periodicity   = models.PositiveIntegerField(null=True, blank=True)
     approved_budget   = models.PositiveIntegerField(blank = True, null = True)
     created_by = models.ForeignKey(User, on_delete = models.DO_NOTHING, blank=True, null=True)
 
