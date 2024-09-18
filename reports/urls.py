@@ -6,7 +6,7 @@ urlpatterns = [
     path('reports/exportcsv/<slug:slug>/',export_reportcsv),
     path('reports/custom-reports/performance-tracker/',custom_report_donor),
     path('reports/', reports_listing, name="reports_listing"),
-    # path('report/<page_slug>/', custom_report, name="custom_report"),
+    path('report/<page_slug>/', custom_report, name="custom_report"),
     path('ajax/custom_report_reload/<page_slug>/<report_slug>/', custom_report_reload, name="custom_report_reload"),
     path('ajax/report_indicator/', get_indicator, name="get_indicator"),
     path('ajax/report_district/', get_district, name="get_district"),
