@@ -162,7 +162,7 @@
                                         </td>
                                     </tr>
                                     {% endif %}
-                                    {% if 1 in request.session.user_mission_list %}
+                                    {% if 1 in request.session.user_mission_list and %}
                                     <tr>
                                         <td>Finance Report - Mission Disha</td>
                                         <td>
@@ -177,7 +177,7 @@
                                             <button type="button" onclick="location.href='/report/finance-mission-saksham/';" class="btn btn-light btn-sm">View</button>
                                             <button type="button" onclick="location.href='/report/finance-mission-saksham/?export=True';" class="btn btn-light btn-sm">Download</button>
                                         </td>
-                                    </tr> {% endcomment %}
+                                    </tr> 
                                     {% if 4 in request.session.user_mission_list %}
                                     <tr>
                                         <td>Finance Report - Mission Netra</td>
@@ -187,6 +187,7 @@
                                         </td>
                                     </tr>
                                     {% endif %}
+                                    {% endcomment %}
                                     {% comment %} <tr>
                                         <td>Finance Report - Hospital</td>
                                         <td>
