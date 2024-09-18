@@ -122,121 +122,147 @@
                             </table>
                         </div>
                     </div>
-                    <!-- Pagination Section -->
-                    <div class="row">
-                        <div class="col-sm-12 col-md-12 col-lg-12" style="margin-top:5px;">
-                            {% if page_info|index:forloop.counter0|get_item:'num_pages' > 1 %}
-                            <ul class="pagination justify-content-end ">
-                                {% if page_info|index:forloop.counter0|get_item:'current_page' > 1 %}
-                                    <li class="paginate_button page-item"><a href="" class="page-link data_reload{{forloop.counter0}}" id="pg_{{forloop.counter0}}_1">First</a></li>
-                                    {%comment%}<li class="paginate_button page-item"><a href="" class="page-link data_reload{{forloop.counter0}}" id="pg_{{forloop.counter0}}_x">>Previous</a></li> {% endcomment %}
-                                {% else %}
-                                    <li class="paginate_button page-item disabled"><span class="page-link">First</span></li>
-                                    {% comment %} <li class="paginate_button page-item disabled"><span class="page-link">Previous</span></li> {% endcomment %}
-                                {% endif %}
-                                {% for i in pagination_range %}
-                                    {% if page_info|index:forloop.parentloop.counter0|get_item:'current_page' == i %}
-                                        <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
-                                    {% else %}
-                                        <li class="paginate_button paginate_button page-item"><a href="" class="page-link data_reload{{forloop.parentloop.counter0}}" id="pg_{{forloop.parentloop.counter0}}_{{i}}">{{ i }}</a></li>
-                                    {% endif %}
-                                {% endfor %}
-                                {% if page_info|index:forloop.counter0|get_item:'current_page' < page_info|index:forloop.counter0|get_item:'num_pages' %}
-                                    {% comment %} <li class="paginate_button page-item"><a href="" class="page-link data_reload{{forloop.counter0}}" id="pg_{{forloop.counter0}}_y">Next</a></li> {% endcomment %}
-                                    <li class="paginate_button page-item"><a href="" class="page-link data_reload{{forloop.counter0}}" id="pg_{{forloop.counter0}}_{{page_info|index:forloop.counter0|get_item:'num_pages'}}">Last</a></li>
-                                {% else %}
-                                    {% comment %} <li class="paginate_button page-item disabled"><span class="page-link">Next</span></li> {% endcomment %}
-                                    <li class="paginate_button page-item disabled"><span class="page-link">Last</span></li>
-                                {% endif %}
-                                </ul>
-                            {% endif %}
-                        </div>  
-                    </div>
-                </div>
-                <script>
-                    //Each report will have a on click defined for handling the sorrt and pagination ajax reload
-                    $(document).on("click", ".data_reload{{forloop.counter0}}", function(e){
-                        //Prevent default action of click of sort button and pagination links
-                        e.preventDefault();
-                        // console.log($(this).attr("id"));
-                        // console.log(e);
-                        //Get data from hidden fields to get the sort details and total count and current page
-                        //- hidden fields stored on page load or on ajax reload of report data
-                        var new_sort_field = $("#sort_field_hd_{{forloop.counter0}}").val();
-                        var new_sort_order = $("#sort_order_hd_{{forloop.counter0}}").val();
-                        var rec_count = $("#rec_count_hd_{{forloop.counter0}}").val();
-                        var new_page_num = $("#page_hd_{{forloop.counter0}}").val();
-                        //get the new sort values on click of sort button
-                        if(($(this).attr("id")).startsWith('sort_'))
-                        {
-                            new_sort_field = $('select[name="sort_field_{{forloop.counter0}}"] option:selected').val();
-                            new_sort_order = $('select[name="sort_order_{{forloop.counter0}}"] option:selected').val();
-                        }
-                        else 
-                        {
-                            //get the new page number onclick of the pagination links
-                            new_page_num = ($(this).attr("id")).replace('pg_{{forloop.counter0}}_','');
-                        }
-                        var url = '/ajax/custom_report_reload/{{page_slug}}/{{report_slug_list|index:forloop.counter0}}/';
-                        var data = {
-                            //get all filter values for the report
-                            {% for filter in filter_values %}
-                            '{{filter.0}}':$('#__hd__{{filter.0}}').val(),
-                            {% endfor %}
-                            'sort_field_{{forloop.counter0}}':new_sort_field,
-                            'sort_order_{{forloop.counter0}}':new_sort_order,
-                            'page_{{forloop.counter0}}':new_page_num,
-                            'rec_count_{{forloop.counter0}}':rec_count,
-                            //csfr token set for the ajax call
-                            'csrfmiddlewaretoken':$('input[name="csrfmiddlewaretoken"]').val()
-                        };
-                        //console.log(new_sort_field + " : " + new_page_num + " : " + rec_count);
-                        $.ajax({
-                            type: "POST",
-                            url: url,
-                            data: data,
-                            success: function (result,status,xhr) {
-                                //console.log(xhr);
-                                //alert('status:'+xhr.status);
-                                if (xhr.status == 200 && result.includes("check_session_valid")){
-                                    // replace the ajax reponse to the report table
-                                    $('#div_data_{{forloop.counter0}}').html(result);
-                                    // re-initialize the responsive table after ajax data load
-                                    $('.table-responsive').responsiveTable({
-                                        addDisplayAllBtn: 'btn btn-secondary'
-                                    });
-                                    $('.btn-toolbar [data-toggle=dropdown]').attr('data-bs-toggle', "dropdown");
-                                }else{
-                                    location.reload();
-                                }
-                            }
-                            //TODO: add the complete, failure functions 
-                        });
-                        return false;
-                    });
-                </script>            
-                {% endfor %}
-            </div> 
-        </div>
-    </div> <!-- end col -->
+<!-- Pagination Section -->
+<div class="row">
+    <div class="col-sm-12 col-md-12 col-lg-12" style="margin-top:5px;">
+        {% if page_info|index:forloop.counter0|get_item:'num_pages' > 1 %}
+        <ul class="pagination justify-content-end ">
+            {% if page_info|index:forloop.counter0|get_item:'current_page' > 1 %}
+                <li class="paginate_button page-item"><a href="" class="page-link data_reload{{forloop.counter0}}" id="pg_{{forloop.counter0}}_1">First</a></li>
+                {%comment%}<li class="paginate_button page-item"><a href="" class="page-link data_reload{{forloop.counter0}}" id="pg_{{forloop.counter0}}_x">>Previous</a></li> {% endcomment %}
+            {% else %}
+                <li class="paginate_button page-item disabled"><span class="page-link">First</span></li>
+                {% comment %} <li class="paginate_button page-item disabled"><span class="page-link">Previous</span></li> {% endcomment %}
+            {% endif %}
+            {% for i in pagination_range %}
+                {% if page_info|index:forloop.parentloop.counter0|get_item:'current_page' == i %}
+                    <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
+                {% else %}
+                    <li class="paginate_button paginate_button page-item"><a href="" class="page-link data_reload{{forloop.parentloop.counter0}}" id="pg_{{forloop.parentloop.counter0}}_{{i}}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if page_info|index:forloop.counter0|get_item:'current_page' < page_info|index:forloop.counter0|get_item:'num_pages' %}
+                {% comment %} <li class="paginate_button page-item"><a href="" class="page-link data_reload{{forloop.counter0}}" id="pg_{{forloop.counter0}}_y">Next</a></li> {% endcomment %}
+                <li class="paginate_button page-item"><a href="" class="page-link data_reload{{forloop.counter0}}" id="pg_{{forloop.counter0}}_{{page_info|index:forloop.counter0|get_item:'num_pages'}}">Last</a></li>
+            {% else %}
+                {% comment %} <li class="paginate_button page-item disabled"><span class="page-link">Next</span></li> {% endcomment %}
+                <li class="paginate_button page-item disabled"><span class="page-link">Last</span></li>
+            {% endif %}
+            </ul>
+        {% endif %}
+    </div>  
+</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+//Each report will have a on click defined for handling the sorrt and pagination ajax reload
+$(document).on("click", ".data_reload{{forloop.counter0}}", function(e){
+    //Prevent default action of click of sort button and pagination links
+    e.preventDefault();
+    // console.log($(this).attr("id"));
+    // console.log(e);
+    //Get data from hidden fields to get the sort details and total count and current page
+    //- hidden fields stored on page load or on ajax reload of report data
+    var new_sort_field = $("#sort_field_hd_{{forloop.counter0}}").val();
+    var new_sort_order = $("#sort_order_hd_{{forloop.counter0}}").val();
+    var rec_count = $("#rec_count_hd_{{forloop.counter0}}").val();
+    var new_page_num = $("#page_hd_{{forloop.counter0}}").val();
+    //get the new sort values on click of sort button
+    if(($(this).attr("id")).startsWith('sort_'))
+    {
+        new_sort_field = $('select[name="sort_field_{{forloop.counter0}}"] option:selected').val();
+        new_sort_order = $('select[name="sort_order_{{forloop.counter0}}"] option:selected').val();
+    }
+    else 
+    {
+        //get the new page number onclick of the pagination links
+        new_page_num = ($(this).attr("id")).replace('pg_{{forloop.counter0}}_','');
+    }
+    var url = '/ajax/custom_report_reload/{{page_slug}}/{{report_slug_list|index:forloop.counter0}}/';
+    var data = {
+        'groupby': $('#groupby').val(),
+        'group_by_month': $('#group_by_month').val(),
+        //get all filter values for the report
+        {% for filter in filter_values %}
+        {% if filter.4 != 'multi-select' %}
+        '{{filter.0}}': $('#__hd__{{filter.0}}').val(),
+        {% else %}
+        '{{filter.0}}': $('#__hd__{{filter.0}}').val(),
+        {% endif %}
+        {% endfor %}
+        'sort_field_{{forloop.counter0}}':new_sort_field,
+        'sort_order_{{forloop.counter0}}':new_sort_order,
+        'page_{{forloop.counter0}}':new_page_num,
+        'rec_count_{{forloop.counter0}}':rec_count,
+        //csfr token set for the ajax call
+        'csrfmiddlewaretoken':$('input[name="csrfmiddlewaretoken"]').val()
+    };
+    //console.log(new_sort_field + " : " + new_page_num + " : " + rec_count);
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: data,
+        success: function (result,status,xhr) {
+            console.log(xhr);
+            //alert('status:'+xhr.status);
+            if (xhr.status == 200 && result.includes("check_session_valid")){
+                // replace the ajax reponse to the report table
+                $('#div_data_{{forloop.counter0}}').html(result);
+                // re-initialize the responsive table after ajax data load
+                $('.table-responsive').responsiveTable({
+                    //addDisplayAllBtn: 'btn btn-secondary',
+                    addDisplayAllBtn:false,
+                    addFocusBtn:false,
+                });
+                $('.btn-toolbar [data-toggle=dropdown]').attr('data-bs-toggle', "dropdown");
+            }else{
+                location.reload();
+            }
+        }
+        //TODO: add the complete, failure functions 
+    });
+    return false;
+});
+});
+
+</script>            
+{% endfor %}
+</div> 
+
+</div>
+</div> <!-- end col -->
 </div> <!-- end row -->
+
+<style>
+.report_table {
+border: 1px solid #616161 !important;
+}
+
+</style>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.js"></script>
 
 <script>
-    $(document).ready(function () {
-        $("i").tooltip({
-            'selector': '',
-            'placement': 'top',
-            'container':'body'
-        });
-    });
+document.addEventListener('DOMContentLoaded', function() {
+$(document).ready(function () {
+$("i").tooltip({
+'selector': '',
+'placement': 'top',
+'container':'body'
+});
+
+});
+});
+
+
 </script>
 {% endblock %}
 {% block extra_javascript %}
-        <!-- Responsive Table js -->
-        <script src="{% static 'libs/admin-resources/rwd-table/rwd-table.min.js' %}"></script>
+<!-- Responsive Table js -->
+<script src="{% static 'libs/admin-resources/rwd-table/rwd-table.min.js' %}"></script>
 
-        <!-- Init js -->
-        <script src="{% static 'js/pages/table-responsive.init.js' %}"></script>
-        
+<!-- Init js -->
+<script src="{% static 'js/pages/table-responsive.init.js' %}"></script>
+
 {% endblock %}

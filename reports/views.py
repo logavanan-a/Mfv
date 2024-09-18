@@ -281,7 +281,7 @@ def custom_report(request, page_slug):
     sorting_field = []
     user_location_data = None
     filter_values = None
-
+    # import ipdb;ipdb.set_trace()
     # get user selected filter data and merge with the user configured location heirarcy
     for idx, report in enumerate(page_reports):
         r_slug = report.report_slug
@@ -323,39 +323,34 @@ def custom_report(request, page_slug):
         for item in headers[0]:
             colspan = item.get('colspan', 0)
             header_col_count += colspan if colspan > 0 else 1
-
         data_query_list.append(data_query)
-        
-#         if request.method == "POST" and request.POST.get("filter"):
-#             data.append(return_sql_results(data_query))
-
-#         total_header_cols.append(header_col_count)
-#         report_slug_list.append(r_slug)
-#         custom_export_headers.append(e_header)
-#         section_title.append(s_title)
-#         nowrap_cols.append(nw_cols)
-#         sorting_field.append(s_info)
-
-#         # if not for export, prepare pagination details
-#         if export_flag == False:
-#             # fetch record count and calcualte pagination info
-#             total_records = 0
-#             count_result=None
-#             if request.method == "POST" and request.POST.get("filter"):
-#                 count_result = return_sql_results(count_query)
-#             if count_result:
-#                 total_records = count_result[0][0]
-#             p_info = calculate_pagination_info(total_records, 1, rows_per_page)
-#             page_info.append(p_info)
-#             # pagination_range will be same for all reports in the page
-#             pagination_range = range(p_info.get(
-#                 'start_page'), p_info.get('end_page')+1)
-#     sidebar_active = 'Report'
-#     heading = section_title[0]
-#     # if export button click, create excel and return as response
-#     if export_flag == True:
-#         return generate_export_excel(section_title[0], data_query_list, table_header, custom_export_headers, section_title)
-#     return render(request, 'reports/multitab_report.html', locals())
+        data.append(return_sql_results(data_query))
+        total_header_cols.append(header_col_count)
+        report_slug_list.append(r_slug)
+        custom_export_headers.append(e_header)
+        section_title.append(s_title)
+        nowrap_cols.append(nw_cols)
+        sorting_field.append(s_info)
+        # if not for export, prepare pagination details
+        if export_flag == False:
+            # fetch record count and calcualte pagination info
+            total_records = 0
+            count_result=None
+            # if request.method in ("POST","GET") and request.POST.get("filter"):
+            count_result = return_sql_results(count_query)
+            if count_result:
+                total_records = count_result[0][0]
+            p_info = calculate_pagination_info(total_records, 1, rows_per_page)
+            page_info.append(p_info)
+            # pagination_range will be same for all reports in the page
+            pagination_range = range(p_info.get(
+                'start_page'), p_info.get('end_page')+1)
+    sidebar_active = 'Report'
+    heading = section_title[0]
+    # if export button click, create excel and return as response
+    if export_flag == True:
+        return generate_export_excel(section_title[0], data_query_list, table_header, custom_export_headers, section_title)
+    return render(request, 'reports/multitab_report.html', locals())
 
 def getacademicyear(fin_yaer):
     today = datetime.today()
@@ -1351,12 +1346,11 @@ def custom_report_reload(request, page_slug, report_slug):
     html = ''
     rows_per_page = 10
     try:
-        if request.method == 'POST' and request.is_ajax():
+        if request.method == 'POST':
             if request.method == "POST":
                 req_data = request.POST
             elif request.method == "GET":
                 req_data = request.GET
-
             # order of reports is specified in the ReportMeta default ordering
             # page_reports = get_list_or_404(ReportMeta, page_slug=page_slug, active=2)
             page_reports = ReportMeta.objects.filter(
