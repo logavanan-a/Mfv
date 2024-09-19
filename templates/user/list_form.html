@@ -66,11 +66,11 @@
                         <div class="col-auto p-0">
                             <button type="reset" id="filter_reset"  class="btn btn-secondary waves-effect btn-xs float-right" >Reset</button>
                         </div>
-                        {% comment %} {% if model != 'project' %} {% endcomment %}
+                        {% if model != 'project' %}
                         <div class="col-auto p-0" style="float: right; ">
                             <button type="button" class="btn btn-success waves-effect btn-xs float-right" onclick="location.href='/application_master/add/{{model}}/'">Add</button>
                         </div> 
-                        {% comment %} {% endif %} {% endcomment %}
+                        {% endif %}
                     </div>
                 </form> 
                 <div class="table-responsive mt-4" data-pattern="priority-columns">
