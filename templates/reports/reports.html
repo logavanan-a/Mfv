@@ -178,6 +178,7 @@
                                             <button type="button" onclick="location.href='/report/finance-mission-saksham/?export=True';" class="btn btn-light btn-sm">Download</button>
                                         </td>
                                     </tr> {% endcomment %}
+                                    {% comment %}
                                     {% if 4 in request.session.user_mission_list %}
                                     <tr>
                                         <td>Finance Report - Mission Netra</td>
@@ -187,6 +188,7 @@
                                         </td>
                                     </tr>
                                     {% endif %}
+                                    {% endcomment %}
                                     {% comment %} <tr>
                                         <td>Finance Report - Hospital</td>
                                         <td>
