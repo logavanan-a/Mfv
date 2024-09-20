@@ -445,6 +445,7 @@ def add_data_to_excel(conn, data_query, headers_query, common_columns, common_he
                     loc_filter_only_id_headers.append(str(boundary[1] + ' ID '))
                     loc_filter_only_id_validations.append(0)
         #beneficiary surveys add the beneficiary ID column
+        extra_columns_list = []
         if survey_type == 0:
             ben_type_columns_list = ['ben.id']
             ben_type_headers_list = ['Beneficiary ID']
@@ -455,12 +456,20 @@ def add_data_to_excel(conn, data_query, headers_query, common_columns, common_he
                 loc_filter_only_id_columns = ['address.1__id__','address.2__id__']
                 loc_filter_only_id_headers = ['School - State','School - District']
                 loc_filter_only_id_validations = [0,0]
+                extra_columns_list = ['project_id', 'project_name', 'partner_id', 'partner_name','donor_id','donor_name']
+                extra_headers_list = ['Project ID', 'Project Name','Partner ID','Partner Name',
+                'Donor ID','Donor Name']
+                extra_validations_list = [0,0,0,0,0,0]
             elif survey_id == 2: 
                 #Student - survey_id 2
                 #Student - Address questions for filter 
                 loc_filter_only_id_columns = ['address.1__id__','address.2__id__']
                 loc_filter_only_id_headers = ['Student - State','Student - District']
-                loc_filter_only_id_validations = [0,0,0,0,0,0]
+                loc_filter_only_id_validations = [0,0]
+                extra_columns_list = ['project_id', 'project_name', 'partner_id', 'partner_name','donor_id','donor_name']
+                extra_headers_list = ['Project ID', 'Project Name','Partner ID','Partner Name',
+                'Donor ID','Donor Name']
+                extra_validations_list = [0,0,0,0,0,0]
             # if survey_id == 6: 
             #     #Committee - survey_id 6
             #     #Committee - Address questions for filter 
@@ -527,7 +536,10 @@ def add_data_to_excel(conn, data_query, headers_query, common_columns, common_he
         columns_list.extend(ben_type_columns_list)
         headers_list.extend(ben_type_headers_list)
         validation_list.extend(ben_type_validations_list)
-
+        if extra_columns_list:
+            columns_list.extend(extra_columns_list)
+            headers_list.extend(extra_headers_list)
+            validation_list.extend(extra_validations_list)
     #adding the actual survey question at the end of the list
     columns_list.extend(survey_question_columns_list)
     headers_list.extend(survey_question_headers_list)
@@ -575,7 +587,7 @@ def add_data_to_excel(conn, data_query, headers_query, common_columns, common_he
     # logger.error("columns_list:"+str(columns_list))
     general_cols_list = ["id","row_id","submission_date","created","modified","response_id", 'user_id_ref_name','address.1__id__','address.2__id__','address.3__id__','address.4__id__', 'address.5__id__','address.6__id__']
     for  idx, col in enumerate(columns_list):
-        if col in general_cols_list  or col.startswith('response.') or (col.startswith('ben.') and col != 'ben.id')  or col.startswith('ai_') or col.startswith('ben_type_question') or col.startswith('row_data.'):
+        if col in general_cols_list  or col.startswith('response.') or (col.startswith('ben.') and col != 'ben.id')  or col.startswith('ai_') or col.startswith('ben_type_question') or col.startswith('row_data.') or col in ('project_id','project_name','partner_id','partner_name','donor_id','donor_name'):
             excel_columns.append(col)
             excel_headers.append(modified_header_list[idx])
     if q_id == 0:
@@ -590,7 +602,6 @@ def add_data_to_excel(conn, data_query, headers_query, common_columns, common_he
                     values(""" + str(survey_id) + """, array_to_json('{\"""" + sheetname + """\"}'::varchar[]),
                     ('{\"""" + sheetname + """\":{"tablename":\"""" + table_name + """\","headers":[\"""" + '","'.join(modified_header_list) + """\"], "columns":[\"""" + '","'.join(columns_list) + """\"],"excel_headers":[\"""" + '","'.join(excel_headers) + """\"], "excel_columns":[\"""" + '","'.join(excel_columns) + """\"]}}'::JSONB),
                     ('""" + json.dumps(location_filters_columns_names) + """')::JSONB )"""
-
         execute_query(conn, meta_sql_query,1)
     else:
         # update export_csv_meta 
