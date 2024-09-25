@@ -13,7 +13,7 @@ from django.contrib.auth.models import User
 from rest_framework import permissions
 from django.db import transaction
 from rest_framework.views import APIView
-from application_master.serializers import LoginAndroidSerializer
+from application_master.serializers import LoginAndroidSerializer,MissionSerializer
 from django.http import JsonResponse
 
 def master_list_form(request,model,key=None):
@@ -622,3 +622,25 @@ def save_activity(request):
 
         return JsonResponse({'status': 'success', 'message': 'Activity date saved.'})
     return JsonResponse({'status': 'fail', 'message': 'Invalid request'}, status=400)
+
+
+# ============== api for mission based projects ===========
+class MissionListAPIView(APIView):
+    """
+    API view to retrieve the list of missions along with associated projects and donors.
+    """
+    def post(self, request):
+        userid = request.data.get('userid')  # Get the userid from the POST request
+        today = datetime.today()  # Get today's date
+
+        # Get the projects mapped to the user
+        user_projects = UserProjectMapping.objects.filter( Q(deactivated_date__isnull=True) | Q(project__end_date__gte=today),user_id=userid).values_list('project_id', flat=True)
+
+        # Get the missions related to these projects
+        missions = Mission.objects.filter(active=2,partnermissionmapping__project__id__in=user_projects).distinct()
+        serializer = MissionSerializer(missions, many=True, context={'user_projects': user_projects})
+        return Response({
+            "status": 2,
+            "message": "mission list sent successfully",
+            "mission_list": serializer.data
+        })

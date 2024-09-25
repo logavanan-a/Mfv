@@ -3,6 +3,7 @@ from django.urls import path, include
 from survey.api_view import *
 from survey.api_views_version3 import * 
 from survey.api_views_version1 import add_survey_answers_version_1
+from application_master.views import MissionListAPIView
 
 urlpatterns = [
     path('app-login/', applogin,name='app_login'),
@@ -39,4 +40,7 @@ urlpatterns = [
     #Monthly dashboard data pull request
     path('<method>/weekly-dashboard/',MonthlyDashboardData.as_view(),name='Monthly Dashboard'),
 
+    # api for mission based project
+    path('missionbasedproject/', MissionListAPIView.as_view(), name='mission-based-project-list'),
+    
 ]
