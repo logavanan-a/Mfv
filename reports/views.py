@@ -439,9 +439,10 @@ def get_donor_district(request):
     if request.method == 'GET':
         selected_donor = request.GET.get('selected_donor', '')
         selected_partner = request.GET.get('selected_partner','')
-        part_mission_ids = PartnerMissionMapping.objects.filter(active=2,partner_id=int(selected_partner)).values_list('id',flat=True)
+        part_mission_ids = PartnerMissionMapping.objects.filter(active=2,mission_id = 2,partner_id=int(selected_partner)).values_list('id',flat=True)
+        #TODO added mission id 2 (Roshini) - 
         project_ids = Project.objects.filter(active=2,partner_mission_mapping_id__in=part_mission_ids).values_list('id',flat=True)
-        donor_project_list = ProjectDonorMapping.objects.filter(active=2, project_id__in=project_ids).values_list('project_id', flat=True)
+        donor_project_list = ProjectDonorMapping.objects.filter(active=2, project_id__in=project_ids,donor_id=int(selected_donor)).values_list('project_id', flat=True)
         district_project_list = Project.objects.filter(active=2, id__in=donor_project_list).values_list('district_id', flat=True)
         district_list_ids = District.objects.filter(active=2, id__in=district_project_list).values_list('id',flat=True)
         district_list_ids_str = list(map(str, district_list_ids))
