@@ -413,7 +413,6 @@ def get_donor_district_list(request,partner_id,donor_id,district_id):
         district_list_ids = District.objects.filter(active=2, id__in=district_project_list).values_list('id',flat=True)
         district_list_ids_str = list(map(str, district_list_ids))
         district_list = Boundary.objects.filter(active=2,code__in=district_list_ids_str,boundary_level_type_id=2).values_list('id','name').order_by('name')
-    print(partner_list,'---------')
     return partner_list,donor_list,district_list
 
 @csrf_exempt
@@ -421,7 +420,7 @@ def get_donor_district_list(request,partner_id,donor_id,district_id):
 def get_partner_district(request):
     if request.method == 'GET':
         selected_partner = request.GET.get('selected_partner', '')
-        part_mission_ids = PartnerMissionMapping.objects.filter(active=2,partner_id=int(selected_partner)).values_list('id',flat=True)
+        part_mission_ids = PartnerMissionMapping.objects.filter(active=2,mission_id = 2,partner_id=int(selected_partner)).values_list('id',flat=True)
         project_ids = Project.objects.filter(active=2,partner_mission_mapping_id__in=part_mission_ids).values_list('id',flat=True)
         donor_ids = ProjectDonorMapping.objects.filter(active=2,project_id__in=project_ids).values_list('donor_id',flat=True)
         donor_list = Donor.objects.filter(active=2,id__in=donor_ids).values_list('id','name').order_by('name')
@@ -439,9 +438,10 @@ def get_donor_district(request):
     if request.method == 'GET':
         selected_donor = request.GET.get('selected_donor', '')
         selected_partner = request.GET.get('selected_partner','')
-        part_mission_ids = PartnerMissionMapping.objects.filter(active=2,partner_id=int(selected_partner)).values_list('id',flat=True)
+        part_mission_ids = PartnerMissionMapping.objects.filter(active=2,mission_id = 2,partner_id=int(selected_partner)).values_list('id',flat=True)
+        #TODO added mission id 2 (Roshini) - 
         project_ids = Project.objects.filter(active=2,partner_mission_mapping_id__in=part_mission_ids).values_list('id',flat=True)
-        donor_project_list = ProjectDonorMapping.objects.filter(active=2, project_id__in=project_ids).values_list('project_id', flat=True)
+        donor_project_list = ProjectDonorMapping.objects.filter(active=2, project_id__in=project_ids,donor_id=int(selected_donor)).values_list('project_id', flat=True)
         district_project_list = Project.objects.filter(active=2, id__in=donor_project_list).values_list('district_id', flat=True)
         district_list_ids = District.objects.filter(active=2, id__in=district_project_list).values_list('id',flat=True)
         district_list_ids_str = list(map(str, district_list_ids))
@@ -1581,7 +1581,6 @@ def get_school(request):
             boundary_ids = Boundary.objects.filter(code__in=[str(dist) for dist in district_ids],boundary_level_type_id =2).values_list('id',flat=True)
             district_id_list = [i for i in boundary_ids]
             school_list = return_sql_results(f"""select creation_key,profile_view->'data'->>'School name' from survey_beneficiaryresponse where survey_id = 1 and address_2 in ({str(district_id_list)[1:-1]})""")
-            print(school_list,'----------------------ajax')
             for school in school_list:
                 result_set.append({'id': school[0], 'name': school[1]})
         return JsonResponse(result_set, safe=False)
