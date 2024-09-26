@@ -40,9 +40,9 @@ def export_report(survey_list):
         if len(survey_list) == 0:
             #sql_query = "select id, name, report_filename from survey_survey where active = 2"
             #TODO : check if active = 0 needs to be picked
-            sql_query = "select id, name, report_filename from survey_survey where active != 0"
+            sql_query = "select id, name, report_filename from survey_survey where active != 0 order by id asc"
         else: 
-            sql_query = "select id, name, report_filename from survey_survey where id in (" + ','.join([str(i) for i in survey_list]) + ")"
+            sql_query = "select id, name, report_filename from survey_survey where id in (" + ','.join([str(i) for i in survey_list]) + ") order by id asc"
         export_media_root = settings.MEDIA_ROOT + "media/export_data/" 
         result = execute_query(conn,sql_query,3)
         for i in result:
@@ -466,33 +466,10 @@ def add_data_to_excel(conn, data_query, headers_query, common_columns, common_he
                 loc_filter_only_id_columns = ['address.1__id__','address.2__id__']
                 loc_filter_only_id_headers = ['Student - State','Student - District']
                 loc_filter_only_id_validations = [0,0]
-                extra_columns_list = ['project_id', 'project_name', 'partner_id', 'partner_name','donor_id','donor_name']
+                extra_columns_list = ['project_id', 'project_name', 'partner_id', 'partner_name','donor_id','donor_name','school_id','school_name','school_state_id','school_state_name','school_district_id','school_district_name']
                 extra_headers_list = ['Project ID', 'Project Name','Partner ID','Partner Name',
-                'Donor ID','Donor Name']
-                extra_validations_list = [0,0,0,0,0,0]
-            # if survey_id == 6: 
-            #     #Committee - survey_id 6
-            #     #Committee - Address questions for filter 
-            #     loc_filter_only_id_columns = ['address.1__id__','address.2__id__','address.3__id__','address.4__id__', 'address.5__id__','address.6__id__']
-            #     loc_filter_only_id_headers = ['Committee - State','Committee - District','Committee - Block','Committee - Ward','Committee - Gram Panchayat','Committee - Village']
-            #     loc_filter_only_id_validations = [0,0,0,0,0,0]
-            # elif survey_id == 4: 
-            #     #School Master - survey_id 4
-            #     #School Master - Address questions for filter 
-            #     loc_filter_only_id_columns = ['address.1__id__','address.2__id__','address.3__id__','address.4__id__', 'address.5__id__','address.6__id__']
-            #     loc_filter_only_id_headers = ['School Master - State','School Master - District','School Master - Block','School Master - Ward','School Master - Gram Panchayat','School Master - Village']
-            #     loc_filter_only_id_validations = [0,0,0,0,0,0]
-            # elif survey_id == 8: 
-            #     #Committee members - survey_id 8
-            #     #fetch the Committee details for the Committee members survey
-            #     ai_columns_list = ['parent_ben.json_id']
-            #     ai_headers_list = ['Committee App ID']
-            #     ai_validations_list = [1,0,0]
-            #     #Committee members - Address questions for filter 
-            #     loc_filter_only_id_columns = ['address.1__id__','address.2__id__','address.3__id__','address.4__id__', 'address.5__id__', 'address.6__id__']
-            #     loc_filter_only_id_headers = ['Committee - State','Committee - District','Committee - Block','Committee - Ward','Committee - Gram Panchayat','Committee - Village']
-            #     loc_filter_only_id_validations = [0,0,0,0,0,0]
-            
+                'Donor ID','Donor Name','School ID','School Name','School - State ID','School - State Name' ,'School - District ID','School - District Name']
+                extra_validations_list = [0,0,0,0,0,0,0,0,0,0,0,0] 
         else:
             # #for extended activity surveys
             #  ben_type_id |                 name                  | id 
@@ -514,6 +491,11 @@ def add_data_to_excel(conn, data_query, headers_query, common_columns, common_he
                 ben_type_columns_list = ['ben.json_id', 'ben_type_question.234.1', 'ben_type_question.234.2','ben_type_question.238', 'ben_type_question.241', 'ben_type_question.242', 'ben_type_question.243', 'ben_type_question.240']
                 ben_type_headers_list = ['Student App ID', 'Student - State','Student - District','Student - Name of the Student', 'Student - Class/Division', 'Student - Roll number', 'Student - Parents phone number', 'Student - Gender']
                 ben_type_validations_list = [1,0,0,0,0,0,0,0]
+                extra_columns_list = ['project_id', 'project_name', 'partner_id', 'partner_name','donor_id','donor_name','school_id','school_name','school_state_id','school_state_name','school_district_id','school_district_name']
+                extra_headers_list = ['Project ID', 'Project Name','Partner ID','Partner Name',
+                'Donor ID','Donor Name','School ID','School Name','School - State ID','School - State Name' ,'School - District ID','School - District Name']
+                extra_validations_list = [0,0,0,0,0,0,0,0,0,0,0,0]
+                
             elif ben_type == '3':
                 #School 
                 loc_filter_only_id_columns = ['address.1__id__','address.2__id__']
@@ -522,6 +504,10 @@ def add_data_to_excel(conn, data_query, headers_query, common_columns, common_he
                 ben_type_columns_list = ['ben.json_id', 'ben_type_question.234.1', 'ben_type_question.234.2', 'ben_type_question.231']
                 ben_type_headers_list = ['School App ID', 'School - State','School - District','School name']
                 ben_type_validations_list = [1,0,0,0]
+                extra_columns_list = ['project_id', 'project_name', 'partner_id', 'partner_name','donor_id','donor_name','school_id','school_name','school_state_id','school_state_name','school_district_id','school_district_name']
+                extra_headers_list = ['Project ID', 'Project Name','Partner ID','Partner Name',
+                'Donor ID','Donor Name','School ID','School Name','School - State ID','School - State Name' ,'School - District ID','School - District Name']
+                extra_validations_list = [0,0,0,0,0,0,0,0,0,0,0,0]
         #mark the column names to be used for location based filters
         #ensure the columns are added from 1 - 8 in the list
         # if loc_q_num != ""        
@@ -587,7 +573,7 @@ def add_data_to_excel(conn, data_query, headers_query, common_columns, common_he
     # logger.error("columns_list:"+str(columns_list))
     general_cols_list = ["id","row_id","submission_date","created","modified","response_id", 'user_id_ref_name','address.1__id__','address.2__id__','address.3__id__','address.4__id__', 'address.5__id__','address.6__id__']
     for  idx, col in enumerate(columns_list):
-        if col in general_cols_list  or col.startswith('response.') or (col.startswith('ben.') and col != 'ben.id')  or col.startswith('ai_') or col.startswith('ben_type_question') or col.startswith('row_data.') or col in ('project_id','project_name','partner_id','partner_name','donor_id','donor_name'):
+        if col in general_cols_list  or col.startswith('response.') or (col.startswith('ben.') and col != 'ben.id')  or col.startswith('ai_') or col.startswith('ben_type_question') or col.startswith('row_data.') or col in ('project_id','project_name','partner_id','partner_name','donor_id','donor_name','school_id','school_name','school_state_id','school_state_name','school_district_id','school_district_name'):
             excel_columns.append(col)
             excel_headers.append(modified_header_list[idx])
     if q_id == 0:
