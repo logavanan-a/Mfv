@@ -49,5 +49,5 @@ class MissionSerializer(serializers.ModelSerializer):
         user_projects = self.context.get('user_projects')
 
         # Get the related projects for this mission
-        projects = Project.objects.filter(partner_mission_mapping__mision = obj,id__in=user_projects,active=2)
+        projects = Project.objects.filter(partner_mission_mapping__mission = obj,id__in=user_projects,active=2)
         return ProjectSerializer(projects, many=True).data
