@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load dict_get %}
 
 {% block contents %}
 <link href="{% static 'libs/sweetalert2/dist/sweetalert2.min.css' %}" rel="stylesheet" type="text/css" />
@@ -158,13 +158,14 @@
                 <div class="tab-pane fade" id="project_tab" role="tabpanel" aria-labelledby="contact-tab">
                     {% if parner_mission_obj %}
                     <div class="table-responsive" data-pattern="priority-columns">
-                        <button type="button" class="btn btn-outline-primary waves-effect btn-xs float-end mb-2 mx-0" onclick="location.href='/application_master/adding_project/{{id}}/'"><i class="bx bx-plus-medical" title="Add New"></i></button>
+                        <button type="button" class="btn btn-outline-primary waves-effect btn-xs float-end mb-2 " onclick="location.href='/application_master/adding_project/{{id}}/'"><i class="bx bx-plus-medical" title="Add New"></i></button>
+                        <button type="button" id="export" class="btn btn-outline-secondary waves-effect btn-xs float-end mb-2 " ><i class="bx bxs-cloud-download" title="Download"></i></button>
                     </div>
                     <div class="tab-content" id="myTabContent">
-                        <table class="table  dt-responsive ">
+                        <table class="table  dt-responsive project_table">
                             <thead class="table-light">
                                 <tr>
-                                    <th colspan="10">Project Details</th>
+                                    <th colspan="11">Project Details</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -172,6 +173,7 @@
                                     <th>SI No</th>
                                     <th>Name</th>
                                     <th>Partner Mission Mapping</th>
+                                    <th>Partner Data Entry Operator</th>
                                     <th>District</th>
                                     <th>Donor</th>
                                     <th>Location</th>
@@ -185,6 +187,7 @@
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ l.name }}</td>
                                     <td>{{l.partner_mission_mapping }}</td>
+                                    <td>{{user_mapping|get_item:l.id }}</td>
                                     <td>{{l.district }}</td>
                                     <td>{{l.projectdonormapping.donor.name }}</td>
                                     <td>{{l.location }}</td>
@@ -253,5 +256,44 @@
         })
     };
 
+
+    $(document).ready(function() {
+        $("#export").click(function() {
+            let csv = [];
+            let rows = $(".project_table tr");
+            console.log(rows)
+            // Loop through the rows, ignoring the first header row with "Project Details"
+            rows.each(function(rowIndex) {
+                // Skip the first header row (index 0)
+                if (rowIndex === 0) return;
+
+                let row = [];
+                $(this).find("th, td").each(function(cellIndex) {
+                    // Skip the "Action" column (index 10, as it's the 11th column)
+                    if (cellIndex === 10) return;
+
+                    // Enclose each cell's text in quotes to preserve content with commas
+                    let cellText = $(this).text().trim();
+                    row.push('"' + cellText + '"');
+                });
+                csv.push(row.join(","));
+            });
+    
+            // Create a CSV string
+            let csvContent = "data:text/csv;charset=utf-8," + csv.join("\n");
+    
+            // Create a download link and trigger click
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            let name = "{{part.name}}";
+            let slug = name.toLowerCase().replace(/\s+/g, '_').replace(/[^\w\-]+/g, '');
+            let filename = slug + ".csv";
+            link.setAttribute("download", filename);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    });
 </script>
 {% endblock %}

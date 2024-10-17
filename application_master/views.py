@@ -218,14 +218,15 @@ def master_details_form(request,model,id):
     heading=model
     if model == 'partner':
         heading="Partner"
-        user_mapping = UserPartnerMapping.objects.filter(partner_id=id).values_list('user_id', flat=True)
-        user_obj = User.objects.filter(id__in=user_mapping)
-        groups_obj = Group.objects.filter(user__in=user_obj).distinct()
+        user_mapping = dict(UserProjectMapping.objects.filter(project__partner_mission_mapping__partner_id=id).values_list('project_id','user__username'))
+        # user_obj = User.objects.filter(id__in=user_mapping)
+        # groups_obj = Group.objects.filter(user__in=user_obj).distinct()
         part=Partner.objects.filter(id=id, active=2)
         missions = Mission.objects.filter(active=2).count()
         parner_mission_obj = PartnerMissionMapping.objects.filter(partner_id__in=part,active=2).order_by('-id')
         total = parner_mission_obj.count()
         project_map = Project.objects.filter(partner_mission_mapping_id__in = parner_mission_obj).select_related('projectdonormapping','projectdonormapping__donor').order_by('-id')
+
     elif model == 'project':
         heading="Project"
         user_mapping = UserProjectMapping.objects.filter(project_id=id).values_list('user_id', flat=True)
