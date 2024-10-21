@@ -338,11 +338,11 @@ def get_latest_survey_versions(user_id):
                 if not ben_obj.category and ben_obj.parent:
                     generalized, category_name = True, ben_obj.parent.name
                     category_id = str(ben_obj.parent.id)
-                    category_order = ben_obj.parent.order
+                    category_order = ben_obj.parent.listing_order
                 else:
                     generalized, category_name = False, ben_obj.category.name
                     category_id = str(ben_obj.category.id)
-                    category_order = ben_obj.category.order
+                    category_order = ben_obj.category.listing_order
         elif i.categories :
             category_name = i.categories.name
             category_id = i.categories.id
