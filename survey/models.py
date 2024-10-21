@@ -1879,7 +1879,7 @@ class BeneficiaryType(BaseContent):
     is_training_type = models.BooleanField(default=False)
     is_admin_type = models.BooleanField(default=False)
     is_training_module = models.BooleanField(default=False)
-    category = models.ForeignKey(MasterLookUp, on_delete=models.DO_NOTHING, \
+    category = models.ForeignKey(Mission, on_delete=models.DO_NOTHING, \
                 blank=True, null=True)
     is_activist_group = models.BooleanField(default=False)
 
