@@ -1,5 +1,5 @@
 from django.urls import path
-from reports.views import custom_report, custom_report_reload, get_indicator,reports_listing, get_project,export_reportcsv,custom_report_csv,get_district,get_school,get_donor_district,custom_report_donor,get_partner_district,quarterly_report
+from reports.views import custom_report, custom_report_reload, get_indicator,reports_listing, get_project,export_reportcsv,custom_report_csv,get_district,get_school,get_donor_district,custom_report_donor,get_partner_district,quarterly_report,latest_json_answers_view
 
 app_name = "reports"
 urlpatterns = [
@@ -16,5 +16,6 @@ urlpatterns = [
     path('ajax/report_school/', get_school, name="get_school"),
     path('reports/custom-report-csv/<int:report_id>/',custom_report_csv),
     path('quarterly-report/',quarterly_report),
-    
+    path('reports/latest-json-answers/', latest_json_answers_view, name='latest_json_answers'),
+
 ]

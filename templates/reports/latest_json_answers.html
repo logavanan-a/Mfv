@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block contents %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">                
+                <!-- Filter Form -->
+                <form method="GET" class="row filter-form mb-4">
+                    <div class="col-md-3">
+                        <label for="start_date" class="form-label">Start Date</label>
+                        <input type="date" id="start_date" name="start_date" class="form-control" value="{{ request.GET.start_date }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="end_date" class="form-label">End Date</label>
+                        <input type="date" id="end_date" name="end_date" class="form-control" value="{{ request.GET.end_date }}">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Filter</button>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-warning w-100" onclick="location.href = '/reports/latest-json-answers/';">Clear</button>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" name="export" value="csv" class="btn btn-success">Export CSV</button>
+                    </div>
+
+                </form>
+
+                <!-- Data Table -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover table-striped">
+                        <thead class="table-dark text-dark">
+                            <tr>
+                                <th>Server Unique ID</th>
+                                <th>Partner ID</th>
+                                <th>Partner Name</th>
+                                <th>Mission ID</th>
+                                <th>Mission Name</th>
+                                <th>Project ID</th>
+                                <th>Project Name</th>
+                                <th>User ID</th>
+                                <th>Username</th>
+                                <th>App Version</th>
+                                <th>Modified Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if object_lists %}
+                                {% for row in object_lists %}
+                                    <tr>
+                                        <td>{{ row.json_answer_id|default_if_none:"-" }}</td>
+                                        <td>{{ row.partner_id|default_if_none:"-" }}</td>
+                                        <td>{{ row.partner_name|default_if_none:"-" }}</td>
+                                        <td>{{ row.mission_id|default_if_none:"-" }}</td>
+                                        <td>{{ row.mission_name|default_if_none:"-" }}</td>
+                                        <td>{{ row.project_id|default_if_none:"-" }}</td>
+                                        <td>{{ row.project_name|default_if_none:"-" }}</td>
+                                        <td>{{ row.user_id|default_if_none:"-" }}</td>
+                                        <td>{{ row.username|default_if_none:"-" }}</td>
+                                        <td>{{ row.app_version|default_if_none:"-" }}</td>
+                                        <td>{{ row.modified_date|default_if_none:"-" }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="11" class="text-center">No data available for the selected date range</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if object_lists %}
+                    {% include 'survey_forms/web_pagination.html' %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
