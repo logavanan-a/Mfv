@@ -550,9 +550,9 @@ def add_user(request, user_location=None):
             # if email and User.objects.filter(email__iexact=email).exists():
             #     email_error = 'Email already exist'
             #     return render(request, 'user/add_user.html', locals())
-            if UserProfile.objects.filter(phone_no__iexact=mobile_no).exists():
-                mobile_no_error = 'Mobile no already exist'
-                return render(request, 'user/add_user.html', locals())
+            # if UserProfile.objects.filter(phone_no__iexact=mobile_no).exists():
+            #     mobile_no_error = 'Mobile no already exist'
+            #     return render(request, 'user/add_user.html', locals())
             user = User.objects.create_user(username=username.lower(), password=password)
             if email:
                 user.email =  email
@@ -637,10 +637,10 @@ def edit_user(request, id):
         #         user_location = None
         #         email_error = 'Email already exist'
         #         return render(request, 'user/edit_user.html', locals())
-        if UserProfile.objects.filter(phone_no__iexact=mobile_no).exclude(id=user_profile.id).exists():
-            user_location = None
-            mobile_no_error = 'Mobile no already exist'
-            return render(request, 'user/edit_user.html', locals())
+        # if UserProfile.objects.filter(phone_no__iexact=mobile_no).exclude(id=user_profile.id).exists():
+        #     user_location = None
+        #     mobile_no_error = 'Mobile no already exist'
+        #     return render(request, 'user/edit_user.html', locals())
         user.username = username.lower()
         if email:
             user.email =  email

@@ -364,7 +364,12 @@ class WebResponseListing(View):
             if district:
                 # district_name = Boundary.objects.get(active=2,code=district,boundary_level_type_id=2).name
                 creation_key_wise_district = "','".join(list(BeneficiaryResponse.objects.filter(address_2=district).values_list('creation_key',flat=True)))
-            query='select DISTINCT ON (js.creation_key)  js.id,survey_id,response,s.slug,creation_key,js.created,js.modified,js.active, pd.donor_id from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id left outer join application_master_userprojectmapping up on up.user_id = js.user_id left outer join application_master_projectdonormapping pd on pd.project_id = up.project_id where js.active != 0 and s.id = {0} @@creation_key @@creation_key_wise_district @@filters @@school_creation_key @@donor order by @@order_by'.format(survey.id)#@@filters
+            query="select DISTINCT ON (js.creation_key)  js.id,survey_id,response,s.slug,creation_key,js.created,js.modified,js.active, pd.donor_id from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id left outer join application_master_userprojectmapping up on up.project_id::text = js.cluster->>'project_id' left outer join application_master_projectdonormapping pd on pd.project_id = up.project_id where js.active != 0 @@project_based_mapping and s.id = {0} @@creation_key @@creation_key_wise_district @@filters @@school_creation_key @@donor order by @@order_by".format(survey.id,request.user.id)#@@filters
+            if not request.user.is_superuser:
+                query=query.replace("@@project_based_mapping",f" and up.user_id = {request.user.id}")
+            else:
+                query=query.replace("@@project_based_mapping",f" ")
+
             if survey.id == 1 and request.user.groups.all()[0].id in [1,2,4]:
                 query=query.replace("@@creation_key_wise_district"," and creation_key in (\'{0}\')".format(creation_key_wise_district))
             else:
@@ -382,7 +387,6 @@ class WebResponseListing(View):
                 query=query.replace("@@donor"," and pd.donor_id= {0}".format(int(donor)))
             else:
                 query=query.replace("@@donor","")
-
             survey_key_question = INSTANCE_CACHE_PREFIX+'survey_heading_questions_for_'+str(survey.id)
             cache_survey_id.update({survey_key_question:survey.id})
         

@@ -43,7 +43,7 @@ class ChoiceAdmin(ImportExportModelAdmin, ImportExportFormat):
 
 @admin.register(JsonAnswer)
 class JsonAnswerAdmin(ImportExportModelAdmin, ImportExportFormat):
-    pass
+    search_fields = ['creation_key']
 
 @admin.register(Media)
 class MediaAdmin(ImportExportModelAdmin, ImportExportFormat):

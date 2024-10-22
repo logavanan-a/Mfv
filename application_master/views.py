@@ -580,7 +580,7 @@ def adding_project(request,id):
         end_date = request.POST.get('end_date')
         additional_info = request.POST.get('additional_info')
         # application_type = request.POST.get('application_type')
-        if not ProjectDonorMapping.objects.filter(active=2,project__active=2,project__partner_mission_mapping_id=partner_mission,project__district_id=district).exists():
+        if not ProjectDonorMapping.objects.filter(active=2,project__active=2,project__partner_mission_mapping_id=partner_mission,project__district_id=district,donor_id=donor).exists():
             pro_details = Project.objects.create(
                 name=name,
                 partner_mission_mapping_id=partner_mission,
