@@ -159,6 +159,7 @@ def add_survey_answers_version_1(request, **kwargs):
                     sync_status = 0
                     server_created_date = ""
                     duplicate_status = "0"
+                    response_id = '0'
                     continue
 
                 cluster_id = val.get('cluster_id')
@@ -285,7 +286,7 @@ def add_survey_answers_version_1(request, **kwargs):
                     exc_type, exc_value, exc_traceback))
                 logging.error(error_stack)
             finally:
-                sync_res.append({"r_uuid": val['r_uuid'], "sync_status": sync_status,"s_created": server_created_date, 'error_msg':error_msg, 'duplicate_status': duplicate_status,"approved_by":approved_by,"approved_on":approved_on,})
+                sync_res.append({"r_uuid": val['r_uuid'], "sync_status": sync_status,"s_created": server_created_date, 'error_msg':error_msg, 'duplicate_status': duplicate_status,"approved_by":approved_by,"approved_on":approved_on,"server_primary":response_id or res.id or 0})
     except Exception as ex:
         status = False
         message = "Failed"

@@ -35,7 +35,8 @@ from openpyxl import Workbook
 from openpyxl.writer.excel import save_workbook
 from django.utils.encoding import escape_uri_path
 import openpyxl
-
+from django.utils.dateparse import parse_date
+from survey.form_views import web_pagination
 logger = logging.getLogger(__name__)
 # ****************************************************************************
 # execute Raw SQL
@@ -1842,3 +1843,106 @@ def custom_report_csv(request, report_id):
         response = HttpResponse(file.read(), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         response['Content-Disposition'] = f'attachment; filename={report_meta.report_slug}.xlsx'
     return response
+
+
+def latest_json_answers_view(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    export = request.GET.get('export', None)
+
+    # Build the query string with optional date filters
+    query = """
+        WITH latest_json_answers AS (
+            SELECT DISTINCT ON (json.user_id) 
+                json.id AS json_answer_id,
+                json.user_id,
+                json.creation_key,
+                json.cluster->>'project_id' AS project_id,
+                json.modified
+            FROM survey_jsonanswer json
+            WHERE 1=1
+    """
+    
+    # Add start and end date filters if provided
+    if start_date:
+        query += " AND json.modified::date >= %s"
+    if end_date:
+        query += " AND json.modified::date <= %s"
+
+    query += """
+            ORDER BY json.user_id, json.modified DESC
+        )
+        SELECT
+            json_answer_id,
+            partner.id AS partner_id,
+            partner.name AS partner_name,
+            mission.id AS mission_id,
+            mission.name AS mission_name,
+            proj.id AS project_id,
+            proj.name AS project_name,
+            au.id AS user_id,
+            au.username AS username,
+            app.version_number AS app_version,
+            latest_json_answers.modified AS modified_date
+        FROM latest_json_answers
+        LEFT JOIN survey_appanswerdata app
+            ON latest_json_answers.creation_key = app.sample_id
+        LEFT JOIN application_master_project proj
+            ON latest_json_answers.project_id::int = proj.id
+        LEFT JOIN application_master_partnermissionmapping mmap
+            ON proj.partner_mission_mapping_id::int = mmap.id
+        LEFT JOIN application_master_mission mission
+            ON mmap.mission_id::int = mission.id
+        LEFT JOIN application_master_partner partner
+            ON mmap.partner_id::int = partner.id
+        LEFT JOIN auth_user au
+            ON latest_json_answers.user_id = au.id;
+    """
+    
+    params = []
+    if start_date:
+        params.append(parse_date(start_date))
+    if end_date:
+        params.append(parse_date(end_date))
+
+    # Execute the query with parameters
+    with connection.cursor() as cursor:
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+
+        columns = [
+            'json_answer_id', 'partner_id', 'partner_name', 
+            'mission_id', 'mission_name', 'project_id', 
+            'project_name', 'user_id', 'username', 
+            'app_version', 'modified_date'
+        ]
+        
+        data = [dict(zip(columns, row)) for row in rows]
+    
+    # If export is requested, return the CSV response
+    if export == 'csv':
+        # Generate a filename with the current timestamp
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"json_answers_{timestamp}.csv"
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] =  f'attachment; filename="{filename}"'
+
+        writer = csv.writer(response)
+        writer.writerow(columns)  # Write headers
+
+        for row in rows:
+            writer.writerow(row)  # Write data
+
+        return response
+        
+    object_lists=web_pagination(request,data)
+    page_number_display_count = settings.PAGE_NUMBER_DISPLAY_COUNT
+    current_page = request.GET.get('page', 1)
+    page_number_start = int(current_page) - 2 if int(current_page) > 2 else 1
+    page_number_end = page_number_start + page_number_display_count if page_number_start + \
+        page_number_display_count < object_lists.paginator.num_pages else object_lists.paginator.num_pages+1
+    display_page_range = range(page_number_start, page_number_end)
+
+    # Passing data to the template
+    return render(request, 'reports/latest_json_answers.html', {'object_lists': object_lists,'heading':'App User Log','page_number_display_count':page_number_display_count,'current_page':current_page,'page_number_start':page_number_start,'page_number_end':page_number_end,'display_page_range':display_page_range})
