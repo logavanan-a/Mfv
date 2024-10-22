@@ -22,7 +22,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     project_name = serializers.CharField(source='name')
     project_id = serializers.IntegerField(source='id')
     order = serializers.IntegerField(source='id')
-    location = serializers.IntegerField(source='district_id')
+    location = serializers.CharField(source='district.name')
     created_on = serializers.DateTimeField(source='created',format='%Y-%m-%d %H:%M:%S.%f')
 
     class Meta:
