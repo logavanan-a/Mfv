@@ -282,7 +282,6 @@ def custom_report(request, page_slug):
     sorting_field = []
     user_location_data = None
     filter_values = None
-    # import ipdb;ipdb.set_trace()
     # get user selected filter data and merge with the user configured location heirarcy
     for idx, report in enumerate(page_reports):
         r_slug = report.report_slug
@@ -303,8 +302,6 @@ def custom_report(request, page_slug):
                 request, req_data, f_info,mission_id)
         # update any variable_location_names  - in query, count query, sort and headers
         default_sort = r_query['default_sort'] if 'default_sort' in r_query else None
-
-
         headers, e_header, data_query, count_query, s_info, default_sort = apply_variable_location_info(
             headers, e_header, d_query, c_query, s_info, default_sort, user_filter_values, user_location_data)
 
@@ -395,14 +392,14 @@ def get_donor_district_list(request,partner_id,donor_id,district_id):
     user_id = request.user.id
     donor_list,district_list = [],[]
     user_details = load_user_details(request)
-    if 'user_partner_list' in request.session:
-        partner_ids = request.session['user_partner_list']
+    if 'user_partner_list_roshni' in request.session:
+        partner_ids = request.session['user_partner_list_roshni']
     partner_list = Partner.objects.filter(id__in=partner_ids).values_list('id','name').order_by('name')
     if partner_id != '' or len(partner_ids) == 1:
         if len(partner_ids) == 1: 
-            part_mission_ids = PartnerMissionMapping.objects.filter(active=2,partner_id__in=partner_ids).values_list('id',flat=True)
+            part_mission_ids = PartnerMissionMapping.objects.filter(active=2,mission_id = 2 ,partner_id__in=partner_ids).values_list('id',flat=True)
         else:
-            part_mission_ids = PartnerMissionMapping.objects.filter(active=2,partner_id=int(partner_id)).values_list('id',flat=True)
+            part_mission_ids = PartnerMissionMapping.objects.filter(active=2,mission_id = 2,partner_id=int(partner_id)).values_list('id',flat=True)
         project_ids = Project.objects.filter(active=2,partner_mission_mapping_id__in=part_mission_ids).values_list('id',flat=True)
         donor_ids = ProjectDonorMapping.objects.filter(active=2,project_id__in=project_ids).values_list('donor_id',flat=True)
         donor_list = Donor.objects.filter(active=2,id__in=donor_ids).values_list('id','name').order_by('name')
@@ -455,7 +452,6 @@ def get_donor_district(request):
 
 @ login_required(login_url='/login/')
 def custom_report_donor(request):
-    # import ipdb;ipdb.set_trace()
     # locations_data = load_user_details_to_session(request)
     academic_year_list = getacademicyear('2024-2025')
     current_academic_year = academic_year_list[-1]
@@ -494,16 +490,28 @@ def child_screening_data(academic_year,q_year,partner_id,donor_id,district_id):
                         row_number() OVER () AS row_num,
                         month,
                         student_name,
+                        new_or_previous_space,
+                        phone_number,
                         age,
                         gender,
                         school_type,
                         school_name,
                         school_district,
                         school_state,
-                        remarks,
+                        remarks_referral_conditions,
                         screening,
+                        vision_with_without_spec_re,
+                        vision_with_without_spec_le,
                         spec_prescriped,
                         spec_issued,
+                        vision_with_spec_re_sph,	
+                        vision_with_spec_re_cyl,	
+                        vision_with_spec_re_axis,	
+                        vision_with_spec_re_vision,
+                        vision_with_spec_le_sph,	
+                        vision_with_spec_le_cyl,	
+                        vision_with_spec_le_axis,	
+                        vision_with_spec_le_vision,	
                         surgery_advised,
                         surgery_provided
                     FROM student_screening_data
@@ -514,16 +522,28 @@ def child_screening_data(academic_year,q_year,partner_id,donor_id,district_id):
                         row_num::text,
                         month::text,
                         student_name::text,
+                        new_or_previous_space::text,
+                        phone_number::text,
                         age::text,
                         gender::text,
                         school_type::text,
                         school_name::text,
                         school_district::text,
                         school_state::text,
-                        remarks::text,
+                        remarks_referral_conditions::text,
                         screening::text,
+                        vision_with_without_spec_re::text,
+                        vision_with_without_spec_le::text,
                         spec_prescriped::text,
                         spec_issued::text,
+                        vision_with_spec_re_sph::text,	
+                        vision_with_spec_re_cyl::text,	
+                        vision_with_spec_re_axis::text,	
+                        vision_with_spec_re_vision::text,
+                        vision_with_spec_le_sph::text,	
+                        vision_with_spec_le_cyl::text,	
+                        vision_with_spec_le_axis::text,	
+                        vision_with_spec_le_vision::text,
                         surgery_advised::text,
                         surgery_provided::text
                     )
@@ -601,7 +621,10 @@ def program_tracker_data(academic_year,q_year,partner_id,donor_id,district_id):
             children_provided_surgery_q_target,
             schools_covered_q_target,
             teacher_trained_q_target,
-            spectacle_compliance_3_months_q_target
+            spectacle_compliance_3_months_q_target,
+            children_advised_continue_sameglasses_q_target,
+            children_referred_hospital_examination_q_target,
+            children_provided_spectacles_hospital_q_target
         FROM 
             program_tracker_data
         where financial_year = '{academic_year}' {where_cond}
@@ -618,6 +641,9 @@ def program_tracker_data(academic_year,q_year,partner_id,donor_id,district_id):
                         t2.schools_covered_q_target as schools_covered_q_target,
                         t2.teacher_trained_q_target as teacher_trained_q_target,
                         t2.spectacle_compliance_3_months_q_target as spectacle_compliance_3_months_q_target,
+                        t2.children_advised_continue_sameglasses_q_target as children_advised_continue_sameglasses_q_target,
+                        t2.children_referred_hospital_examination_q_target as children_referred_hospital_examination_q_target,
+                        t2.children_provided_spectacles_hospital_q_target as children_provided_spectacles_hospital_q_target,
                         t1.children_screened_ach AS children_screened_ach,
                         t1.children_prescribed_spectacles_ach AS children_prescribed_spectacles_ach,
                         t1.children_provided_spectacles_ach AS children_provided_spectacles_ach,
@@ -626,6 +652,9 @@ def program_tracker_data(academic_year,q_year,partner_id,donor_id,district_id):
                         t1.schools_covered_ach AS schools_covered_ach,
                         t1.teacher_trained_ach AS teacher_trained_ach,
                         t1.spectacle_compliance_3_months_ach AS spectacle_compliance_3_months_ach,
+                        t1.children_advised_continue_sameglasses_ach AS children_advised_continue_sameglasses_ach,
+                        t1.children_referred_hospital_examination_ach AS children_referred_hospital_examination_ach,
+                        t1.children_provided_spectacles_hospital_ach AS children_provided_spectacles_hospital_ach,
                         sum(coalesce(t1.children_screened_male,0)) as children_screened_male,
                         sum(coalesce(t1.children_screened_female,0)) as children_screened_female,
                         sum(coalesce(t1.children_screened_total,0)) as children_screened_total,
@@ -649,7 +678,16 @@ def program_tracker_data(academic_year,q_year,partner_id,donor_id,district_id):
                         SUM(COALESCE(t1.teacher_trained_total, 0)) AS teacher_trained_total,
                         SUM(COALESCE(t1.spectacle_compliance_3_months_male, 0)) AS spectacle_compliance_3_months_male,
                         SUM(COALESCE(t1.spectacle_compliance_3_months_female, 0)) AS spectacle_compliance_3_months_female,
-                        SUM(COALESCE(t1.spectacle_compliance_3_months_total, 0)) AS spectacle_compliance_3_months_total 
+                        SUM(COALESCE(t1.spectacle_compliance_3_months_total, 0)) AS spectacle_compliance_3_months_total,
+                        sum(coalesce(t1.children_advised_continue_sameglasses_male,0)) as children_advised_continue_sameglasses_male,
+                        sum(coalesce(t1.children_advised_continue_sameglasses_female,0)) as children_advised_continue_sameglasses_female,
+                        sum(coalesce(t1.children_advised_continue_sameglasses_total,0)) as children_advised_continue_sameglasses_total,
+                        sum(coalesce(t1.children_referred_hospital_examination_male,0)) as children_referred_hospital_examination_male,
+                        sum(coalesce(t1.children_referred_hospital_examination_female,0)) as children_referred_hospital_examination_female,
+                        sum(coalesce(t1.children_referred_hospital_examination_total,0)) as children_referred_hospital_examination_total,
+                        sum(coalesce(t1.children_provided_spectacles_hospital_male,0)) as children_provided_spectacles_hospital_male,
+                        sum(coalesce(t1.children_provided_spectacles_hospital_female,0)) as children_provided_spectacles_hospital_female,
+                        sum(coalesce(t1.children_provided_spectacles_hospital_total,0)) as children_provided_spectacles_hospital_total
                     FROM 
                         program_tracker_data t1 
                         left join target_data t2 on t1.quarterly_year = t2.quarterly_year
@@ -664,6 +702,9 @@ def program_tracker_data(academic_year,q_year,partner_id,donor_id,district_id):
                         t2.schools_covered_q_target,
                         t2.teacher_trained_q_target,
                         t2.spectacle_compliance_3_months_q_target,
+                        t2.children_advised_continue_sameglasses_q_target,
+                        t2.children_referred_hospital_examination_q_target,
+                        t2.children_provided_spectacles_hospital_q_target,
                         t1.children_screened_ach,
                         t1.children_prescribed_spectacles_ach,
                         t1.children_provided_spectacles_ach,
@@ -671,7 +712,10 @@ def program_tracker_data(academic_year,q_year,partner_id,donor_id,district_id):
                         t1.children_provided_surgery_ach,
                         t1.schools_covered_ach,
                         t1.teacher_trained_ach,
-                        t1.spectacle_compliance_3_months_ach
+                        t1.spectacle_compliance_3_months_ach,
+                        t1.children_advised_continue_sameglasses_ach,
+                        t1.children_referred_hospital_examination_ach,
+                        t1.children_provided_spectacles_hospital_ach
                 )
                 SELECT 
                     quarterly_year,
@@ -731,6 +775,27 @@ def program_tracker_data(academic_year,q_year,partner_id,donor_id,district_id):
                             spectacle_compliance_3_months_female,
                             spectacle_compliance_3_months_total,
                             spectacle_compliance_3_months_ach 
+                        ),
+                        json_build_array(
+                        children_advised_continue_sameglasses_q_target,
+                            children_advised_continue_sameglasses_male,
+                            children_advised_continue_sameglasses_female,
+                            children_advised_continue_sameglasses_total,
+                            children_advised_continue_sameglasses_ach
+                        ),
+                        json_build_array(
+                        children_referred_hospital_examination_q_target,
+                            children_referred_hospital_examination_male,
+                            children_referred_hospital_examination_female,
+                            children_referred_hospital_examination_total,
+                            children_referred_hospital_examination_ach
+                        ),
+                        json_build_array(
+                        children_provided_spectacles_hospital_q_target,
+                            children_provided_spectacles_hospital_male,
+                            children_provided_spectacles_hospital_female,
+                            children_provided_spectacles_hospital_total,
+                            children_provided_spectacles_hospital_ach
                         )
                     ) as aggregated_data
                 FROM 
@@ -769,7 +834,16 @@ def program_tracker_data(academic_year,q_year,partner_id,donor_id,district_id):
             from program_tracker_data t1 where t1.financial_year = '{academic_year}' {where_cond} group by financial_year
             union ALL
             select financial_year,519 as i_id,sum(spectacle_compliance_3_months_total) as cum_total ,sum(spectacle_compliance_3_months_ach) as cum_ach
+            from program_tracker_data t1 where t1.financial_year = '{academic_year}' {where_cond} group by financial_year
+            union ALL
+            select financial_year,520 as i_id,sum(children_advised_continue_sameglasses_total) as cum_total ,sum(children_advised_continue_sameglasses_ach) as cum_ach
             from program_tracker_data t1 where t1.financial_year = '{academic_year}' {where_cond} group by financial_year 
+            union ALL
+            select financial_year,521 as i_id,sum(children_referred_hospital_examination_total) as cum_total ,sum(children_referred_hospital_examination_ach) as cum_ach
+            from program_tracker_data t1 where t1.financial_year = '{academic_year}' {where_cond} group by financial_year
+            union ALL
+            select financial_year,522 as i_id,sum(children_provided_spectacles_hospital_total) as cum_total ,sum(children_provided_spectacles_hospital_ach) as cum_ach
+            from program_tracker_data t1 where t1.financial_year = '{academic_year}' {where_cond} group by financial_year
         )
         select t2.name,
         t1.annual_target,
@@ -864,7 +938,6 @@ def export_excel_donor(child_screening_data,spectacle_comp_data,teacher_training
     surgery_data = surgery_details_data if surgery_details_data else [['No Data Avilable in the Financial Year and Quarterly Year']]
     program_tracker_a_data = a_data if a_data else [['No Data Avilable in the Financial Year and Quarterly Year']]
     # sheet 1 - Program Tracker
-    # import ipdb;ipdb.set_trace()
     #append heading
     start_row = 2
     for col_num, cell_value in enumerate(pt_heading[:3], start=1):
@@ -876,7 +949,6 @@ def export_excel_donor(child_screening_data,spectacle_comp_data,teacher_training
     
     if state_dist_name:
         worksheet_child_program_tracker.cell(row=5, column=1, value=state_dist_name[0][0])
-    # import ipdb;ipdb.set_trace()
     if t_data:
         start_row = 5
         for row_idx, row_data in enumerate(t_data):
@@ -902,7 +974,7 @@ def export_excel_donor(child_screening_data,spectacle_comp_data,teacher_training
                     worksheet_child_program_tracker.cell(row=start_row, column=col_offset + col_num, value=cell_value)
     #sheet2 - Children Screening Data
     worksheet_child_screening['A1'] = f"Children Screening Details - {financial_year} - {quarterly_year}"
-    start_row = 3
+    start_row = 5
     for row_data in child_screening_data:
         for col_num, cell_value in enumerate(row_data, start=1):
             worksheet_child_screening.cell(row=start_row, column=col_num, value=cell_value)
@@ -1076,24 +1148,36 @@ def get_filter_data(request, req_data, f_info,mission_id):
         filter_display_order = -1
         if k in display_order:
             filter_display_order = display_order.index(k)
-
         if k == 'donor':
             donor_list = Donor.objects.filter(id__in=request.session['user_donor_list'],active=2).values_list('id', 'name')
             data_list = [(str(item[0]), item[1])
                          for item in donor_list]
+            donor_id_list = [item[0] for item in donor_list]
             data_id = user_filter_values.get('donor', '')
+            if data_id == '':
+                if donor_id_list:
+                    data_id = str(donor_id_list)[1:-1]
+                    user_filter_values.update({'donor': data_id})
             filter_type = 'select'
         elif k == 'partner':
             partner_list = Partner.objects.filter(id__in=request.session['user_partner_list'],active=2).values_list('id', 'name')
-            data_list = [(str(item[0]), item[1])
-                         for item in partner_list]
+            data_list = [(str(item[0]), item[1]) for item in partner_list]
+            partner_id_list = [item[0] for item in partner_list]
             data_id = user_filter_values.get('partner', '')
+            if data_id == '':
+                if partner_id_list:
+                    data_id = str(partner_id_list)[1:-1]
+                    user_filter_values.update({'partner': data_id})
             filter_type = 'select'
         elif k == 'project':
             project_list = Project.objects.filter(id__in=request.session['user_project_list'],partner_mission_mapping__mission_id=mission_id,active=2).values_list('id', 'name')
-            data_list = [(str(item[0]), item[1])
-                         for item in project_list]
+            data_list = [(str(item[0]), item[1]) for item in project_list]
+            project_id_list = [item[0] for item in project_list]
             data_id = user_filter_values.get('project', '')
+            if data_id == '':
+                if project_id_list:
+                    data_id = str(project_id_list)[1:-1]
+                    user_filter_values.update({'project': data_id})
             filter_type = 'select'
         elif k == 'category':
             loc_data = user_location_data[0][4]
@@ -1167,7 +1251,6 @@ def get_filter_data(request, req_data, f_info,mission_id):
         else:
             filter_values[filter_display_order] = [
                 k, data_list, data_id, f_labels.get(k, ''), filter_type]
-
     return user_location_data, filter_values, user_filter_values, extended_filters_dict
 
 
@@ -1597,7 +1680,6 @@ def execute_query(conn, sql_query, query_type):
     #typ4 = stored procedure
     #typ5 = insert returning id
     #typ6 = DDL
-    # import ipdb;ipdb.set_trace()
     result = None
     cursor = None
     try:

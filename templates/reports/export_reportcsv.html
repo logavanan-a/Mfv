@@ -90,7 +90,7 @@
                         </div>
                         <div class="material-datatables new_datatablefilter table-responsive width_section" >
                             <form type="get" action="." style="margin: 0">
-                                {%if widget_obj.slug != 'benificiary-data' and widget_obj.slug != 'custom-report' %}
+                                {%if widget_obj.slug != 'benificiary-data' and widget_obj.slug != 'disha-benificiary-data' and widget_obj.slug != 'nayan-benificiary-data' and widget_obj.slug != 'custom-report' %}
                                 <!-- date filetr start-->
                                 <!-- <div class="col-lg-4">
                                     <div class="datetime_picker">
@@ -191,7 +191,7 @@
                                 
                                         <div class="col-6 col-md-6 mt-md-4">
                                             <div class="d-flex justify-content-between" >
-                                                {%if widget_obj.slug not in "'custom-report','benificiary-data'" %}
+                                                {%if widget_obj.slug not in "'custom-report','benificiary-data','disha-benificiary-data','nayan-benificiary-data'" %}
                                                 <div class="p d-flex" style="position: relative; left:10px; top: 8.5px !important; gap:10px">
                                                     <!-- <input  id="search_box" type="text" name="search_box"  placeholder="Search..." > -->
                                                     <!-- <button id="search_submit" type="submit" onclick="checkLength()" >Submit</button> -->
@@ -224,7 +224,7 @@
                                         <td>{{k}}</td>
                                     {% endfor %}
                                        
-                                    {%if report_slug in "'export-reports','benificiary-data'" and i.2 != '-' %}<td>
+                                    {%if report_slug in "'export-reports','benificiary-data','disha-benificiary-data','nayan-benificiary-data','disha-export-reports','nayan-export-reports'" and i.2 != '-' %}<td>
                                     <a href="#" onclick="export_csv('{{i.0}}')">Download</a>
                     <!-- <a href="javascript:onclickFunction('id')">Download</a>     -->
                                     </td>

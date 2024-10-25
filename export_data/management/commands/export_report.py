@@ -186,12 +186,12 @@ def export_excel(surveyid, excel_filename):
             cluster_info_for_survey = {"columns":[],"headers":[], "validations":[]}
             if survey_id == 1:
                 response_id_header = "School App ID"
-            elif survey_id == 6:
-                response_id_header = "Committee App ID"
-            elif survey_id == 8:
-                response_id_header = "Committee Member App ID"
-            elif survey_id == 4:
-                response_id_header = "School master App ID"
+            elif survey_id == 2:
+                response_id_header = "Student App ID"
+            elif survey_id == 12:
+                response_id_header = "Child Member App ID"
+            elif survey_id == 15:
+                response_id_header = "Disha Patient Screening master App ID"
             else:
                 response_id_header = "Response App ID"
             common_info_for_survey = {"columns":["id","creation_key","submission_date","created","modified","user_id"],"headers":[response_id_header, "Beneificary Unique Key", "Submission Date", "Created On", "Modified On", "Created By User ID"],"validations":[1,0,99,99,99,0]}
@@ -217,7 +217,7 @@ def export_excel(surveyid, excel_filename):
         common_columns.extend(cluster_info_for_survey.get('columns'))
         common_headers.extend(cluster_info_for_survey.get('headers'))
         common_validations.extend(cluster_info_for_survey.get('validations'))
-        aw_qtype_text_mapping={"1":"School","4":"School Master","6":"Committee","8":"Committee"}
+        aw_qtype_text_mapping={"1":"School Detail","2":"Student Details","12":"Child","15":"Disha Patient Screening"}
         # fetch resposne column names and header text for all question types except In type (variable grid questions)
         # AW type question column names and headers are separate query with UNION ALL to combine the list with other type of questions
         address_question_text_prefix = """'""" + aw_qtype_text_mapping.get(str(survey_id),'') + """'""" if str(survey_id) in aw_qtype_text_mapping.keys() else "a.text"
@@ -470,6 +470,27 @@ def add_data_to_excel(conn, data_query, headers_query, common_columns, common_he
                 extra_headers_list = ['Project ID', 'Project Name','Partner ID','Partner Name',
                 'Donor ID','Donor Name','School ID','School Name','School - State ID','School - State Name' ,'School - District ID','School - District Name']
                 extra_validations_list = [0,0,0,0,0,0,0,0,0,0,0,0] 
+            elif survey_id == 12: 
+                #Child - survey_id 12
+                #Child - Address questions for filter 
+                loc_filter_only_id_columns = ['address.1__id__','address.2__id__']
+                loc_filter_only_id_headers = ['Child - State','Child - District']
+                loc_filter_only_id_validations = [0,0]
+                extra_columns_list = ['project_id', 'project_name', 'partner_id', 'partner_name','donor_id','donor_name']
+                extra_headers_list = ['Project ID', 'Project Name','Partner ID','Partner Name',
+                'Donor ID','Donor Name']
+                extra_validations_list = [0,0,0,0,0,0]
+            elif survey_id == 15: 
+                #Disha Patient Screening - survey_id 12
+                #Disha Patient Screening - Address questions for filter 
+                loc_filter_only_id_columns = ['address.1__id__','address.2__id__']
+                loc_filter_only_id_headers = ['Disha Patient Screening - State','Disha Patient Screening - District']
+                loc_filter_only_id_validations = [0,0]
+                extra_columns_list = ['project_id', 'project_name', 'partner_id', 'partner_name','donor_id','donor_name']
+                extra_headers_list = ['Project ID', 'Project Name','Partner ID','Partner Name',
+                'Donor ID','Donor Name']
+                extra_validations_list = [0,0,0,0,0,0]
+            
         else:
             # #for extended activity surveys
             #  ben_type_id |                 name                  | id 
@@ -508,6 +529,30 @@ def add_data_to_excel(conn, data_query, headers_query, common_columns, common_he
                 extra_headers_list = ['Project ID', 'Project Name','Partner ID','Partner Name',
                 'Donor ID','Donor Name','School ID','School Name','School - State ID','School - State Name' ,'School - District ID','School - District Name']
                 extra_validations_list = [0,0,0,0,0,0,0,0,0,0,0,0]
+            elif ben_type == '4':
+                #School 
+                loc_filter_only_id_columns = ['address.1__id__','address.2__id__']
+                loc_filter_only_id_headers = ['Child - State','Child - District']
+                loc_filter_only_id_validations = [0,0]
+                ben_type_columns_list = ['ben.json_id', 'ben_type_question.234.1', 'ben_type_question.234.2', 'ben_type_question.231']
+                ben_type_headers_list = ['Child App ID', 'Child - State','Child - District','Child name']
+                ben_type_validations_list = [1,0,0,0]
+                extra_columns_list = ['project_id', 'project_name', 'partner_id', 'partner_name','donor_id','donor_name']
+                extra_headers_list = ['Project ID', 'Project Name','Partner ID','Partner Name',
+                'Donor ID','Donor Name']
+                extra_validations_list = [0,0,0,0,0,0]
+            elif ben_type == '5':
+                #School 
+                loc_filter_only_id_columns = ['address.1__id__','address.2__id__']
+                loc_filter_only_id_headers = ['Disha Patient Screening - State','Disha Patient Screening - District']
+                loc_filter_only_id_validations = [0,0]
+                ben_type_columns_list = ['ben.json_id', 'ben_type_question.234.1', 'ben_type_question.234.2', 'ben_type_question.231']
+                ben_type_headers_list = ['Disha Patient Screening App ID', 'Disha Patient Screening - State','Disha Patient Screening - District','Disha Patient Screening name']
+                ben_type_validations_list = [1,0,0,0]
+                extra_columns_list = ['project_id', 'project_name', 'partner_id', 'partner_name','donor_id','donor_name']
+                extra_headers_list = ['Project ID', 'Project Name','Partner ID','Partner Name',
+                'Donor ID','Donor Name']
+                extra_validations_list = [0,0,0,0,0,0]
         #mark the column names to be used for location based filters
         #ensure the columns are added from 1 - 8 in the list
         # if loc_q_num != ""        
