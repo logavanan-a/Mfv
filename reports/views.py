@@ -281,7 +281,6 @@ def custom_report(request, page_slug):
     sorting_field = []
     user_location_data = None
     filter_values = None
-    # import ipdb;ipdb.set_trace()
     # get user selected filter data and merge with the user configured location heirarcy
     for idx, report in enumerate(page_reports):
         r_slug = report.report_slug
@@ -302,8 +301,6 @@ def custom_report(request, page_slug):
                 request, req_data, f_info,mission_id)
         # update any variable_location_names  - in query, count query, sort and headers
         default_sort = r_query['default_sort'] if 'default_sort' in r_query else None
-
-
         headers, e_header, data_query, count_query, s_info, default_sort = apply_variable_location_info(
             headers, e_header, d_query, c_query, s_info, default_sort, user_filter_values, user_location_data)
 
@@ -454,7 +451,6 @@ def get_donor_district(request):
 
 @ login_required(login_url='/login/')
 def custom_report_donor(request):
-    # import ipdb;ipdb.set_trace()
     # locations_data = load_user_details_to_session(request)
     academic_year_list = getacademicyear('2024-2025')
     current_academic_year = academic_year_list[-1]
@@ -941,7 +937,6 @@ def export_excel_donor(child_screening_data,spectacle_comp_data,teacher_training
     surgery_data = surgery_details_data if surgery_details_data else [['No Data Avilable in the Financial Year and Quarterly Year']]
     program_tracker_a_data = a_data if a_data else [['No Data Avilable in the Financial Year and Quarterly Year']]
     # sheet 1 - Program Tracker
-    # import ipdb;ipdb.set_trace()
     #append heading
     start_row = 2
     for col_num, cell_value in enumerate(pt_heading[:3], start=1):
@@ -953,7 +948,6 @@ def export_excel_donor(child_screening_data,spectacle_comp_data,teacher_training
     
     if state_dist_name:
         worksheet_child_program_tracker.cell(row=5, column=1, value=state_dist_name[0][0])
-    # import ipdb;ipdb.set_trace()
     if t_data:
         start_row = 5
         for row_idx, row_data in enumerate(t_data):
@@ -1153,24 +1147,36 @@ def get_filter_data(request, req_data, f_info,mission_id):
         filter_display_order = -1
         if k in display_order:
             filter_display_order = display_order.index(k)
-
         if k == 'donor':
             donor_list = Donor.objects.filter(id__in=request.session['user_donor_list'],active=2).values_list('id', 'name')
             data_list = [(str(item[0]), item[1])
                          for item in donor_list]
+            donor_id_list = [item[0] for item in donor_list]
             data_id = user_filter_values.get('donor', '')
+            if data_id == '':
+                if donor_id_list:
+                    data_id = str(donor_id_list)[1:-1]
+                    user_filter_values.update({'donor': data_id})
             filter_type = 'select'
         elif k == 'partner':
             partner_list = Partner.objects.filter(id__in=request.session['user_partner_list'],active=2).values_list('id', 'name')
-            data_list = [(str(item[0]), item[1])
-                         for item in partner_list]
+            data_list = [(str(item[0]), item[1]) for item in partner_list]
+            partner_id_list = [item[0] for item in partner_list]
             data_id = user_filter_values.get('partner', '')
+            if data_id == '':
+                if partner_id_list:
+                    data_id = str(partner_id_list)[1:-1]
+                    user_filter_values.update({'partner': data_id})
             filter_type = 'select'
         elif k == 'project':
             project_list = Project.objects.filter(id__in=request.session['user_project_list'],partner_mission_mapping__mission_id=mission_id,active=2).values_list('id', 'name')
-            data_list = [(str(item[0]), item[1])
-                         for item in project_list]
+            data_list = [(str(item[0]), item[1]) for item in project_list]
+            project_id_list = [item[0] for item in project_list]
             data_id = user_filter_values.get('project', '')
+            if data_id == '':
+                if project_id_list:
+                    data_id = str(project_id_list)[1:-1]
+                    user_filter_values.update({'project': data_id})
             filter_type = 'select'
         elif k == 'category':
             loc_data = user_location_data[0][4]
@@ -1244,7 +1250,6 @@ def get_filter_data(request, req_data, f_info,mission_id):
         else:
             filter_values[filter_display_order] = [
                 k, data_list, data_id, f_labels.get(k, ''), filter_type]
-
     return user_location_data, filter_values, user_filter_values, extended_filters_dict
 
 
@@ -1674,7 +1679,6 @@ def execute_query(conn, sql_query, query_type):
     #typ4 = stored procedure
     #typ5 = insert returning id
     #typ6 = DDL
-    # import ipdb;ipdb.set_trace()
     result = None
     cursor = None
     try:
