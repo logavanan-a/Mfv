@@ -7,6 +7,7 @@ from constants import OPTIONAL
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
+from survey.manager import ActiveQuerySet
 
 from django.contrib.auth.models import AbstractUser
 
@@ -18,6 +19,7 @@ class BaseContent(models.Model):
     created         = models.DateTimeField(auto_now_add = True)
     modified        = models.DateTimeField(auto_now = True)
     listing_order   = models.PositiveIntegerField(default = 0)
+    objects = ActiveQuerySet.as_manager()
 
     class Meta:
         abstract    = True
@@ -183,6 +185,8 @@ class Project(BaseContent):
     additional_info = models.TextField(blank=True, null=True)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
+    # project_task = defalt false # project id from last month task 
+    # 
     # application_type = models.ForeignKey('application_master.MasterLookup', related_name='masterlookup_application', **OPTIONAL,on_delete=models.DO_NOTHING)
 
     class Meta:

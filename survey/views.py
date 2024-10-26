@@ -12,12 +12,13 @@ import pandas as pd
 from django.shortcuts import render,HttpResponse,HttpResponseRedirect
 import bleach,os
 from rest_framework.response import Response
-from cache_configuration.views import load_data_to_cache_survey,load_data_to_cache_questions,load_data_to_cache_boundary_level
+from cache_configuration.views import load_data_to_cache_survey,load_data_to_cache_questions,load_data_to_cache_boundary_level,cache_delete_namespace
 from django.contrib import messages
 from survey.management.commands.import_responses import questions_validation
 from io import BytesIO
 import subprocess
 import logging
+from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
 
@@ -167,6 +168,7 @@ class Surveys(View):
     
     def get(self, request, *args, **kwargs):
         # anonymous_user_entry = user_setup().get('anonymous_user_entry')
+        heading="Data collections"
         surveys = Survey.objects.filter().exclude(active=0).order_by("survey_order")
         search_txt = request.GET.get('s')
         if search_txt:
@@ -195,11 +197,99 @@ class SurveyAdd(View):
         capture_level_choices= CAPTURE_LEVEL_CHOICES
         # """#survey_order=Survey.objects.get('survey_order')"""
         themes = MasterLookUp.objects.filter(parent__slug="theme")
-        # beneficiary_types = BeneficiaryType.objects.filter(active=2).exclude(parent=None).order_by('btype_order')
+        beneficiary_types = BeneficiaryType.objects.filter(active=2).exclude(parent=None).order_by('btype_order')
         levels = BoundaryLevel.objects.all()
         # roles = RoleTypes.objects.filter(active=2)
         return render(request,self.template_name,locals())
     
+    def post(self, request,*args, **kwargs):
+        add = True
+        # roles = RoleTypes.objects.filter(active=2)
+        survey_type_choices = SURVEY_TYPE_CHOICES
+        periodicity_choices = PERIODICITY_CHOICES
+        capture_level_choices= CAPTURE_LEVEL_CHOICES
+        beneficiary_types = BeneficiaryType.objects.filter(active=2).exclude(parent=None).order_by('btype_order')
+        levels = BoundaryLevel.objects.all()
+        name = sanitized(request.POST.get('name'))
+        beneficiary_type_id = request.POST.get('beneficiary_type_id')
+        location_id = request.POST.get('level_id')
+        survey_type = request.POST.get('survey_type')
+        periodicity = request.POST.get('periodicity')
+        role_type = request.POST.get('role_id')
+        description = request.POST.get('description')
+        activity_code = request.POST.get('activity_code')
+        survey_order=request.POST.get('survey_order') #if request.POST.get('survey_order') else 0
+        data_dict = {}
+        if Survey.objects.filter(survey_order=request.POST.get('survey_order')).exists():
+             error="survey order is already exists" 
+             return render(request,self.template_name,locals())
+        
+            
+        if survey_type:
+            
+            if str(survey_type) == str(0):
+                if Survey.objects.filter(content_type=ContentType.objects.get_for_model(BeneficiaryType), object_id=beneficiary_type_id):
+                    error = "Baseline activity with this beneficiary type already exists"
+                    return render(request,self.template_name,locals())
+#              """  #if Survey.objects.filter(survey_order=request.POST.get('surevy_order')).exists():
+#                #   error="survey order is already exists"
+#                #  return render(request,self.template_name,locals())"""
+                else:
+                    data_dict = add_baseline_survey(data_dict,request.POST)
+                    survey_object = Survey.objects.create(**data_dict)
+                    Block.objects.create(block_order=1, code=1, name=name, survey=survey_object)
+                    
+                    
+            elif str(survey_type) == str(1):
+                data_dict = add_extended_survey(data_dict, request.POST)
+                survey_object = Survey.objects.create(**data_dict)
+                Block.objects.create(block_order=1, code=1, name=name, survey=survey_object)
+            '''
+                ###############################################################################
+                * Below if condition is because of anonymous user entry for forms
+                * 8 digits hashcode will be generated based on survey slug
+                * Fields --> hashcode, anonymous_user_entry,data will be dictionary 
+                * which helps to display extra information in html
+                * These fields will be saved in extra_config column of survey object
+                ###############################################################################
+                
+            '''
+            # if user_setup().get('anonymous_user_entry') == 1:
+            #     data_ = {"hash_code":int(str(abs(hash(survey_object.slug)))[:8]),
+            #              "anonymous_user_entry":1,
+            #              "data":{}
+            #             }
+            #     survey_object.extra_config = data_
+            #     survey_object.save()
+            ''' *********************Anonymous user ENDS HERE********************* '''
+            cache_delete_namespace('FORM_BUILDER')
+            return HttpResponseRedirect('/survey/')
+        else:
+            error = "Please select survey type"
+        return render(request,self.template_name,locals())
+
+#sub function for add activity if type is baseline
+def add_baseline_survey(data_dict,data ):
+    name = sanitized(data.get('name'))
+    beneficiary_type_id = data.get('beneficiary_type_id') 
+    location_id = data.get('level_id')
+    survey_type = data.get('survey_type')
+    description = data.get('description')
+    periodicity = data.get('periodicity')
+    survey_order=data.get('survey_order')
+    capture_level = data.get('cp_level')
+    activity_code = data.get('activity_code')
+    data_dict.update({"name": name, 
+                    "survey_type": survey_type,
+                    "content_type":
+                		ContentType.objects.get_for_model(
+                            BeneficiaryType), "object_id":
+                        beneficiary_type_id, "periodicity":
+                        periodicity,"survey_order":survey_order,
+                        "capture_level_type":capture_level,
+
+                        })
+    return data_dict
 
 class SurveyEdit(View):
     template_name = 'survey_forms/survey_add.html'
@@ -210,7 +300,7 @@ class SurveyEdit(View):
         survey_deactivate_reasons =  SURVEY_DEACTIVATE_REASON
         themes = MasterLookUp.objects.filter(parent__slug="theme")
         capture_level_choices= CAPTURE_LEVEL_CHOICES
-        # beneficiary_types = BeneficiaryType.objects.filter(active=2).exclude(parent=None).order_by('btype_order')
+        beneficiary_types = BeneficiaryType.objects.filter(active=2).exclude(parent=None).order_by('btype_order')
         levels = BoundaryLevel.objects.all()
         survey_obj = Survey.objects.get(id=pk)
         survey_order=Survey.objects.get(id=pk).survey_order
@@ -403,8 +493,8 @@ class AddSurveyQuestion(View):
                 question.api_json = {"date_val":request.POST.get('validation_type') if request.POST.get('validation_type') else str(496)}
                 question.save()
             if qtype in ['In', 'GD']:
-                return HttpResponseRedirect('/manage/question/add/' + str(pk) + '/' + str(question.id) + '/')
-            return HttpResponseRedirect('/manage/questions/' + str(pk) + '/')
+                return HttpResponseRedirect('/question/add/' + str(pk) + '/' + str(question.id) + '/')
+            return HttpResponseRedirect('/questions/' + str(pk) + '/')
         return render(request,self.template_name,locals())
     
 
@@ -876,3 +966,55 @@ def generate_excel(request,survey_id,project_id):
 
     return response
     
+class GetSurvey(APIView):
+    def get(self, request, sid):
+        try:
+            survey = Survey.objects.get(id=sid)
+            survey_details = {}
+            survey_details['name'] = survey.name
+            survey_details['survey_type'] = survey.survey_type
+            survey_details['periodicity'] = survey.periodicity
+            survey_details['display_type'] = survey.display_type
+            survey_details['theme_id'] = survey.theme.id if survey.theme else ""
+            survey_details['beneficiary_type_id'] = ""
+            survey_details['location_id'] = ""
+            survey_details['type'] = 3
+            survey_details['cp_level'] = survey.capture_level_type
+            if survey.survey_type == 0:
+                survey_details['type'] = 2
+                survey_details['beneficiary_type_id'] = survey.object_id
+            elif survey.survey_type == 1:
+                get_updated_survey_details(survey_details, survey)
+            return Response({'status': 2, 'survey_details': survey_details})
+        except Exception as e:
+            return Response({'status': 0, 'message': 'Survey doesnt exist', 'error': e.args[0]})
+
+
+def get_updated_survey_details(survey_details, survey):
+    """
+    Inline function for updating the survey details dictionary
+    if it is extended survey.
+    Return the updated dictionary with beneficiary type and location level
+    """
+    values_list = []
+    for config in survey.config:
+        for k in config.keys():
+            values_list.extend(config.values())
+            ids = k.split('_')[-1]
+            if str(config[k]) == 'BoundaryLevel':
+                survey_details['location_id'] = int(
+                    config.get('object_id_' + ids))
+            if str(config[k]) == 'BeneficiaryType':
+                survey_details['beneficiary_type_id'] = int(
+                    config.get('object_id_' + ids))
+           # for role type activity
+            if str(config[k]) == 'RoleTypes':
+                survey_details['role_id'] = int(
+                    config.get('object_id_' + ids))
+    if 'BoundaryLevel' in values_list:
+        survey_details['type'] = 1
+    if 'BeneficiaryType' in values_list:
+        survey_details['type'] = 2
+    if 'RoleTypes' in values_list:
+        survey_details['type'] = 4
+    return None

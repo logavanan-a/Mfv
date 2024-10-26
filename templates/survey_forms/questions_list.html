@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load common_tags %}
 {% block contents %}
-<div class="content">
+<div class="contents">
     <div class="container-fluid">
         <div class="row">
             <!-- <h1>data collection form > setting </h1> -->
@@ -80,7 +80,7 @@
                                     <th>Type</th>
                                     <th>Parent Question</th>
                                     <th>Status</th>
-                                    <th class="text-right d-flex justify-content-end">Actions</th>
+                                    <th>Actions</th>
                                 </thead>
                                 <tbody>
                                     {% for question in object_list %}

@@ -271,3 +271,14 @@ color: #373737;
     left:150px;
     height: 100%;
 } */
+.error_alert {
+    color: #de426b !important;
+    border: 1px solid #de426b;
+    margin: 20px 0px;
+    font-size: 22px;
+    padding: 10px 15px;
+}
+
+.error_alert h3{
+    color: #de426b !important;
+}

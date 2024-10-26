@@ -218,7 +218,7 @@ def master_details_form(request,model,id):
     heading=model
     if model == 'partner':
         heading="Partner"
-        user_mapping = dict(UserProjectMapping.objects.filter(project__partner_mission_mapping__partner_id=id).values_list('project_id','user__username'))
+        user_mapping = dict(UserProjectMapping.objects.filter(active=2,project__partner_mission_mapping__partner_id=id,user__groups__id=1).values_list('project_id','user__username'))
         # user_obj = User.objects.filter(id__in=user_mapping)
         # groups_obj = Group.objects.filter(user__in=user_obj).distinct()
         part=Partner.objects.filter(id=id, active=2)
