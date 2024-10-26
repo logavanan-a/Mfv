@@ -334,7 +334,7 @@ def question_based_validation(df,question,columns,validation,column):
             copy_df['all_values_exist'] = copy_df.astype(str).apply(lambda x: unique_id_validation(x,beneficiary_dict))
             unique_id_error = columns[~copy_df['all_values_exist']].index.tolist()
             if unique_id_error:
-                error_message =  f"* Validate the value of the {column} question is correct. It does not exist in our database. (Please ensure commas are used to separate values)."
+                error_message =  f"* Validate the value of the {column} question is correct. It does not exist in our database."
                 df.loc[unique_id_error, 'Error Message'] = error_message
         
 def get_beneficiary_unique_values(ben_survey_id,question_id,unique_values):
@@ -504,7 +504,7 @@ def get_beneficiary_clusters(beneficiaries):
 
 # get the schools linked to project
 def get_school_based_project(project_district):
-    boundary_data = Boundary.objects.get(code=project_district)
+    boundary_data = Boundary.objects.get(boundary_level_type_id=2,code=project_district)
     beneficiary_data = [i.response.get('428') for i in JsonAnswer.objects.filter(active=2,survey_id=1,response__address__1__234__2=str(boundary_data.id)) if i.response.get('428')]
     return beneficiary_data
 

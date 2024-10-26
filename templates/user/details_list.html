@@ -187,7 +187,7 @@
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ l.name }}</td>
                                     <td>{{l.partner_mission_mapping }}</td>
-                                    <td>{{user_mapping|get_item:l.id }}</td>
+                                    <td>{{user_mapping|get_item:l.id|default_if_none:"-" }}</td>
                                     <td>{{l.district }}</td>
                                     <td>{{l.projectdonormapping.donor.name }}</td>
                                     <td>{{l.location }}</td>

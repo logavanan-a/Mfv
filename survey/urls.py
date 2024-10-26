@@ -20,6 +20,7 @@ urlpatterns = [
     # path('list/<slug:survey_slug>/', login_required(WebResponseListing.as_view(),login_url='/login/')),
     #user and facility mapping api
     path('survey/ajax/get_custom_validation/', custom_validation_survey_wise_version1),
+    path('survey/get_survey_details/<int:sid>/', GetSurvey.as_view()),
 
     # data import feature
     path('manage/generate-excel/<survey_id>/<project_id>/', generate_excel, name='generate_excel'),

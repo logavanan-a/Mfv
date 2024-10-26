@@ -4,7 +4,7 @@
 {% with "data-collection-forms"|make_string:"view" as keystring %}
             {% if request.user.is_superuser or request|has_permission_for_action:keystring %}
 {% block contents %}
-<div class="content">
+<div class="contents">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
@@ -20,7 +20,7 @@
                             <div class="p">
                                 <form action="{{request.path}}" class="app-search d-none d-sm-block" style="padding: 0;!important">
                                     <div class="position-relative">
-                                        <input formcontrolname="text" {% if search_txt%}  value={{search_txt}} {%else%} {%endif%} name = 's' type="text" class="form-control" placeholder="Search with name...">
+                                        <input formcontrolname="text" name="s" type="text" class="form-control" placeholder="Search with name..." {% if search_txt %}  value={{search_txt}} {%else%} {%endif%}>
                                         <span class="bx bx-search-alt"></span>
                                     </div>
                                 </form>
@@ -75,7 +75,7 @@
                         <!-- new search bar -->
                             <form action="{{request.path}}" class="app-search d-none d-sm-block">
                                 <div class="position-relative">
-                                    <input formcontrolname="text" name = 's' type="text" class="form-control" placeholder="Search with name...">
+                                    <input formcontrolname="text" name="s" type="text" class="form-control" placeholder="Search with name...">
                                     <span class="bx bx-search-alt"></span>
                                 </div>
                             </form>
@@ -97,10 +97,10 @@
                                     <th>Order</th>
                                     <th>Status</th>
                                     {% with "data-collection-forms"|make_string:"edit" as keystring %}
-            {% if request.user.is_superuser or request|has_permission_for_action:keystring %}
-                                    <th class="text-right d-flex justify-content-end">Actions</th>
-                                    {% endif %}
-                                        {% endwith %}
+                                        {% if request.user.is_superuser or request|has_permission_for_action:keystring %}
+                                            <th>Actions</th>
+                                        {% endif %}
+                                    {% endwith %}
                                 </thead>
                                 <tbody style="vertical-align: middle;!important ">
                                     {% for survey in object_list %}
@@ -115,51 +115,51 @@
                                         <td> {% if survey.active == 2 %} Active {% else %} InActive {% endif %}  </td>
                                         
                                         {% with "data-collection-forms"|make_string:"edit" as keystring %}
-            {% if request.user.is_superuser or request|has_permission_for_action:keystring %}
-                                        <td class="action_btn d-flex justify-content-end" style="gap: 5px;">
-                                            <a href="/survey/edit/{{survey.id}}/" class="ng-star-inserted">
-                                                <button class="btn btn-just-icon btn-info btn-sm" style="float:right" title=edit>
-                                                    <i class="bx bx-pencil" style="font-size: 16px;"></i>
-                                                </button>
-                                            </a>
-                                            <a href="/questions/{{survey.id}}/" class="ng-star-inserted">
-                                                <button class="btn btn-light btn-just-icon btn-rose btn-sm" style="float:right">
-<!--                                                Manage Questions-->
-                                                <i class="bx bx-cog" style="font-size: 16px;"></i>
-                                                </button>
-                                            </a>
-                                            {% if request.user.is_superuser %}
+                                            {% if request.user.is_superuser or request|has_permission_for_action:keystring %}
+                                                <td>
+                                                    <div class="d-flex flex-wrap gap-2" >
+                                                        <a href="/survey/edit/{{survey.id}}/" class="ng-star-inserted">
+                                                            <button class="btn btn-just-icon btn-info btn-sm" style="float:right" title=edit>
+                                                                <i class="bx bx-pencil" style="font-size: 16px;"></i>
+                                                            </button>
+                                                        </a>
+                                                        <a href="/questions/{{survey.id}}/" class="ng-star-inserted">
+                                                            <button class="btn btn-light btn-just-icon btn-rose btn-sm" style="float:right">
+            <!--                                                Manage Questions-->
+                                                            <i class="bx bx-cog" style="font-size: 16px;"></i>
+                                                            </button>
+                                                        </a>
+                                                        {% if request.user.is_superuser %}
 
-                                            <a href="/import-questions/{{survey.id}}/" class="ng-star-inserted ">
-                                                <button class="btn btn-just-icon btn-success btn-sm" style="float:right" rel="tooltip" title="Import Ques and choices">
-                                                <em class="bx bx-cloud-upload" style="font-size: 16px;"></em>
-                                                </button>
-                                            </a>
-                                            
-                                            <a href="/import-modified-questions/{{survey.id}}/" class="ng-star-inserted ">
-                                                <button class="btn btn-just-icon btn-success btn-sm" style="float:right" rel="tooltip" title="Modified Import Ques and choices">
-<!--                                                Manage Questions-->
-                                                <i class="bx bx-cloud-upload" style="font-size: 16px;"></i>
-                                                </button>
-                                            </a>
-                                            
-                                            <a href="/activity/questions/export/?id={{survey.id}}" class="ng-star-inserted ">
-                                                <button class="btn btn-just-icon btn-success btn-sm" style="float:right"rel="tooltip" title="Export Questions">
-<!--                                                Manage Questions-->
-                                                <i class="bx bx-cloud-download" style="font-size: 16px;"></i>
-                                                </button>
-                                            </a>
+                                                        <a href="/import-questions/{{survey.id}}/" class="ng-star-inserted ">
+                                                            <button class="btn btn-just-icon btn-success btn-sm" style="float:right" rel="tooltip" title="Import Ques and choices">
+                                                            <em class="bx bx-cloud-upload" style="font-size: 16px;"></em>
+                                                            </button>
+                                                        </a>
+                                                        
+                                                        <a href="/import-modified-questions/{{survey.id}}/" class="ng-star-inserted ">
+                                                            <button class="btn btn-just-icon btn-success btn-sm" style="float:right" rel="tooltip" title="Modified Import Ques and choices">
+            <!--                                                Manage Questions-->
+                                                            <i class="bx bx-cloud-upload" style="font-size: 16px;"></i>
+                                                            </button>
+                                                        </a>
+                                                        
+                                                        <a href="/activity/questions/export/?id={{survey.id}}" class="ng-star-inserted ">
+                                                            <button class="btn btn-just-icon btn-success btn-sm" style="float:right"rel="tooltip" title="Export Questions">
+            <!--                                                Manage Questions-->
+                                                            <i class="bx bx-cloud-download" style="font-size: 16px;"></i>
+                                                            </button>
+                                                        </a>
+                                                        <a href="/activity/choices/export/?id={{survey.id}}" class="ng-star-inserted ">
+                                                            <button class="btn btn-just-icon btn-success btn-sm" style="float:right" rel="tooltip" title="Export Choices">
+                                                                <!--                                                Manage Questions-->
+                                                                <i class="bx bx-cloud-download" style="font-size: 16px;"></i>
+                                                            </button>
+                                                        </a>
+                                                        {% endif %}
+                                                    </div>
+                                                </td>
                                             {% endif %}
-                                            {% if request.user.is_superuser %}
-                                            <a href="/activity/choices/export/?id={{survey.id}}" class="ng-star-inserted ">
-                                                <button class="btn btn-just-icon btn-success btn-sm" style="float:right" rel="tooltip" title="Export Choices">
-<!--                                                Manage Questions-->
-                                                <i class="bx bx-cloud-download" style="font-size: 16px;"></i>
-                                                </button>
-                                            </a>
-                                            {% endif %}
-                                        </td>
-                                        {% endif %}
                                         {% endwith %}
                                     </tr>
                                     {% endfor %}
