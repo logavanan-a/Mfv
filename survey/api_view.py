@@ -89,7 +89,7 @@ def applogin(request, **kwargs):
         updateapk = {"forceUpdate": "False",
                      "appVersion": 0,
                      "updateMessage": "New update available, download from playstore",
-                     "link": ""}
+                     "link": settings.APP_URL}
         user_list = UserProjectMapping.objects.filter(user=user,project__partner_mission_mapping__mission_id=2)
         user_profile = UserProfile.objects.filter(user=user,login_type__in=[2,3])
         if role_typ == 1 and user_profile.exists() and user_list.exists():
@@ -820,7 +820,7 @@ def updatedtables(request):
         updateapk = {"forceUpdate": str(version_update.force_update),
                      "appVersion": int(version_update.version_code),
                      "updateMessage": "New update available, download from playstore",
-                     "link":""}
+                     "link":settings.APP_URL}
         res = {'status': 2,
                'message': 'updated successfully',
                'updatedTables': res_dict}
