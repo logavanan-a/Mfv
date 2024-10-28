@@ -783,7 +783,7 @@ def updatedtables(request):
 
         updated_dict["BlockLanguageTranslation"] = updated_dict.pop(
             "LanguageBlock")
-        print(updated_dict)        
+
         updated_dict["QuestionLanguageTranslation"] = updated_dict.pop(
             "LanguageQuestion")
         updated_dict["MetricsQuestionConfiguration"] = updated_dict.pop(
@@ -815,10 +815,10 @@ def updatedtables(request):
         res_dict["Options"] = True if res_dict.get("Choice") else False
         res_dict["LanguageOptions"] = res_dict.pop("ChoiceLanguageTranslation")
         # userprofile_obj = UserRoles.objects.get(user__id=user_id)
-        # version_update = VersionUpdate.objects.filter().latest('id')
+        version_update = VersionUpdate.objects.filter().latest('id')
         # updated_link = user_setup().get('updated_link',"") 
-        updateapk = {"forceUpdate": "",
-                     "appVersion": 0,
+        updateapk = {"forceUpdate": str(version_update.force_update),
+                     "appVersion": int(version_update.version_code),
                      "updateMessage": "New update available, download from playstore",
                      "link":""}
         res = {'status': 2,

@@ -229,9 +229,9 @@ def master_details_form(request,model,id):
 
     elif model == 'project':
         heading="Project"
-        user_mapping = UserProjectMapping.objects.filter(project_id=id).values_list('user_id', flat=True)
-        user_obj = User.objects.filter(id__in=user_mapping)
-        groups_obj = Group.objects.filter(user__in=user_obj).distinct()
+        user_mapping = dict(UserProjectMapping.objects.filter(active=2,project__partner_mission_mapping__partner_id=id,user__groups__id=1).values_list('project_id','user__username'))
+        # user_obj = User.objects.filter(id__in=user_mapping)
+        # groups_obj = Group.objects.filter(user__in=user_obj).distinct()
         project_donor_obj = ProjectDonorMapping.objects.filter(project_id=id).values_list('donor_id', flat=True)
         project_obj = Donor.objects.filter(id__in=project_donor_obj)
         
