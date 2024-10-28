@@ -102,8 +102,10 @@ def add_survey_answers_version_1(request, **kwargs):
     # data = json.loads(request.body.decode('utf-8'))
     data = request.POST
     create_post_log_v2(request, data)
+    interface=1 #1:App 0:Web 3:Migrated Data 
     if kwargs:
         data=kwargs
+        interface = 0
     user_id = int(data['u_uuid'])
     sync_res = []
     message = "Success"
@@ -251,6 +253,10 @@ def add_survey_answers_version_1(request, **kwargs):
                     if response_id or duplicate_status == "0":
                         status, res = create_answers_version1(
                             user, response, **ans_params)
+
+                        # updating the interface of data
+                        res.interface=interface
+                        res.save()
 
                         # json_obj = JsonAnswer.objects.get(id=res_id)
                         if files_info:
@@ -406,7 +412,7 @@ def create_app_answer_data_version1(val):
                                        survey_status=val.get('survey_status'),
                                        reason=val.get('reason'),
                                        sample_id=val.get('r_uuid') if val.get(
-                                           'r_uuid') else str(uuid4()),  # manualy creating uuid
+                                           'r_uuid') else datetime.now().strftime('%Y%m%d%H%M%S') + str(uuid4()),  # manualy creating uuid
                                        cluster_id=val.get('cluster_id'),
                                        interface=2,
                                        active=0)

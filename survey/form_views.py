@@ -364,11 +364,11 @@ class WebResponseListing(View):
             if district:
                 # district_name = Boundary.objects.get(active=2,code=district,boundary_level_type_id=2).name
                 creation_key_wise_district = "','".join(list(BeneficiaryResponse.objects.filter(address_2=district).values_list('creation_key',flat=True)))
-            query="select DISTINCT ON (js.creation_key)  js.id,survey_id,response,s.slug,creation_key,js.created,js.modified,js.active, pd.donor_id from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id left outer join application_master_userprojectmapping up on up.project_id::text = js.cluster->>'project_id' left outer join application_master_projectdonormapping pd on pd.project_id = up.project_id where js.active != 0 @@project_based_mapping and s.id = {0} @@creation_key @@creation_key_wise_district @@filters @@school_creation_key @@donor order by @@order_by".format(survey.id,request.user.id)#@@filters
-            if not request.user.is_superuser:
-                query=query.replace("@@project_based_mapping",f" and up.user_id = {request.user.id}")
-            else:
-                query=query.replace("@@project_based_mapping",f" ")
+            query="select DISTINCT ON (js.creation_key)  js.id,survey_id,response,s.slug,creation_key,js.created,js.modified,js.active, pd.donor_id from survey_jsonanswer js inner join survey_survey s on s.id = js.survey_id left outer join application_master_userprojectmapping up on up.project_id::text = js.cluster->>'project_id' left outer join application_master_projectdonormapping pd on pd.project_id = up.project_id where js.active != 0 @@project_based_mapping and s.id = {0} and ((s.survey_type != 0) or (s.survey_type=0 and js.cluster->>'project_id'::text != '-1')) @@creation_key @@creation_key_wise_district @@filters @@school_creation_key @@donor order by @@order_by".format(survey.id,request.user.id)#@@filters
+            # if not request.user.is_superuser:
+            #     query=query.replace("@@project_based_mapping",f" and up.user_id = {request.user.id}")
+            # else:
+            query=query.replace("@@project_based_mapping",f" ")
 
             if survey.id == 1 and request.user.groups.all()[0].id in [1,2,4]:
                 query=query.replace("@@creation_key_wise_district"," and creation_key in (\'{0}\')".format(creation_key_wise_district))
@@ -608,6 +608,7 @@ def add_survey_form(request,pk):
     heading=survey.get('name')
     skip_questions=[]
     ben_uuid=request.GET.get('ben',request.POST.get('ben'))
+    selected_project = None
     #block for shows the beneficiary details 
     try:
         if ben_uuid:
@@ -650,31 +651,16 @@ def add_survey_form(request,pk):
         for k,v in config.items():
             skip_questions.extend(config.get(k).get(json_response.get(k)))
 
-    #survey 8 logic : based on parent questions , child question answer will store
-    if pk == '8' and json_response:
-        questions_meta = load_data_to_cache_questions()
-        skip_hiv_questions = questions_meta.get('563')#Question.objects.filter(id=563)
-        if skip_hiv_questions and skip_hiv_questions.get('training_config'):
-            reference_id=skip_hiv_questions.get('training_config').get('reference_id')
-            result=skip_hiv_questions.get('training_config').get('result')
-            ans_append=False
-            for qid, ans in reference_id.items():
-                if json_response.get(qid) == ans:
-                    ans_append = True
-                else:
-                    ans_append= False
-            if ans_append:
-                value=result.get('success').get('text')
-            else:
-                value=result.get('fail').get('text')
-        
-        #static code for if the survey have records or not 
-        count_of_hiv_records=len(JsonAnswer.objects.filter(cluster__BeneficiaryResponse=ben_uuid,survey_id=8))
+    #survey 1 logic : based on school question adding the project id
+    if pk == '1':
+        project_obj = UserProjectMapping.objects.filter(active=2,user_id=request.user.id).values('project_id','project__name')
+        if project_obj and len(project_obj) == 1:
+            selected_project = project_obj[0].get('project_id')
+    elif pk == '2':
+        school_obj=JsonAnswer.objects.get(creation_key=school_creation_key)
+        selected_project = school_obj.cluster.get('project_id',-1)
+            
 
-        # gender based field for hiv form hide the question In Case of PPW inmate Linked with PPTCT
-        gender_male=False
-        if json_response.get('9') == '65':
-            gender_male=True
     boundaries = load_data_to_cache_boundaries_name()
     if not request.user.is_superuser and not request.user.is_staff:
         next_level_boundries=load_data_to_cache_boundarylevel()
@@ -694,6 +680,9 @@ def add_survey_form(request,pk):
             date_time_str = now.strftime("%Y-%m-%d %H:%M:%S")
             answers=json.loads(request.POST.getlist('all_in_one')[0])
             ben_uuid=request.GET.get('ben',request.POST.get('ben','0'))
+            if not selected_project:
+                selected_project=request.POST.get('project_id')
+
             responses={
                 "u_uuid": request.user.id,
                 "d_uuid": "",
@@ -705,6 +694,7 @@ def add_survey_form(request,pk):
                     "beneficiary_id": ben_uuid,
                     "cluster_id": request.POST.get('cluster_id'),
                     "answers_array":str(answers),
+                    "project_id":selected_project or -1,
                     }]
             }
             # ans=json.loads(request.POST.get('all_in_one'))
@@ -1711,9 +1701,14 @@ def get_location_boundry(request):
         # import ipdb;ipdb.set_trace()
         # boundarys=[item for item in boundaries if str(item.get('parent')) == selected_boundry and ((request.session['user_boundary_levelcode'] == 1 and item.get('parent') in request.session['user_parent_boundary_list']) or (item.get('id') in request.session['user_boundary_list']) or (transfer_page == 'true'))]# or survey_id == '2'
         boundarys=[item for item in boundaries if str(item.get('parent')) == selected_boundry and item.get('code') in list(map(str,request.session.get('user_boundary_list',[])))]
+        district_ids = []
         for boundary in boundarys:
+            district_ids.append(boundary.get('code'))
             result_set.append({'id':boundary.get('id'), 'name': boundary.get('name'), })
-        return HttpResponse(json.dumps(result_set))
+
+        project_obj = list(UserProjectMapping.objects.filter(user_id=request.user.id,project__district_id__in=district_ids).values_list('project_id',flat=True))
+        
+        return HttpResponse(json.dumps({'result_set':result_set,'project_ids':project_obj}))
 
 @login_required(login_url='/')
 def get_donor_district(request, donor_id):

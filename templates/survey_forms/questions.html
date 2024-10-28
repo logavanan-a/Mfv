@@ -15,8 +15,8 @@
             {% endif %}
 
         <div class="row">
-        
-        {% for question in get_questions %}
+
+            {% for question in get_questions %}
             {% is_skip_question question.id as main_is_skip_question %}
             {% choice_list question.id as main_choice_list %}
             {% get_inner_questions question.id as main_get_inner_questions %}
@@ -663,6 +663,24 @@
                             }
                         </style> 
                     {% endfor %}
+                    {% if project_obj.count > 1 %}
+                        <!-- Project listing for school adding -->
+                        <div class="col-lg-6" id='skip_{{question.id}}'>
+                            <div class=" mb-3">
+                                <label class="form-label" >Project <span class="required-field"></span></label>
+                                <select class=" select2 form-select main_question S_0_0 "  name='project_id' id='project_id' 
+                                    aria-label="Floating label select example" data-placeholder="" required >
+                                    <option selected disabled value=""></option>
+                                    {% for project_detail in project_obj %}
+                                    <option value="{{project_detail.project_id}}" >{{project_detail.project__name}}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select atleast one option from the list
+                                </div>
+                            </div> 
+                        </div> 
+                    {% endif %}
                 {% endif %}
             {% endif %}
             {% if not question.is_editable and response_obj.response and response_obj.response.616 != '619'   %}

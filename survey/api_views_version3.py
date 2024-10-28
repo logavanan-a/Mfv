@@ -75,33 +75,6 @@ def new_responses_list_v3(request):
             logger.info("#############----------TIME-TRACKER (Beneficiaries - ResponseCount): " + str(len(res_list)))
             
             if len(res_list) == 0:
-                # logger.info("#############TIME-TRACKER (Activities-Start): " + str(datetime.now()))
-                # cache_key = 'user_based_surveys' + '-' + user_id
-                # lineitem_obj = cache.get(settings.INSTANCE_CACHE_PREFIX + cache_key)
-                # if not lineitem_obj:
-                #     project_list = ProjectUserRelation.objects.filter(user__in=[user_role.id]).values_list('project', flat=True)
-                #     lineitem_obj = list(Lineitem.objects.filter(active=2, project__in=project_list).values_list('activity', flat=True))
-                #     location_based_survey = list(Survey.objects.filter(active=2,survey_type=1,data_entry_level_id=1).values_list('id',flat=True))
-                #     lineitem_obj += location_based_survey
-                #     cache_set_with_namespace('RESPONSE_SURVEY_V3', cache_key, lineitem_obj, 14400)
-
-                # cache_key = 'user_based_form_surveys'
-                # user_based_survey = cache.get(settings.INSTANCE_CACHE_PREFIX + cache_key)
-                # if not user_based_survey:
-                #     user_based_survey = list(Survey.objects.filter(active=2,survey_type=1,data_entry_level_id=4).values_list('id',flat=True))
-                #     cache_set_with_namespace('RESPONSE_SURVEY_V3', cache_key, user_based_survey, 14400)
-
-                # activities =  JsonAnswer.objects.filter(survey_id__in=lineitem_obj,boundary_id__in = loc_list,submission_date__date__gte=fy_date).order_by('modified')
-                # if boudnary_level_filter != 5:
-                #     loc_list = Boundary.objects.filter(id__in=loc_list)
-                #     loc_list = get_higher_level_locations(loc_list, boudnary_level_filter, 5)
-
-                #current financial year start and end
-                # financial_year = get_financial_years()
-                
-                # project_location_query = Q(survey_id__in=lineitem_obj, boundary_id__in=loc_list)
-                # userbased_query = Q(survey_id__in=user_based_survey,user_id=user_id)
-                # activities = JsonAnswer.objects.filter(project_location_query | userbased_query,submission_date__date__range=[financial_year['current_financial_start'],financial_year['current_financial_end']]).order_by('modified')
                 activities = JsonAnswer.objects.filter(active=2,cluster__BeneficiaryResponse__in = list(beneficiaries_json.values_list('creation_key',flat=True))).exclude(survey__survey_type = 0).order_by('modified')
                 if act_modified_date:
                     activities = activities.filter(modified__gt=act_modified_date)
