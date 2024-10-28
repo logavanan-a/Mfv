@@ -525,21 +525,22 @@ function adres_widget_1(parent_valueSelected, selected = null) {
         success: function (result) {
             $("#" + next_dropdown_boundry + " option").remove();
             $("#facility option").remove();
-
-            ans = JSON.parse(result)
+            
+            result = JSON.parse(result)
+            ans = result['result_set']
             if (ans[ans.length - 1]) {
                 a = '<option selected value="" > </option>';
                 $("#" + next_dropdown_boundry).append(a);
             }
-            if (JSON.parse(result) == 0) {
+            if (ans == 0) {
                 $("#" + next_dropdown_boundry + " option").remove();
                 a =
                     '<option selected  value=""> </option>';
                 $("#" + next_dropdown_boundry).append(a);
             } else {
-                $.each(JSON.parse(result), function (key, value) {
+                $.each(ans, function (key, value) {
                     if (typeof value['id'] !== "undefined") {
-                        if (parseInt(selected) == value['id'] || JSON.parse(result).length == 1) {
+                        if (parseInt(selected) == value['id'] || ans.length == 1) {
                             a = '<option value=' + value['id'] + ' selected>' +
                                 value['name'] + '</option>';
                             $("#" + next_dropdown_boundry).append(a);
@@ -551,11 +552,44 @@ function adres_widget_1(parent_valueSelected, selected = null) {
                         }
                     }
                 })
+
+                //
+                project_id = result['project_ids']
+
+                unhideOptions(); // Unhide options
+                hideOptions(project_id);
             }
         }
     })
 }
 
+// Store and remove options to "hide" them
+function hideOptions(visibleIds) {
+    const select = $("#project_id");
+
+    // Store all options in a data attribute before hiding
+    if (!select.data("hiddenOptions")) {
+        select.data("hiddenOptions", select.html()); // Store original options once
+    }
+
+    // Remove all options that are NOT in the visibleIds list
+    select.find("option").each(function() {
+        const optionValue = parseInt($(this).val(), 10);
+        if (!visibleIds.includes(optionValue)) {
+            $(this).remove();
+        }
+    });
+
+    // Refresh select2 to reflect changes
+    select.select2();
+}
+
+// Restore options to "unhide" them
+function unhideOptions() {
+    const select = $("#project_id");
+    select.html(select.data("hiddenOptions")); // Restore saved options
+    select.select2(); // Refresh select2
+}
 
 function disable_edit_fields() {
     $('#survey input').attr('readonly', 'readonly');

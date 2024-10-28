@@ -84,10 +84,10 @@ def applogin(request, **kwargs):
 #        role_names = [i.name.lower() for i in userrole_obj.role_type.all()]
 #        app_roles = ['community organizer','data entry operator','ceo','vertical specialist', 'field staff', 'master trainer', 'field level officer','development officer','case worker','team lead','director','issac']
 
-        # version_update = VersionUpdate.objects.filter().latest('id')
+        version_update = VersionUpdate.objects.filter().latest('id')
         # updated_link = user_setup().get('updated_link', "")
-        updateapk = {"forceUpdate": "False",
-                     "appVersion": 0,
+        updateapk = {"forceUpdate": str(version_update.force_update),
+                     "appVersion": int(version_update.version_code),
                      "updateMessage": "New update available, download from playstore",
                      "link": settings.APP_URL}
         user_list = UserProjectMapping.objects.filter(user=user,project__partner_mission_mapping__mission_id=2)
