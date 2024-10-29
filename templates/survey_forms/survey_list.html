@@ -88,13 +88,13 @@
                         <div class="table-responsive width_section" >
                             <table class="table">
                                 <thead class="text-primary" style="vertical-align: middle;!important ">
-                                    <th>Name</th>
+                                    <th>Mission</th>
+                                    <th>Name of the form</th>
                                     {% if anonymous_user_entry == 1 or anonymous_user_entry == 2 %}
                                     <th>Hash Code</th>
                                     {% endif %}
                                     <th>Type</th>
                                     <th>Participant(Location)</th>
-                                    <th>Mission</th>
                                     <th>Order</th>
                                     <th>Status</th>
                                     {% with "data-collection-forms"|make_string:"edit" as keystring %}
@@ -106,13 +106,13 @@
                                 <tbody style="vertical-align: middle;!important ">
                                     {% for survey in object_list %}
                                     <tr>
+                                        <td>{% with activity_beneficiary_dict|get_item:survey.id as ben_id %}{{beneficiary_to_mission|get_item:ben_id}}{% endwith %}</td>
                                         <td>{{ survey.name }}</td>
                                         {% if anonymous_user_entry == 1 or anonymous_user_entry == 2 %}
                                         <td>{{survey.get_hash_code}}</td>
                                         {% endif %}
                                         <td>{{ survey.get_survey_type_display }}</td>
                                         <td>{% if survey.get_beneficiary_type %}{{ survey.get_beneficiary_type }}{% endif %}{% if survey.get_survey_location %}({{ survey.get_survey_location }}){% endif %}</td>
-                                        <td>{% with activity_beneficiary_dict|get_item:survey.id as ben_id %}{{beneficiary_to_mission|get_item:ben_id}}{% endwith %}</td>
                                         <td>{{ survey.survey_order }}</td>
                                         <td> {% if survey.active == 2 %} Active {% else %} InActive {% endif %}  </td>
                                         
