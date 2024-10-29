@@ -22,6 +22,15 @@ register = template.Library()
 #     except:
 #         pass
 
+@register.filter
+def get_item(dictionary, key):
+    try:
+        # Gets item from dictionary
+        return dictionary.get(key)
+    except:
+        # Returns None if key is not found
+        return ''
+
 # Register function as template tag
 @register.simple_tag
 def get_request():
