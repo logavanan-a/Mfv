@@ -174,6 +174,13 @@ class Surveys(View):
         if search_txt:
             surveys = surveys.filter(name__icontains = search_txt)
         object_list = get_pagination(request, surveys)
+        
+        # mission name dictionary with beneficiary
+        beneficiary_to_mission = dict(BeneficiaryType.objects.filter(active=2).values_list('id','category__name'))
+        activity_beneficiary_dict = {}
+        for i in surveys :
+            activity_beneficiary_dict[i.id] = i.object_id or int(i.config[0].get('object_id_1',0))
+
         return render(request,self.template_name,locals())
     
 # def user_setup():
