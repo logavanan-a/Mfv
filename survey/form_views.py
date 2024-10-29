@@ -738,157 +738,66 @@ def partner_registration_date_validate(error_msg,resp_dict,ben_respons,previous_
 def custom_validation_survey_wise(resp_dict,survey_id,json_id,ben_uuid=None):
 
     #this function return the error in any custom validations fails
+
     error_msg = {}
     json_id=str(json_id)
     validations={
-        1:{
-            "8":{"field":"Inmate Date of Birth "},
-            # "35":{"field":"when was the last time you took (inhale/smoke/ingested) the drugs"},
-            "40":{"field":"When was the last time you had any type of sex","validate_with":"8"},
-            # "42":{"field":"when was you forced to have sex","validate_with":"8"},
-            "16":{"field":"Date of Imprisonment","validate_with":"8"},
-            "4":{"field":"Date of registration in Subhiksha+ "},
-            # "35":{"field":"when was the last time you took (inhale/smoke/ingested) the drugs"},
-            # "40":{"field":"When was the last time you had any type of sex"},
-            # "42":{"field":"when was you forced to have sex"},
-            "21":{"field":"Expected date/year of release"},
-        },
-        3:{
-            "58":{"field":"DOB"},
-            "64":{"field":"Date of Selection"},
-            "65":{"field":"Date of Training"},
-            "556":{"field":"Date of 1st Refresher Training"},
-            "557":{"field":"Date of 2nd Refresher Training"},
-            "66":{"field":"Date of Release"},
-        },
-        # 7:{
-        #     "98":{"field":"Date of activity organized"},
-        #     "107":{"field":"Date of Advocacy Meeting"},
-        # },
-        8:{
-            "120":{"field":"Date of HIV screening"},
-            "121":{"field":"Date when found screened reactive"},
-            "123":{"field":"Date of HIV confirmation test"},
-            "128":{"field":"Date of Pre-ART registration" ,"validate_with":"123"},
-            "131":{"field":"Date of Baseline CD-4 Test","validate_with":"123"},
-            "132":{"field":"Date of ART initiation ","validate_with":"123"},
-            "136":{"field":"Date of Viral load test","validate_with":"123"},
-            "140":{"field":"If yes, date of Linkages with PPTCT","validate_with":"123"},
-        },
-        9:{
-            "141":{"field":"Date of TB Screening (4S)"},
-            "143":{"field":"Date of tested for TB "},
-            "147":{"field":"Date of ATT initiation"},
-            "149":{"field":"Date of linkages with Nikshay"},
-            "151":{"field":"Date of completion of ATT"},
-        },
-        10:{
-            "152":{"field":"Date of STI Screening"},
-            "156":{"field":"Date of episodic treatment completed"},
-        },
-        11:{
-            "157":{"field":"Date tested for Syphilis"},
-            "160":{"field":"Date of episodic treatment completed"},
-        },
         12:{
-            "161":{"field":"Date tested for HBV"},
-            "163":{"field":"Date of initiated HBV Treatment"},
-            "164":{"field":"Date of completed HBV Treatment"},
+            "524":{"field":"Date of Screening"},
+            "527":{"field":"Date of Birth"},
         },
         13:{
-            "165":{"field":"Date tested for HCV"},
-            "167":{"field":"Date of initiated HCV Treatment"},
-            "168":{"field":"Date of completed HCV Treatment"},
+            "540":{"field":"Date of Follow up","validate_with":"524"},
         },
-        14:{
-            "171":{"field":"Spouse/Partner Date of birth"},
-            "173":{"field":"Date of HIV Screening"},
-            "572":{"field":"Date of First Repeat HIV screening"},
-            "174":{"field":"Date of HIV Confirmation"},
-            "177":{"field":"Date of ART initiation"},
-            "181":{"field":"Date of baseline CD-4 Test"},
-        },
-        15:{
-            "198":{"field":"Date of follow-up/visit"},
-        },
-        16:{
-            "209":{"field":"Date of linkages with Scheme"},
-        },
-        17:{
-            "225":{"field":"Date of establishment"},
-            "227":{"field":"Date of making functional"},
-            "229":{"field":"Date of making non-functional"},
-        },
-        18:{
-            "256":{"field":"Reporting Month"},
-        },
-        20:{
-            "293":{"field":"Reporting Month"},
-            "294":{"field":"Start Date"},
-            "295":{"field":"End Date"},
-        },
-        141:{
-            "184":{"field":"Child Date of birth"},
-            "186":{"field":"Date of HIV Screening"},
-            "573":{"field":"Date of First Repeat HIV screening"},
-            "187":{"field":"Date of HIV Confirmation"},
-            "190":{"field":"Date of ART initiation"},
-            "194":{"field":"Date of baseline CD-4 Test"},
-        },
-        161:{
-            "217":{"field":"Date of linkages"},
-        },
-        162:{
-            "223":{"field":"Date of death"},
-        },
+        
     }
-    previous_record_validation={
-        1:'4',#Date of registration in Subhiksha+
-        # 3:'64',
-        8:'123',#'120',# Date of HIV screening
-        9:'141',#Date of TB Screening (4S)
-        10:'152',#Date of STI Screening
-        # 10:'156',
-        11:'157',#Date tested for Syphilis
-        12:'161',#Date tested for HBV
-        13:'165',#Date tested for HCV
-        15:'198',#Date of follow-up/visit
-        # 16:'209',
-        # 17:'225',
-        18:'256',#Reporting Month(MM/YY)
-        20:'293',#Reporting Month(MM/YY)
-        # 161:'217',
-        # 162:'223',
-    }
-    # if the conditon key and value will match then the key will pass as the key for resp_dict
-    # conditional_date_range_checking={
-    #     8:{'key':'8','condition':{'5':'275'},'field':'Date of birth','update_id':'123'},#8:Date of birth 5:Inmate Registered as 275:Known HIV Positive
+    # previous_record_validation={
+    #     1:'4',#Date of registration in Subhiksha+
+    #     # 3:'64',
+    #     8:'123',#'120',# Date of HIV screening
+    #     9:'141',#Date of TB Screening (4S)
+    #     10:'152',#Date of STI Screening
+    #     # 10:'156',
+    #     11:'157',#Date tested for Syphilis
+    #     12:'161',#Date tested for HBV
+    #     13:'165',#Date tested for HCV
+    #     15:'198',#Date of follow-up/visit
+    #     # 16:'209',
+    #     # 17:'225',
+    #     18:'256',#Reporting Month(MM/YY)
+    #     20:'293',#Reporting Month(MM/YY)
+    #     # 161:'217',
+    #     # 162:'223',
     # }
+
     unique_validation={
-        1:{"6":"Inmate UID"},
-        2:{"47":"Name of Health Service Centre","address,1,45,2":"District","48":"Address","49":"Type of Services"},        
-        4:{"235":"Name of Prison/OCS","241":"Place","address,1,69,2":"District"},
-        "messages":{
-            1:"Unable to generate the uid for this facility. Please contact administrator"
-        }
+        1:{"235":"Mobile Number"},
+        # 2:{"47":"Name of Health Service Centre","address,1,45,2":"District","48":"Address","49":"Type of Services"},        
+        # 4:{"235":"Name of Prison/OCS","241":"Place","address,1,69,2":"District"},
+        # "messages":{
+        #     1:"Unable to generate the uid for this facility. Please contact administrator"
+        # }
     }
     beneficiary_unique_validation={
-        3:{"57":"Name of PPV"},
-        18:{"256":"Reporting Month(MM/YY)"},
-        20:{"293":"Reporting Month","294":"Start Date"},
-        "messages":{
-            20:"Data has already exists on web for the selected dates. Please delete this record,sync,recheck before entering data.",
-            18:"Data has already exists on web for the selected dates. Please delete this record,sync,recheck before entering data."
-        }
+        # 13:{"540":"Date of Follow up - Laser"},
+        # 18:{"256":"Reporting Month(MM/YY)"},
+        # 20:{"293":"Reporting Month","294":"Start Date"},
+        # "messages":{
+        #     20:"Data has already exists on web for the selected dates. Please delete this record,sync,recheck before entering data.",
+        #     18:"Data has already exists on web for the selected dates. Please delete this record,sync,recheck before entering data."
+        # }
     }
 
     inline_validations={
-        8:{
-            "54":{
-                "131":{"field":"Date of CD-4 Test","validation_question":"128","message":"Date of CD-4 Test should be greated than Date of ART registration","all_field_mandatory":"130"},
+        14:{
+            "545":{
+                "546":{"field":"Date of Follow up - Laser","validation_question":"544","message":"Date of Follow up - Laser should be greated than Date of Laser Treatmen","all_field_mandatory":None},
             },
-            "119":{
-                "136":{"field":"Date of Viral load test","validation_question":"128","message":"Date of Viral load test should be greated than Date of ART registration","all_field_mandatory":"137"},
+            "551":{
+                "552":{"field":"Date of Follow up - Injections","validation_question":"550","message":"Date of Follow up - Injections should be greated than Date of Injection","all_field_mandatory":None},
+            },
+            "557":{
+                "558":{"field":"Date of Follow up - Surgery","validation_question":"556","message":"Date of Follow up - Surgery should be greated than Date of Surgery","all_field_mandatory":None},
             }
         },
     }
@@ -897,99 +806,99 @@ def custom_validation_survey_wise(resp_dict,survey_id,json_id,ben_uuid=None):
     # questions = load_data_to_cache_survey_based_questions().get(str(survey_id))
     # questions_for_mit_prison=["256","293","294","295"]
     # error_msg = {i['id']:f'{i["text"]} is required ' for i in questions_for_mit_prison if i.get('mandatory') and resp_dict.get(str(i.get('id'))) in ['',None]}
-    questions_for_mit_prison = validations.get(survey_id) if survey_id in [18,20] else {}
-    error_msg = {q_id:f'{text["field"]} is required ' for q_id,text in questions_for_mit_prison.items() if resp_dict.get(q_id) in ['',None]}
+    # questions_for_mit_prison = validations.get(survey_id) if survey_id in [18,20] else {}
+    # error_msg = {q_id:f'{text["field"]} is required ' for q_id,text in questions_for_mit_prison.items() if resp_dict.get(q_id) in ['',None]}
     
-    if error_msg:
-        return error_msg
+    # if error_msg:
+    #     return error_msg
     
     response_data=JsonAnswer.objects.filter(active=2,survey_id=survey_id).values('id','survey_id','cluster__BeneficiaryResponse','response').order_by('-created')
     ben_respons={}
     if ben_uuid not in ['None','0',None]:
         ben_respons=JsonAnswer.objects.get_or_none(creation_key=ben_uuid).response
     # for surveyid,validations in validations.items():
-    if previous_record_validation.get(survey_id):
-        month_format = re.compile(r'\d{1,2}-\d{4}')
-        date_format = re.compile(r'\d{1,2}-\d{1,2}-\d{4}')
-        #return data need for unique and other validations
-        data=prepare_data(response_data,ben_uuid,json_id,'cluster_beneficiry')
-        if len(data) == 0 or str(data[len(data) - 1].get('id')) == json_id:
+    # if previous_record_validation.get(survey_id):
+    #     month_format = re.compile(r'\d{1,2}-\d{4}')
+    #     date_format = re.compile(r'\d{1,2}-\d{1,2}-\d{4}')
+    #     #return data need for unique and other validations
+    #     data=prepare_data(response_data,ben_uuid,json_id,'cluster_beneficiry')
+    #     if len(data) == 0 or str(data[len(data) - 1].get('id')) == json_id:
 
-            # commented the above line becuase of this ticket : https://pm.thesocialbytes.com/issues/19847
-            field_key='4'
-            error_field = 'Date of registration in Subhiksha+'
-            #TODO: previously this is dynamic checking . Only for HIV form commented the below code 
-            # if conditional_date_range_checking.get(survey_id):
-            #     validation_keys=list(conditional_date_range_checking.get(survey_id).get('condition').items())
-            #     if ben_respons.get(validation_keys[0][0]) == validation_keys[0][1]:
-            #         error_field = conditional_date_range_checking.get(survey_id).get('field')
-            #         field_key = conditional_date_range_checking.get(survey_id).get('key')
-            #         #if known hiv positive then update the question id for previous_record_validation
-            #         update_key = conditional_date_range_checking.get(survey_id).get('update_id')
-            #         if not resp_dict.get(conditional_date_range_checking.get(survey_id).get('update_id',previous_record_validation.get(survey_id))):
-            #             # field_key = '8' #Date of birth
-            #             update_key = '128' #Date of ART registration
-            #         previous_record_validation.update({survey_id:update_key})
-            if survey_id == 8:
-                if ben_respons.get('5') == "275":
-                    error_field = "Date of birth"
-                    field_key = "8"
-                    #if known hiv positive then update the question id for previous_record_validation
-                # if not resp_dict.get(update_key,previous_record_validation.get(survey_id)):
-                #     update_key = '128' #Date of ART registration
+    #         # commented the above line becuase of this ticket : https://pm.thesocialbytes.com/issues/19847
+    #         field_key='4'
+    #         error_field = 'Date of registration in Subhiksha+'
+    #         #TODO: previously this is dynamic checking . Only for HIV form commented the below code 
+    #         # if conditional_date_range_checking.get(survey_id):
+    #         #     validation_keys=list(conditional_date_range_checking.get(survey_id).get('condition').items())
+    #         #     if ben_respons.get(validation_keys[0][0]) == validation_keys[0][1]:
+    #         #         error_field = conditional_date_range_checking.get(survey_id).get('field')
+    #         #         field_key = conditional_date_range_checking.get(survey_id).get('key')
+    #         #         #if known hiv positive then update the question id for previous_record_validation
+    #         #         update_key = conditional_date_range_checking.get(survey_id).get('update_id')
+    #         #         if not resp_dict.get(conditional_date_range_checking.get(survey_id).get('update_id',previous_record_validation.get(survey_id))):
+    #         #             # field_key = '8' #Date of birth
+    #         #             update_key = '128' #Date of ART registration
+    #         #         previous_record_validation.update({survey_id:update_key})
+    #         if survey_id == 8:
+    #             if ben_respons.get('5') == "275":
+    #                 error_field = "Date of birth"
+    #                 field_key = "8"
+    #                 #if known hiv positive then update the question id for previous_record_validation
+    #             # if not resp_dict.get(update_key,previous_record_validation.get(survey_id)):
+    #             #     update_key = '128' #Date of ART registration
             
-            error_msg = partner_registration_date_validate(error_msg,resp_dict,ben_respons,previous_record_validation,field_key,month_format,survey_id,validations,error_field)
-            # ben_subhiksha_register_date=ben_respons.get(field_key,ben_respons.get('75'))
-            # date_entered=resp_dict.get(previous_record_validation.get(survey_id))
-            # # ben_subhiksha_register_date=ben_respons.get('4')
-            # if date_entered and month_format.match(date_entered) and ben_subhiksha_register_date :
-            #     date_entered='01-'+date_entered
-            #     ben_subhiksha_register_date="01"+ben_subhiksha_register_date[2:]
-            # if ben_subhiksha_register_date and date_entered and datetime.strptime(date_entered, "%d-%m-%Y") < datetime.strptime(ben_subhiksha_register_date, "%d-%m-%Y"):
-            #     error_msg[previous_record_validation.get(survey_id)]="{0} should be greater than {1}".format(validations.get(survey_id).get(previous_record_validation.get(survey_id)).get('field'),error_field)
+    #         error_msg = partner_registration_date_validate(error_msg,resp_dict,ben_respons,previous_record_validation,field_key,month_format,survey_id,validations,error_field)
+    #         # ben_subhiksha_register_date=ben_respons.get(field_key,ben_respons.get('75'))
+    #         # date_entered=resp_dict.get(previous_record_validation.get(survey_id))
+    #         # # ben_subhiksha_register_date=ben_respons.get('4')
+    #         # if date_entered and month_format.match(date_entered) and ben_subhiksha_register_date :
+    #         #     date_entered='01-'+date_entered
+    #         #     ben_subhiksha_register_date="01"+ben_subhiksha_register_date[2:]
+    #         # if ben_subhiksha_register_date and date_entered and datetime.strptime(date_entered, "%d-%m-%Y") < datetime.strptime(ben_subhiksha_register_date, "%d-%m-%Y"):
+    #         #     error_msg[previous_record_validation.get(survey_id)]="{0} should be greater than {1}".format(validations.get(survey_id).get(previous_record_validation.get(survey_id)).get('field'),error_field)
         
-        update_key = "120"
-        if survey_id == 8 and not resp_dict.get(previous_record_validation.get(survey_id)):
-            previous_record_validation.update({survey_id:update_key})
-            update_key = "123"
-        if not error_msg:
-            for idx,response in enumerate(data):
-                prev_rec_idx=None
-                next_rec_idx=None
-                if json_id == '0':
-                    prev_rec_idx=0
-                elif json_id == str(response.get('id')):
-                    prev_rec_idx=idx+1
-                    next_rec_idx=idx-1
+    #     update_key = "120"
+    #     if survey_id == 8 and not resp_dict.get(previous_record_validation.get(survey_id)):
+    #         previous_record_validation.update({survey_id:update_key})
+    #         update_key = "123"
+    #     if not error_msg:
+    #         for idx,response in enumerate(data):
+    #             prev_rec_idx=None
+    #             next_rec_idx=None
+    #             if json_id == '0':
+    #                 prev_rec_idx=0
+    #             elif json_id == str(response.get('id')):
+    #                 prev_rec_idx=idx+1
+    #                 next_rec_idx=idx-1
 
-                q_id=previous_record_validation.get(survey_id)
-                #added the condition for check the field values is added or not
-                #if any question is non mandatory
-                # import ipdb;ipdb.set_trace()
-                if resp_dict.get(q_id) and date_format.match(resp_dict[q_id]): #and not (str(survey_id) in ['20','18'] and resp_dict.get('256',resp_dict.get('293')) in ['10-2023'] )
-                    entered_data=resp_dict.get(q_id,resp_dict.get(update_key)) #"02-"+resp_dict[q_id] if month_format.match(resp_dict[q_id]) else resp_dict[q_id]
-                    if prev_rec_idx != None and prev_rec_idx < len(data) :
-                    #     previous_start_date = '01-' if survey_id == 20 else '03-'
-                        # prev_data=data[prev_rec_idx]['response'][q_id]
-                        previous_response = data[prev_rec_idx].get('response')
-                        prev_data=previous_response.get(q_id,previous_response.get(update_key))  
-                        #previous_start_date+data[prev_rec_idx]['response'][q_id] if month_format.match(resp_dict[q_id]) else data[prev_rec_idx]['response'][q_id] 
-                    if next_rec_idx != None and next_rec_idx >= 0:
-                        # next_data=data[prev_rec_idx]['response'][q_id] #"01-"+data[next_rec_idx]['response'][q_id] if month_format.match(resp_dict[q_id]) else data[next_rec_idx]['response'][q_id]
-                        next_response = data[next_rec_idx].get('response')
-                        next_data=next_response.get(q_id,next_response.get(update_key)) #"01-"+data[next_rec_idx]['response'][q_id] if month_format.match(resp_dict[q_id]) else data[next_rec_idx]['response'][q_id]
+    #             q_id=previous_record_validation.get(survey_id)
+    #             #added the condition for check the field values is added or not
+    #             #if any question is non mandatory
+    #             # import ipdb;ipdb.set_trace()
+    #             if resp_dict.get(q_id) and date_format.match(resp_dict[q_id]): #and not (str(survey_id) in ['20','18'] and resp_dict.get('256',resp_dict.get('293')) in ['10-2023'] )
+    #                 entered_data=resp_dict.get(q_id,resp_dict.get(update_key)) #"02-"+resp_dict[q_id] if month_format.match(resp_dict[q_id]) else resp_dict[q_id]
+    #                 if prev_rec_idx != None and prev_rec_idx < len(data) :
+    #                 #     previous_start_date = '01-' if survey_id == 20 else '03-'
+    #                     # prev_data=data[prev_rec_idx]['response'][q_id]
+    #                     previous_response = data[prev_rec_idx].get('response')
+    #                     prev_data=previous_response.get(q_id,previous_response.get(update_key))  
+    #                     #previous_start_date+data[prev_rec_idx]['response'][q_id] if month_format.match(resp_dict[q_id]) else data[prev_rec_idx]['response'][q_id] 
+    #                 if next_rec_idx != None and next_rec_idx >= 0:
+    #                     # next_data=data[prev_rec_idx]['response'][q_id] #"01-"+data[next_rec_idx]['response'][q_id] if month_format.match(resp_dict[q_id]) else data[next_rec_idx]['response'][q_id]
+    #                     next_response = data[next_rec_idx].get('response')
+    #                     next_data=next_response.get(q_id,next_response.get(update_key)) #"01-"+data[next_rec_idx]['response'][q_id] if month_format.match(resp_dict[q_id]) else data[next_rec_idx]['response'][q_id]
                     
-                    # entered data is user intered data and prev_data is previous record date 
-                    # if the survey is 20 then previous_start_date is 03- else 01- 
-                    if prev_rec_idx != None and prev_rec_idx < len(data) and entered_data and prev_data and datetime.strptime(entered_data, "%d-%m-%Y") < datetime.strptime(prev_data, "%d-%m-%Y"):
-                        error_msg[q_id]="{0} should be greater than previous {0} ".format(validations.get(survey_id).get(q_id).get('field'))
-                        break
-                    if next_rec_idx != None and next_rec_idx >= 0 and entered_data and next_data and datetime.strptime(entered_data, "%d-%m-%Y") > datetime.strptime(next_data, "%d-%m-%Y"):
-                        error_msg[q_id]="{0} greater than record already exist ".format(validations.get(survey_id).get(q_id).get('field'))
-                        break
+    #                 # entered data is user intered data and prev_data is previous record date 
+    #                 # if the survey is 20 then previous_start_date is 03- else 01- 
+    #                 if prev_rec_idx != None and prev_rec_idx < len(data) and entered_data and prev_data and datetime.strptime(entered_data, "%d-%m-%Y") < datetime.strptime(prev_data, "%d-%m-%Y"):
+    #                     error_msg[q_id]="{0} should be greater than previous {0} ".format(validations.get(survey_id).get(q_id).get('field'))
+    #                     break
+    #                 if next_rec_idx != None and next_rec_idx >= 0 and entered_data and next_data and datetime.strptime(entered_data, "%d-%m-%Y") > datetime.strptime(next_data, "%d-%m-%Y"):
+    #                     error_msg[q_id]="{0} greater than record already exist ".format(validations.get(survey_id).get(q_id).get('field'))
+    #                     break
     default_validations={
-        (8,141,162):{ "8":"Date of Birth"},
-        (11,12,13,16,15,161,10,9):{ "4":"Date of registration in Subhiksha+"},
+        (13,):{ "524":"Date of Screening"},
+        # (11,12,13,16,15,161,10,9):{ "4":"Date of registration in Subhiksha+"},
     }
     if validations.get(survey_id):
         previous_item=None
@@ -1005,15 +914,15 @@ def custom_validation_survey_wise(resp_dict,survey_id,json_id,ben_uuid=None):
                     message = list(default_validation.items())[0][1]
                 else:
                     message=validations.get(survey_id).get(previous_item).get('field')
-                error_msg[key]="{0} should be greater than {1}".format(value.get('field'),message)
+                error_msg[key]="{0} should be greater than or equal to {1}".format(value.get('field'),message)
                 break
             if curr_date:
                 previous_item=key 
 
-    if survey_id == 1 and resp_dict.get('6','') == '':
-        resp_dict,seq_error=sequence_id_creator(str(survey_id),resp_dict)  
-        if seq_error:
-            error_msg.update(seq_error)
+    # if survey_id == 1 and resp_dict.get('6','') == '':
+    #     resp_dict,seq_error=sequence_id_creator(str(survey_id),resp_dict)  
+    #     if seq_error:
+    #         error_msg.update(seq_error)
 
     if unique_validation.get(survey_id) or beneficiary_unique_validation.get(survey_id):
         # import ipdb;ipdb.set_trace()
@@ -1096,7 +1005,7 @@ def custom_validation_survey_wise(resp_dict,survey_id,json_id,ben_uuid=None):
                         
                         # validation if one field data entered and not entered the other field value 
                         field_to_check = message.get('all_field_mandatory') 
-                        if bool(item.get(field_to_check)) != bool(item.get(id)):
+                        if field_to_check and bool(item.get(field_to_check)) != bool(item.get(id)):
                             if bool(item.get(id)):
                                 name="group-"+key+str([int(index)])+str([int(field_to_check)])
                             error_msg[name]={"inline":True,"message":"Please enter all values to save the record"}
@@ -1104,141 +1013,141 @@ def custom_validation_survey_wise(resp_dict,survey_id,json_id,ben_uuid=None):
                     
 
           
-    if survey_id == 8:
-        rc_data=prepare_data(response_data,ben_uuid,json_id,'cluster_beneficiry')
+    # if survey_id == 8:
+    #     rc_data=prepare_data(response_data,ben_uuid,json_id,'cluster_beneficiry')
 
-        #checking the hiv positive & positive record already exists or not
-        for idx,response in enumerate(rc_data):
-            if idx==0:
-                recent_record=response.get('id')
-            if str(response.get('id')) != json_id and response['response'].get('126') and response['response']['126'] == '441' and resp_dict.get('126') == '441' :
-                error_msg['126']="Positive record already exists. Please enter valid data" 
-                break
-            if json_id != '0' and str(recent_record) != json_id and resp_dict.get('126') == '441':
-                error_msg['126']="Can't make this record positive. Please enter valid data" 
-                break
-    if survey_id in [1,3] and ben_uuid != 'None':
-        ben_respons=JsonAnswer.objects.get(creation_key=ben_uuid).response
-        dob = datetime.strptime(resp_dict.get('8',resp_dict.get('58')), "%d-%m-%Y")
-        seventeen_delta = datetime.today().date() - relativedelta(years=17)
-        thirteen_delta = datetime.today().date() - relativedelta(years=13)
-        if ben_respons.get('72') == "368" and seventeen_delta < dob.date():
-            key='8' if resp_dict.get('8') else '58'
-            error_msg[key]="Date of birth should be greater than 17 years"
-        elif survey_id == 3 and ben_respons.get('72') == "369" and thirteen_delta < dob.date():
-            error_msg['58']="Date of birth should be greater than 13 years"
+    #     #checking the hiv positive & positive record already exists or not
+    #     for idx,response in enumerate(rc_data):
+    #         if idx==0:
+    #             recent_record=response.get('id')
+    #         if str(response.get('id')) != json_id and response['response'].get('126') and response['response']['126'] == '441' and resp_dict.get('126') == '441' :
+    #             error_msg['126']="Positive record already exists. Please enter valid data" 
+    #             break
+    #         if json_id != '0' and str(recent_record) != json_id and resp_dict.get('126') == '441':
+    #             error_msg['126']="Can't make this record positive. Please enter valid data" 
+    #             break
+    # if survey_id in [1,3] and ben_uuid != 'None':
+    #     ben_respons=JsonAnswer.objects.get(creation_key=ben_uuid).response
+    #     dob = datetime.strptime(resp_dict.get('8',resp_dict.get('58')), "%d-%m-%Y")
+    #     seventeen_delta = datetime.today().date() - relativedelta(years=17)
+    #     thirteen_delta = datetime.today().date() - relativedelta(years=13)
+    #     if ben_respons.get('72') == "368" and seventeen_delta < dob.date():
+    #         key='8' if resp_dict.get('8') else '58'
+    #         error_msg[key]="Date of birth should be greater than 17 years"
+    #     elif survey_id == 3 and ben_respons.get('72') == "369" and thirteen_delta < dob.date():
+    #         error_msg['58']="Date of birth should be greater than 13 years"
     
-    comparing_validation={
-        #72: Type of Facility
-        #89 : Prison registered in eprison portal
-        #368 : Prison
-        #369 : OCS
-        #384 : Yes
-        #385 : No
-        #if prison is selected then the Q89 should be 384 or 385 
-        4:{"72":{"368":{"89":["384","385"],"message":"Please recheck the type of facility selection"},"369":{"89":['0','',None],"message":"Please enter a valid answer"}},"type":"S"},
+    # comparing_validation={
+    #     #72: Type of Facility
+    #     #89 : Prison registered in eprison portal
+    #     #368 : Prison
+    #     #369 : OCS
+    #     #384 : Yes
+    #     #385 : No
+    #     #if prison is selected then the Q89 should be 384 or 385 
+    #     4:{"72":{"368":{"89":["384","385"],"message":"Please recheck the type of facility selection"},"369":{"89":['0','',None],"message":"Please enter a valid answer"}},"type":"S"},
 
-        #173,186: Date of first HIV Screening/Test
-        #669,670: Type of Test Conducted?
-        #654,653: Was repeat test done ?
-        14:{"173":{"in":{"condition":{"654":["0","",None],"669":["0","",None]},"message":"Please select valid option"}},"type":"D"},
-        141:{"186":{"in":{"condition":{"653":["0","",None],"670":["0","",None]},"message":"Please select valid option"}},"type":"D"},
+    #     #173,186: Date of first HIV Screening/Test
+    #     #669,670: Type of Test Conducted?
+    #     #654,653: Was repeat test done ?
+    #     14:{"173":{"in":{"condition":{"654":["0","",None],"669":["0","",None]},"message":"Please select valid option"}},"type":"D"},
+    #     141:{"186":{"in":{"condition":{"653":["0","",None],"670":["0","",None]},"message":"Please select valid option"}},"type":"D"},
 
-        # #163,167 : Date of initiated HBV Treatmen
-        # #164,168 : Date of completed HBV Treatment
-        # 12:{"164":{"in":{"condition":{"164":["",None]},"message":"Please select valid date"}},"type":"D"},
-        # 13:{"167":{"in":{"condition":{"168":["",None]},"message":"Please select valid date"}},"type":"D"},
+    #     # #163,167 : Date of initiated HBV Treatmen
+    #     # #164,168 : Date of completed HBV Treatment
+    #     # 12:{"164":{"in":{"condition":{"164":["",None]},"message":"Please select valid date"}},"type":"D"},
+    #     # 13:{"167":{"in":{"condition":{"168":["",None]},"message":"Please select valid date"}},"type":"D"},
 
-        #9: Gender
-        #10 : Marital Status
-        #66 : Female
-        #65 : Male
-        #67 : Transgender
-        #289 : Widow
-        #290 : Widower
-        #287 : Married
-        #288 : Unmarried
-        #291 : Separated
-        1:{"9":{"65":{"10":["290","287","288","291"],"message":"Please recheck the gender and marital status"},"66":{"10":["289","287","288","291"],"message":"Please recheck the gender and marital status"},"67":{"10":["290","289","287","288","291"],"message":"Please recheck the gender and marital status"}},"type":"S"},
-    }
-    for comparing_question_id,value in comparing_validation.get(survey_id,{}).items():
-        for key_1,value_1 in value.items():
-            if comparing_validation.get(survey_id,{}).get('type') == 'S':
-                comparing_q,comparing_message = value.get(resp_dict.get(comparing_question_id)).items()
-                if resp_dict.get(comparing_q[0]) not in comparing_q[1]:
-                    error_msg[comparing_q[0]]=comparing_message[1]
-                    break
-            elif comparing_validation.get(survey_id,{}).get('type') == 'D':
-                cond,message = value_1.items()
-                operator = key_1 if resp_dict.get(comparing_question_id) not in ['',None] else 'not in'
-                for cond_k,cond_v in cond[1].items():
-                    if eval(f"{resp_dict.get(cond_k)!r} {operator} {cond_v!r}"):
-                        error_msg[cond_k]=message[1]
+    #     #9: Gender
+    #     #10 : Marital Status
+    #     #66 : Female
+    #     #65 : Male
+    #     #67 : Transgender
+    #     #289 : Widow
+    #     #290 : Widower
+    #     #287 : Married
+    #     #288 : Unmarried
+    #     #291 : Separated
+    #     1:{"9":{"65":{"10":["290","287","288","291"],"message":"Please recheck the gender and marital status"},"66":{"10":["289","287","288","291"],"message":"Please recheck the gender and marital status"},"67":{"10":["290","289","287","288","291"],"message":"Please recheck the gender and marital status"}},"type":"S"},
+    # }
+    # for comparing_question_id,value in comparing_validation.get(survey_id,{}).items():
+    #     for key_1,value_1 in value.items():
+    #         if comparing_validation.get(survey_id,{}).get('type') == 'S':
+    #             comparing_q,comparing_message = value.get(resp_dict.get(comparing_question_id)).items()
+    #             if resp_dict.get(comparing_q[0]) not in comparing_q[1]:
+    #                 error_msg[comparing_q[0]]=comparing_message[1]
+    #                 break
+    #         elif comparing_validation.get(survey_id,{}).get('type') == 'D':
+    #             cond,message = value_1.items()
+    #             operator = key_1 if resp_dict.get(comparing_question_id) not in ['',None] else 'not in'
+    #             for cond_k,cond_v in cond[1].items():
+    #                 if eval(f"{resp_dict.get(cond_k)!r} {operator} {cond_v!r}"):
+    #                     error_msg[cond_k]=message[1]
 
-        #break added because ignore the "type" loop            
-        break        
+    #     #break added because ignore the "type" loop            
+    #     break        
     
-    hbv_hcv_validation_date = {
-        #163,167 : Date of initiated HBV Treatmen
-        #164,168 : Date of completed HBV Treatment
-        12:{"164":{"in":{"condition":{"163":["",None]},"message":"Please select valid date"}},"type":"D"},
-        13:{"168":{"in":{"condition":{"167":["",None]},"message":"Please select valid date"}},"type":"D"},
+    # hbv_hcv_validation_date = {
+    #     #163,167 : Date of initiated HBV Treatmen
+    #     #164,168 : Date of completed HBV Treatment
+    #     12:{"164":{"in":{"condition":{"163":["",None]},"message":"Please select valid date"}},"type":"D"},
+    #     13:{"168":{"in":{"condition":{"167":["",None]},"message":"Please select valid date"}},"type":"D"},
 
-    }
-    for comparing_question_id,value in hbv_hcv_validation_date.get(survey_id,{}).items():
-        for key_1,value_1 in value.items():
-            # if hbv_hcv_validation_date.get(survey_id,{}).get('type') == 'S':
-            #     comparing_q,comparing_message = value.get(resp_dict.get(comparing_question_id)).items()
-            #     if resp_dict.get(comparing_q[0]) not in comparing_q[1]:
-            #         error_msg[comparing_q[0]]=comparing_message[1]
-            #         break
-            if hbv_hcv_validation_date.get(survey_id,{}).get('type') == 'D' and resp_dict.get(comparing_question_id):
-                cond,message = value_1.items()
-                operator = key_1 #if resp_dict.get(comparing_question_id) #not in ['',None] else 'not in'
-                for cond_k,cond_v in cond[1].items():
-                    if eval(f"{resp_dict.get(cond_k)!r} {operator} {cond_v!r}"):
-                        error_msg[cond_k]=message[1]
-        break  
-    dob_validation_for_grid={
-        # 1:["18","27","30","35","40","42"],
-        1:["740","741","742","743","744","745"],
-        #740:Sentencing Period in case of CV 
-        #743:If yes, when was the last time you took (inhale/smoke/ingested) the drugs
-        #742:If yes, how long have you been injecting drugs
-        #741:When was the last time you injected drugs
-        #744:If yes, when was you forced to have sex
-        #745:When was the last time you had any type of sex
-    }
-    if dob_validation_for_grid.get(survey_id):
-        current_date = datetime.now()
-        dob = datetime.strptime(resp_dict.get('8'), "%d-%m-%Y")
-        age = current_date.year - dob.year - ((current_date.month, current_date.day) < (dob.month, dob.day))
-        json_string = json.dumps(resp_dict)
+    # }
+    # for comparing_question_id,value in hbv_hcv_validation_date.get(survey_id,{}).items():
+    #     for key_1,value_1 in value.items():
+    #         # if hbv_hcv_validation_date.get(survey_id,{}).get('type') == 'S':
+    #         #     comparing_q,comparing_message = value.get(resp_dict.get(comparing_question_id)).items()
+    #         #     if resp_dict.get(comparing_q[0]) not in comparing_q[1]:
+    #         #         error_msg[comparing_q[0]]=comparing_message[1]
+    #         #         break
+    #         if hbv_hcv_validation_date.get(survey_id,{}).get('type') == 'D' and resp_dict.get(comparing_question_id):
+    #             cond,message = value_1.items()
+    #             operator = key_1 #if resp_dict.get(comparing_question_id) #not in ['',None] else 'not in'
+    #             for cond_k,cond_v in cond[1].items():
+    #                 if eval(f"{resp_dict.get(cond_k)!r} {operator} {cond_v!r}"):
+    #                     error_msg[cond_k]=message[1]
+    #     break  
+    # dob_validation_for_grid={
+    #     # 1:["18","27","30","35","40","42"],
+    #     1:["740","741","742","743","744","745"],
+    #     #740:Sentencing Period in case of CV 
+    #     #743:If yes, when was the last time you took (inhale/smoke/ingested) the drugs
+    #     #742:If yes, how long have you been injecting drugs
+    #     #741:When was the last time you injected drugs
+    #     #744:If yes, when was you forced to have sex
+    #     #745:When was the last time you had any type of sex
+    # }
+    # if dob_validation_for_grid.get(survey_id):
+    #     current_date = datetime.now()
+    #     dob = datetime.strptime(resp_dict.get('8'), "%d-%m-%Y")
+    #     age = current_date.year - dob.year - ((current_date.month, current_date.day) < (dob.month, dob.day))
+    #     json_string = json.dumps(resp_dict)
         
-        for i in dob_validation_for_grid.get(survey_id):
-            pattern = fr'"{i}": "(.*?)"'
-            match = re.search(pattern, json_string)
-            if match and match.group(1) and  age < int(match.group(1)):
-                error_msg[i]="Years should be lesser than age"
-                break
+    #     for i in dob_validation_for_grid.get(survey_id):
+    #         pattern = fr'"{i}": "(.*?)"'
+    #         match = re.search(pattern, json_string)
+    #         if match and match.group(1) and  age < int(match.group(1)):
+    #             error_msg[i]="Years should be lesser than age"
+    #             break
 
-    # Prison/OCS Progress start date checking , if perticular facility on selected month if its first record then start date should be 1
-    if survey_id == 20 and json_id == '0':
-        data=prepare_data(response_data,ben_uuid,json_id,'cluster_beneficiry')
-        selected_month = datetime.strptime(resp_dict.get('293'), '%m-%Y')
-        filtered_data = [i for i in data if datetime.strptime(i.get('response').get('293'), '%m-%Y') == selected_month]
-        selected_start_date = datetime.strptime(resp_dict.get('294'), '%d-%m-%Y')
-        if not filtered_data and selected_start_date.date() != selected_month.date():
-            error_msg['294'] = 'Start date should be 1st of month'
-        elif filtered_data:
-            sorted_data = sorted(filtered_data, key=lambda x: datetime.strptime(x["response"]["294"], "%d-%m-%Y"))
-            previouse_end_date = datetime.strptime(sorted_data[-1]['response']['295'], '%d-%m-%Y')
-            next_date = previouse_end_date + timedelta(days=1)
-            if next_date.date() != selected_start_date.date(): 
-                error_msg['294'] = 'Start date not matching with previous end date'
+    # # Prison/OCS Progress start date checking , if perticular facility on selected month if its first record then start date should be 1
+    # if survey_id == 20 and json_id == '0':
+    #     data=prepare_data(response_data,ben_uuid,json_id,'cluster_beneficiry')
+    #     selected_month = datetime.strptime(resp_dict.get('293'), '%m-%Y')
+    #     filtered_data = [i for i in data if datetime.strptime(i.get('response').get('293'), '%m-%Y') == selected_month]
+    #     selected_start_date = datetime.strptime(resp_dict.get('294'), '%d-%m-%Y')
+    #     if not filtered_data and selected_start_date.date() != selected_month.date():
+    #         error_msg['294'] = 'Start date should be 1st of month'
+    #     elif filtered_data:
+    #         sorted_data = sorted(filtered_data, key=lambda x: datetime.strptime(x["response"]["294"], "%d-%m-%Y"))
+    #         previouse_end_date = datetime.strptime(sorted_data[-1]['response']['295'], '%d-%m-%Y')
+    #         next_date = previouse_end_date + timedelta(days=1)
+    #         if next_date.date() != selected_start_date.date(): 
+    #             error_msg['294'] = 'Start date not matching with previous end date'
 
-    if survey_id in [18,20]:
-        error_msg = partner_registration_date_validate(error_msg,resp_dict,ben_respons,previous_record_validation,'75',month_format,survey_id,validations,'Date of registration in Subhiksha+')
+    # if survey_id in [18,20]:
+    #     error_msg = partner_registration_date_validate(error_msg,resp_dict,ben_respons,previous_record_validation,'75',month_format,survey_id,validations,'Date of registration in Subhiksha+')
 
     return error_msg
 
@@ -1458,13 +1367,13 @@ def custom_validation_survey_wise_version1(request):
             answers_list = question_answer_dict(questions,answers_list)
         
         # import ipdb;ipdb.set_trace()
-        # if not json_answer or json_answer[0].response != answers_list:
-        #     error=custom_validation_survey_wise(answers_list,int(survey_id),json_id,ben_uuid)
-        # if error:
-        #     error.update({'success':False})
-        #     return JsonResponse(error)
-        # else:
-        return JsonResponse({'success':True})
+        if not json_answer or json_answer[0].response != answers_list:
+            error=custom_validation_survey_wise(answers_list,int(survey_id),json_id,ben_uuid)
+        if error:
+            error.update({'success':False})
+            return JsonResponse(error)
+        else:
+            return JsonResponse({'success':True})
 
 def load_data_to_cache_survey_slug():
     #caching the surveys based on slug

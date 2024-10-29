@@ -181,7 +181,7 @@ class Project(BaseContent):
     name = models.CharField(max_length = 350)
     partner_mission_mapping =  models.ForeignKey(PartnerMissionMapping, on_delete = models.DO_NOTHING, blank=True, null=True)
     district = models.ForeignKey(District, on_delete = models.DO_NOTHING, blank=True, null=True)
-    location = models.CharField(max_length = 350)
+    location = models.CharField(max_length = 350,blank=True, null=True)
     additional_info = models.TextField(blank=True, null=True)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)

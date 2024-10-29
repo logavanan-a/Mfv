@@ -204,52 +204,52 @@ def add_survey_answers_version_1(request, **kwargs):
                                   'last_updated_date': last_updated_date, "response_created_date": response_created}
                     # code start to check the duplicate status for survey household and quid are 1221,1222,1223 for ration id, samagra id and akrspi unique id.
                     duplicate_status = "0"
-                    if survey_ids == "70":
-                        if "1221" in answers_list:  # ration_id
-                            uid = answers_list.get("1221")[0].get("T_0_0")
-                            ration_id_count = JsonAnswer.objects.raw(
-                                "select * from survey_jsonanswer where survey_id = 70 and lower(trim((response ->> '1221')::varchar))=lower(trim('"+uid+"'::varchar)) and creation_key !='"+r_uuid+"'")
-                            if len(list(ration_id_count)) > 0:
-                                duplicate_status = "1"
-                        elif "1222" in answers_list:  # samagra_id
-                            uid = answers_list.get("1222")[0].get("T_0_0")
-                            samagra_id_count = JsonAnswer.objects.raw(
-                                "select * from survey_jsonanswer where survey_id = 70 and lower(trim((response ->> '1222')::varchar))=lower(trim('"+uid+"'::varchar)) and creation_key !='"+r_uuid+"'")
-                            if len(list(samagra_id_count)) > 0:
-                                duplicate_status = "1"
-                        elif "1223" in answers_list:  # akrspi_unique_id
-                            uid = answers_list.get("1223")[0].get("T_0_0")
-                            akrspi_unique_id_count = JsonAnswer.objects.raw(
-                                "select * from survey_jsonanswer where survey_id = 70 and lower(trim((response ->> '1223')::varchar))=lower(trim('"+uid+"'::varchar)) and creation_key !='"+r_uuid+"'")
-                            if len(list(akrspi_unique_id_count)) > 0:
-                                duplicate_status = "1"
-                    elif survey_ids == "71":
-                        uname = answers_list.get("25")[0].get("T_0_0")
-                        address5 = answers_list.get("23")[0].get("5")
-                        people_count = JsonAnswer.objects.raw("select * from survey_jsonanswer where survey_id = 71 and lower(trim((response ->> '25')::varchar))=lower(trim('" +
-                                                              uname+"'::varchar)) and lower(trim((response->'address'->'1'->'23'->>'5')::varchar))=lower(trim('"+address5+"'::varchar)) and creation_key !='"+r_uuid+"'")
-                        if len(list(people_count)) > 0:
-                            duplicate_status = "1"
-                    elif survey_ids == "181":
-                        uname = answers_list.get("944")[0].get("T_0_0")
-                        address5 = answers_list.get("1288")[0].get("5")
-                        institution_count = JsonAnswer.objects.raw("select * from survey_jsonanswer where survey_id = 181 and lower(trim((response ->> '944')::varchar))=lower(trim('" +
-                                                                   uname+"'::varchar)) and lower(trim((response->'address'->'1'->'1288'->>'5')::varchar))=lower(trim('"+address5+"'::varchar)) and creation_key !='"+r_uuid+"'")
-                        if len(list(institution_count)) > 0:
-                            duplicate_status = "1"
-                    elif survey_ids == "73":
-                        household_uid = answers_list.get("16")[0].get("AI_0_0")
-                        household = JsonAnswer.objects.filter(
-                            creation_key=household_uid)
-                        if household.count() > 1:
-                            household_id = household[0].get_beneficiary_object(
-                            ).id
-                            uname = answers_list.get("636")[0].get("T_0_0")
-                            people_count = JsonAnswer.objects.raw("select * from survey_jsonanswer where survey_id = 73 and lower(trim((response ->> '636')::varchar))=lower(trim('" +
-                                                                  uname+"'::varchar)) and lower(trim((response ->> '640')::varchar))=lower(trim('"+str(household_id)+"'::varchar)) and creation_key !='"+r_uuid+"'")
-                            if len(list(people_count)) > 0:
-                                duplicate_status = "1"
-                            # code end to check the duplicate status for survey household and quid are 1221,1222,1223 for ration id, samagra id and akrspi unique id.
+                    # if survey_ids == "70":
+                    #     if "1221" in answers_list:  # ration_id
+                    #         uid = answers_list.get("1221")[0].get("T_0_0")
+                    #         ration_id_count = JsonAnswer.objects.raw(
+                    #             "select * from survey_jsonanswer where survey_id = 70 and lower(trim((response ->> '1221')::varchar))=lower(trim('"+uid+"'::varchar)) and creation_key !='"+r_uuid+"'")
+                    #         if len(list(ration_id_count)) > 0:
+                    #             duplicate_status = "1"
+                    #     elif "1222" in answers_list:  # samagra_id
+                    #         uid = answers_list.get("1222")[0].get("T_0_0")
+                    #         samagra_id_count = JsonAnswer.objects.raw(
+                    #             "select * from survey_jsonanswer where survey_id = 70 and lower(trim((response ->> '1222')::varchar))=lower(trim('"+uid+"'::varchar)) and creation_key !='"+r_uuid+"'")
+                    #         if len(list(samagra_id_count)) > 0:
+                    #             duplicate_status = "1"
+                    #     elif "1223" in answers_list:  # akrspi_unique_id
+                    #         uid = answers_list.get("1223")[0].get("T_0_0")
+                    #         akrspi_unique_id_count = JsonAnswer.objects.raw(
+                    #             "select * from survey_jsonanswer where survey_id = 70 and lower(trim((response ->> '1223')::varchar))=lower(trim('"+uid+"'::varchar)) and creation_key !='"+r_uuid+"'")
+                    #         if len(list(akrspi_unique_id_count)) > 0:
+                    #             duplicate_status = "1"
+                    # elif survey_ids == "71":
+                    #     uname = answers_list.get("25")[0].get("T_0_0")
+                    #     address5 = answers_list.get("23")[0].get("5")
+                    #     people_count = JsonAnswer.objects.raw("select * from survey_jsonanswer where survey_id = 71 and lower(trim((response ->> '25')::varchar))=lower(trim('" +
+                    #                                           uname+"'::varchar)) and lower(trim((response->'address'->'1'->'23'->>'5')::varchar))=lower(trim('"+address5+"'::varchar)) and creation_key !='"+r_uuid+"'")
+                    #     if len(list(people_count)) > 0:
+                    #         duplicate_status = "1"
+                    # elif survey_ids == "181":
+                    #     uname = answers_list.get("944")[0].get("T_0_0")
+                    #     address5 = answers_list.get("1288")[0].get("5")
+                    #     institution_count = JsonAnswer.objects.raw("select * from survey_jsonanswer where survey_id = 181 and lower(trim((response ->> '944')::varchar))=lower(trim('" +
+                    #                                                uname+"'::varchar)) and lower(trim((response->'address'->'1'->'1288'->>'5')::varchar))=lower(trim('"+address5+"'::varchar)) and creation_key !='"+r_uuid+"'")
+                    #     if len(list(institution_count)) > 0:
+                    #         duplicate_status = "1"
+                    # elif survey_ids == "73":
+                    #     household_uid = answers_list.get("16")[0].get("AI_0_0")
+                    #     household = JsonAnswer.objects.filter(
+                    #         creation_key=household_uid)
+                    #     if household.count() > 1:
+                    #         household_id = household[0].get_beneficiary_object(
+                    #         ).id
+                    #         uname = answers_list.get("636")[0].get("T_0_0")
+                    #         people_count = JsonAnswer.objects.raw("select * from survey_jsonanswer where survey_id = 73 and lower(trim((response ->> '636')::varchar))=lower(trim('" +
+                    #                                               uname+"'::varchar)) and lower(trim((response ->> '640')::varchar))=lower(trim('"+str(household_id)+"'::varchar)) and creation_key !='"+r_uuid+"'")
+                    #         if len(list(people_count)) > 0:
+                    #             duplicate_status = "1"
+                    #         # code end to check the duplicate status for survey household and quid are 1221,1222,1223 for ration id, samagra id and akrspi unique id.
                     if response_id or duplicate_status == "0":
                         status, res = create_answers_version1(
                             user, response, **ans_params)
@@ -445,7 +445,7 @@ def update_operator_details_version1(val, obj):
         obj.save()
     return obj
 
-
+from survey.form_views import custom_validation_survey_wise
 def create_answers_version1(user, response_obj, **ans_params):
     # from beneficiary.views import save_list_view
 
@@ -479,6 +479,12 @@ def create_answers_version1(user, response_obj, **ans_params):
         questions = Question.objects.filter(parent=parent_question, active=2)
     resp_dict = question_answer_dict(
         questions, answers_list, response_created_date)
+
+    # import ipdb;ipdb.set_trace()
+    # custom validation for the form data including the app/web data 
+    error=custom_validation_survey_wise(resp_dict,survey.id,response_id or 0,beneficiary)
+
+
     # this to save the child beneficiary address from parent beneficiary using the api question in child beneficiary
     if not survey.questions().filter(qtype='AW').exists() and survey.questions().filter(api_json__is_beneficiary_ques=2).exists():
         address_question = get_address_question(survey)

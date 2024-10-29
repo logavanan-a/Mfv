@@ -574,7 +574,7 @@ def adding_project(request,id):
         if state:
             districts = District.objects.filter(active=2,state_id=state).order_by('name')
         district = request.POST.get('district')
-        location = request.POST.get('location')
+        location = request.POST.get('location','')
         donor = request.POST.get('donor')
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date')

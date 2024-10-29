@@ -1880,7 +1880,7 @@ class BeneficiaryType(BaseContent):
     is_admin_type = models.BooleanField(default=False)
     is_training_module = models.BooleanField(default=False)
     category = models.ForeignKey(Mission, on_delete=models.DO_NOTHING, \
-                blank=True, null=True)
+                blank=True, null=True,verbose_name=_('Mission'))
     is_activist_group = models.BooleanField(default=False)
 
     def __str__(self):
