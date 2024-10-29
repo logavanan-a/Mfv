@@ -60,9 +60,9 @@ map_project{% extends 'base.html' %}
                         </div> 
                     </div>
                     <div class="row mb-4">
-                        <label class="col-md-2 col-form-label">Location<span class="required-field"></span></label>
+                        <label class="col-md-2 col-form-label">Location</label>
                         <div class="col-md-4">
-                            <input type="text"  name= "location" class="form-control" value="{{location|default_if_none:''}}" required placeholder="Enter Location" />
+                            <input type="text"  name= "location" class="form-control" value="{{location|default_if_none:''}}" placeholder="Enter Location" />
                             <div class="invalid-feedback">
                                 Please enter location.
                             </div>
