@@ -238,9 +238,9 @@ def questions_validation(df,survey_id,project_id):
             continue
         
         if question.qtype == 'AI':
-            column = get_api_column_name(question)
+            column,unique_question_id = get_api_column_name(question)
              # static validating for given project and school landline number in same location or not
-            project_linked_schools = get_school_based_project(project.district_id)
+            project_linked_schools = get_school_based_project(project.district_id,unique_question_id)
             # import ipdb;ipdb.set_trace()
             mask = ~df[column].apply(lambda value: any(val.strip() in project_linked_schools for val in str(value).split(',')))
             if mask.any():
@@ -381,7 +381,7 @@ def parse_data_row(df,survey_id):
     final_result = []
     ai_questions = questions.filter(qtype='AI')
     if ai_questions:
-        api_column = get_api_column_name(ai_questions[0])
+        api_column,unique_question_id = get_api_column_name(ai_questions[0])
         flattened_list = [item for sublist in df[api_column+'-API'].tolist() for item in sublist]
         cluster_beneficiary_data = get_beneficiary_clusters(flattened_list)
     for i in range(len(df)):
@@ -497,15 +497,15 @@ def get_api_column_name(question):
     question_id = unique_ids.get(str(parent_survey_id))
     unique_question_name = survey_questions.get(question_id)
     column = cache_parent_survey.get('name') + "--" +unique_question_name.get('text') 
-    return column
+    return column,question_id
 
 def get_beneficiary_clusters(beneficiaries):
     return dict(BeneficiaryResponse.objects.filter(creation_key__in=beneficiaries).values_list('creation_key','address_2'))
 
 # get the schools linked to project
-def get_school_based_project(project_district):
+def get_school_based_project(project_district,unique_question_id):
     boundary_data = Boundary.objects.get(boundary_level_type_id=2,code=project_district)
-    beneficiary_data = [i.response.get('428') for i in JsonAnswer.objects.filter(active=2,survey_id=1,response__address__1__234__2=str(boundary_data.id)) if i.response.get('428')]
+    beneficiary_data = [i.response.get(unique_question_id) for i in JsonAnswer.objects.filter(active=2,survey_id=1,response__address__1__234__2=str(boundary_data.id)) if i.response.get(unique_question_id)]
     return beneficiary_data
 
 def get_all_role_user(project):
