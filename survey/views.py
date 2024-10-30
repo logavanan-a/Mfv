@@ -19,6 +19,10 @@ from io import BytesIO
 import subprocess
 import logging
 from rest_framework.views import APIView
+from django.utils import timezone
+from application_master.views import record_deactivate
+from collections import defaultdict
+from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
@@ -204,9 +208,16 @@ class SurveyAdd(View):
         capture_level_choices= CAPTURE_LEVEL_CHOICES
         # """#survey_order=Survey.objects.get('survey_order')"""
         themes = MasterLookUp.objects.filter(parent__slug="theme")
+        
         beneficiary_types = BeneficiaryType.objects.filter(active=2).exclude(parent=None).order_by('btype_order')
+        beneficiary_types_ben = beneficiary_types.exclude(id__in=Survey.objects.filter(active=2,survey_type=0).values_list('object_id')).exclude(parent=None).values('id','name','category_id')
+        beneficiary_type_mission = defaultdict(list)
+        for i in beneficiary_types_ben:
+            beneficiary_type_mission[i['category_id']].append(i['id'])
+        beneficiary_type_mission = dict(beneficiary_type_mission)
+
         levels = BoundaryLevel.objects.all()
-        # roles = RoleTypes.objects.filter(active=2)
+        missions = Mission.objects.filter(active=2)
         return render(request,self.template_name,locals())
     
     def post(self, request,*args, **kwargs):
@@ -1025,3 +1036,55 @@ def get_updated_survey_details(survey_details, survey):
     if 'RoleTypes' in values_list:
         survey_details['type'] = 4
     return None
+
+@method_decorator(login_required, name='dispatch')
+class SurveyDeactivate(View):
+    def get(self,request,activityid):
+        try:
+            activity = Survey.objects.get(id=activityid)
+            if activity.active:
+                if request.user.is_authenticated:
+                    activity.active = 3 # Making the Activty as Inactive
+                    activity.deactivated_reason = request.GET.get("reason")
+                    activity.deactivated_user = request.user 
+                    # activity.deactivated_date  = datetime.datetime.now() 
+                    activity.deactivated_date  = timezone.localtime(timezone.now())
+                    activity.save()
+                    record_deactivate(request,'survey',activityid,request.GET.get("reason"),activity.active)
+        except:
+            pass 
+        return HttpResponseRedirect('/survey/edit/{0}/'.format(activityid))
+            
+@method_decorator(login_required, name='dispatch')
+class QuestionDeactivate(View):
+    def get(self,request,questionid):
+        try:
+            question = Question.objects.get(id=questionid)
+            if question.active:
+                if request.user.is_authenticated:
+                    question.active = 3 # Making the Activty as Inactive
+                    question.deactivated_reason = request.GET.get("reason")
+                    question.deactivated_user = request.user 
+                    question.deactivated_date  = timezone.localtime(timezone.now())
+                    question.save()
+                    record_deactivate(request,'question',questionid,request.GET.get("reason"),question.active)
+        except:
+            pass 
+        return HttpResponseRedirect('/question/edit/{0}/'.format(questionid))
+
+@method_decorator(login_required, name='dispatch')
+class ChoiceDeactivate(View):
+    def get(self,request,choiceid):
+        try:
+            choice = Choice.objects.get(id=choiceid)
+            if choice.active:
+                if request.user.is_authenticated:
+                    choice.active = 3 # Making the Activty as Inactive
+                    choice.deactivated_reason = request.GET.get("reason")
+                    choice.deactivated_user = request.user 
+                    choice.deactivated_date  = timezone.localtime(timezone.now())
+                    choice.save()
+                    record_deactivate(request,'choice',choiceid,request.GET.get("reason"),choice.active)
+        except:
+            pass 
+        return HttpResponseRedirect('/choice/edit/{0}/'.format(choiceid))

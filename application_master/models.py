@@ -448,3 +448,19 @@ class UserActivityDate(BaseContent):
     
     def __str__(self):
         return f"{self.user.username} - {self.activity_date.strftime('%Y-%m-%d %H:%M:%S')}"
+
+#delete table for store deleted responses
+class DeleteLog(models.Model):
+    ACTIVE_CHOICES = ((0, 'Deleted'), (2, 'Active'),(3,"Inactive"))
+    
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    deleted_by = models.ForeignKey(User,blank=True, null=True,on_delete=models.DO_NOTHING)
+    deleted_at = models.DateTimeField(auto_now_add=True)
+    reason = models.TextField()
+    record_updated_to = models.PositiveIntegerField(default=0,choices=ACTIVE_CHOICES)
+        
+    def __str__(self):
+        """Return Name."""
+        return f"{self.reason} "
+    

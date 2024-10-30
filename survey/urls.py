@@ -26,4 +26,8 @@ urlpatterns = [
     path('manage/generate-excel/<survey_id>/<project_id>/', generate_excel, name='generate_excel'),
     path('manage/activity/import/', SurveyResponseDataImport.as_view()),
     path('manage/activity/import-responses/<int:pk>/',ImportResponses.as_view()),
+    path('deactivate-activity/<int:activityid>/',SurveyDeactivate.as_view()),
+    path('deactivate-question/<int:questionid>/',QuestionDeactivate.as_view()),
+    path('deactivate-choice/<int:choiceid>/',ChoiceDeactivate.as_view()),
+
 ]

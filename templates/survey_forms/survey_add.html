@@ -12,7 +12,7 @@
                     You won't be able to activate it again please confirm !
                 </h4>
             </div>
-            <form method="POST" action="/manage/deactivate-activity/{{survey_obj.id}}/" class="form-horizontal">{% csrf_token %}
+            <form method="GET" action="/deactivate-activity/{{survey_obj.id}}/" class="form-horizontal">{% csrf_token %}
 
                 <div class="card-content">
                     <h4 class="card-title"></h4>
@@ -69,6 +69,19 @@
                         {% if error %} <div class="col-md-12"><div class="error_alert"><h3>{{error}}</h3></div></div>{% endif %}
                         
                         <div class="row card-content">
+                            <div class="col-md-6 validate_height mb-3" id="">
+                                <label class="col-sm-12 label-on-left">Mission<span class="required">*</span></label>
+                                <div class="col-sm-12">
+                                    <div class="form-group label-floating">
+                                        <select class="col-sm-12 form-control" data-style="select-with-transition" name="mission_id" id="mission_id">
+                                            <option value="">---------------</option>
+                                            {% for mission in missions %}
+                                            <option value="{{ mission.id }}">{{ mission.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col-md-6 validate_height mb-3" id="div_name">
                                 <label class="col-sm-12 label-on-left">Activity Name <span class="required">*</span></label>
                                 <div class="col-sm-12">
@@ -238,7 +251,7 @@
         
                                         </div>
                                         <div class="col-md-12 text-right choose_right">
-                                            <a href="/manage/activities/">
+                                            <a href="/survey/">
                                                 <span class="btn btn-primary btn-fill btn-sm">Back</span>
                                             </a>
                                     {% endif%}
@@ -408,7 +421,56 @@
     $('#survey_type_id').change(function(){
            var id=$(this).val();
            display_fields_type_based(id)
+
+           var mission_id=$('#mission_id').val();
+           bene_ids = {{beneficiary_type_mission|safe}}
+           if(id == '1'){
+            unhideOptions('beneficiary_type_id',select2=false);
+            let excludeIds = Object.values(bene_ids).flat();
+            // Get the values of options that are not in the excludeIds list
+            let selectedValues = $("#beneficiary_type_id option")
+            .filter(function() {
+                return !excludeIds.includes(parseInt(this.value,10));
+            })
+            .map(function() {
+                return parseInt(this.value,10);
+            })
+            .get();
+
+            hideOptions(selectedValues,'beneficiary_type_id',select2=false);
+           }else{
+            
+            mission_ben_ids = bene_ids[mission_id] || []
+
+            unhideOptions('beneficiary_type_id',select2=false);
+            hideOptions(mission_ben_ids,'beneficiary_type_id',select2=false);
+           }
         });
+
+    $('#mission_id').change(function(){
+        var selected_id=$(this).val();
+        var activity_type=$('#survey_type_id').val();
+        bene_ids = {{beneficiary_type_mission|safe}}
+        if(activity_type == '0'){
+            mission_ben_ids = bene_ids[selected_id] || []
+    
+            unhideOptions('beneficiary_type_id',select2=false);
+            hideOptions(mission_ben_ids,'beneficiary_type_id',select2=false);
+        }else{
+            unhideOptions('beneficiary_type_id',select2=false);
+            let excludeIds = Object.values(bene_ids).flat();
+            // Get the values of options that are not in the excludeIds list
+            let selectedValues = $("#beneficiary_type_id option")
+            .filter(function() {
+                return !excludeIds.includes(parseInt(this.value,10));
+            })
+            .map(function() {
+                return parseInt(this.value,10);
+            })
+            .get();
+            hideOptions(selectedValues,'beneficiary_type_id',select2=false);
+        }
+    });
     });
 </script>
 
