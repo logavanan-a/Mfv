@@ -10,7 +10,7 @@
                     You won't be able to activate it again please confirm !
                 </h4>
             </div>
-            <form method="POST" action="/manage/deactivate-choice/{{choice_object.id}}/" class="form-horizontal">{% csrf_token %}
+            <form method="GET" action="/deactivate-choice/{{choice_object.id}}/" class="form-horizontal">{% csrf_token %}
 
                 <div class="card-content">
                     <h4 class="card-title"></h4>
@@ -114,7 +114,7 @@
         
                                     </div>
                                     <div class="col-md-12 text-right choose_right">
-                                        <a href="/manage/choices/{{cancel_id}}/">
+                                        <a href="/choices/{{cancel_id}}/">
                                             <span class="btn btn-danger btn-fill btn-sm">Back</span>
                                         </a>
                                     <div>

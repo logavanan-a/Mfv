@@ -645,3 +645,14 @@ class MissionListAPIView(APIView):
             "message": "mission list sent successfully",
             "mission_list": serializer.data
         })
+
+def record_deactivate(request, model_name, object_id,reason,updated_to):
+    """Record Deactivate."""
+    content_type = ContentType.objects.get(model=model_name)
+    obj = DeleteLog.objects.create(
+        content_type=content_type, 
+        object_id=object_id,
+        deleted_by=request.user,
+        reason=reason,
+        record_updated_to=updated_to,
+        )

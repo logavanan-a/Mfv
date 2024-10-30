@@ -553,19 +553,18 @@ function adres_widget_1(parent_valueSelected, selected = null) {
                     }
                 })
 
-                //
                 project_id = result['project_ids']
 
-                unhideOptions(); // Unhide options
-                hideOptions(project_id);
+                unhideOptions('project_id'); // Unhide options
+                hideOptions(project_id,'project_id');
             }
         }
     })
 }
 
 // Store and remove options to "hide" them
-function hideOptions(visibleIds) {
-    const select = $("#project_id");
+function hideOptions(visibleIds,hide_id,select2=true) {
+    const select = $("#"+hide_id);
 
     // Store all options in a data attribute before hiding
     if (!select.data("hiddenOptions")) {
@@ -579,16 +578,19 @@ function hideOptions(visibleIds) {
             $(this).remove();
         }
     });
-
-    // Refresh select2 to reflect changes
-    select.select2();
+    if(select2){
+        // Refresh select2 to reflect changes
+        select.select2();
+    }
 }
 
 // Restore options to "unhide" them
-function unhideOptions() {
-    const select = $("#project_id");
+function unhideOptions(hide_id,select2=true) {
+    const select = $("#"+hide_id);
     select.html(select.data("hiddenOptions")); // Restore saved options
-    select.select2(); // Refresh select2
+    if(select2){
+        select.select2(); // Refresh select2
+    }
 }
 
 function disable_edit_fields() {

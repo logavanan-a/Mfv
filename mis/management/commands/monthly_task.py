@@ -34,9 +34,9 @@ class Command(BaseCommand):
             return 'Please provide valid date for task in the format dd/mm/yyyy (e.g. -td 01/01/2019)'
         from_date = datetime.datetime.strptime(task_date, "%d/%m/%Y").date()
         if p_id:
-            projects = Project.objects.filter(id__in=p_id.split(','),active=2,partner_mission_mapping__mission_id=5).order_by('name')
+            projects = Project.objects.filter(id__in=p_id.split(','),active=2,partner_mission_mapping__mission_id__in=[5,10,11]).order_by('name')
         else:
-            projects = Project.objects.filter(active=2,partner_mission_mapping__mission_id=5).order_by('name')
+            projects = Project.objects.filter(active=2,partner_mission_mapping__mission_id__in=[5,10,11]).order_by('name')
         end_date = from_date.replace(day=calendar.monthrange(from_date.year, from_date.month)[1])
         multiple_projects_users, multiple_partner_users, created_tasks = [], [], []
         for project in projects:
