@@ -1244,9 +1244,9 @@ def get_levels(request, level):
     #    userrole = UserRoles.objects.get(user__id=request.POST.get('uid'))
     #    orguser = OrganizationLocation.objects.filter(user__id=userrole.id)
         user = User.objects.get(id=request.POST.get('uid'))
-        boundary_level = {1:State,2:District}
+        # boundary_level = {1:State,2:District}
         # tagged_locations = UserProjectMapping.objects.filter(user=user,active=2).select_related('project','project__district','project__district__state')
-        project_mapped_locations = list(UserProjectMapping.objects.filter(user=user,active=2,project__partner_mission_mapping__mission_id = 2).select_related('project__district').values_list('project__district',flat=True))
+        project_mapped_locations = list(UserProjectMapping.objects.filter(user=user,active=2).select_related('project__district').distinct().values_list('project__district',flat=True))
         # level_obj = BoundaryLevel.objects.get(code=int(url_level))
         # user_locations = user_projects_locations(user, level_obj)
         tagged_locations = Boundary.objects.filter(boundary_level_type_id=2,code__in=list(map(str,project_mapped_locations))).order_by('modified').select_related('parent','boundary_level_type','parent__boundary_level_type')
