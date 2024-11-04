@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 @csrf_exempt
-def new_responses_list_v3(request):
+def new_responses_list_v3_old(request):
     # get user and based on userid get surveys mapped to user
     # get active survey id
     if request.method == 'POST':
@@ -84,6 +84,67 @@ def new_responses_list_v3(request):
                 # logger.info("#############----------TIME-TRACKER (Activities-CommonResponse End): " + str(datetime.now()))
                 logger.info("#############----------TIME-TRACKER (Activites - ResponseCount): " + str(len(res_list)))
                 # logger.info("#############----------TIME-TRACKER (Activities-End): " + str(datetime.now()))
+        else:
+            res_list = []
+
+        res = {'status': 2,
+                'batch_size': batch_count,
+                'current_record_count': len(res_list),
+                'message': "Success",
+                "ResponsesData": res_list, }
+
+        logger.info("##TIME-TRACKER (End (ResponseCount) - " + user_id +
+                    " : " + str(len(res_list)) + "): " + str(datetime.now()))
+        return JsonResponse(res)
+
+@csrf_exempt
+def new_responses_list_v3(request):
+    # get user and based on userid get surveys mapped to user
+    # get active survey id
+    if request.method == 'POST':
+        user_id = request.POST.get("userid")
+        user_role = User.objects.get(id=user_id)
+        ben_modified_date_str = request.POST.get("ben_modified_date")
+        ben_modified_date = convert_string_to_date(ben_modified_date_str)
+        act_modified_date_str = request.POST.get("act_modified_date")
+        act_modified_date = convert_string_to_date(act_modified_date_str)
+        act_modified_date_str = convert_date_to_string(act_modified_date)
+        # partner_obj = UserRoles.objects.get(user_id=int(user_id)).partner
+        loc_list = []
+
+        batch_count = settings.SYNC_SETTINGS['RESPONSES_V3']['BATCH_SIZE']
+        t1 = datetime.now()
+        loc_list_cache_key = "user_based_project__" + user_id
+        project_list = cache.get(settings.INSTANCE_CACHE_PREFIX + loc_list_cache_key)
+        if not project_list:
+            project_list = list(UserProjectMapping.objects.filter(active=2, user_id=user_id,project__partner_mission_mapping__mission_id=2).values_list('project_id', flat=True).distinct())
+            cache_set_with_namespace('RESPONSE_SURVEY_V3', loc_list_cache_key, project_list, 14400)
+            logger.info("## TIME-TRACKER UserID-loc_list::" + str(user_id) + " : " + str(project_list))
+
+        if len(project_list) > 0:
+            beneficiaries = JsonAnswer.objects.filter(active=2,cluster__project_id__in=project_list).order_by('modified')
+            
+            if ben_modified_date:
+                responses = beneficiaries.filter(modified__gt=ben_modified_date)
+            else:
+                responses = beneficiaries
+
+            responses = responses[:batch_count]
+            logger.info("#############-----------TIME-TRACKER (Beneficiaries-CommonResponse - Start): " + str(datetime.now()))
+            res_list = common_responses_details_v3(responses, user_id,user_role)
+            logger.info("#############-----------TIME-TRACKER (Beneficiaries-CommonResponse - End): " + str(datetime.now()))
+            logger.info("#############----------TIME-TRACKER (Beneficiaries - ResponseCount): " + str(len(res_list)))
+            
+            if len(res_list) == 0:
+                activities = JsonAnswer.objects.filter(active=2,cluster__BeneficiaryResponse__in = list(beneficiaries.values_list('creation_key',flat=True))).exclude(survey__survey_type = 0).order_by('modified')
+                if act_modified_date:
+                    activities = activities.filter(modified__gt=act_modified_date)
+                responses = activities[:batch_count]
+                logger.info("#############----------TIME-TRACKER (Activities-CommonResponse Start): " + str(datetime.now()))
+                res_list = common_responses_details_v3(responses, user_id,user_role)
+                logger.info("#############----------TIME-TRACKER (Activities-CommonResponse End): " + str(datetime.now()))
+                logger.info("#############----------TIME-TRACKER (Activites - ResponseCount): " + str(len(res_list)))
+                logger.info("#############----------TIME-TRACKER (Activities-End): " + str(datetime.now()))
         else:
             res_list = []
 
