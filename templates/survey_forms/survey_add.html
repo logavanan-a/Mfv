@@ -127,7 +127,7 @@
                                         <select class="col-sm-12 form-control" data-style="select-with-transition" name="beneficiary_type_id" id="beneficiary_type_id">
                                             <option value="">---------------</option>
                                             {% for beneficiary_type in beneficiary_types %}
-                                            <option value="{{ beneficiary_type.id }}">{{ beneficiary_type.name }}</option>
+                                            <option value="{{ beneficiary_type.id }}" mission='{{beneficiary_type.category_id}}'>{{ beneficiary_type.name }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -294,6 +294,7 @@
 					if (parseInt(d.survey_details.type) == 4){
                         $( "select[name='role_id']" ).val(d.survey_details.role_id);
                     }
+                    $( "#mission_id" ).val($('#beneficiary_type_id  option:selected').attr("mission")).change()
                     $('#'+d.survey_details.type).prop('checked', true);
                     display_fields_section_based(parseInt(d.survey_details.type))
                     $('.selectpicker').selectpicker('refresh')
@@ -404,6 +405,7 @@
         $("#survey").validate({
             rules :
             {
+                mission_id: {required: true},
                 name: {required: true},
                 survey_type: {required: true},
                 beneficiary_type_id: {required: true},
@@ -430,7 +432,7 @@
             // Get the values of options that are not in the excludeIds list
             let selectedValues = $("#beneficiary_type_id option")
             .filter(function() {
-                return !excludeIds.includes(parseInt(this.value,10));
+                return !excludeIds.includes(parseInt(this.value,10)) && (mission_id == $(this).attr('mission'));
             })
             .map(function() {
                 return parseInt(this.value,10);
@@ -462,7 +464,7 @@
             // Get the values of options that are not in the excludeIds list
             let selectedValues = $("#beneficiary_type_id option")
             .filter(function() {
-                return !excludeIds.includes(parseInt(this.value,10));
+                return (!excludeIds.includes(parseInt(this.value,10))) && (selected_id == $(this).attr('mission')) ;
             })
             .map(function() {
                 return parseInt(this.value,10);
