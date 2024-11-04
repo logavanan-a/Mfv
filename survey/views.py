@@ -199,6 +199,48 @@ def sanitized(val):
         return ''
 
 
+# sub function for add extended activity
+def add_extended_survey(data_dict, data):
+    name = sanitized(data.get('name'))
+    beneficiary_type_id = data.get('beneficiary_type_id') 
+    location_id = data.get('level_id')
+    survey_type = data.get('survey_type')
+    periodicity = data.get('periodicity')
+    role_type = data.get('role_id')
+    survey_order=data.get('survey_order')
+    capture_level = data.get('cp_level')
+    # description = data.get('description')
+    # activity_code = data.get('activity_code')
+    data_dict.update({"name": name, 
+                      "survey_type": survey_type,
+                      "periodicity": periodicity,
+                      "survey_order":survey_order,
+                      "capture_level_type":capture_level,
+                    #   "voucher_description":description,
+                    #   "activity_code":activity_code
+                      })
+    if location_id:
+        config = [{"content_type_2": "BoundaryLevel",
+                   "object_id_2": str(location_id)}]
+        data_dict.update({"config": config})
+    elif beneficiary_type_id:
+        least_location_id = 2#user_setup().get('least_location_level_config')
+        config = [{"content_type_1": "BeneficiaryType",
+                   "object_id_1": str(beneficiary_type_id)},
+                   {"content_type_2": "BoundaryLevel",
+                    "object_id_2": str(least_location_id)}]
+        data_dict.update({"config": config})
+    elif role_type:
+        location_id=OrganizationUnit.objects.get(roles=role_type).organization_level.code
+        config = [{"content_type_2": "BoundaryLevel",
+                    "object_id_2": str(location_id)},
+				   {"content_type_3": "RoleTypes",
+                    "object_id_3": str(role_type)}]
+        data_dict.update({"config": config})
+    return data_dict
+    
+
+
 class SurveyAdd(View):
     template_name = 'survey_forms/survey_add.html'
     def get(self, request, *args, **kwargs):
@@ -210,14 +252,14 @@ class SurveyAdd(View):
         themes = MasterLookUp.objects.filter(parent__slug="theme")
         
         beneficiary_types = BeneficiaryType.objects.filter(active=2).exclude(parent=None).order_by('btype_order')
-        beneficiary_types_ben = beneficiary_types.exclude(id__in=Survey.objects.filter(active=2,survey_type=0).values_list('object_id')).exclude(parent=None).values('id','name','category_id')
+        beneficiary_types_ben = list(beneficiary_types.exclude(id__in=Survey.objects.filter(active=2,survey_type=0).values_list('object_id')).exclude(parent=None).values('id','name','category_id'))
         beneficiary_type_mission = defaultdict(list)
         for i in beneficiary_types_ben:
             beneficiary_type_mission[i['category_id']].append(i['id'])
         beneficiary_type_mission = dict(beneficiary_type_mission)
+        missions = Mission.objects.filter(active=2)
 
         levels = BoundaryLevel.objects.all()
-        missions = Mission.objects.filter(active=2)
         return render(request,self.template_name,locals())
     
     def post(self, request,*args, **kwargs):
@@ -318,7 +360,15 @@ class SurveyEdit(View):
         survey_deactivate_reasons =  SURVEY_DEACTIVATE_REASON
         themes = MasterLookUp.objects.filter(parent__slug="theme")
         capture_level_choices= CAPTURE_LEVEL_CHOICES
+        
         beneficiary_types = BeneficiaryType.objects.filter(active=2).exclude(parent=None).order_by('btype_order')
+        beneficiary_types_ben = beneficiary_types.exclude(id__in=Survey.objects.filter(active=2,survey_type=0).values_list('object_id')).exclude(parent=None).values('id','name','category_id')
+        beneficiary_type_mission = defaultdict(list)
+        for i in beneficiary_types_ben:
+            beneficiary_type_mission[i['category_id']].append(i['id'])
+        beneficiary_type_mission = dict(beneficiary_type_mission)
+        missions = Mission.objects.filter(active=2)
+        
         levels = BoundaryLevel.objects.all()
         survey_obj = Survey.objects.get(id=pk)
         survey_order=Survey.objects.get(id=pk).survey_order
@@ -374,8 +424,8 @@ class SurveyEdit(View):
                                "object_id_2": str(location_id)}]
                     data_dict.update({"config": config})
                 elif beneficiary_type_id:
-                    least_location_id = user_setup().get(
-                        'least_location_level_config')
+                    least_location_id = 2#user_setup().get(
+                        # 'least_location_level_config')
                     config = [{"content_type_1": "BeneficiaryType",
                                "object_id_1": str(beneficiary_type_id)},
                               {"content_type_2": "BoundaryLevel",
