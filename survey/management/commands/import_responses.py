@@ -15,11 +15,13 @@ import logging
 import sys, traceback
 import ipdb
 import numpy as np
-import subprocess
+import subprocess,operator
 from io import BytesIO
 from django.core.files.base import ContentFile
 from send_mail.views import send_mail
 from send_mail.models import MailTemplate,MailData
+from functools import reduce
+
 # Mandatories 
 # TODO: Project, State, District, Block,Gram Panchayath, Village, Generation Key, -- All questions related to that form
 # TODO: Unique validation required for unique fields like aadhar , ration card and other
@@ -444,8 +446,9 @@ def parse_data_row(df,survey_id):
 
 
 def get_choice_id(name, qid):
+    query = reduce(operator.or_, (Q(text__icontains=term) for term in name.split(',')))
     # Query the database for the choice ID based on choice_name
-    choice = Choice.objects.filter(text__in=name.split(','), question_id=qid).values_list('id', flat=True)
+    choice = Choice.objects.filter(question_id=qid).filter(query).values_list('id', flat=True)
     # return [','.join(map(str,choice))] if choice else "[]"
     text = ""
     if len(choice) > 1 :

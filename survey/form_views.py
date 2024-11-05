@@ -749,7 +749,11 @@ def custom_validation_survey_wise(resp_dict,survey_id,json_id,ben_uuid=None):
         13:{
             "540":{"field":"Date of Follow up","validate_with":"524"},
         },
-        
+        18:{
+            "617":{"field":"Date of admission"},
+            "618":{"field":"Date of Surgery"},
+            "619":{"field":"Date of Discharge"},
+        },
     }
     # previous_record_validation={
     #     1:'4',#Date of registration in Subhiksha+

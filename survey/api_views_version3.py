@@ -117,7 +117,7 @@ def new_responses_list_v3(request):
         loc_list_cache_key = "user_based_project__" + user_id
         project_list = cache.get(settings.INSTANCE_CACHE_PREFIX + loc_list_cache_key)
         if not project_list:
-            project_list = list(UserProjectMapping.objects.filter(active=2, user_id=user_id,project__partner_mission_mapping__mission_id=2).values_list('project_id', flat=True).distinct())
+            project_list = list(UserProjectMapping.objects.filter(active=2, user_id=user_id).values_list('project_id', flat=True).distinct())
             cache_set_with_namespace('RESPONSE_SURVEY_V3', loc_list_cache_key, project_list, 14400)
             logger.info("## TIME-TRACKER UserID-loc_list::" + str(user_id) + " : " + str(project_list))
 
