@@ -114,8 +114,10 @@ def login_view(request):
                 latest_activity = UserActivityDate.objects.filter(user=user,active=2).order_by('-activity_date').first()
                 if latest_activity and latest_activity.activity_date.strftime('%Y-%m-%d'):
                     request.session['activity_date'] =  latest_activity.activity_date.strftime('%Y-%m-%d')
-
-                if (user.groups.all()[0].id in [3,7,8]) or (user.groups.all()[0].id != 9 and 2 not in user_mission_id) :
+                form_redirect = (Menus.objects.filter(active=2,group__in=user.groups.all(),parent=None).exclude(app_link='').values_list('app_link',flat=True))
+                if form_redirect:
+                    return redirect(form_redirect[0]) 
+                elif (user.groups.all()[0].id in [3,7,8]) or (user.groups.all()[0].id != 9 and 2 not in user_mission_id) :
                     return redirect('/task-list/') 
                 else: 
                     return redirect('/dashboard/?page_slug=mission-roshni')
