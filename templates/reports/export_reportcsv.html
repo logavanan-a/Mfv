@@ -224,7 +224,7 @@
                                         <td>{{k}}</td>
                                     {% endfor %}
                                        
-                                    {%if report_slug in "'export-reports','benificiary-data'" and i.2 != '-' %}<td>
+                                    {%if report_slug in "'export-reports'" or "benificiary-data" in report_slug and i.2 != '-' %}<td>
                                     <a href="#" onclick="export_csv('{{i.0}}')">Download</a>
                     <!-- <a href="javascript:onclickFunction('id')">Download</a>     -->
                                     </td>
