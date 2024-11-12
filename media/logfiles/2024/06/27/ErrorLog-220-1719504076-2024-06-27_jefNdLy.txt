@@ -1,0 +1,4 @@
+Date : 27-06-2024
+Time : 21hrs:31min
+
+Error : Section : getChoicelist,Date : Jun 27, 2024 9:31:16 PM,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,Realme,RMX1941,28,Error Message : Conflict on Option date,postparameters : 2024-06-26 12:51:36.653891

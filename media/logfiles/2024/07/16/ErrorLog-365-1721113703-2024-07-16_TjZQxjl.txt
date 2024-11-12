@@ -1,0 +1,4 @@
+Date : 16-07-2024
+Time : 12hrs:38min
+
+Error : Section : getAssessmentlist,Date : 16-Jul-2024 12:38:23 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,samsung,SM-M526B,33,Error Message : Conflict on Assessment date,postparameters : 2024-07-05 15:10:53.230514

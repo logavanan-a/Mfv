@@ -1,0 +1,4 @@
+Date : 05-08-2024
+Time : 14hrs:57min
+
+Error : Section : getAnswerFromResponse,Date : Aug 5, 2024 2:57:49 PM,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,Google,sdk_gphone64_x86_64,34,Error Message : Exception on getting the answer from response,postparameters : 

@@ -1,0 +1,18 @@
+Date : 05-08-2024
+Time : 17hrs:07min
+
+Error : Section : SyncSurveyActivity_SyncFunction,Date : 5 Aug 2024 5:07:52 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,Nothing,A142,34,Error Message : java.lang.IllegalStateException: database not open
+	at net.sqlcipher.database.SQLiteDatabase.updateWithOnConflict(SQLiteDatabase.java:2204)
+	at net.sqlcipher.database.SQLiteDatabase.update(SQLiteDatabase.java:2155)
+	at org.thesocialbytes.mfv.convenecode.database.NewDBHandler.updateSurveyDataToDB(NewDBHandler.java:3315)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.fetchDatabaseValues(AutoSyncActivity.java:353)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.surveyIdListLooping(AutoSyncActivity.java:269)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.doInBackground(AutoSyncActivity.java:218)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.doInBackground(AutoSyncActivity.java:143)
+	at android.os.AsyncTask$3.call(AsyncTask.java:394)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at android.os.AsyncTask$SerialExecutor$1.run(AsyncTask.java:305)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+	at java.lang.Thread.run(Thread.java:1012)
+,postparameters : null

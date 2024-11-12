@@ -1,0 +1,4 @@
+Date : 16-07-2024
+Time : 15hrs:14min
+
+Error : Section : getChoicelist,Date : 16-Jul-2024 3:14:45 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,Xiaomi,M2101K6I,33,Error Message : Conflict on Option date,postparameters : 2024-07-08 07:30:32.388003

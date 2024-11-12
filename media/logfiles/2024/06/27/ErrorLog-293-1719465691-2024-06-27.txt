@@ -1,0 +1,4 @@
+Date : 27-06-2024
+Time : 10hrs:51min
+
+Error : Section : getQuestionlist,Date : 27-Jun-2024 10:51:30 am,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,samsung,SM-M336BU,34,Error Message : Conflict on Question date,postparameters : 2024-06-26 16:08:23.990071

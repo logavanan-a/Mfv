@@ -1,0 +1,4 @@
+Date : 21-10-2024
+Time : 15hrs:16min
+
+Error : Section : getBlocklist,Date : 21-Oct-2024 3:16:42 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,samsung,SM-M526B,33,Error Message : Conflict on Block date,postparameters : 2024-10-21 06:08:24.102161

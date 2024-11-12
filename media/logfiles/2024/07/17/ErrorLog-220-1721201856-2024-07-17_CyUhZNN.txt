@@ -1,0 +1,4 @@
+Date : 17-07-2024
+Time : 13hrs:07min
+
+Error : Section : getAnswerFromResponse,Date : 17 Jul 2024 13:07:36,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,samsung,SM-T505,31,Error Message : Exception on getting the answer from response,postparameters : 

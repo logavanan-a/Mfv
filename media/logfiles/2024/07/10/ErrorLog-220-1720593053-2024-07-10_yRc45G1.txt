@@ -1,0 +1,4 @@
+Date : 10-07-2024
+Time : 12hrs:00min
+
+Error : Section : GetPeriodicity,Date : 10-Jul-2024 12:00:53 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,realme,RMX2151,31,Error Message : Conflict on Periodicity Date,postparameters : 2024-07-10 04:41:33.788451

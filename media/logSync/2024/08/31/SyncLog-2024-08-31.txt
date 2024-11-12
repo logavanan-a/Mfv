@@ -1,0 +1,32 @@
+
+
+
+==================================================
+
+
+Log Date & Time : 08/31/2024, 10:26:46hrs{
+    "u_uuid": "375",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024083020032341654a97-0a56-4616-8084-e5e3512aa22c\",\"la\":\"18.9972\",\"lo\":\"72.8392\",\"vn\":\"3.0\",\"survey_id\":\"10\",\"last_updated_date\":\"2024-08-30 20:03:23\",\"beneficiary_id\":\"20240822151432bd829ce6-e317-4d72-8ce1-750a1c8b06df\",\"facility_id\":\"0\",\"cluster_id\":\"605\",\"response_id\":\"0\",\"approved_status\":0,\"project_id\":\"-1\",\"answers_array\":{\"390\":[{\"D_0_0\":\"07-2024\"}],\"391\":[{\"T_0_0\":\"Yashi\"}],\"392\":[{\"R_0_0\":\"261\"}],\"393\":[{\"R_0_0\":\"262\"}],\"394\":[{\"T_0_0\":\"None\"}],\"404\":[{\"D_0_0\":\"24-07-2024\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 08/31/2024, 10:26:46hrs{
+    "status": true,
+    "message": "Success",
+    "sync_res": [
+        {
+            "r_uuid": "2024083020032341654a97-0a56-4616-8084-e5e3512aa22c",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ],
+    "u_uuid": ""
+}

@@ -1,0 +1,22 @@
+Date : 06-07-2024
+Time : 17hrs:30min
+
+Error : Section : SyncSurveyActivity_Startsurvey,Date : Jul 6, 2024 5:30:10 PM,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,Realme,RMX1941,28,Error Message : net.sqlcipher.database.SQLiteException: no such table: Level5: , while compiling: select * from Level5 where id = 0
+	at net.sqlcipher.database.SQLiteCompiledSql.native_compile(Native Method)
+	at net.sqlcipher.database.SQLiteCompiledSql.compile(SQLiteCompiledSql.java:91)
+	at net.sqlcipher.database.SQLiteCompiledSql.<init>(SQLiteCompiledSql.java:64)
+	at net.sqlcipher.database.SQLiteProgram.<init>(SQLiteProgram.java:89)
+	at net.sqlcipher.database.SQLiteQuery.<init>(SQLiteQuery.java:48)
+	at net.sqlcipher.database.SQLiteDirectCursorDriver.query(SQLiteDirectCursorDriver.java:60)
+	at net.sqlcipher.database.SQLiteDatabase.rawQueryWithFactory(SQLiteDatabase.java:1867)
+	at net.sqlcipher.database.SQLiteDatabase.rawQuery(SQLiteDatabase.java:1785)
+	at org.thesocialbytes.mfv.convenecode.database.NewDBHandler.getLevels(NewDBHandler.java:15255)
+	at org.thesocialbytes.mfv.convenecode.utils.StartSurvey.doInBackground(StartSurvey.java:319)
+	at org.thesocialbytes.mfv.convenecode.utils.StartSurvey.doInBackground(StartSurvey.java:51)
+	at android.os.AsyncTask$2.call(AsyncTask.java:333)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at android.os.AsyncTask$SerialExecutor$1.run(AsyncTask.java:245)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1167)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
+	at java.lang.Thread.run(Thread.java:764)
+,postparameters : {}

@@ -1,0 +1,4 @@
+Date : 18-07-2024
+Time : 18hrs:23min
+
+Error : Section : dynamicallySettingView,Date : Jul 18, 2024 6:23:04 PM,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,Realme,RMX1941,28,Error Message : Exception In Getting View ,postparameters : 

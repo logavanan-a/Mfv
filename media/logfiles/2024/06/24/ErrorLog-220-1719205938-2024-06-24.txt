@@ -1,0 +1,4 @@
+Date : 24-06-2024
+Time : 10hrs:42min
+
+Error : Section : getBlocklist,Date : 24 Jun 2024 10:42:17 am,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,OPPO,CPH2527,34,Error Message : Conflict on Block date,postparameters : 2024-06-21 14:14:49.650085

@@ -1,0 +1,18 @@
+Date : 07-07-2024
+Time : 14hrs:12min
+
+Error : Section : SurveydataSending,Date : 07-Jul-2024 2:12:13 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,samsung,SM-M526B,33,Error Message : java.lang.NullPointerException: Attempt to read from field 'long net.sqlcipher.database.SQLiteCompiledSql.nStatement' on a null object reference in method 'void net.sqlcipher.database.SQLiteProgram.<init>(net.sqlcipher.database.SQLiteDatabase, java.lang.String)'
+	at net.sqlcipher.database.SQLiteProgram.<init>(SQLiteProgram.java:119)
+	at net.sqlcipher.database.SQLiteQuery.<init>(SQLiteQuery.java:48)
+	at net.sqlcipher.database.SQLiteDirectCursorDriver.query(SQLiteDirectCursorDriver.java:60)
+	at net.sqlcipher.database.SQLiteDatabase.rawQueryWithFactory(SQLiteDatabase.java:1867)
+	at net.sqlcipher.database.SQLiteDatabase.rawQuery(SQLiteDatabase.java:1785)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.doInBackground(AutoSyncActivity.java:197)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.doInBackground(AutoSyncActivity.java:140)
+	at android.os.AsyncTask$3.call(AsyncTask.java:394)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at android.os.AsyncTask$SerialExecutor$1.run(AsyncTask.java:305)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1137)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:637)
+	at java.lang.Thread.run(Thread.java:1012)
+,postparameters : 

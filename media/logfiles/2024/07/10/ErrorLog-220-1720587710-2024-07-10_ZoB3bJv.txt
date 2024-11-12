@@ -1,0 +1,4 @@
+Date : 10-07-2024
+Time : 10hrs:31min
+
+Error : Section : GetPeriodicity,Date : 10-Jul-2024 10:31:50 am,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,samsung,SM-M526B,33,Error Message : Conflict on Periodicity Date,postparameters : 2024-07-10 04:41:33.788451

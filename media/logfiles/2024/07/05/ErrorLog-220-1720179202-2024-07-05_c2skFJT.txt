@@ -1,0 +1,17 @@
+Date : 05-07-2024
+Time : 17hrs:03min
+
+Error : Section : SyncSurveyActivity_SyncFunction,Date : 05-Jul-2024 5:03:21 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,samsung,SM-M526B,33,Error Message : android.app.BackgroundServiceStartNotAllowedException: Not allowed to start service Intent { cmp=org.thesocialbytes.mfv/.convenecode.MyIntentService }: app is in background uid UidRecord{edb3639 u0a1907 CAC  bg:+2h4m53s88ms idle change:procadj procs:0 seq(2593265,2081725)}
+	at android.app.ContextImpl.startServiceCommon(ContextImpl.java:1981)
+	at android.app.ContextImpl.startService(ContextImpl.java:1927)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.fetchDatabaseValues(AutoSyncActivity.java:387)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.surveyIdListLooping(AutoSyncActivity.java:266)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.doInBackground(AutoSyncActivity.java:215)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.doInBackground(AutoSyncActivity.java:140)
+	at android.os.AsyncTask$3.call(AsyncTask.java:394)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at android.os.AsyncTask$SerialExecutor$1.run(AsyncTask.java:305)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1137)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:637)
+	at java.lang.Thread.run(Thread.java:1012)
+,postparameters : null

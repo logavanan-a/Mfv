@@ -1,0 +1,4 @@
+Date : 19-08-2024
+Time : 14hrs:23min
+
+Error : Section : GetPeriodicity,Date : 19 Aug 2024 2:23:11 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,OPPO,CPH2527,34,Error Message : Conflict on Periodicity Date,postparameters : 2024-08-19 08:50:52.643389

@@ -1,0 +1,4 @@
+Date : 16-08-2024
+Time : 21hrs:15min
+
+Error : Section : getQuestionlist,Date : 16-Aug-2024 9:15:26 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,samsung,SM-M526B,33,Error Message : Conflict on Question date,postparameters : 2024-08-16 15:44:12.788754

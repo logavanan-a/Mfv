@@ -1,0 +1,20 @@
+Date : 07-07-2024
+Time : 14hrs:35min
+
+Error : Section : SurveydataSending,Date : 07-Jul-2024 2:35:33 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,samsung,SM-M526B,33,Error Message : java.lang.IllegalStateException: database /data/user/0/org.thesocialbytes.mfv/databases/DB_220.db already closed
+	at net.sqlcipher.database.SQLiteCompiledSql.compile(SQLiteCompiledSql.java:82)
+	at net.sqlcipher.database.SQLiteCompiledSql.<init>(SQLiteCompiledSql.java:64)
+	at net.sqlcipher.database.SQLiteProgram.<init>(SQLiteProgram.java:89)
+	at net.sqlcipher.database.SQLiteQuery.<init>(SQLiteQuery.java:48)
+	at net.sqlcipher.database.SQLiteDirectCursorDriver.query(SQLiteDirectCursorDriver.java:60)
+	at net.sqlcipher.database.SQLiteDatabase.rawQueryWithFactory(SQLiteDatabase.java:1867)
+	at net.sqlcipher.database.SQLiteDatabase.rawQuery(SQLiteDatabase.java:1785)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.doInBackground(AutoSyncActivity.java:197)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.doInBackground(AutoSyncActivity.java:140)
+	at android.os.AsyncTask$3.call(AsyncTask.java:394)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at android.os.AsyncTask$SerialExecutor$1.run(AsyncTask.java:305)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1137)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:637)
+	at java.lang.Thread.run(Thread.java:1012)
+,postparameters : 

@@ -1,0 +1,2402 @@
+
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:32:36hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210322113efd07a-7ee8-47be-ad7c-55fbf7077f27\",\"la\":\"12.7218\",\"lo\":\"75.1613\",\"vn\":\"1.0\",\"survey_id\":\"1\",\"last_updated_date\":\"2024-06-22 10:32:21\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"117\":[{\"T_0_0\":\"vhethu\"}],\"118\":[{\"S_0_0\":\"3\"}],\"119\":[{\"T_0_0\":\"9565646494\"}],\"223\":[{\"1\":\"1003\",\"2\":\"3\",\"3\":\"\",\"4\":\"\",\"5\":\"\",\"6\":\"\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:32:37hrs{
+    "status": true,
+    "message": "Success",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210322113efd07a-7ee8-47be-ad7c-55fbf7077f27",
+            "sync_status": 2,
+            "s_created": "2024-06-22 10:32:36",
+            "error_msg": "",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:32:54hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"20240622103241b8166bd1-e229-4815-abdc-114fe6a1d1c5\",\"la\":\"12.7235\",\"lo\":\"75.1589\",\"vn\":\"1.0\",\"survey_id\":\"8\",\"last_updated_date\":\"2024-06-22 10:32:41\",\"beneficiary_id\":\"2024062210322113efd07a-7ee8-47be-ad7c-55fbf7077f27\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"221\":[{\"T_0_0\":\"t wt\"}],\"222\":[{\"R_0_0\":\"130\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:32:55hrs{
+    "status": true,
+    "message": "Success",
+    "sync_res": [
+        {
+            "r_uuid": "20240622103241b8166bd1-e229-4815-abdc-114fe6a1d1c5",
+            "sync_status": 2,
+            "s_created": "2024-06-22 10:32:55",
+            "error_msg": "",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:34:19hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:34:19hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:36:14hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"expenses\":{},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:36:14hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:36:14hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:36:14hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:37:45hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"expenses\":{},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:37:45hrs{
+    "status": true,
+    "message": "Success",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check answers_array is None.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:37:46hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:37:46hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:37:46hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:37:46hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:38:50hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:38:50hrs{
+    "status": true,
+    "message": "Success",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check answers_array is None.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:38:50hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:38:50hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:38:50hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:38:50hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:38:51hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:38:51hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:43:22hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:43:22hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:43:22hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:43:22hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:43:22hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:43:22hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:43:22hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:43:22hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:46:27hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:46:27hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:46:27hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:46:27hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:46:28hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:46:28hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:46:28hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 10:46:28hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:04:34hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:04:34hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:04:34hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:04:34hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:04:35hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:04:35hrs{
+    "status": true,
+    "message": "Success",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check answers_array is None.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:04:35hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:04:35hrs{
+    "status": true,
+    "message": "Success",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check answers_array is None.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:02hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:02hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:02hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:02hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:03hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:03hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:03hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:03hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:11hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:11hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:11hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:11hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:11hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:11hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:12hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:12hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:58hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"response_id\":\"0\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221105408d98d7c3-be38-4bad-9341-56e754ef86a9\",\"la\":\"12.7235\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 11:05:40\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"test\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"10\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"976464\"}],\"126\":[{\"T_0_0\":\"9496434646\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:58hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221105408d98d7c3-be38-4bad-9341-56e754ef86a9",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "202406221105408d98d7c3-be38-4bad-9341-56e754ef86a9 - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:58hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"response_id\":\"0\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221105408d98d7c3-be38-4bad-9341-56e754ef86a9\",\"la\":\"12.7235\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 11:05:40\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"test\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"10\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"976464\"}],\"126\":[{\"T_0_0\":\"9496434646\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:58hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221105408d98d7c3-be38-4bad-9341-56e754ef86a9",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "202406221105408d98d7c3-be38-4bad-9341-56e754ef86a9 - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:58hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"response_id\":\"0\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221105408d98d7c3-be38-4bad-9341-56e754ef86a9\",\"la\":\"12.7235\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 11:05:40\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"test\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"10\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"976464\"}],\"126\":[{\"T_0_0\":\"9496434646\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:58hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221105408d98d7c3-be38-4bad-9341-56e754ef86a9",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "202406221105408d98d7c3-be38-4bad-9341-56e754ef86a9 - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:58hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"response_id\":\"0\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221105408d98d7c3-be38-4bad-9341-56e754ef86a9\",\"la\":\"12.7235\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 11:05:40\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"test\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"10\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"976464\"}],\"126\":[{\"T_0_0\":\"9496434646\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:58hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221105408d98d7c3-be38-4bad-9341-56e754ef86a9",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "202406221105408d98d7c3-be38-4bad-9341-56e754ef86a9 - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:59hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 10:33:47\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"response_id\":\"0\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"nan\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"995855\"}],\"126\":[{\"T_0_0\":\"9658756841\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 10:34:46\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"18\"}],\"128\":[{\"T_0_0\":\"test\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"tedt\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]},{\"r_uuid\":\"20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1\",\"la\":\"12.7236\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"7\",\"last_updated_date\":\"2024-06-22 10:36:21\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"219\":[{\"D_0_0\":\"22-06-2024\"}],\"220\":[{\"T_0_0\":\"test\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d\",\"la\":\"12.7236\",\"lo\":\"75.1587\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 10:37:47\",\"beneficiary_id\":\"2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"test\"}],\"176\":[{\"T_0_0\":\"56\"}],\"177\":[{\"S_0_0\":\"67\"}],\"178\":[{\"T_0_0\":\"school \"}],\"179\":[{\"T_0_0\":\"9586595881\"}],\"180\":[{\"C_0_0\":\"[70, 77, 75, 71]\"}],\"181\":[{\"T_0_0\":\"tedt\"}],\"182\":[{\"C_0_0\":\"[80, 81, 79, 78]\"}],\"183\":[{\"T_0_0\":\"dd\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"test\"}],\"187\":[{\"T_0_0\":\"fty\"}],\"188\":[{\"R_0_0\":\"84\"}]},\"files_info\":[]},{\"r_uuid\":\"202406221105408d98d7c3-be38-4bad-9341-56e754ef86a9\",\"la\":\"12.7235\",\"lo\":\"75.1588\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 11:05:40\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"6\"}],\"121\":[{\"T_0_0\":\"test\"}],\"122\":[{\"T_0_0\":\"56\"}],\"123\":[{\"S_0_0\":\"10\"}],\"124\":[{\"T_0_0\":\"class\"}],\"125\":[{\"T_0_0\":\"976464\"}],\"126\":[{\"T_0_0\":\"9496434646\"}],\"224\":[{\"AI_0_0\":\"20240621190827c6cdfd34-2c94-4f4f-b10f-faf74a07d826\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:05:59hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "2024062210334709f2f1e1-23a0-4831-ae73-81d1d44439af - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103446d4165aac-36d6-43db-a648-c79bdd8a3ba0",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "20240622103621509caee9-8922-4de5-aa8f-1e93877c83b1",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221037478b83a8b3-ff9e-4f67-8dbf-cd07f986955d",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check beneficiary is not exists.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        },
+        {
+            "r_uuid": "202406221105408d98d7c3-be38-4bad-9341-56e754ef86a9",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "202406221105408d98d7c3-be38-4bad-9341-56e754ef86a9 - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:52:15hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"202406221151546c07e253-4cd9-435c-ace9-556cbe952459\",\"la\":\"8.27539\",\"lo\":\"77.2002\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 11:51:54\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"5\"}],\"121\":[{\"T_0_0\":\"Robin isac\"}],\"122\":[{\"T_0_0\":\"12\"}],\"123\":[{\"S_0_0\":\"10\"}],\"124\":[{\"T_0_0\":\"5\"}],\"125\":[{\"T_0_0\":\"12\"}],\"126\":[{\"T_0_0\":\"9767646464\"}],\"224\":[{\"AI_0_0\":\"20240621183732282dd1c6-4d3b-48a4-99cb-d6c1ae6d712c\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:52:15hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "202406221151546c07e253-4cd9-435c-ace9-556cbe952459",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "202406221151546c07e253-4cd9-435c-ace9-556cbe952459 - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:53:44hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"202406221151546c07e253-4cd9-435c-ace9-556cbe952459\",\"la\":\"8.27539\",\"lo\":\"77.2002\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 11:51:54\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:53:44hrs{
+    "status": true,
+    "message": "Success",
+    "sync_res": [
+        {
+            "r_uuid": "202406221151546c07e253-4cd9-435c-ace9-556cbe952459",
+            "sync_status": 0,
+            "s_created": "",
+            "error_msg": "Please check answers_array is None.",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:53:44hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"202406221151546c07e253-4cd9-435c-ace9-556cbe952459\",\"la\":\"8.27539\",\"lo\":\"77.2002\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 11:51:54\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"5\"}],\"121\":[{\"T_0_0\":\"Robin isac\"}],\"122\":[{\"T_0_0\":\"12\"}],\"123\":[{\"S_0_0\":\"10\"}],\"124\":[{\"T_0_0\":\"5\"}],\"125\":[{\"T_0_0\":\"12\"}],\"126\":[{\"T_0_0\":\"9767646464\"}],\"224\":[{\"AI_0_0\":\"20240621183732282dd1c6-4d3b-48a4-99cb-d6c1ae6d712c\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:53:44hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "202406221151546c07e253-4cd9-435c-ace9-556cbe952459",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "202406221151546c07e253-4cd9-435c-ace9-556cbe952459 - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:54:43hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"202406221151546c07e253-4cd9-435c-ace9-556cbe952459\",\"la\":\"8.27539\",\"lo\":\"77.2002\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 11:51:54\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"5\"}],\"121\":[{\"T_0_0\":\"Robin isac\"}],\"122\":[{\"T_0_0\":\"12\"}],\"123\":[{\"S_0_0\":\"10\"}],\"124\":[{\"T_0_0\":\"5\"}],\"125\":[{\"T_0_0\":\"12\"}],\"126\":[{\"T_0_0\":\"9767646464\"}],\"224\":[{\"AI_0_0\":\"20240621183732282dd1c6-4d3b-48a4-99cb-d6c1ae6d712c\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:54:43hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "202406221151546c07e253-4cd9-435c-ace9-556cbe952459",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "202406221151546c07e253-4cd9-435c-ace9-556cbe952459 - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:54:43hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"202406221151546c07e253-4cd9-435c-ace9-556cbe952459\",\"la\":\"8.27539\",\"lo\":\"77.2002\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 11:51:54\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"5\"}],\"121\":[{\"T_0_0\":\"Robin isac\"}],\"122\":[{\"T_0_0\":\"12\"}],\"123\":[{\"S_0_0\":\"10\"}],\"124\":[{\"T_0_0\":\"5\"}],\"125\":[{\"T_0_0\":\"12\"}],\"126\":[{\"T_0_0\":\"9767646464\"}],\"224\":[{\"AI_0_0\":\"20240621183732282dd1c6-4d3b-48a4-99cb-d6c1ae6d712c\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 11:54:43hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "202406221151546c07e253-4cd9-435c-ace9-556cbe952459",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "202406221151546c07e253-4cd9-435c-ace9-556cbe952459 - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 12:03:51hrs{
+    "pushInput": "[{\"r_uuid\":\"202406221151546c07e253-4cd9-435c-ace9-556cbe952459\",\"la\":\"8.27539\",\"lo\":\"77.2002\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 11:51:54\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"5\"}],\"121\":[{\"T_0_0\":\"Robin isac\"}],\"122\":[{\"T_0_0\":\"12\"}],\"123\":[{\"S_0_0\":\"10\"}],\"124\":[{\"T_0_0\":\"5\"}],\"125\":[{\"T_0_0\":\"12\"}],\"126\":[{\"T_0_0\":\"9767646464\"}],\"224\":[{\"AI_0_0\":\"20240621183732282dd1c6-4d3b-48a4-99cb-d6c1ae6d712c\"}]},\"files_info\":[]}]",
+    "u_uuid": "220",
+    "d_uuid": "",
+    "0bcb6b59-6584-4d05-86b6-6e3daf7935f3": ""
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 12:03:51hrs{
+    "status": true,
+    "message": "Failed",
+    "sync_res": [
+        {
+            "r_uuid": "202406221151546c07e253-4cd9-435c-ace9-556cbe952459",
+            "sync_status": 3,
+            "s_created": "",
+            "error_msg": "202406221151546c07e253-4cd9-435c-ace9-556cbe952459 - 'Survey' object has no attribute 'is_beneficiary_based_child'",
+            "duplicate_status": "-1",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 12:27:02hrs{
+    "u_uuid": "293",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"202406221226313e8a58dc-e1b8-488a-a5c5-1d352dbf751b\",\"la\":\"13.0185\",\"lo\":\"77.6663\",\"vn\":\"1.0\",\"survey_id\":\"1\",\"last_updated_date\":\"2024-06-22 12:26:31\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"208\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"117\":[{\"T_0_0\":\"KCD School\"}],\"118\":[{\"S_0_0\":\"2\"}],\"119\":[{\"T_0_0\":\"9433437327\"}],\"223\":[{\"1\":\"1007\",\"2\":\"208\",\"3\":\"\",\"4\":\"\",\"5\":\"\",\"6\":\"\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 12:27:02hrs{
+    "status": true,
+    "message": "Success",
+    "sync_res": [
+        {
+            "r_uuid": "202406221226313e8a58dc-e1b8-488a-a5c5-1d352dbf751b",
+            "sync_status": 2,
+            "s_created": "2024-06-22 12:27:02",
+            "error_msg": "",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 12:27:52hrs{
+    "u_uuid": "293",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062212272005e2791c-287b-4048-a688-b64a993d9dd5\",\"la\":\"13.0185\",\"lo\":\"77.6663\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 12:27:20\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"7\"}],\"121\":[{\"T_0_0\":\"Daniel\"}],\"122\":[{\"T_0_0\":\"46\"}],\"123\":[{\"S_0_0\":\"9\"}],\"124\":[{\"T_0_0\":\"8\"}],\"125\":[{\"T_0_0\":\"14\"}],\"126\":[{\"T_0_0\":\"9767676767\"}],\"224\":[{\"AI_0_0\":\"202406221226313e8a58dc-e1b8-488a-a5c5-1d352dbf751b\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 12:27:52hrs{
+    "status": true,
+    "message": "Success",
+    "sync_res": [
+        {
+            "r_uuid": "2024062212272005e2791c-287b-4048-a688-b64a993d9dd5",
+            "sync_status": 2,
+            "s_created": "2024-06-22 12:27:52",
+            "error_msg": "",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 12:28:41hrs{
+    "u_uuid": "293",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"202406221228087bf953d4-acab-4b48-95a2-def17e95279a\",\"la\":\"13.0185\",\"lo\":\"77.6663\",\"vn\":\"1.0\",\"survey_id\":\"3\",\"last_updated_date\":\"2024-06-22 12:28:08\",\"beneficiary_id\":\"2024062212272005e2791c-287b-4048-a688-b64a993d9dd5\",\"facility_id\":\"0\",\"cluster_id\":\"208\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"127\":[{\"S_0_0\":\"16\"}],\"129\":[{\"R_0_0\":\"19\"}],\"130\":[{\"T_0_0\":\"Test\"}],\"131\":[{\"R_0_0\":\"21\"}],\"132\":[{\"T_0_0\":\"Yes\"}],\"133\":[{\"S_0_0\":\"23\"}],\"134\":[{\"S_0_0\":\"29\"}],\"136\":[{\"S_0_0\":\"37\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 12:28:41hrs{
+    "status": true,
+    "message": "Success",
+    "sync_res": [
+        {
+            "r_uuid": "202406221228087bf953d4-acab-4b48-95a2-def17e95279a",
+            "sync_status": 2,
+            "s_created": "2024-06-22 12:28:41",
+            "error_msg": "",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 12:44:30hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"2024062212434324417a28-8f2a-4caa-8a74-cc8593384f23\",\"la\":\"13.0182\",\"lo\":\"77.6664\",\"vn\":\"1.0\",\"survey_id\":\"5\",\"last_updated_date\":\"2024-06-22 12:43:43\",\"beneficiary_id\":\"2024062212272005e2791c-287b-4048-a688-b64a993d9dd5\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"175\":[{\"T_0_0\":\"\"}],\"176\":[{\"T_0_0\":\"\"}],\"177\":[{}],\"178\":[{\"T_0_0\":\"\"}],\"179\":[{\"T_0_0\":\"\"}],\"180\":[{\"C_0_0\":\"[72]\"}],\"182\":[{\"C_0_0\":\"[81]\"}],\"184\":[{\"R_0_0\":\"82\"}],\"185\":[{\"D_0_0\":\"22-06-2024\"}],\"186\":[{\"T_0_0\":\"Done\"}],\"187\":[{\"T_0_0\":\"Left eye\"}],\"188\":[{\"R_0_0\":\"86\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 12:44:30hrs{
+    "status": true,
+    "message": "Success",
+    "sync_res": [
+        {
+            "r_uuid": "2024062212434324417a28-8f2a-4caa-8a74-cc8593384f23",
+            "sync_status": 2,
+            "s_created": "2024-06-22 12:44:30",
+            "error_msg": "",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 13:00:47hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"202406221151546c07e253-4cd9-435c-ace9-556cbe952459\",\"la\":\"8.27539\",\"lo\":\"77.2002\",\"vn\":\"1.0\",\"survey_id\":\"2\",\"last_updated_date\":\"2024-06-22 11:51:54\",\"beneficiary_id\":\"0\",\"facility_id\":\"0\",\"cluster_id\":\"2\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"120\":[{\"S_0_0\":\"5\"}],\"121\":[{\"T_0_0\":\"Robin isac\"}],\"122\":[{\"T_0_0\":\"12\"}],\"123\":[{\"S_0_0\":\"10\"}],\"124\":[{\"T_0_0\":\"5\"}],\"125\":[{\"T_0_0\":\"12\"}],\"126\":[{\"T_0_0\":\"9767646464\"}],\"224\":[{\"AI_0_0\":\"20240621183732282dd1c6-4d3b-48a4-99cb-d6c1ae6d712c\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 13:00:47hrs{
+    "status": true,
+    "message": "Success",
+    "sync_res": [
+        {
+            "r_uuid": "202406221151546c07e253-4cd9-435c-ace9-556cbe952459",
+            "sync_status": 2,
+            "s_created": "2024-06-22 13:00:47",
+            "error_msg": "",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 13:56:48hrs{
+    "u_uuid": "220",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"20240622135640f579727a-8b21-4940-8821-5089895adb80\",\"la\":\"8.26952\",\"lo\":\"77.1743\",\"vn\":\"1.0\",\"survey_id\":\"8\",\"last_updated_date\":\"2024-06-22 13:56:40\",\"beneficiary_id\":\"202406212151235242329b-9c0a-4c0f-b336-63de6822d1e7\",\"facility_id\":\"0\",\"cluster_id\":\"3\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"221\":[{\"T_0_0\":\"Test\"}],\"222\":[{\"R_0_0\":\"129\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 13:56:48hrs{
+    "status": true,
+    "message": "Success",
+    "sync_res": [
+        {
+            "r_uuid": "20240622135640f579727a-8b21-4940-8821-5089895adb80",
+            "sync_status": 2,
+            "s_created": "2024-06-22 13:56:48",
+            "error_msg": "",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 14:21:53hrs{
+    "u_uuid": "293",
+    "d_uuid": "",
+    "pushInput": "[{\"r_uuid\":\"202406221417281f8736d2-50e2-435a-bf60-93dbc9a93793\",\"la\":\"13.0185\",\"lo\":\"77.6664\",\"vn\":\"1.0\",\"survey_id\":\"6\",\"last_updated_date\":\"2024-06-22 14:17:28\",\"beneficiary_id\":\"2024062212272005e2791c-287b-4048-a688-b64a993d9dd5\",\"facility_id\":\"0\",\"cluster_id\":\"208\",\"approved_status\":1,\"project_id\":\"-1\",\"answers_array\":{\"189\":[{\"T_0_0\":\"\"}],\"190\":[{\"T_0_0\":\"\"}],\"191\":[{\"S_0_0\":\"0\"}],\"192\":[{\"T_0_0\":\"\"}],\"193\":[{\"T_0_0\":\"7862222563\"}],\"194\":[{\"D_0_0\":\"22-06-2024\"}],\"195\":[{\"R_0_0\":\"91\"}],\"197\":[{\"C_0_0\":\"[105]\"}],\"198\":[{\"C_0_0\":\"[108]\"}],\"199\":[{\"S_0_0\":\"115\"}],\"200\":[{\"T_201_202\":\"\"},{\"T_201_204\":\"\"},{\"T_201_205\":\"\"},{\"T_201_206\":\"\"},{\"T_201_207\":\"\"},{\"T_201_203\":\"f\"},{\"T_201_203\":\"f\"}],\"208\":[{\"T_209_211\":\"\"},{\"T_209_213\":\"\"},{\"T_209_212\":\"t\"},{\"T_209_212\":\"t\"}],\"214\":[{\"R_0_0\":\"118\"}],\"215\":[{\"S_0_0\":\"120\"}],\"216\":[{\"R_0_0\":\"122\"}],\"217\":[{\"S_0_0\":\"125\"}],\"218\":[{\"S_0_0\":\"127\"}]},\"files_info\":[]}]"
+}
+
+
+==================================================
+
+
+Log Date & Time : 06/22/2024, 14:21:53hrs{
+    "status": true,
+    "message": "Success",
+    "sync_res": [
+        {
+            "r_uuid": "202406221417281f8736d2-50e2-435a-bf60-93dbc9a93793",
+            "sync_status": 2,
+            "s_created": "2024-06-22 14:21:53",
+            "error_msg": "",
+            "duplicate_status": "0",
+            "approved_by": "",
+            "approved_on": ""
+        }
+    ]
+}

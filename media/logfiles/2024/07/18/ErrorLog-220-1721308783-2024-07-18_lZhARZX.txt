@@ -1,0 +1,21 @@
+Date : 18-07-2024
+Time : 18hrs:49min
+
+Error : Section : SurveydataSending,Date : 18-Jul-2024 6:49:39 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,realme,RMX2151,31,Error Message : net.sqlcipher.database.SQLiteMisuseException: bad parameter or other API misuse: , while compiling: Select uuid,sync_status From Survey where sync_status=1
+	at net.sqlcipher.database.SQLiteCompiledSql.native_compile(Native Method)
+	at net.sqlcipher.database.SQLiteCompiledSql.compile(SQLiteCompiledSql.java:91)
+	at net.sqlcipher.database.SQLiteCompiledSql.<init>(SQLiteCompiledSql.java:64)
+	at net.sqlcipher.database.SQLiteProgram.<init>(SQLiteProgram.java:89)
+	at net.sqlcipher.database.SQLiteQuery.<init>(SQLiteQuery.java:48)
+	at net.sqlcipher.database.SQLiteDirectCursorDriver.query(SQLiteDirectCursorDriver.java:60)
+	at net.sqlcipher.database.SQLiteDatabase.rawQueryWithFactory(SQLiteDatabase.java:1867)
+	at net.sqlcipher.database.SQLiteDatabase.rawQuery(SQLiteDatabase.java:1785)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.doInBackground(AutoSyncActivity.java:200)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.doInBackground(AutoSyncActivity.java:143)
+	at android.os.AsyncTask$3.call(AsyncTask.java:394)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at android.os.AsyncTask$SerialExecutor$1.run(AsyncTask.java:305)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+	at java.lang.Thread.run(Thread.java:1012)
+,postparameters : 

@@ -1,0 +1,4 @@
+Date : 27-06-2024
+Time : 10hrs:55min
+
+Error : Section : getBlocklist,Date : Jun 27, 2024 10:55:21 AM,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,Realme,RMX1941,28,Error Message : Conflict on Block date,postparameters : 2024-06-26 12:37:31.958850

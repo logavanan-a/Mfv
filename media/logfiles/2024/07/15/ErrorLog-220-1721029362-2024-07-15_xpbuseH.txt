@@ -1,0 +1,4 @@
+Date : 15-07-2024
+Time : 13hrs:12min
+
+Error : Section : getBlocklist,Date : 01-Aug-2024 1:12:41 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,motorola,moto e13,33,Error Message : Conflict on Block date,postparameters : 2024-06-27 15:49:22.348033

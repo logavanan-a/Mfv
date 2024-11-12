@@ -1,0 +1,4 @@
+Date : 09-07-2024
+Time : 13hrs:13min
+
+Error : Section : getChoicelist,Date : 9 Jul 2024 1:13:23 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,samsung,SM-M515F,31,Error Message : Conflict on Option date,postparameters : 2024-07-08 07:30:32.388003

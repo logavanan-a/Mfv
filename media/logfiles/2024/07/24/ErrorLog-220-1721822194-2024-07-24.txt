@@ -1,0 +1,18 @@
+Date : 24-07-2024
+Time : 17hrs:26min
+
+Error : Section : SyncSurveyActivity_SyncFunction,Date : 25 Jul 2024 5:46:06 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,Nothing,A142,34,Error Message : org.json.JSONException: Value Internal of type java.lang.String cannot be converted to JSONObject
+	at org.json.JSON.typeMismatch(JSON.java:112)
+	at org.json.JSONObject.<init>(JSONObject.java:172)
+	at org.json.JSONObject.<init>(JSONObject.java:185)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.fetchDatabaseValues(AutoSyncActivity.java:327)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.surveyIdListLooping(AutoSyncActivity.java:269)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.doInBackground(AutoSyncActivity.java:218)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.doInBackground(AutoSyncActivity.java:143)
+	at android.os.AsyncTask$3.call(AsyncTask.java:394)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at android.os.AsyncTask$SerialExecutor$1.run(AsyncTask.java:305)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+	at java.lang.Thread.run(Thread.java:1012)
+,postparameters : null

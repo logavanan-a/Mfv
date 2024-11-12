@@ -1,0 +1,4 @@
+Date : 21-10-2024
+Time : 17hrs:19min
+
+Error : Section : ondisplayDatepicker,Date : 21-Oct-2024 5:19:51 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,samsung,SM-M526B,33,Error Message : Exception on Displaying the date picker,postparameters : 

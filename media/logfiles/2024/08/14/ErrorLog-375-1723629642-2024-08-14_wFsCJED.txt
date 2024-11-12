@@ -1,0 +1,4 @@
+Date : 14-08-2024
+Time : 15hrs:30min
+
+Error : Section : GetPeriodicity,Date : 14-Aug-2024 3:30:41 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,motorola,moto e13,33,Error Message : Conflict on Periodicity Date,postparameters : 2024-08-14 09:58:39.115658

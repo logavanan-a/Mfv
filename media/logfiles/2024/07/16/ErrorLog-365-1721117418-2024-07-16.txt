@@ -1,0 +1,4 @@
+Date : 16-07-2024
+Time : 13hrs:40min
+
+Error : Section : getAnswerFromResponse,Date : 16 Jul 2024 1:40:18 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,Nothing,A142,34,Error Message : Exception on getting the answer from response,postparameters : 

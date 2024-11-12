@@ -1,0 +1,4 @@
+Date : 24-06-2024
+Time : 12hrs:57min
+
+Error : Section : getValidation,Date : 24-Jun-2024 12:57:28 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,samsung,SM-M336BU,34,Error Message : Exception on not getting the validation,postparameters : 

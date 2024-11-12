@@ -1,0 +1,4 @@
+Date : 05-08-2024
+Time : 14hrs:54min
+
+Error : Section : getAssessmentlist,Date : Aug 5, 2024 2:54:19 PM,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,Google,sdk_gphone64_x86_64,34,Error Message : Conflict on Assessment date,postparameters : 2024-08-05 07:52:11.598964

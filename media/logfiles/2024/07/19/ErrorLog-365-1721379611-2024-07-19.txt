@@ -1,0 +1,4 @@
+Date : 19-07-2024
+Time : 14hrs:30min
+
+Error : Section : GetPeriodicity,Date : 01-Aug-2024 2:30:10 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,motorola,motorola edge 40,34,Error Message : Conflict on Periodicity Date,postparameters : 2024-07-19 08:05:50.367198

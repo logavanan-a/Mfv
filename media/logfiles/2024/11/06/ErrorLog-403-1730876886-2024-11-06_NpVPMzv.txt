@@ -1,0 +1,4 @@
+Date : 06-11-2024
+Time : 12hrs:38min
+
+Error : Section : getAssessmentlist,Date : Nov 6, 2024 12:38:09 PM,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,Realme,RMX1941,28,Error Message : Conflict on Assessment date,postparameters : 2024-10-29 07:26:06.387880

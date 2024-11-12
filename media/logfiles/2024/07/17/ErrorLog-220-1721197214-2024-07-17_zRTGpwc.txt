@@ -1,0 +1,18 @@
+Date : 17-07-2024
+Time : 11hrs:50min
+
+Error : Section : SyncSurveyActivity_Startsurvey,Date : 17 Jul 2024 11:50:14,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,samsung,SM-T505,31,Error Message : java.lang.IllegalArgumentException: invalid null provider
+	at com.android.internal.util.Preconditions.checkArgument(Preconditions.java:59)
+	at android.location.LocationManager.getLastKnownLocation(LocationManager.java:823)
+	at android.location.LocationManager.getLastKnownLocation(LocationManager.java:795)
+	at org.thesocialbytes.mfv.convenecode.location.MyCurrentLocationTracker.getLocation(MyCurrentLocationTracker.java:253)
+	at org.thesocialbytes.mfv.convenecode.utils.StartSurvey.setLocation(StartSurvey.java:294)
+	at org.thesocialbytes.mfv.convenecode.utils.StartSurvey.doInBackground(StartSurvey.java:315)
+	at org.thesocialbytes.mfv.convenecode.utils.StartSurvey.doInBackground(StartSurvey.java:51)
+	at android.os.AsyncTask$3.call(AsyncTask.java:394)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at android.os.AsyncTask$SerialExecutor$1.run(AsyncTask.java:305)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+	at java.lang.Thread.run(Thread.java:1012)
+,postparameters : {}

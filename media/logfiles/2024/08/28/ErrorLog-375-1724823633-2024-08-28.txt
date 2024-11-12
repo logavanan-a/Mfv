@@ -1,0 +1,4 @@
+Date : 28-08-2024
+Time : 11hrs:10min
+
+Error : Section : getBlocklist,Date : 28 Aug 2024 11:10:33 am,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,Nothing,A142,34,Error Message : Conflict on Block date,postparameters : 2024-08-06 09:31:47.288417

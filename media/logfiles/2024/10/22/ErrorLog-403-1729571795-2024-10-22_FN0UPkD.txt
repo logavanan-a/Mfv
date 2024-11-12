@@ -1,0 +1,4 @@
+Date : 22-10-2024
+Time : 10hrs:06min
+
+Error : Section : dynamicallySettingView,Date : 22-Oct-2024 10:06:35 am,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,samsung,SM-M526B,33,Error Message : Exception In Getting View ,postparameters : 

@@ -1,0 +1,4 @@
+Date : 13-08-2024
+Time : 13hrs:11min
+
+Error : Section : getChoicelist,Date : 13-Aug-2024 1:11:40 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,motorola,moto e13,33,Error Message : Conflict on Option date,postparameters : 2024-08-05 11:34:07.556617

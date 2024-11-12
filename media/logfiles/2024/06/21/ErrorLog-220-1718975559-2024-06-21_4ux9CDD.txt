@@ -1,0 +1,4 @@
+Date : 21-06-2024
+Time : 18hrs:42min
+
+Error : Section : getValidation,Date : 21-Jun-2024 6:42:38 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,motorola,moto e13,33,Error Message : Exception on not getting the validation,postparameters : 

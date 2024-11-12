@@ -1,0 +1,4 @@
+Date : 24-06-2024
+Time : 08hrs:28min
+
+Error : Section : getAssessmentlist,Date : Jun 24, 2024 8:28:28 AM,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,OPPO,CPH1931,29,Error Message : Conflict on Assessment date,postparameters : 2024-06-23 13:02:42.202179

@@ -1,0 +1,4 @@
+Date : 21-10-2024
+Time : 18hrs:37min
+
+Error : Section : dynamicallySettingView,Date : 21-Oct-2024 6:37:47 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,HONOR,ELI-NX9,34,Error Message : Exception In Getting View ,postparameters : 

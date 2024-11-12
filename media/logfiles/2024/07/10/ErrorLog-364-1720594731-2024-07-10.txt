@@ -1,0 +1,29 @@
+Date : 10-07-2024
+Time : 12hrs:28min
+
+Error : Section : SyncSurveyActivity_Startsurvey,Date : 10-Jul-2024 12:28:50 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,samsung,SM-A236E,34,Error Message : java.lang.SecurityException: uid 10359 does not have android.permission.ACCESS_COARSE_LOCATION or android.permission.ACCESS_FINE_LOCATION.
+	at android.os.Parcel.createExceptionOrNull(Parcel.java:3069)
+	at android.os.Parcel.createException(Parcel.java:3053)
+	at android.os.Parcel.readException(Parcel.java:3036)
+	at android.os.Parcel.readException(Parcel.java:2978)
+	at android.location.ILocationManager$Stub$Proxy.getLastLocation(ILocationManager.java:1322)
+	at android.location.LocationManager.getLastKnownLocation(LocationManager.java:904)
+	at android.location.LocationManager.getLastKnownLocation(LocationManager.java:871)
+	at org.thesocialbytes.mfv.convenecode.location.MyCurrentLocationTracker.getLocation(MyCurrentLocationTracker.java:253)
+	at org.thesocialbytes.mfv.convenecode.utils.StartSurvey.setLocation(StartSurvey.java:294)
+	at org.thesocialbytes.mfv.convenecode.utils.StartSurvey.doInBackground(StartSurvey.java:315)
+	at org.thesocialbytes.mfv.convenecode.utils.StartSurvey.doInBackground(StartSurvey.java:51)
+	at android.os.AsyncTask$3.call(AsyncTask.java:394)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at android.os.AsyncTask$SerialExecutor$1.run(AsyncTask.java:305)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+	at java.lang.Thread.run(Thread.java:1012)
+Caused by: android.os.RemoteException: Remote stack trace:
+	at com.android.server.location.LocationPermissions.enforceLocationPermission(LocationPermissions.java:119)
+	at com.android.server.location.LocationManagerService.getLastLocation(LocationManagerService.java:1267)
+	at android.location.ILocationManager$Stub.onTransact(ILocationManager.java:584)
+	at android.os.Binder.execTransactInternal(Binder.java:1375)
+	at android.os.Binder.execTransact(Binder.java:1311)
+
+,postparameters : {}

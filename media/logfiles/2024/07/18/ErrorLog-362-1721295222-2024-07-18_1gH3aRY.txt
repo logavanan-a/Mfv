@@ -1,0 +1,4 @@
+Date : 18-07-2024
+Time : 15hrs:03min
+
+Error : Section : GetPeriodicity,Date : 18-Jul-2024 3:03:41 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,Xiaomi,M2101K7BI,33,Error Message : Conflict on Periodicity Date,postparameters : 

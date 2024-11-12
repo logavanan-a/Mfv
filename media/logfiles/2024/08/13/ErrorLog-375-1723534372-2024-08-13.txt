@@ -1,0 +1,4 @@
+Date : 13-08-2024
+Time : 13hrs:02min
+
+Error : Section : getAssessmentlist,Date : 13 Aug 2024 1:02:51 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,Nothing,A063,34,Error Message : Conflict on Assessment date,postparameters : 2024-08-09 05:42:34.211159

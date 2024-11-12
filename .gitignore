@@ -1,24 +1,23 @@
-*~
-*#*
-*.pyc
-*.swp
-__pycache__
-/silk/**/*
-/static/silk/**/*
-*.ipynb
-*.sublime-project
-*.sublime-workspace
-/.vscode/**/*
-# /Convene2/database.py
-# /Convene2/storage.py
-# /Convene2/middleware.py
-/mfv_mis/settings.py
-# /Convene2/wsgi.py
-# common_methods.py
-*.xlsx
-*.sql
-*.zip
-*.gz
-*.bz2 
-/media/*
-!.gitignore
+# *~
+# *#*
+# *.pyc
+# *.swp
+# __pycache__
+# /silk/**/*
+# /static/silk/**/*
+# *.ipynb
+# *.sublime-project
+# *.sublime-workspace
+# /.vscode/**/*
+# # /Convene2/database.py
+# # /Convene2/storage.py
+# # /Convene2/middleware.py
+# /mfv_mis/settings.py
+# # /Convene2/wsgi.py
+# # common_methods.py
+# *.xlsx
+# *.sql
+# *.zip
+# *.bz2 
+# /media/*
+# !.gitignore

@@ -1,0 +1,4 @@
+Date : 14-08-2024
+Time : 15hrs:30min
+
+Error : Section : getAssessmentlist,Date : 14-Aug-2024 3:30:24 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,motorola,moto e13,33,Error Message : Conflict on Assessment date,postparameters : 2024-08-09 05:42:34.211159

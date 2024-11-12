@@ -1,0 +1,4 @@
+Date : 05-11-2024
+Time : 12hrs:36min
+
+Error : Section : dynamicallySettingView,Date : 5 Nov 2024 12:36:13 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,Nothing,A142,34,Error Message : Exception In Getting View ,postparameters : 

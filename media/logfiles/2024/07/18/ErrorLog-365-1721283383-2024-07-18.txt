@@ -1,0 +1,4 @@
+Date : 18-07-2024
+Time : 11hrs:46min
+
+Error : Section : GetPeriodicity,Date : 18 Jul 2024 11:46:23 am,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,Nothing,A142,34,Error Message : Conflict on Periodicity Date,postparameters : 2024-08-01 14:35:38

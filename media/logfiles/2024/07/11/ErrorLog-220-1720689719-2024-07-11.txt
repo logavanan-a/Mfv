@@ -1,0 +1,4 @@
+Date : 11-07-2024
+Time : 14hrs:51min
+
+Error : Section : getChoicelist,Date : 11-Jul-2024 2:51:58 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,samsung,SM-M336BU,34,Error Message : Conflict on Option date,postparameters : 2024-07-08 07:30:32.388003

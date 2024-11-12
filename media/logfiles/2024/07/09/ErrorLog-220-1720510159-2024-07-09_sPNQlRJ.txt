@@ -1,0 +1,19 @@
+Date : 09-07-2024
+Time : 12hrs:59min
+
+Error : Section : SyncSurveyActivity_SyncFunction,Date : 09-Jul-2025 12:59:18 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,samsung,SM-M526B,33,Error Message : org.json.JSONException: End of input at character 0 of 
+	at org.json.JSONTokener.syntaxError(JSONTokener.java:460)
+	at org.json.JSONTokener.nextValue(JSONTokener.java:101)
+	at org.json.JSONObject.<init>(JSONObject.java:168)
+	at org.json.JSONObject.<init>(JSONObject.java:185)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.fetchDatabaseValues(AutoSyncActivity.java:324)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.surveyIdListLooping(AutoSyncActivity.java:266)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.doInBackground(AutoSyncActivity.java:215)
+	at org.thesocialbytes.mfv.convenecode.AutoSyncActivity$SurveyUpdateTask.doInBackground(AutoSyncActivity.java:140)
+	at android.os.AsyncTask$3.call(AsyncTask.java:394)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at android.os.AsyncTask$SerialExecutor$1.run(AsyncTask.java:305)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1137)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:637)
+	at java.lang.Thread.run(Thread.java:1012)
+,postparameters : null

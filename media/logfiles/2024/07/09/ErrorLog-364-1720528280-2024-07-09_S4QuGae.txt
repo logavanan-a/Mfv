@@ -1,0 +1,4 @@
+Date : 09-07-2024
+Time : 18hrs:01min
+
+Error : Section : dynamicallySettingView,Date : Jul 9, 2024 6:01:20 PM,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,vivo,V2307,34,Error Message : Exception In Getting View ,postparameters : 

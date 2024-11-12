@@ -1,0 +1,4 @@
+Date : 18-07-2024
+Time : 17hrs:00min
+
+Error : Section : getAnswerFromResponse,Date : 18-Jul-2024 5:00:22 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : MOBILE: CONNECTED,Ip Address : localhost/127.0.0.1,realme,RMX2151,31,Error Message : Exception on getting the answer from response,postparameters : 

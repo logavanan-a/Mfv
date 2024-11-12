@@ -1,0 +1,4 @@
+Date : 10-07-2024
+Time : 13hrs:11min
+
+Error : Section : getAnswerFromResponse,Date : 10-Jul-2026 1:10:29 pm,Uid : ,Application : CRY,NetWorkType & NetwortStatus : WIFI: CONNECTED,Ip Address : localhost/127.0.0.1,realme,RMX2151,31,Error Message : Exception on getting the answer from response,postparameters : 
